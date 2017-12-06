@@ -1,0 +1,51 @@
+/*Bootstrap*/
+
+body {
+  padding-top: 70px;
+}
+
+.starter-template {
+  padding: 40px 15px;
+  text-align: center;
+}
+
+/*Cards*/
+
+#main ul {
+    padding: 0;
+    margin: 0;
+}
+
+#main li {
+    padding: 0;
+    float: left;
+    margin: 10px;
+    list-style: none;
+    outline: solid;
+    width: 6%;
+    height: 32%;
+}
+
+#main li img {
+    width: 100%;
+    height: 50%;
+    border: solid 1px;
+    opacity: 0;
+}
+
+#main li span {
+    width: 100%;
+    height: 50%;
+}
+
+#main img.face-up {
+    opacity: 1;
+}
+
+
+#dec {
+    padding: 5px;
+    outline: solid;
+    width: 100%;
+    height: 50%;
+}

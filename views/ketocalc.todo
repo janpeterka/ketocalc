@@ -1,0 +1,53 @@
+
+Login + Register
+	- design
+	+- credentials check
+	+- saving password
+
++Session
+	+- new session
+	+- all pages get info
+
+Database
+	+- connection
+	- loadUserDiets
+	- loadUserRecipes
+
+User page
+	- design
+	- load recipes from database
+	- load diets from database
+
+Recipe page
+	- design
+	- load recipe from database
+
+New recipe
+	- design
+	- AJAX Calculator
+	- save to database
+	- load diet from database
+
+New diet
+	- design
+	- save to database
+
+Edit diet
+	- design
+	- load/save to database
+
+New ingredint
+	- design
+	+- save to database
+
+Calculator
+	- make it work!!!
+
+Use case
+	- špatná registrace
+	- špatný login
+
+Deploy!
+	- change TEMPLATE_PATH
+	- change database info
+	- test
