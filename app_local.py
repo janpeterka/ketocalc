@@ -35,6 +35,10 @@ session_opts = {
 }
 
 
+def temp_print(input):
+    print(input)
+
+
 class Diet(object):
     """  For loading from database """
 
@@ -157,24 +161,13 @@ def loadDietRecipes(dietID):
     query = ("SELECT diets_has_recipes.recipes_id FROM diets_has_recipes WHERE diets_id='{}';".format(dietID))
     cursor.execute(query)
     response = cursor.fetchall()
-    # response = [word.strip() for word in response.split(',')]
-
-    print("getting response...")
-    print(response)
-    print(len(response))
 
     recipes = []
-    # if len(response) == 0:
-    #     return recipes
 
     for i in range(len(response)):
-        print(response[i][0])
         temp_recipe = loadRecipe(response[i][0])[0]    # get only recipe
         recipe = Recipe(temp_recipe.id, temp_recipe.name)
         recipes.append(recipe)
-
-    print("getting recipes...")
-    print(recipes)
 
     return recipes
     """ recipe (Recipe: id, name)"""
@@ -275,8 +268,6 @@ def saveUser(username, password_hash, firstname, lastname):
 
     db.commit()
 
-    # print("affected rows = {}".format(cursor.rowcount))
-
     return cursor.rowcount
 
 
@@ -284,21 +275,14 @@ def loadUser(username):
     db = dbConnect()
     cursor = db.cursor()
 
-    query = ("SELECT * FROM users WHERE username=" + "'" + username + "'" + ";")
+    query = ("SELECT * FROM users WHERE username='{}';".format(username))
     cursor.execute(query)
 
     response = cursor.fetchone()
-
     return response
 
 
 # MAIN
-
-# @route('test')
-# def test():
-#   return '''
-#   test
-#   '''
 
 @route('/')
 def main():
@@ -347,15 +331,25 @@ def check_login(username, password):
         return False
 
 
+@route('/logout')
+def logout():
+    session = getSession()
+    session['username'] = None
+    session.save()
+    redirect('/login')
+
+
 @get('/register')
 def register():
-    # print(getSession())
     return template('registerForm')
 
 
 @post('/register')
 def do_register():
     username = request.forms.get('username')
+    # check uniquness of username
+    if loadUser(username) is not None:
+        return "Uživatelské jméno nelze použít"
     temp_password = str(request.forms.get('password')).encode('utf-8')
     password_hash = hashlib.sha256(temp_password).hexdigest()
     firstname = request.forms.get('firstname')
@@ -367,6 +361,16 @@ def do_register():
         redirect('/login')
     else:
         return "Registrace neproběhla v pořádku"
+
+
+@post('/registerValidate')
+def validateRegister():
+    username = request.forms.get('username')
+    temp_print(loadUser(username))
+    if loadUser(username) is not None:
+        return False
+    else:
+        return True
 
 # USER PAGE
 
@@ -396,7 +400,6 @@ def selectDietAJAX():
         recipes[i] = json_recipe
 
     array_recipes = {'array': recipes, 'dietID': dietID}
-    print(array_recipes['array'])
     return array_recipes
 
 

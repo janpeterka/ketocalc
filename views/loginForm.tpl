@@ -8,12 +8,18 @@
 	% include('styleBody.tpl')
 </head>
 <body>
-	<form action="./login" method="post" class="form-group col-sm-6">
-            <label for="username">Přihlašovací jméno</label>
-            <input name="username" type="text" class="form-control" />
-            <label for="password">Heslo</label>
-            <input name="password" type="password" class="form-control" />
-            <input value="Login" type="submit" class="btn btn-primary" />
-        </form>
+	<div class="col-sm-6">
+		<form action="./login" method="post" class="form-group" >
+	        <label for="username">Přihlašovací email</label>
+	        <input name="username" type="text" class="form-control" />
+
+	        <label for="password">Heslo</label>
+	        <input name="password" type="password" class="form-control" />
+
+	        	<input value="Login" type="submit" class="btn btn-primary col-sm-3" />
+        	<a class="col-sm-2" href="/register">Registrovat</a>
+	    </form>
+	    
+	</div>
 </body>
 </html>

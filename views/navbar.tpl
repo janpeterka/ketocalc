@@ -1,4 +1,4 @@
- <nav class="navbar navbar-inverse navbar-fixed-top">
+<!--  <nav class="navbar navbar-expand navbar-fixed-top">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -15,17 +15,33 @@
                 <li><a href="/newrecipe">Nový recept</a></li>
                 <li><a href="/newdiet">Nová dieta</a></li>
                 <li> <a href="/newingredient">Nová surovina</a></li>
-                
-
-                <!-- <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                         Ukázky <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="Binary/binary.html">Dvojková soustava</a></li>
-                    </ul>
-                </li> -->
+                <li> <a href="/logout">Odhlásit se</a></li>
         </div>
-        <!--/.nav-collapse -->
     </div>
+</nav> -->
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" href="#">Ketogenní kalkulačka</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="/user">Hlavní stránka</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/newrecipe">Nový recept</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/newdiet">Nová dieta</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/newingredient">Nová surovina</a>
+        </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/logout">Odhlásit se</a>
+      </li>
+    </ul>
+  </div>
 </nav>

@@ -88,71 +88,74 @@
     </head>
     <body>
         % include('navbar.tpl')
-        <div class="col-sm-6">
+        <div class="container row">
+            <div class="col">
 
-            <div class="form-group col-sm-12">
-                <form id="addIngredientForm" method="POST" action="/addIngredientAJAX">
-                    <select name="ingredient" class="form-control">
-                    %for ingredient in ingredients:
-                        <option value="{{ingredient[0]}}">{{ingredient[1]}}</option>
-                    %end
-                    </select>
-                    <input id="ajaxButton" type="submit" class="btn btn-primary" value="Přidat surovinu" />
-                </form>
-            </div>
-            
+                <div class="form-group col-sm-12">
+                    <form id="addIngredientForm" method="POST" action="/addIngredientAJAX">
+                        <select name="ingredient" class="form-control">
+                        %for ingredient in ingredients:
+                            <option value="{{ingredient[0]}}">{{ingredient[1]}}</option>
+                        %end
+                        </select>
+                        <input id="ajaxButton" type="submit" class="btn btn-primary" value="Přidat surovinu" />
+                    </form>
+                </div>
+                
 
-            <div id="selectedIngredientsDiv" class="col-sm-12">
-                <table id="selectedIngredients" class="table">
-                    <tr>
-                        <th>ID</th>
-                        <th>Název</th>
-                        <th>Cukr</th>
-                        <th>Tuk</th>
-                        <th>Bílkovina</th>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="col-sm-12">
-                <form id="calcRecipeForm" method="POST" class="form-group" action="/calcRecipeAJAX">
-                    <label for="recipeDiet">Název diety</label>
-                    <select name="recipeDiet" class="form-control">
-                    %for diet in diets:
-                        <option value="{{diet.id}}">{{diet.name}}</option>
-                    %end
-                    </select>
-                    <input id="calcRecipe" type="submit" class="btn btn-primary" value="Spočítat množství!" />
-                    <input type="hidden" id="ingredientsArray" name="ingredientsArray" value="" />
-                </form>
-            </div>
-        </div>
-
-
-        <div class="col-sm-4" id=addRecipe>
-            <div class="col-sm-12">     
-                <form id="addRecipeForm" method="POST" action="/saveRecipeAJAX" class="form-group">
-                    <label for="recipeName">Název receptu</label>
-                    <input type="text" name="recipeName" class="form-control"/>
-                    
-                    <table id="selectedIngredientsAdd" class="table">
+                <div id="selectedIngredientsDiv" class="col-sm-12">
+                    <table id="selectedIngredients" class="table">
                         <tr>
                             <th>ID</th>
                             <th>Název</th>
                             <th>Cukr</th>
                             <th>Tuk</th>
                             <th>Bílkovina</th>
-                            <th>Množství</th>
                         </tr>
                     </table>
+                </div>
 
-                    <input id="addRecipe" type="submit" class="btn btn-primary" value="Uložit mezi recepty" />
-                    
-                    <input type="hidden" id="ingredientsArray2" name="ingredientsArray2" value="" />
-                    <input type="hidden" id="selectedDietID" name="selectedDietID" value="" />
-                    <input type="hidden" id="ingredientsAmount2" name="ingredientsAmount2" value="" />
+                <div class="col-sm-12">
+                    <form id="calcRecipeForm" method="POST" class="form-group" action="/calcRecipeAJAX">
+                        <label for="recipeDiet">Název diety</label>
+                        <select name="recipeDiet" class="form-control">
+                        %for diet in diets:
+                            <option value="{{diet.id}}">{{diet.name}}</option>
+                        %end
+                        </select>
+                        <input id="calcRecipe" type="submit" class="btn btn-primary" value="Spočítat množství!" />
+                        <input type="hidden" id="ingredientsArray" name="ingredientsArray" value="" />
+                    </form>
+                </div>
 
-                </form>
+            </div>
+
+
+            <div class="col-md-4" id=addRecipe>
+                <div class="col">     
+                    <form id="addRecipeForm" method="POST" action="/saveRecipeAJAX" class="form-group">
+                        <label for="recipeName">Název receptu</label>
+                        <input type="text" name="recipeName" class="form-control"/>
+                        
+                        <table id="selectedIngredientsAdd" class="table">
+                            <tr>
+                                <th>ID</th>
+                                <th>Název</th>
+                                <th>Cukr</th>
+                                <th>Tuk</th>
+                                <th>Bílkovina</th>
+                                <th>Množství</th>
+                            </tr>
+                        </table>
+
+                        <input id="addRecipe" type="submit" class="btn btn-primary" value="Uložit mezi recepty" />
+                        
+                        <input type="hidden" id="ingredientsArray2" name="ingredientsArray2" value="" />
+                        <input type="hidden" id="selectedDietID" name="selectedDietID" value="" />
+                        <input type="hidden" id="ingredientsAmount2" name="ingredientsAmount2" value="" />
+
+                    </form>
+                </div>
             </div>
         </div>
 
