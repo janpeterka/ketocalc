@@ -17,12 +17,12 @@ Database
 
 User page
 	-1 design
-	-4 load recipes from database -- no recipe in database
+	+-4 load recipes from database
 		- podle diety
 
 Recipe page
 	- design
-	-3 load recipe from database  -- no recipe in database
+	-3 load recipe from database
 	-2 
 
 
@@ -32,6 +32,7 @@ New recipe
 	+-4 save to database (w/ diet)
 		- hidden pole id ingrediencí
 	+- load diet from database
+	- visibility of 2nd form
 
 New diet
 	+- design
@@ -53,6 +54,9 @@ Calculator
 Use case
 	- špatná registrace
 	- špatný login
+
+Design
+	- navigation
 
 Deploy!
 	- change TEMPLATE_PATH

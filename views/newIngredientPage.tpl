@@ -8,6 +8,7 @@
         % include('styleBody.tpl')
     </head>
     <body>
+        % include('navbar.tpl')
         <form id="newIngredientForm" method="POST" action="/newIngredientAJAX" class="form-group col-sm-4">
 
             <label for="name">Název suroviny</label>

@@ -80,14 +80,6 @@
 
         </script>
         <style type="text/css" media="screen">
-            div{
-                /*margin: 5px;*/
-                padding: 5px;
-                /*border: 2px solid black;*/
-            }
-            input{
-                margin: 2px;
-            }
 
             #addRecipe{
                 /*visibility: hidden;*/
@@ -95,6 +87,7 @@
         </style>
     </head>
     <body>
+        % include('navbar.tpl')
         <div class="col-sm-6">
 
             <div class="form-group col-sm-12">

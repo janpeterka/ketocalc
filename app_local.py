@@ -89,38 +89,36 @@ def loadRecipe(recipeID):
     db = dbConnect()
     cursor = db.cursor()
 
-    query = ("SELECT * FROM recipes WHERE id=" + recipeID + ";")
+    query = ("SELECT * FROM recipes WHERE id='{}';".format(recipeID))
     cursor.execute(query)
     response = cursor.fetchone()
     recipe = Recipe(response[0], response[1])
 
-    query = ("SELECT * FROM ingredients JOIN recipes_has_ingredients ON ingredient.id=recipes_has_ingredients.ingredients_id JOIN recipes ON recipes_has_ingredients.recipes_id='{}';".format(recipeID))
+    query = ("SELECT * FROM ingredients JOIN recipes_has_ingredients ON ingredients.id=recipes_has_ingredients.ingredients_id JOIN recipes ON recipes_has_ingredients.recipes_id='{}';".format(recipeID))
     cursor.execute(query)
     response = cursor.fetchall()
 
     ingredientIDs = []
-    for i in len(response):
+    for i in range(len(response)):
         ingrID = response[i][0]
         ingredientIDs.append(ingrID)
     return [recipe, ingredientIDs]
+    """ recipe (Recipe: id, name); ingredientIDs (Array: ingredientID (Int))"""
 
 
 def saveRecipe(recipe, ingredients, dietID):
     """ recipe (Object: name), ingredients (Array of ingredient (Object: id, amount), dietID (Int)"""
+
     db = dbConnect()
     cursor = db.cursor()
 
     """ Save to recipe table """
-    # print(recipe.name)
     query = ("INSERT INTO recipes(name) VALUES ('{}');".format(recipe.name))
     cursor.execute(query)
     last_id = db.insert_id()
 
-    # print(last_id)
-
     """ Save to recipe/ingredient table"""
     for ingredient in ingredients:
-        # print (last_id, ingredient.id, ingredient.amount)
         query = ("INSERT INTO recipes_has_ingredients(recipes_id, ingredients_id, amount) VALUES({}, {}, {})".format(last_id, ingredient.id, ingredient.amount))
         cursor.execute(query)
 
@@ -151,6 +149,35 @@ def loadUserRecipes(username):
         recipes.append(temp_recipe)
 
     return recipes
+
+
+def loadDietRecipes(dietID):
+    db = dbConnect()
+    cursor = db.cursor()
+    query = ("SELECT diets_has_recipes.recipes_id FROM diets_has_recipes WHERE diets_id='{}';".format(dietID))
+    cursor.execute(query)
+    response = cursor.fetchall()
+    # response = [word.strip() for word in response.split(',')]
+
+    print("getting response...")
+    print(response)
+    print(len(response))
+
+    recipes = []
+    # if len(response) == 0:
+    #     return recipes
+
+    for i in range(len(response)):
+        print(response[i][0])
+        temp_recipe = loadRecipe(response[i][0])[0]    # get only recipe
+        recipe = Recipe(temp_recipe.id, temp_recipe.name)
+        recipes.append(recipe)
+
+    print("getting recipes...")
+    print(recipes)
+
+    return recipes
+    """ recipe (Recipe: id, name)"""
 
 
 # Diets
@@ -217,7 +244,7 @@ def loadIngredient(ingredientID):
     db = dbConnect()
     cursor = db.cursor()
 
-    query = ("SELECT * FROM ingredients WHERE id={};".format(int(ingredientID)))
+    query = ("SELECT * FROM ingredients WHERE id='{}';".format(int(ingredientID)))
     cursor.execute(query)
     response = cursor.fetchone()
 
@@ -315,7 +342,6 @@ def check_login(username, password):
     password_hash = hashlib.sha256(temp_password).hexdigest()
 
     if password_hash == pwdhash:
-
         return True
     else:
         return False
@@ -350,9 +376,28 @@ def user():
     session = getSession()
     if session.get('username') is None:
         redirect('/login')
-    recipes = loadUserRecipes(session['username'])
-    # recipes = []
-    return template('userPage', username=session['username'], recipes=recipes)
+
+    diets = loadUserDiets(session['username'])
+    recipes = loadDietRecipes(diets[0])
+    return template('userPage', username=session['username'], recipes=recipes, diets=diets)
+
+
+@route('/selectDietAJAX', method='POST')
+def selectDietAJAX():
+    session = getSession()
+    if session.get('username') is None:
+        redirect('/login')
+    dietID = request.forms.get('selectDiet')
+    recipes = loadDietRecipes(dietID)
+
+    for i in range(len(recipes)):
+        recipe = recipes[i]
+        json_recipe = {'id': recipe.id, 'name': recipe.name}
+        recipes[i] = json_recipe
+
+    array_recipes = {'array': recipes, 'dietID': dietID}
+    print(array_recipes['array'])
+    return array_recipes
 
 
 # NEW DIET
