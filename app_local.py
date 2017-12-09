@@ -98,7 +98,7 @@ def loadRecipe(recipeID):
     response = cursor.fetchone()
     recipe = Recipe(response[0], response[1])
 
-    query = ("SELECT * FROM ingredients JOIN recipes_has_ingredients ON ingredients.id=recipes_has_ingredients.ingredients_id JOIN recipes ON recipes_has_ingredients.recipes_id='{}';".format(recipeID))
+    query = ("SELECT recipes_has_ingredients.ingredients_id FROM recipes_has_ingredients WHERE recipes_has_ingredients.recipes_id='{}';".format(recipeID))
     cursor.execute(query)
     response = cursor.fetchall()
 
@@ -106,6 +106,7 @@ def loadRecipe(recipeID):
     for i in range(len(response)):
         ingrID = response[i][0]
         ingredientIDs.append(ingrID)
+
     return [recipe, ingredientIDs]
     """ recipe (Recipe: id, name); ingredientIDs (Array: ingredientID (Int))"""
 
@@ -132,7 +133,7 @@ def saveRecipe(recipe, ingredients, dietID):
 
     db.commit()
 
-    return
+    return last_id
 
 
 def loadUserRecipes(username):
@@ -309,7 +310,6 @@ def do_login():
         session = getSession()
         session['username'] = username
         session.save()
-        # print(session)
         redirect('/user')
     else:
         return "<p>Login failed.</p>"
@@ -366,7 +366,6 @@ def do_register():
 @post('/registerValidate')
 def validateRegister():
     username = request.forms.get('username')
-    temp_print(loadUser(username))
     if loadUser(username) is not None:
         return False
     else:
@@ -503,8 +502,8 @@ def addRecipeAJAX():
     recipe = type('', (), {})()
     recipe.name = request.forms.get("recipeName")
 
-    saveRecipe(recipe, ingredients, dietID)
-    redirect('/success')
+    last_id = saveRecipe(recipe, ingredients, dietID)
+    redirect('/recipe=' + str(last_id))
 
 
 @route('/recipe=<recipeID>')

@@ -45,6 +45,8 @@
                                 $('#selectedIngredientsAdd').append("<tr><td>" + ingredients[i].id + "</td><td>" + ingredients[i].name + "</td><td>" + ingredients[i].sugar+ "</td><td>" + ingredients[i].fat + "</td><td>" + ingredients[i].protein + "</td><td>" + ingredients[i].amount + "</td></tr>");
                             }
 
+                            $('#ingredientsArray').val("");
+
                             // ingredient IDs
                             
                             for (i = 0; i<ingredients.length; i++ ){

@@ -16,20 +16,21 @@ Login + Register
 	+- new session
 	+- all pages get info
 
-+Database
+Database
 	+- connection
 	+- loadUserDiets
 	+- loadUserRecipes
 	+-3 transaction (aby prošlo všechno nebo nic)
+	- UTF-8
 
 User page
-	-1 design
+	+-1 design
 	+-4 load recipes from database
 		- podle diety
 
 Recipe page
-	- design
-	-3 load recipe from database
+	+- design
+	+-3 load recipe from database
 	-2 
 
 
@@ -40,7 +41,9 @@ New recipe
 		- hidden pole id ingrediencí
 	+- load diet from database
 	- visibility of 2nd form
-	- success > redirect to new recipe
+	+- success > redirect to new recipe
+	- AJAX ingredient select
+		- only once
 
 New diet
 	+- design
