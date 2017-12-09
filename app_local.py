@@ -25,18 +25,18 @@ import hashlib
 # bottle.TEMPLATE_PATH = "~/Dropbox/Programming/PyServer/views/"
 # bottle.TEMPLATE_PATH.insert(0, '/home/jan/Dropbox/Programming/KetoCalc')
 
-bottle.TEMPLATE_PATH.insert(0, '/home/jan/Dropbox/Programming/KetoCalc/views')
+bottle.TEMPLATE_PATH.insert(0, '/home/jan/Dropbox/Programming/ketoCalc/views')
 
 session_opts = {
     'session.type': 'file',
-    'session.cookie_expires': 600,
+    'session.cookie_expires': 60000,
     'session.data_dir': './data',
     'session.auto': True
 }
 
 
 class Diet(object):
-    """  """
+    """  For loading from database """
 
     def __init__(self, dbID, name, sugar, fat, protein):
         super(Diet, self).__init__()
@@ -45,6 +45,28 @@ class Diet(object):
         self.sugar = sugar
         self.fat = fat
         self.protein = protein
+
+
+class Recipe(object):
+    """  For loading from database """
+
+    def __init__(self, dbID, name):
+        super(Recipe, self).__init__()
+        self.id = dbID
+        self.name = name
+
+
+class Ingredient(object):
+    """  For loading from database """
+
+    def __init__(self, dbID, name, sugar, fat, protein):
+        super(Ingredient, self).__init__()
+        self.id = dbID
+        self.name = name
+        self.sugar = sugar
+        self.fat = fat
+        self.protein = protein
+        self.amount = 0
 
 
 app = SessionMiddleware(bottle.app(), session_opts)
@@ -59,7 +81,6 @@ def getSession():
 # DATABASE related functions
 def dbConnect():
     db = MySQLdb.connect(user='root', password='mainframe', database='keto_db')
-
     return db
 
 
@@ -70,40 +91,66 @@ def loadRecipe(recipeID):
 
     query = ("SELECT * FROM recipes WHERE id=" + recipeID + ";")
     cursor.execute(query)
+    response = cursor.fetchone()
+    recipe = Recipe(response[0], response[1])
+
+    query = ("SELECT * FROM ingredients JOIN recipes_has_ingredients ON ingredient.id=recipes_has_ingredients.ingredients_id JOIN recipes ON recipes_has_ingredients.recipes_id='{}';".format(recipeID))
+    cursor.execute(query)
     response = cursor.fetchall()
-    # db.commit()
-    return response
+
+    ingredientIDs = []
+    for i in len(response):
+        ingrID = response[i][0]
+        ingredientIDs.append(ingrID)
+    return [recipe, ingredientIDs]
 
 
-def saveRecipe(recipe, ingredients):         # recipe as object(name), ingredients as objects (IDs + amounts)
+def saveRecipe(recipe, ingredients, dietID):
+    """ recipe (Object: name), ingredients (Array of ingredient (Object: id, amount), dietID (Int)"""
     db = dbConnect()
     cursor = db.cursor()
 
-    query = ("INSERT INTO recipes(name) VALUES ({});".format(recipe.name))
+    """ Save to recipe table """
+    # print(recipe.name)
+    query = ("INSERT INTO recipes(name) VALUES ('{}');".format(recipe.name))
     cursor.execute(query)
     last_id = db.insert_id()
+
+    # print(last_id)
+
+    """ Save to recipe/ingredient table"""
     for ingredient in ingredients:
-        query = ("INSERT INTO recipes_has_ingredients(recipes_id, ingredients_id, amount) VALUES('{}', '{}', '{}')".format(last_id, ingredient.id, ingredient.amount))
+        # print (last_id, ingredient.id, ingredient.amount)
+        query = ("INSERT INTO recipes_has_ingredients(recipes_id, ingredients_id, amount) VALUES({}, {}, {})".format(last_id, ingredient.id, ingredient.amount))
         cursor.execute(query)
+
+    """ save to diet/recipe table"""
+    query = ("INSERT INTO diets_has_recipes(diets_id, recipes_id) VALUES ({}, {});".format(dietID, last_id))
+    cursor.execute(query)
 
     db.commit()
 
     return
 
 
-# def loadUserRecipes(username):
-#     db = dbConnect()
-#     cursor = db.cursor()
+def loadUserRecipes(username):
+    db = dbConnect()
+    cursor = db.cursor()
+    temp_query = ("SELECT users.id FROM users WHERE users.username = '{}';".format(username))
+    cursor.execute(temp_query)
+    user_id = cursor.fetchone()
 
-#     query = ("SELECT * FROM recipes JOIN WHERE id=" + recipeID + ";")
-#     cursor.execute(query)
-#     response = cursor.fetchall()
-#     # db.commit()
-#     return response
+    query = ("SELECT recipes.id, recipes.name FROM recipes JOIN diets_has_recipes ON recipes.id=diets_has_recipes.recipes_id JOIN diets ON diets.id=diets_has_recipes.diets_id JOIN users_has_diets ON diets.id=users_has_diets.diets_id JOIN users ON users_has_diets.users_id= '{}';".format(user_id[0]))
+    cursor.execute(query)
+    response = cursor.fetchall()
 
-#     SELECT Orders.OrderID, Customers.CustomerName, Orders.OrderDate
-# FROM Orders
-# INNER JOIN Customers ON Orders.CustomerID=Customers.CustomerID;
+    # convert to array of objects
+    recipes = []
+    for i in range(len(response)):
+        temp_recipe = Recipe(response[i][0], response[i][1])
+        recipes.append(temp_recipe)
+
+    return recipes
 
 
 # Diets
@@ -141,8 +188,6 @@ def loadUserDiets(username):
     cursor.execute(temp_query)
     user_id = cursor.fetchone()
 
-    print(user_id[0])
-
     query = ("SELECT diets.id, diets.name, diets.sugar, diets.fat, diets.protein FROM diets JOIN users_has_diets ON diets.id=users_has_diets.diets_id JOIN users ON users_has_diets.users_id= '{}' ;".format(user_id[0]))
     cursor.execute(query)
     response = cursor.fetchall()
@@ -153,13 +198,7 @@ def loadUserDiets(username):
         temp_diet = Diet(response[i][0], response[i][1], response[i][2], response[i][3], response[i][4], )
         diets.append(temp_diet)
 
-    print(diets)
     return diets
-
-#   SELECT Orders.OrderID, Customers.CustomerName, Orders.OrderDate
-#   FROM Orders
-#   INNER JOIN Customers ON Orders.CustomerID=Customers.CustomerID;
-    # pass
 
 
 # Ingredients
@@ -178,11 +217,13 @@ def loadIngredient(ingredientID):
     db = dbConnect()
     cursor = db.cursor()
 
-    query = ("SELECT * FROM ingredients WHERE id=" + ingredientID + ";")
+    query = ("SELECT * FROM ingredients WHERE id={};".format(int(ingredientID)))
     cursor.execute(query)
     response = cursor.fetchone()
 
-    return response
+    ingredient = Ingredient(response[0], response[1], response[2], response[3], response[4])
+
+    return ingredient
 
 
 def saveIngredient(ingredient, username):  # ingredient as object (name, sugar, fat, protein)
@@ -226,6 +267,11 @@ def loadUser(username):
 
 # MAIN
 
+# @route('test')
+# def test():
+#   return '''
+#   test
+#   '''
 
 @route('/')
 def main():
@@ -304,10 +350,9 @@ def user():
     session = getSession()
     if session.get('username') is None:
         redirect('/login')
-    username = session['username']
-    # recipes = loadUserRecipes(username)
-    recipes = []
-    return template('userPage', username=username, recipes=recipes)
+    recipes = loadUserRecipes(session['username'])
+    # recipes = []
+    return template('userPage', username=session['username'], recipes=recipes)
 
 
 # NEW DIET
@@ -352,7 +397,8 @@ def newRecipe():
 
     diets = loadUserDiets(session['username'])
     ingredients = loadAllIngredients(session['username'])
-    return template('newRecipePage', ingredients=ingredients, diets=diets)
+    ingredientsArray = []
+    return template('newRecipePage', ingredients=ingredients, diets=diets, ingredientsArray=ingredientsArray)
 
 
 @route('/addIngredientAJAX', method='POST')
@@ -361,7 +407,7 @@ def addIngredienttoRecipeAJAX():
     if session.get('username') is None:
         redirect('/login')
     ingredient = loadIngredient(request.forms.get("ingredient"))
-    json_ingredient = {'id': ingredient[0], 'name': ingredient[1], 'sugar': ingredient[2], 'fat': ingredient[3], 'protein': ingredient[4]}
+    json_ingredient = {'id': ingredient.id, 'name': ingredient.name, 'sugar': ingredient.sugar, 'fat': ingredient.fat, 'protein': ingredient.protein}
     return json_ingredient
 
 
@@ -370,7 +416,58 @@ def calcRecipeAJAX():
     session = getSession()
     if session.get('username') is None:
         redirect('/login')
-    return
+
+    ingredients = request.forms.get("ingredientsArray")
+    ingredients = [word.strip() for word in ingredients.split(',')]
+
+    dietID = request.forms.get("recipeDiet")
+
+    for i in range(len(ingredients)):
+        ingredient = loadIngredient(ingredients[i])
+        json_ingredient = {'id': ingredient.id, 'name': ingredient.name, 'sugar': ingredient.sugar, 'fat': ingredient.fat, 'protein': ingredient.protein, 'amount': ingredient.amount}
+        ingredients[i] = json_ingredient
+
+    array_ingredients = {'array': ingredients, 'dietID': dietID}
+    return array_ingredients
+
+
+@route('/saveRecipeAJAX', method='POST')
+def addRecipeAJAX():
+    session = getSession()
+    if session.get('username') is None:
+        redirect('/login')
+
+    dietID = request.forms.get("selectedDietID")
+
+    temp_ingredients = request.forms.get("ingredientsArray2")
+    temp_ingredients = [word.strip() for word in temp_ingredients.split(',')]
+
+    amounts = request.forms.get("ingredientsAmount2")
+    amounts = [word.strip() for word in amounts.split(',')]
+
+    ingredients = []
+    for i in range(len(temp_ingredients)):
+        ingredient = type('', (), {})()
+        ingredient.id = temp_ingredients[i]
+        ingredient.amount = amounts[i]
+        ingredients.append(ingredient)
+
+    recipe = type('', (), {})()
+    recipe.name = request.forms.get("recipeName")
+
+    saveRecipe(recipe, ingredients, dietID)
+    redirect('/success')
+
+
+@route('/recipe=<recipeID>')
+def showRecipe(recipeID):
+    recipe = loadRecipe(recipeID)[0]
+    ingredientIDs = loadRecipe(recipeID)[1]
+    ingredients = []
+    for ID in ingredientIDs:
+        ingredients.append(loadIngredient(ID))
+
+    return template('recipePage', recipe=recipe, ingredients=ingredients)
 
 
 # NEW INGREDIENT PAGE
@@ -406,6 +503,12 @@ def successPage():
     pass
 
 # CALCULATE RECIPE
+
+
+# S'MORE
+@route('/index.html')
+def indexhtml():
+    redirect('/')
 
 
 # ERROR

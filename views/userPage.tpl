@@ -3,18 +3,25 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Login to KetoCalc</title>
+	<title>Vítejte {{username}}</title>
+    % include('bootstrap.tpl')
+    % include('styleBody.tpl')
 </head>
 <body>
-	hi {{username}} <br>
-    <a href="/newdiet">Make new diet</a> <br>
-    <a href="/newrecipe">Make new recipe</a> <br>
+    
+    <div>
+        <a href="/newdiet">Make new diet</a> <br>
+        <a href="/newrecipe">Make new recipe</a> <br>
+    </div>
 
-    <ul>
-    %for recipe in recipes:
-        <li><a href="/recipe={{recipe}}">{{recipe}}</a></li>
-    %end
-    </ul>
 
+    <div>
+        Seznam receptů:
+        <ul>
+        %for recipe in recipes:
+            <li><a href="/recipe={{recipe.id}}">{{recipe.name}}</a></li>
+        %end
+        </ul>
+    </div>
 </body>
 </html>
