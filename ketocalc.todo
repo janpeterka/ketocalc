@@ -40,34 +40,33 @@ New recipe
 	+-4 save to database (w/ diet)
 		- hidden pole id ingrediencí
 	+- load diet from database
-	- visibility of 2nd form
+	+- visibility of 2nd form
 	+- success > redirect to new recipe
-	- AJAX ingredient select
+	+- AJAX ingredient select
 		- only once
 
-New diet
++New diet
 	+- design
 	+- save to database
 
-Edit diet
-	- design
-	-3 load from database
-	-3 save to database
++Show diet
+	+- design
+	+-3 load from database
 
 New ingredint
 	+- design
 	+- save to database
-	-3 ml nebo gramy? V čem ukládat, v čem měřit?
+	-4 ml nebo gramy? V čem ukládat, v čem měřit?
 
 Calculator
 	-2 make it work!!!
 
-Use case
-	- špatná registrace
-	- špatný login
++Use case
+	+- špatná registrace
+	+- špatný login
 
-Design
-	- navigation
++Design
+	+- navigation
 
 Deploy!
 	- change TEMPLATE_PATH

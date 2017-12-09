@@ -1,10 +1,8 @@
 <style>
-body{
-	/*margin: 15px;*/
-	/*padding-top: 70px;*/
-}
+
 input{
-	margin: 2px;
+	margin-top: 5px;
+	margin-bottom: 5px;
 }
 
 .navbar{

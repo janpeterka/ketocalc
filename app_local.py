@@ -179,11 +179,14 @@ def loadDiet(dietID):
     db = dbConnect()
     cursor = db.cursor()
 
-    query = ("SELECT * FROM diets WHERE id=" + dietID + ";")
+    query = ("SELECT * FROM diets WHERE id='{}';".format(dietID))
     cursor.execute(query)
-    response = cursor.fetchall()
+    response = cursor.fetchone()
 
-    return response
+    diet = Diet(response[0], response[1], response[2], response[3], response[4])
+
+    return diet
+    """ diet (Diet: id, name, sugar, fat, protein) """
 
 
 def saveDiet(diet):             # diet as object (name, sugar, fat, protein)
@@ -310,9 +313,11 @@ def do_login():
         session = getSession()
         session['username'] = username
         session.save()
+        temp_print("True")
         redirect('/user')
     else:
-        return "<p>Login failed.</p>"
+        temp_print("False")
+        return False
 
 
 def check_login(username, password):
@@ -426,13 +431,23 @@ def addDietAJAX():
     redirect('/user')
 
 
-# EDIT DIET PAGE
-@route('/editdiet=<dietID>')
-def editDietShow(dietID):
+# SHOW DIET PAGE
+@route('/diet=<dietID>')
+def showDiet(dietID):
     session = getSession()
     if session.get('username') is None:
         redirect('/login')
-    return template('')
+
+    # recipe = loadRecipe(recipeID)[0]
+    # ingredientIDs = loadRecipe(recipeID)[1]
+    # ingredients = []
+    # for ID in ingredientIDs:
+    #     ingredients.append(loadIngredient(ID))
+
+    diet = loadDiet(dietID)
+    recipes = loadDietRecipes(diet.id)
+
+    return template('dietPage', diet=diet, recipes=recipes)
 
 
 # NEW RECIPE PAGE
@@ -444,8 +459,17 @@ def newRecipe():
 
     diets = loadUserDiets(session['username'])
     ingredients = loadAllIngredients(session['username'])
-    ingredientsArray = []
-    return template('newRecipePage', ingredients=ingredients, diets=diets, ingredientsArray=ingredientsArray)
+    temp_print(ingredients)
+    temp_ingredients = []
+    for ingredient in ingredients:
+        temp_ingredient = Ingredient(ingredient[0], ingredient[1], ingredient[2], ingredient[3], ingredient[4])
+        temp_ingredients.append(temp_ingredient)
+
+    temp_print(temp_ingredients)
+    temp_ingredients.sort(key=lambda x: x.name)
+    temp_ingredients = sorted(temp_ingredients, key=lambda x: x.name)
+    temp_print(temp_ingredients)
+    return template('newRecipePage', ingredients=temp_ingredients, diets=diets)
 
 
 @route('/addIngredientAJAX', method='POST')

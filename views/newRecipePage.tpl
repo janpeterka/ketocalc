@@ -24,6 +24,9 @@
                                 $('#ingredientsArray').val(temp_array + ", " + response.id);
                             }
 
+                            // remove option
+                            $("#ingredientSelect option[value='"+response.id+"']").remove();
+
                         },
                         error: function(error) {
                             console.log(error);
@@ -72,6 +75,9 @@
                             // diet ID
                             $('#selectedDietID').val(response.dietID);
 
+                            // change visibility
+                            $("#addRecipe").css('visibility', 'visible');
+
                         },
                         error: function(error) {
                             console.log(error);
@@ -84,7 +90,7 @@
         <style type="text/css" media="screen">
 
             #addRecipe{
-                /*visibility: hidden;*/
+                visibility: hidden;
             }
         </style>
     </head>
@@ -95,9 +101,9 @@
 
                 <div class="form-group col-sm-12">
                     <form id="addIngredientForm" method="POST" action="/addIngredientAJAX">
-                        <select name="ingredient" class="form-control">
+                        <select id="ingredientSelect" name="ingredient" class="form-control">
                         %for ingredient in ingredients:
-                            <option value="{{ingredient[0]}}">{{ingredient[1]}}</option>
+                            <option name={{ingredient.name}} value="{{ingredient.id}}">{{ingredient.name}}</option>
                         %end
                         </select>
                         <input id="ajaxButton" type="submit" class="btn btn-primary" value="Přidat surovinu" />
@@ -134,30 +140,28 @@
 
 
             <div class="col-md-4" id=addRecipe>
-                <div class="col">     
-                    <form id="addRecipeForm" method="POST" action="/saveRecipeAJAX" class="form-group">
-                        <label for="recipeName">Název receptu</label>
-                        <input type="text" name="recipeName" class="form-control"/>
-                        
-                        <table id="selectedIngredientsAdd" class="table">
-                            <tr>
-                                <th>ID</th>
-                                <th>Název</th>
-                                <th>Cukr</th>
-                                <th>Tuk</th>
-                                <th>Bílkovina</th>
-                                <th>Množství</th>
-                            </tr>
-                        </table>
+                <form id="addRecipeForm" method="POST" action="/saveRecipeAJAX" class="form-group">
+                    <label for="recipeName">Název receptu</label>
+                    <input type="text" name="recipeName" class="form-control"/>
+                    
+                    <table id="selectedIngredientsAdd" class="table">
+                        <tr>
+                            <th>ID</th>
+                            <th>Název</th>
+                            <th>Cukr</th>
+                            <th>Tuk</th>
+                            <th>Bílkovina</th>
+                            <th>Množství</th>
+                        </tr>
+                    </table>
 
-                        <input id="addRecipe" type="submit" class="btn btn-primary" value="Uložit mezi recepty" />
-                        
-                        <input type="hidden" id="ingredientsArray2" name="ingredientsArray2" value="" />
-                        <input type="hidden" id="selectedDietID" name="selectedDietID" value="" />
-                        <input type="hidden" id="ingredientsAmount2" name="ingredientsAmount2" value="" />
+                    <input id="addRecipeButton" type="submit" class="btn btn-primary" value="Uložit mezi recepty" />
+                    
+                    <input type="hidden" id="ingredientsArray2" name="ingredientsArray2" value="" />
+                    <input type="hidden" id="selectedDietID" name="selectedDietID" value="" />
+                    <input type="hidden" id="ingredientsAmount2" name="ingredientsAmount2" value="" />
 
-                    </form>
-                </div>
+                </form>
             </div>
         </div>
 
