@@ -202,7 +202,7 @@ def saveDiet(diet):             # diet as object (name, sugar, fat, protein)
 
     db.commit()
 
-    return
+    return last_id
 
 
 def loadUserDiets(username):
@@ -212,7 +212,7 @@ def loadUserDiets(username):
     cursor.execute(temp_query)
     user_id = cursor.fetchone()
 
-    query = ("SELECT diets.id, diets.name, diets.sugar, diets.fat, diets.protein FROM diets JOIN users_has_diets ON diets.id=users_has_diets.diets_id JOIN users ON users_has_diets.users_id= '{}' ;".format(user_id[0]))
+    query = ("SELECT diets.id, diets.name, diets.sugar, diets.fat, diets.protein FROM diets JOIN users_has_diets ON diets.id=users_has_diets.diets_id WHERE users_has_diets.users_id= '{}' ;".format(user_id[0]))
     cursor.execute(query)
     response = cursor.fetchall()
 
@@ -256,10 +256,11 @@ def saveIngredient(ingredient, username):  # ingredient as object (name, sugar, 
 
     query = ("INSERT INTO ingredients(name, sugar, fat, protein, author) VALUES ('{}', '{}', '{}', '{}', '{}');".format(ingredient.name, ingredient.sugar, ingredient.fat, ingredient.protein, username))
     cursor.execute(query)
+    last_id = db.insert_id()
 
     db.commit()
 
-    return
+    return last_id
 
 
 # Users
@@ -290,8 +291,10 @@ def loadUser(username):
 
 @route('/')
 def main():
-    dbConnect()
-    return template('index')
+    if getSession().get('username') is not None:
+        redirect('/user')
+    else:
+        redirect('login')
 
 
 # LOGIN
@@ -313,10 +316,8 @@ def do_login():
         session = getSession()
         session['username'] = username
         session.save()
-        temp_print("True")
         redirect('/user')
     else:
-        temp_print("False")
         return False
 
 
@@ -346,7 +347,7 @@ def logout():
 
 @get('/register')
 def register():
-    return template('registerForm')
+    return template('registerForm', username="", firstname="", lastname="", problem="")
 
 
 @post('/register')
@@ -355,10 +356,28 @@ def do_register():
     # check uniquness of username
     if loadUser(username) is not None:
         return "Uživatelské jméno nelze použít"
+
     temp_password = str(request.forms.get('password')).encode('utf-8')
+    temp_password_2 = str(request.forms.get('againPassword')).encode('utf-8')
+
     password_hash = hashlib.sha256(temp_password).hexdigest()
     firstname = request.forms.get('firstname')
+
     lastname = request.forms.get('lastname')
+
+    problem = ""
+
+    if temp_password_2 != temp_password:
+        problem = "Hesla jsou rozdílná!"
+    if len(temp_password) < 8:
+        problem = "Heslo je příliš krátké"
+    if len(firstname) == 0:
+        problem = "Jméno je příliš krátké"
+    if len(lastname) == 0:
+        problem = "Příjmení je příliš krátké"
+
+    if problem != "":
+        return template('registerForm', username=username, firstname=firstname, lastname=lastname, problem=problem)
 
     response = saveUser(username, password_hash, firstname, lastname)
 
@@ -371,10 +390,14 @@ def do_register():
 @post('/registerValidate')
 def validateRegister():
     username = request.forms.get('username')
+    # print(username)
+    # print(loadUser(username))
     if loadUser(username) is not None:
-        return False
+        # print("User found")
+        return "False"
     else:
-        return True
+        # print("No user")
+        return "True"
 
 # USER PAGE
 
@@ -384,10 +407,8 @@ def user():
     session = getSession()
     if session.get('username') is None:
         redirect('/login')
-
     diets = loadUserDiets(session['username'])
-    recipes = loadDietRecipes(diets[0])
-    return template('userPage', username=session['username'], recipes=recipes, diets=diets)
+    return template('userPage', username=session['username'], diets=diets)
 
 
 @route('/selectDietAJAX', method='POST')
@@ -423,12 +444,20 @@ def addDietAJAX():
         redirect('/login')
     diet = type('', (), {})()               # Magický trik, jak udělat prázdný objekt
     diet.name = request.forms.get("name")
+    if len(diet.name) == 0:
+        return "Vyplňte název"
     diet.sugar = request.forms.get("sugar")
+    if len(diet.sugar) == 0:
+        return "Vyplňte množství cukru"
     diet.fat = request.forms.get("fat")
+    if len(diet.fat) == 0:
+        return "Vyplňte množství tuku"
     diet.protein = request.forms.get("protein")
+    if len(diet.protein) == 0:
+        return "Vyplňte množství bílkoviny"
     diet.username = session['username']
-    saveDiet(diet)
-    redirect('/user')
+    last_id = saveDiet(diet)
+    redirect('/diet={}'.format(last_id))
 
 
 # SHOW DIET PAGE
@@ -437,12 +466,6 @@ def showDiet(dietID):
     session = getSession()
     if session.get('username') is None:
         redirect('/login')
-
-    # recipe = loadRecipe(recipeID)[0]
-    # ingredientIDs = loadRecipe(recipeID)[1]
-    # ingredients = []
-    # for ID in ingredientIDs:
-    #     ingredients.append(loadIngredient(ID))
 
     diet = loadDiet(dietID)
     recipes = loadDietRecipes(diet.id)
@@ -459,16 +482,13 @@ def newRecipe():
 
     diets = loadUserDiets(session['username'])
     ingredients = loadAllIngredients(session['username'])
-    temp_print(ingredients)
     temp_ingredients = []
     for ingredient in ingredients:
         temp_ingredient = Ingredient(ingredient[0], ingredient[1], ingredient[2], ingredient[3], ingredient[4])
         temp_ingredients.append(temp_ingredient)
 
-    temp_print(temp_ingredients)
     temp_ingredients.sort(key=lambda x: x.name)
     temp_ingredients = sorted(temp_ingredients, key=lambda x: x.name)
-    temp_print(temp_ingredients)
     return template('newRecipePage', ingredients=temp_ingredients, diets=diets)
 
 
@@ -562,7 +582,7 @@ def newIngredienttoRecipeAJAX():
     ingredient.fat = request.forms.get("fat")
     ingredient.protein = request.forms.get("protein")
     saveIngredient(ingredient, session['username'])
-    redirect('/success')
+    redirect('/newrecipe')
 
 
 @route('/success')

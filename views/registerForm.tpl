@@ -14,8 +14,8 @@
                 url: '/register',
                 data: $(this).serialize(),
                 success: function(response) {
-                    console.log(response);
-                    alert(response);
+                    $("#genProblem").empty();
+                    $("#genProblem").append("<small class='form-text'>" + response + "</small>");
                 },
                 error: function(error) {
                     console.log(error);
@@ -30,21 +30,19 @@
                 url: '/registerValidate',
                 data: $(this).serialize(),
                 success: function(response) {
-                    if (!response){
-                        // console.log("username ok");
+                    if (response=="True") {
                         $("#wrongUsername").empty();
-                    } else {
-                        // console.log(response);
+                    } else if (response=="False") {
                         $("#wrongUsername").empty();
                         $("#wrongUsername").append("<small class='form-text'>Jméno nemůžete použít!</small>");
                         // alert(response);
-                    }
+                    } else {
 
+                    }
                 },
                 error: function(error) {
                     console.log(error);
                 }
-
             });
             e.preventDefault();
         });
@@ -71,32 +69,34 @@
 	<form id="registerForm" action="/register" method="post" class="col-sm-6">
 
             <label for="username">Přihlašovací email</label>
-            <input id="username" name="username" type="email" class="form-control" />
+            <input id="username" name="username" type="email" class="form-control" required value={{username}} >
             <span id=wrongUsername></span>
 
             <label for="password">Heslo (alespoň 8 znaků)</label>
-            <input id="password" name="password" type="password" class="form-control" />
+            <input id="password" name="password" type="password" class="form-control" required />
             <span id=wrongPassword></span>
 
             <label for="password">Heslo znovu</label>
-            <input id="againPassword" name="password" type="password" class="form-control" />
+            <input id="againPassword" name="againPassword" type="password" class="form-control" required />
             <span id=diffPassword></span>
 
             <div class="form-row">
 
                 <div class="col">
                     <label for="firstname">Jméno</label>
-                    <input name="firstname" type="text" class="form-control" />
+                    <input name="firstname" type="text" class="form-control" required value={{firstname}} >
                 </div>
                 
                 <div class="col">
                     <label for="lastname">Příjmení</label>
-                    <input name="lastname" type="text" class="form-control" /> <br>
+                    <input name="lastname" type="text" class="form-control" required value={{lastname}} > <br>
                 </div>
 
             </div>
 
-            <input id="registerButton" value="Registrovat" type="submit" class="btn btn-primary"/>
+            <input id="registerButton" value="Registrovat" type="submit" class="btn btn-primary" /><br>
+            <span id=genProblem class="" style="color: red;">{{problem}}</span>
         </form>
+
 </body>
 </html>
