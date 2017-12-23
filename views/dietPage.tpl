@@ -6,36 +6,6 @@
 	<title>Dieta: {{diet.name}}</title>
     % include('bootstrap.tpl')
     % include('styleBody.tpl')
-
-    <!-- <script type="text/javascript">
-        $(document).on("submit", "#selectDietForm", function(e) {
-            $.ajax({
-                type: 'POST',
-                url: '/selectDietAJAX',
-                data: $(this).serialize(),
-                success: function(response) {
-                    var recipes = response.array;
-                    // console.log(recipes);
-                    // console.log(recipes[0]);
-                    // console.log(recipes[0].id);
-
-                    var dietID = response.dietID[0];
-                    // recipes to table
-                    $('#recipeList').empty();
-                    // $('#recipeList').append("<label for='recipeList'>" + dietID + "</label>");
-                    for (i = 0; i<response.array.length; i++ ){
-                        console.log(recipes[i].name);
-                        $('#recipeList').append("<li><a href='/recipe=" + recipes[i].id + "'>" + recipes[i].name + "</a></li>");
-                    }
-                },
-                error: function(error) {
-                    console.log(error);
-                }
-
-            });
-            e.preventDefault();
-        });
-    </script> -->
 </head>
 <body>
     % include('navbar.tpl')

@@ -1,0 +1,7 @@
+
+bottle.TEMPLATE_PATH.insert(0, '/home/peterkj1/python/views')
+
+# DATABASE related functions
+def dbConnect():
+    db = MySQLdb.connect(user='peterkj1', password='Hyperb0l0id_Kraken', database='peterkj1')
+    return db

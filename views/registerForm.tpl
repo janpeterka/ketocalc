@@ -94,8 +94,9 @@
 
             </div>
 
-            <input id="registerButton" value="Registrovat" type="submit" class="btn btn-primary" /><br>
-            <span id=genProblem class="" style="color: red;">{{problem}}</span>
+            <input id="registerButton" value="Registrovat" type="submit" class="btn btn-primary" />
+            <a class="col-sm-2" href="/login">Přihlásit se</a><br>
+            <span id=genProblem class="problem" >{{problem}}</span>
         </form>
 
 </body>

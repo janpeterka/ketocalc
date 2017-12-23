@@ -12,9 +12,8 @@
         $(document).ready(function() {
             $("#selectDietForm").submit();
         });
-// 
+
         $(document).on("submit", "#selectDietForm", function(e) {
-        // $(document).on("click", "#selectDiet", function(e) {
             $.ajax({
                 type: 'POST',
                 url: '/selectDietAJAX',
@@ -25,7 +24,6 @@
                     // recipes to table
                     $('#recipeList').empty();
                     for (i = 0; i<response.array.length; i++ ){
-                        console.log(recipes[i].name);
                         $('#recipeList').append("<li><a href='/recipe=" + recipes[i].id + "'>" + recipes[i].name + "</a></li>");
                     }
                 },

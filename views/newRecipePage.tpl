@@ -142,7 +142,7 @@
             <div class="col-md-4" id=addRecipe>
                 <form id="addRecipeForm" method="POST" action="/saveRecipeAJAX" class="form-group">
                     <label for="recipeName">Název receptu</label>
-                    <input type="text" name="recipeName" class="form-control"/>
+                    <input type="text" name="recipeName" required class="form-control"/>
                     
                     <table id="selectedIngredientsAdd" class="table">
                         <tr>

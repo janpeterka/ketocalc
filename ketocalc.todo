@@ -1,15 +1,11 @@
 
-Login + Register
++Login + Register
 	+- design
 	+- credentials check
 	+- saving password
 	+-2 unique username
 	+-2 logout
 	+-2 login před email
-	- změna hesla
-	- zapomenuté heslo
-		- poslat dočasný?
-		- poslat odkaz, kde se dá změnit/obnovit?
 	+- emailová adresa
 	+-3 když nedopadne
 		+- něco nefunguje
@@ -41,6 +37,7 @@ Login + Register
 New recipe
 	+- design
 	-2 AJAX Calculator
+		- aspoň pro 3 suroviny
 	+-4 save to database (w/ diet)
 		- hidden pole id ingrediencí
 	+- load diet from database
@@ -48,12 +45,16 @@ New recipe
 	+- success > redirect to new recipe
 	+- AJAX ingredient select
 		- only once
-	- kontrola formu
+	+- kontrola formu
+		+- (1.) jestli je tam nějaká ingredience
+			- pokud ne, nic to neudělá
+		+- (2.) jestli je tam název
+			- řešeno přes HTML require
 
-New diet
++New diet
 	+- design
 	+- save to database
-	- kontrola formu
+	+- kontrola formu
 
 +Show diet
 	+- design
@@ -63,10 +64,15 @@ New ingredint
 	+- design
 	+- save to database
 	-2 ml nebo gramy? V čem ukládat, v čem měřit?
-	- kontrola formu
+	+- kontrola formu
 
 Calculator
-	-2 make it work!!!
+	- make it work!!!
+
+Calculator(3 ings)
+	- x,y,z > 0
+	- ERR Singular matrix error
+	- <0 cannot be created in db
 
 +Use case
 	+- špatná registrace
@@ -78,7 +84,7 @@ Calculator
 Deploy!
 	-5 run
 	- change TEMPLATE_PATH
-	+- change database info
+	- change database info
 	- test
 
 Bonusy
@@ -86,3 +92,7 @@ Bonusy
 	-2 přepočítání receptů na jinou dietu
 	-2 tisk receptu (ze stránky receptu)
 	-0 register captcha
+	- změna hesla
+	- zapomenuté heslo
+		- poslat dočasný?
+		- poslat odkaz, kde se dá změnit/obnovit?

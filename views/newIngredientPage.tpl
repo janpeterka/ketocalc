@@ -9,17 +9,18 @@
     </head>
     <body>
         % include('navbar.tpl')
-        <form id="newIngredientForm" method="POST" action="/newIngredientAJAX" class="form-group col-sm-4">
+        <form id="newIngredientForm" method="POST" action="/newIngredient" class="form-group col-sm-4">
 
             <label for="name">Název suroviny</label>
-            <input type="text" name="name" class="form-control" />
+            <input type="text" name="name" class="form-control"  required value={{name}}>
             <label for="sugar">Množství cukru / 100 g</label>
-            <input type="number" name="sugar" class="form-control" step="0.01"/>
+            <input type="number" name="sugar" class="form-control" step="0.01" required value={{sugar}}>
             <label for="fat">Množství tuku / 100 g</label>
-            <input type="number" name="fat" class="form-control" step="0.01"/>
+            <input type="number" name="fat" class="form-control" step="0.01" required value={{fat}}>
             <label for="protein">Množství bílkovin / 100 g</label>
-            <input type="number" name="protein" class="form-control" step="0.01"/><br>
-            <input id="ajaxButton" type="submit" class="btn btn-primary" value="Přidat surovinu" />
+            <input type="number" name="protein" class="form-control" step="0.01" required value={{protein}}><br>
+            <input id="ajaxButton" type="submit" class="btn btn-primary" value="Přidat surovinu" /><br>
+            <span id=genProblem class="problem">{{problem}}</span>
         </form>
 
         <!-- <div id="selectedIngredientsDiv">

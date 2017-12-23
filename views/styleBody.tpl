@@ -8,4 +8,9 @@ input{
 .navbar{
 	margin-bottom: 15px;
 }
+
+.problem{
+	color: red;
+}
+
 </style>

@@ -22,6 +22,10 @@ import MySQLdb
 # Hashing library
 import hashlib
 
+# Math library
+import numpy
+import math
+
 # bottle.TEMPLATE_PATH = "~/Dropbox/Programming/PyServer/views/"
 # bottle.TEMPLATE_PATH.insert(0, '/home/jan/Dropbox/Programming/KetoCalc')
 
@@ -354,8 +358,6 @@ def register():
 def do_register():
     username = request.forms.get('username')
     # check uniquness of username
-    if loadUser(username) is not None:
-        return "Uživatelské jméno nelze použít"
 
     temp_password = str(request.forms.get('password')).encode('utf-8')
     temp_password_2 = str(request.forms.get('againPassword')).encode('utf-8')
@@ -367,14 +369,16 @@ def do_register():
 
     problem = ""
 
-    if temp_password_2 != temp_password:
-        problem = "Hesla jsou rozdílná!"
-    if len(temp_password) < 8:
-        problem = "Heslo je příliš krátké"
-    if len(firstname) == 0:
-        problem = "Jméno je příliš krátké"
     if len(lastname) == 0:
         problem = "Příjmení je příliš krátké"
+    if len(firstname) == 0:
+        problem = "Jméno je příliš krátké"
+    if len(temp_password) < 8:
+        problem = "Heslo je příliš krátké"
+    if temp_password_2 != temp_password:
+        problem = "Hesla jsou rozdílná!"
+    if loadUser(username) is not None:
+        problem = "Uživatelské jméno nelze použít"
 
     if problem != "":
         return template('registerForm', username=username, firstname=firstname, lastname=lastname, problem=problem)
@@ -384,19 +388,15 @@ def do_register():
     if response == 1:
         redirect('/login')
     else:
-        return "Registrace neproběhla v pořádku"
+        return template('failure', problem="Registrace neproběhla v pořádku")
 
 
 @post('/registerValidate')
 def validateRegister():
     username = request.forms.get('username')
-    # print(username)
-    # print(loadUser(username))
     if loadUser(username) is not None:
-        # print("User found")
         return "False"
     else:
-        # print("No user")
         return "True"
 
 # USER PAGE
@@ -429,32 +429,39 @@ def selectDietAJAX():
 
 
 # NEW DIET
-@route('/newdiet')
+@get('/newdiet')
 def newDietShow():
     session = getSession()
     if session.get('username') is None:
         redirect('/login')
-    return template('newDietPage')
+    return template('newDietPage', name="", sugar="", fat="", protein="", problem="")
 
 
-@route('/addDietAJAX', method='POST')
+@post('/newdiet')
 def addDietAJAX():
     session = getSession()
     if session.get('username') is None:
         redirect('/login')
     diet = type('', (), {})()               # Magický trik, jak udělat prázdný objekt
     diet.name = request.forms.get("name")
-    if len(diet.name) == 0:
-        return "Vyplňte název"
     diet.sugar = request.forms.get("sugar")
-    if len(diet.sugar) == 0:
-        return "Vyplňte množství cukru"
     diet.fat = request.forms.get("fat")
-    if len(diet.fat) == 0:
-        return "Vyplňte množství tuku"
     diet.protein = request.forms.get("protein")
+
+    problem = ""
+
     if len(diet.protein) == 0:
-        return "Vyplňte množství bílkoviny"
+        problem = "Vyplňte množství bílkoviny"
+    if len(diet.fat) == 0:
+        problem = "Vyplňte množství tuku"
+    if len(diet.sugar) == 0:
+        problem = "Vyplňte množství cukru"
+    if len(diet.name) == 0:
+        problem = "Vyplňte název"
+
+    if problem != "":
+        return template('newDietPage', name=diet.name, sugar=diet.sugar, fat=diet.fat, protein=diet.protein, problem=problem)
+
     diet.username = session['username']
     last_id = saveDiet(diet)
     redirect('/diet={}'.format(last_id))
@@ -489,7 +496,7 @@ def newRecipe():
 
     temp_ingredients.sort(key=lambda x: x.name)
     temp_ingredients = sorted(temp_ingredients, key=lambda x: x.name)
-    return template('newRecipePage', ingredients=temp_ingredients, diets=diets)
+    return template('newRecipePage', ingredients=temp_ingredients, diets=diets, problem="")
 
 
 @route('/addIngredientAJAX', method='POST')
@@ -513,9 +520,16 @@ def calcRecipeAJAX():
 
     dietID = request.forms.get("recipeDiet")
 
+    temp_ingredients = []
     for i in range(len(ingredients)):
         ingredient = loadIngredient(ingredients[i])
-        json_ingredient = {'id': ingredient.id, 'name': ingredient.name, 'sugar': ingredient.sugar, 'fat': ingredient.fat, 'protein': ingredient.protein, 'amount': ingredient.amount}
+        temp_ingredients.append(ingredient)
+
+    amounts = calc(temp_ingredients, loadDiet(dietID))
+
+    for i in range(len(ingredients)):
+        ingredient = loadIngredient(ingredients[i])
+        json_ingredient = {'id': ingredient.id, 'name': ingredient.name, 'sugar': ingredient.sugar, 'fat': ingredient.fat, 'protein': ingredient.protein, 'amount': math.ceil(amounts[i] * 100) / 100}
         ingredients[i] = json_ingredient
 
     array_ingredients = {'array': ingredients, 'dietID': dietID}
@@ -563,15 +577,15 @@ def showRecipe(recipeID):
 
 # NEW INGREDIENT PAGE
 
-@route('/newingredient')
+@get('/newingredient')
 def newingredient():
     session = getSession()
     if session.get('username') is None:
         redirect('/login')
-    return template('newIngredientPage')
+    return template('newIngredientPage', name="", sugar="", fat="", protein="", problem="")
 
 
-@route('/newIngredientAJAX', method='POST')
+@post('/newIngredient')
 def newIngredienttoRecipeAJAX():
     session = getSession()
     if session.get('username') is None:
@@ -581,19 +595,39 @@ def newIngredienttoRecipeAJAX():
     ingredient.sugar = request.forms.get("sugar")
     ingredient.fat = request.forms.get("fat")
     ingredient.protein = request.forms.get("protein")
+
+    problem = ""
+    if len(ingredient.protein) == 0:
+        problem = "Zadejte množství bílkoviny"
+    if len(ingredient.fat) == 0:
+        problem = "Zadejte množství tuku"
+    if len(ingredient.sugar) == 0:
+        problem = "Zadejte množství cukru"
+    if len(ingredient.name) == 0:
+        problem = "Zadejte název suroviny"
+
+    if problem != "":
+        return template('newIngredientPage', name=ingredient.name, sugar=ingredient.sugar, fat=ingredient.fat, protein=ingredient.protein, problem=problem)
+
     saveIngredient(ingredient, session['username'])
     redirect('/newrecipe')
 
 
-@route('/success')
-def successPage():
-    return '''
-        Povedlo se! <br>
-        <a href=/user>Přehled</a>
-        '''
-    pass
-
 # CALCULATE RECIPE
+
+
+# Calc for 3 ingredients
+def calc(ingredients, diet):
+    if len(ingredients) == 3:
+        a = numpy.array([[ingredients[0].sugar, ingredients[1].sugar, ingredients[2].sugar],
+                         [ingredients[0].fat, ingredients[1].fat, ingredients[2].fat],
+                         [ingredients[0].protein, ingredients[1].protein, ingredients[2].protein]])
+        # print(a)
+        b = numpy.array([diet.sugar, diet.fat, diet.protein])
+        # print(b)
+        x = numpy.linalg.solve(a, b)
+        print(x)
+        return [x[0], x[1], x[2]]
 
 
 # S'MORE
@@ -610,7 +644,7 @@ def error404(error):
 
 @error(500)
 def error500(error):
-    return 'Something went wrong! (Err500)'
+    return 'Something went wrong! (Err500) <br>' + str(error)
 
 
 # application = bottle.default_app()
