@@ -26,10 +26,13 @@ import hashlib
 import numpy
 import math
 
+from sys import argv
+
 # bottle.TEMPLATE_PATH = "~/Dropbox/Programming/PyServer/views/"
 # bottle.TEMPLATE_PATH.insert(0, '/home/jan/Dropbox/Programming/KetoCalc')
 
-bottle.TEMPLATE_PATH.insert(0, '/home/jan/Dropbox/Programming/ketoCalc/views')
+# bottle.TEMPLATE_PATH.insert(0, '/home/jan/Dropbox/Programming/ketoCalc/views')
+bottle.TEMPLATE_PATH.insert(0, './views')
 
 session_opts = {
     'session.type': 'file',
@@ -648,4 +651,5 @@ def error500(error):
 
 
 # application = bottle.default_app()
-bottle.run(app=app)
+# bottle.run(app=app)
+bottle.run(host='0.0.0.0', port=argv[1])
