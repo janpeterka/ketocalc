@@ -654,4 +654,4 @@ def error500(error):
 
 # application = bottle.default_app()
 # bottle.run(app=app)
-bottle.run(host='0.0.0.0', port=argv[1], app=app)
+bottle.run(host='0.0.0.0', port=argv[1])
