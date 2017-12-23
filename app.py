@@ -28,6 +28,8 @@ import math
 
 from sys import argv
 
+app = SessionMiddleware(bottle.app(), session_opts)
+
 # bottle.TEMPLATE_PATH = "~/Dropbox/Programming/PyServer/views/"
 # bottle.TEMPLATE_PATH.insert(0, '/home/jan/Dropbox/Programming/KetoCalc')
 
@@ -80,7 +82,7 @@ class Ingredient(object):
         self.amount = 0
 
 
-app = SessionMiddleware(bottle.app(), session_opts)
+
 
 
 # SESSION related functions
@@ -652,4 +654,4 @@ def error500(error):
 
 # application = bottle.default_app()
 # bottle.run(app=app)
-bottle.run(host='0.0.0.0', port=argv[1])
+bottle.run(host='0.0.0.0', port=argv[1] app=app)
