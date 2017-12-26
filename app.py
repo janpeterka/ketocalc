@@ -14,7 +14,7 @@ from bottle import get, post, request
 
 
 # Session manager
-from beaker.middleware import SessionMiddleware
+# from beaker.middleware import SessionMiddleware
 
 # MySQL connector
 import MySQLdb
@@ -28,7 +28,6 @@ import math
 
 from sys import argv
 
-app = SessionMiddleware(bottle.app(), session_opts)
 
 # bottle.TEMPLATE_PATH = "~/Dropbox/Programming/PyServer/views/"
 # bottle.TEMPLATE_PATH.insert(0, '/home/jan/Dropbox/Programming/KetoCalc')
@@ -42,6 +41,7 @@ session_opts = {
     'session.data_dir': './data',
     'session.auto': True
 }
+app = SessionMiddleware(bottle.app(), session_opts)
 
 
 def temp_print(input):
