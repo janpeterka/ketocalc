@@ -91,7 +91,7 @@ def getSession():
 
 # DATABASE related functions
 def dbConnect():
-    db = MySQLdb.connect(hostname='cvktne7b4wbj4ks1.chr7pe7iynqr.eu-west-1.rds.amazonaws.com', port='3306', user='sbn13vkg4k895di1', password='ot7aivfxw37d9tbr', database='nobexi41fwyb1088')
+    db = MySQLdb.connect(hostname='cvktne7b4wbj4ks1.chr7pe7iynqr.eu-west-1.rds.amazonaws.com', port=3306, user='sbn13vkg4k895di1', password='ot7aivfxw37d9tbr', database='nobexi41fwyb1088')
     return db
 
 
