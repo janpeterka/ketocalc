@@ -36,8 +36,10 @@
 
 New recipe
 	+- design
-	-2 AJAX Calculator
+	-4 AJAX Calculator
+		- když míň než tři, vyhoď chybu
 		- aspoň pro 3 suroviny
+	-4 když spočítám jednu a pak přidám další, tak to počítá nové, ale neaktualizuje pravou tabulku
 	+-4 save to database (w/ diet)
 		- hidden pole id ingrediencí
 	+- load diet from database
@@ -82,9 +84,9 @@ Calculator(3 ings)
 	+- navigation
 
 Deploy!
-	-5 run
-	- change TEMPLATE_PATH
-	- change database info
+	+-5 run
+	+- change TEMPLATE_PATH
+	+- change database info
 	- test
 
 Bonusy

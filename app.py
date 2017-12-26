@@ -32,7 +32,7 @@ from sys import argv
 # bottle.TEMPLATE_PATH = "~/Dropbox/Programming/PyServer/views/"
 # bottle.TEMPLATE_PATH.insert(0, '/home/jan/Dropbox/Programming/KetoCalc')
 
-# bottle.TEMPLATE_PATH.insert(0, '/home/jan/Dropbox/Programming/ketoCalc/views')
+bottle.TEMPLATE_PATH.insert(0, '/home/jan/Dropbox/Programming/ketoCalc/views')
 bottle.TEMPLATE_PATH.insert(0, './views')
 
 session_opts = {
@@ -621,16 +621,24 @@ def newIngredienttoRecipeAJAX():
 
 # Calc for 3 ingredients
 def calc(ingredients, diet):
-    if len(ingredients) == 3:
+    # if len(ingredients) == 0:  # wip
+    #     return None
+    # if len(ingredients) == 1:  # wip
+    #     return [1, 2]
+    # if len(ingredients) == 2:  # wip
+    #     return [1, 2, 3]
+    if len(ingredients) == 3:  # wip
         a = numpy.array([[ingredients[0].sugar, ingredients[1].sugar, ingredients[2].sugar],
                          [ingredients[0].fat, ingredients[1].fat, ingredients[2].fat],
                          [ingredients[0].protein, ingredients[1].protein, ingredients[2].protein]])
-        # print(a)
         b = numpy.array([diet.sugar, diet.fat, diet.protein])
-        # print(b)
         x = numpy.linalg.solve(a, b)
-        print(x)
         return [x[0], x[1], x[2]]
+    else:
+        temp_array = []
+        for i in range(len(ingredients)):
+            temp_array.append(1)
+        return temp_array
 
 
 # S'MORE
@@ -653,4 +661,4 @@ def error500(error):
 # application = bottle.default_app()
 # bottle.run(app=app)
 bottle.run(host='0.0.0.0', port=argv[1], app=beaker_app)
-
+# bottle.run(host='127.0.0.1', port=8080, app=beaker_app)
