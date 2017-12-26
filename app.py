@@ -41,7 +41,8 @@ session_opts = {
     'session.data_dir': './data',
     'session.auto': True
 }
-app = SessionMiddleware(bottle.app(), session_opts)
+
+beaker_app = SessionMiddleware(bottle.app(), session_opts)
 
 
 def temp_print(input):
@@ -80,9 +81,6 @@ class Ingredient(object):
         self.fat = fat
         self.protein = protein
         self.amount = 0
-
-
-
 
 
 # SESSION related functions
@@ -654,4 +652,5 @@ def error500(error):
 
 # application = bottle.default_app()
 # bottle.run(app=app)
-bottle.run(host='0.0.0.0', port=argv[1])
+bottle.run(host='0.0.0.0', port=argv[1], app=beaker_app)
+
