@@ -14,7 +14,7 @@ from bottle import get, post, request
 
 
 # Session manager
-# from beaker.middleware import SessionMiddleware
+from beaker.middleware import SessionMiddleware
 
 # MySQL connector
 import MySQLdb
