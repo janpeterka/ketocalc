@@ -53,7 +53,9 @@
             % for ingredient in ingredients:
                 <tr>
                     <td>{{ingredient.id}}</td>
-                    <td>{{ingredient.name}}</td>
+                    <td>
+                        <a href="/ingredient={{ingredient.id}}">{{ingredient.name}}</a>
+                    </td>
                     <td>{{ingredient.sugar}}</td>
                     <td>{{ingredient.fat}}</td>
                     <td>{{ingredient.protein}}</td>
@@ -61,6 +63,10 @@
                 </tr>
             % end     
         </table>
+
+        <form id="removeRecipe" action="/recipe={{recipe.id}}/remove" method="post" accept-charset="utf-8">
+            <input id="ajaxButton" type="submit" class="btn btn-danger" value="Smazat recept" />
+        </form>
     </div>
 
 

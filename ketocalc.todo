@@ -1,4 +1,6 @@
 Errors
+	+-3 při načítání receptu není množství suroviny
+		- db? load?
 
 Design
 	- Bílkoviny Tuky Sacharidy
@@ -33,14 +35,10 @@ Design
 	+- intial load recipes by AJAX
 	+- diety
 
-Recipe page
+Recipes
 	+- design
 	+-3 load recipe from database
-	-2 mazání receptů
-
-
-
-New recipe
+	+-2 mazání receptů
 	+- design
 	-4 AJAX Calculator
 		- když míň než tři, vyhoď chybu
@@ -58,23 +56,24 @@ New recipe
 			- pokud ne, nic to neudělá
 		+- (2.) jestli je tam název
 			- řešeno přes HTML require
-
-+New diet
+Diets
 	+- design
 	+- save to database
 	+- kontrola formu
-
-Show diet
 	+- design
 	+-3 load from database
-	-2 mazání diet
+	+-2 mazání diet
+	-2 seznam diet
 
-New ingredint
+Ingredints
 	+- design
 	+- save to database
 	- ml nebo gramy? V čem ukládat, v čem měřit?
 	+- kontrola formu
-	-2 mazání ingrediencí
+	-1 mazání ingrediencí
+		-0 mazání všech receptů, kde je použitý (po dotazu)
+	-2 seznam ingrediencí
+
 
 Calculator
 	- make it work!!!
@@ -95,13 +94,13 @@ Deploy!
 	+-5 run
 	+- change TEMPLATE_PATH
 	+- change database info
-	- test
+	- testování
 
 Bonusy
 	- recepty podle surovin
 	-2 přepočítání receptů na jinou dietu
 	-2 tisk receptu (ze stránky receptu)
-	-0 register captcha
+	- register captcha
 	- změna hesla
 	- zapomenuté heslo
 		- poslat dočasný?

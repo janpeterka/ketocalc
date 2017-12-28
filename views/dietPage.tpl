@@ -36,5 +36,9 @@
         
     </div> 
 
+    <form id="removeIngredient" action="/diet={{diet.id}}/remove" method="post" accept-charset="utf-8">
+        <input id="ajaxButton" type="submit" class="btn btn-danger" value="Smazat dietu" />
+    </form>
+
 </body>
 </html>

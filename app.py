@@ -157,6 +157,22 @@ def saveRecipe(recipe, ingredients, dietID):
     return last_id
 
 
+def deleteRecipe(recipeID):
+    db = dbConnect()
+    cursor = db.cursor()
+
+    query = ("DELETE FROM diets_has_recipes WHERE diets_has_recipes.recipes_id = {};".format(recipeID))
+    cursor.execute(query)
+
+    query = ("DELETE FROM recipes_has_ingredients WHERE recipes_has_ingredients.recipes_id = {};".format(recipeID))
+    cursor.execute(query)
+
+    query = ("DELETE FROM recipes WHERE recipes.id = {};".format(recipeID))
+    cursor.execute(query)
+
+    db.commit()
+
+
 def loadUserRecipes(username):
     db = dbConnect()
     cursor = db.cursor()
@@ -226,6 +242,36 @@ def saveDiet(diet):             # diet as object (name, sugar, fat, protein)
     return last_id
 
 
+def deleteDietCheck(dietID):
+    db = dbConnect()
+    cursor = db.cursor()
+
+    query = ("SELECT diets_has_recipes.recipes_id FROM diets_has_recipes WHERE diets_has_recipes.diets_id = {};".format(dietID))
+    cursor.execute(query)
+    response = cursor.fetchall()
+    if len(response) == 0:
+        return True
+    else:
+        return False
+
+
+def deleteDiet(dietID):
+    db = dbConnect()
+    cursor = db.cursor()
+
+    # recipes in diet are not accessible, but not deleted
+    query = ("DELETE FROM diets_has_recipes WHERE diets_has_recipes.diets_id = {};".format(dietID))
+    cursor.execute(query)
+
+    query = ("DELETE FROM users_has_diets WHERE users_has_diets.diets_id = {};".format(dietID))
+    cursor.execute(query)
+
+    query = ("DELETE FROM diets WHERE diets.id = {};".format(dietID))
+    cursor.execute(query)
+
+    db.commit()
+
+
 def loadUserDiets(username):
     db = dbConnect()
     cursor = db.cursor()
@@ -271,16 +317,20 @@ def loadIngredient(ingredientID):
     return ingredient
 
 
-def saveIngredient(ingredient, username):  # ingredient as object (name, sugar, fat, protein)
+def loadAmount(ingredientID, recipeID):
     db = dbConnect()
     cursor = db.cursor()
 
-    # temp_print(ingredient.name)
-    # temp_print(ingredient.name.encode('UTF-8'))
-    # temp_print(str(ingredient.name.decode('utf8')))
-    # temp_print(ingredient.name.encode('UTF8'))
-    # temp_print(ingredient.name.encode('utf-8'))
-    # temp_print(ingredient.name.encode('utf8'))
+    query = ("SELECT amount FROM recipes_has_ingredients WHERE recipes_has_ingredients.ingredients_id = '{}' AND recipes_has_ingredients.recipes_id = '{}'".format(ingredientID, recipeID))
+    cursor.execute(query)
+    response = cursor.fetchone()
+
+    return response
+
+
+def saveIngredient(ingredient, username):  # ingredient as object (name, sugar, fat, protein)
+    db = dbConnect()
+    cursor = db.cursor()
 
     query = ("INSERT INTO ingredients(name, sugar, fat, protein, author) VALUES ('{}', '{}', '{}', '{}', '{}');".format(ingredient.name, ingredient.sugar, ingredient.fat, ingredient.protein, username))
     cursor.execute(query)
@@ -289,6 +339,30 @@ def saveIngredient(ingredient, username):  # ingredient as object (name, sugar, 
     db.commit()
 
     return last_id
+
+
+def deleteIngredientCheck(ingredientID):
+    db = dbConnect()
+    cursor = db.cursor()
+
+    query = ("SELECT recipes_has_ingredients.recipes_id FROM recipes_has_ingredients WHERE recipes_has_ingredients.ingredients_id = {};".format(ingredientID))
+    cursor.execute(query)
+    response = cursor.fetchall()
+    if len(response) == 0:
+        return True
+    else:
+        return False
+
+
+def deleteIngredient(ingredientID):
+    db = dbConnect()
+    cursor = db.cursor()
+
+    query = ("DELETE FROM recipes_has_ingredients WHERE recipes_has_ingredients.ingredients_id= {};".format(ingredientID))
+    cursor.execute(query)
+    query = ("DELETE FROM ingredients WHERE ingredients.id = {};".format(ingredientID))
+    cursor.execute(query)
+    db.commit()
 
 
 # Users
@@ -437,8 +511,7 @@ def user():
         redirect('/login')
     diets = loadUserDiets(session['username'])
     user = loadUser(session['username'])
-    # temp_print(user.firstname)
-    return template('userPage', username=session['username'], diets=diets, firstname=user.firstname, test="ěšřž")
+    return template('userPage', username=session['username'], diets=diets, firstname=user.firstname)
 
 
 @route('/selectDietAJAX', method='POST')
@@ -508,6 +581,15 @@ def showDiet(dietID):
     recipes = loadDietRecipes(diet.id)
 
     return template('dietPage', diet=diet, recipes=recipes)
+
+
+@route('/diet=<dietID>/remove', method='POST')
+def removeDiet(dietID):
+    if deleteDietCheck(dietID):  # wip
+        deleteDiet(dietID)
+        redirect("/user")
+    else:
+        return template('failure', problem="Tato dieta má recepty, nelze smazat")
 
 
 # NEW RECIPE PAGE
@@ -600,13 +682,16 @@ def showRecipe(recipeID):
     ingredients = []
     for ID in ingredientIDs:
         ingredients.append(loadIngredient(ID))
+    for i in ingredients:
+        i.amount = float(loadAmount(i.id, recipeID)[0])
 
     return template('recipePage', recipe=recipe, ingredients=ingredients)
 
 
 @route('/recipe=<recipeID>/remove', method='POST')
 def removeRecipe(recipeID):
-    pass
+    deleteRecipe(recipeID)
+    redirect('/user')
 
 
 # NEW INGREDIENT PAGE
@@ -626,7 +711,6 @@ def newIngredienttoRecipeAJAX():
 
     ingredient = type('', (), {})()
     ingredient.name = request.forms.name
-    temp_print(ingredient.name)
     ingredient.sugar = request.forms.sugar
     ingredient.fat = request.forms.fat
     ingredient.protein = request.forms.protein
@@ -646,6 +730,21 @@ def newIngredienttoRecipeAJAX():
 
     saveIngredient(ingredient, session['username'])
     redirect('/newrecipe')
+
+
+@route('/ingredient=<ingredientID>')
+def showingredient(ingredientID):
+    ingredient = loadIngredient(ingredientID)
+    return template('ingredientPage', ingredient=ingredient)
+
+
+@route('/ingredient=<ingredientID>/remove', method='POST')
+def removeIngredient(ingredientID):
+    if deleteIngredientCheck(ingredientID):  # wip
+        deleteIngredient(ingredientID)
+        redirect("/user")
+    else:
+        return template('failure', problem="Tato surovina je použita, nelze smazat")
 
 
 # CALCULATE RECIPE
