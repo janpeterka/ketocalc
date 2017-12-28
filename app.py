@@ -4,7 +4,6 @@
 
 # run by pyserver
 
-
 import bottle
 # from bottle import view
 from bottle import route, template
@@ -28,6 +27,8 @@ import math
 
 from sys import argv
 
+# dev var - LOCAL / DEPLOY
+APP_MODE = "LOCAL"
 
 # bottle.TEMPLATE_PATH = "~/Dropbox/Programming/PyServer/views/"
 # bottle.TEMPLATE_PATH.insert(0, '/home/jan/Dropbox/Programming/KetoCalc')
@@ -83,6 +84,18 @@ class Ingredient(object):
         self.amount = 0
 
 
+class User(object):
+    """ For loading from database """
+
+    def __init__(self, tid, username, pwdhash, firstname, lastname):
+        super(User, self).__init__()
+        self.id = tid
+        self.username = username
+        self.pwdhash = pwdhash
+        self.firstname = firstname
+        self.lastname = lastname
+
+
 # SESSION related functions
 def getSession():
     session = bottle.request.environ.get('beaker.session')
@@ -91,7 +104,7 @@ def getSession():
 
 # DATABASE related functions
 def dbConnect():
-    db = MySQLdb.connect(host='cvktne7b4wbj4ks1.chr7pe7iynqr.eu-west-1.rds.amazonaws.com', port=3306, user='sbn13vkg4k895di1', password='ot7aivfxw37d9tbr', database='nobexi41fwyb1088')
+    db = MySQLdb.connect(host='cvktne7b4wbj4ks1.chr7pe7iynqr.eu-west-1.rds.amazonaws.com', port=3306, user='sbn13vkg4k895di1', password='ot7aivfxw37d9tbr', database='nobexi41fwyb1088', charset='utf8', init_command='SET NAMES UTF8')
     return db
 
 
@@ -204,7 +217,7 @@ def saveDiet(diet):             # diet as object (name, sugar, fat, protein)
     cursor.execute(query)
 
     last_id = db.insert_id()
-    query = ("INSERT INTO users_has_diets(users_id, diets_id) VALUES ('{}', '{}');".format(loadUser(diet.username)[0], last_id))
+    query = ("INSERT INTO users_has_diets(users_id, diets_id) VALUES ('{}', '{}');".format(loadUser(diet.username).id, last_id))
     cursor.execute(query)
 
     db.commit()
@@ -261,6 +274,13 @@ def saveIngredient(ingredient, username):  # ingredient as object (name, sugar, 
     db = dbConnect()
     cursor = db.cursor()
 
+    # temp_print(ingredient.name)
+    # temp_print(ingredient.name.encode('UTF-8'))
+    # temp_print(str(ingredient.name.decode('utf8')))
+    # temp_print(ingredient.name.encode('UTF8'))
+    # temp_print(ingredient.name.encode('utf-8'))
+    # temp_print(ingredient.name.encode('utf8'))
+
     query = ("INSERT INTO ingredients(name, sugar, fat, protein, author) VALUES ('{}', '{}', '{}', '{}', '{}');".format(ingredient.name, ingredient.sugar, ingredient.fat, ingredient.protein, username))
     cursor.execute(query)
     last_id = db.insert_id()
@@ -291,7 +311,11 @@ def loadUser(username):
     cursor.execute(query)
 
     response = cursor.fetchone()
-    return response
+
+    if response is None:
+        return None
+    else:
+        return User(response[0], response[1], response[2], response[3], response[4])
 
 
 # MAIN
@@ -316,8 +340,8 @@ def login():
 
 @post('/login')
 def do_login():
-    username = request.forms.get('username')
-    password = request.forms.get('password')
+    username = request.forms.username
+    password = request.forms.password
     if check_login(username, password):
         # return "<p>Your login information was correct.</p>"
         session = getSession()
@@ -333,7 +357,7 @@ def check_login(username, password):
     if user is None:
         return False
 
-    pwdhash = user[2]
+    pwdhash = user.pwdhash
 
     temp_password = password.encode('utf-8')
     password_hash = hashlib.sha256(temp_password).hexdigest()
@@ -359,16 +383,16 @@ def register():
 
 @post('/register')
 def do_register():
-    username = request.forms.get('username')
+    username = request.forms.username
     # check uniquness of username
 
-    temp_password = str(request.forms.get('password')).encode('utf-8')
-    temp_password_2 = str(request.forms.get('againPassword')).encode('utf-8')
+    temp_password = str(request.forms.password)
+    temp_password_2 = str(request.forms.againPassword)
 
     password_hash = hashlib.sha256(temp_password).hexdigest()
-    firstname = request.forms.get('firstname')
+    firstname = request.forms.firstname
 
-    lastname = request.forms.get('lastname')
+    lastname = request.forms.lastname
 
     problem = ""
 
@@ -396,7 +420,7 @@ def do_register():
 
 @post('/registerValidate')
 def validateRegister():
-    username = request.forms.get('username')
+    username = request.forms.username
     if loadUser(username) is not None:
         return "False"
     else:
@@ -411,7 +435,9 @@ def user():
     if session.get('username') is None:
         redirect('/login')
     diets = loadUserDiets(session['username'])
-    return template('userPage', username=session['username'], diets=diets)
+    user = loadUser(session['username'])
+    # temp_print(user.firstname)
+    return template('userPage', username=session['username'], diets=diets, firstname=user.firstname, test="ěšřž")
 
 
 @route('/selectDietAJAX', method='POST')
@@ -419,7 +445,7 @@ def selectDietAJAX():
     session = getSession()
     if session.get('username') is None:
         redirect('/login')
-    dietID = request.forms.get('selectDiet')
+    dietID = request.forms.selectDiet
     recipes = loadDietRecipes(dietID)
 
     for i in range(len(recipes)):
@@ -446,10 +472,10 @@ def addDietAJAX():
     if session.get('username') is None:
         redirect('/login')
     diet = type('', (), {})()               # Magický trik, jak udělat prázdný objekt
-    diet.name = request.forms.get("name")
-    diet.sugar = request.forms.get("sugar")
-    diet.fat = request.forms.get("fat")
-    diet.protein = request.forms.get("protein")
+    diet.name = request.forms.name
+    diet.sugar = request.forms.sugar
+    diet.fat = request.forms.fat
+    diet.protein = request.forms.protein
 
     problem = ""
 
@@ -458,7 +484,7 @@ def addDietAJAX():
     if len(diet.fat) == 0:
         problem = "Vyplňte množství tuku"
     if len(diet.sugar) == 0:
-        problem = "Vyplňte množství cukru"
+        problem = "Vyplňte množství sacharidů"
     if len(diet.name) == 0:
         problem = "Vyplňte název"
 
@@ -507,7 +533,7 @@ def addIngredienttoRecipeAJAX():
     session = getSession()
     if session.get('username') is None:
         redirect('/login')
-    ingredient = loadIngredient(request.forms.get("ingredient"))
+    ingredient = loadIngredient(request.forms.ingredient)
     json_ingredient = {'id': ingredient.id, 'name': ingredient.name, 'sugar': ingredient.sugar, 'fat': ingredient.fat, 'protein': ingredient.protein}
     return json_ingredient
 
@@ -518,10 +544,10 @@ def calcRecipeAJAX():
     if session.get('username') is None:
         redirect('/login')
 
-    ingredients = request.forms.get("ingredientsArray")
+    ingredients = request.forms.ingredientsArray
     ingredients = [word.strip() for word in ingredients.split(',')]
 
-    dietID = request.forms.get("recipeDiet")
+    dietID = request.forms.recipeDiet
 
     temp_ingredients = []
     for i in range(len(ingredients)):
@@ -545,12 +571,12 @@ def addRecipeAJAX():
     if session.get('username') is None:
         redirect('/login')
 
-    dietID = request.forms.get("selectedDietID")
+    dietID = request.forms.selectedDietID
 
-    temp_ingredients = request.forms.get("ingredientsArray2")
+    temp_ingredients = request.forms.ingredientsArray2
     temp_ingredients = [word.strip() for word in temp_ingredients.split(',')]
 
-    amounts = request.forms.get("ingredientsAmount2")
+    amounts = request.forms.ingredientsAmount2
     amounts = [word.strip() for word in amounts.split(',')]
 
     ingredients = []
@@ -561,8 +587,7 @@ def addRecipeAJAX():
         ingredients.append(ingredient)
 
     recipe = type('', (), {})()
-    recipe.name = request.forms.get("recipeName")
-
+    recipe.name = request.forms.recipeName
     last_id = saveRecipe(recipe, ingredients, dietID)
     redirect('/recipe=' + str(last_id))
 
@@ -593,11 +618,13 @@ def newIngredienttoRecipeAJAX():
     session = getSession()
     if session.get('username') is None:
         redirect('/login')
+
     ingredient = type('', (), {})()
-    ingredient.name = request.forms.get("name")
-    ingredient.sugar = request.forms.get("sugar")
-    ingredient.fat = request.forms.get("fat")
-    ingredient.protein = request.forms.get("protein")
+    ingredient.name = request.forms.name
+    temp_print(ingredient.name)
+    ingredient.sugar = request.forms.sugar
+    ingredient.fat = request.forms.fat
+    ingredient.protein = request.forms.protein
 
     problem = ""
     if len(ingredient.protein) == 0:
@@ -605,7 +632,7 @@ def newIngredienttoRecipeAJAX():
     if len(ingredient.fat) == 0:
         problem = "Zadejte množství tuku"
     if len(ingredient.sugar) == 0:
-        problem = "Zadejte množství cukru"
+        problem = "Zadejte množství sacharidů"
     if len(ingredient.name) == 0:
         problem = "Zadejte název suroviny"
 
@@ -660,5 +687,8 @@ def error500(error):
 
 # application = bottle.default_app()
 # bottle.run(app=app)
-bottle.run(host='0.0.0.0', port=argv[1], app=beaker_app)
-# bottle.run(host='127.0.0.1', port=8080, app=beaker_app)
+
+if APP_MODE == "LOCAL":
+    bottle.run(host='127.0.0.1', port=8080, app=beaker_app)
+elif APP_MODE == "DEPLOY":
+    bottle.run(host='0.0.0.0', port=argv[1], app=beaker_app)
