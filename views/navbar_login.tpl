@@ -6,7 +6,7 @@
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link" href="/login">Přihlásit se/a>
+          <a class="nav-link" href="/login">Přihlásit se</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="/register">Zaregistrovat se</a>

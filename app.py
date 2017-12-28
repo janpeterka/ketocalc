@@ -29,7 +29,7 @@ from sys import argv
 
 # dev var - LOCAL / DEPLOY
 # APP_MODE = "LOCAL"
-APP_MODE = DEPLOY
+APP_MODE = "DEPLOY"
 
 # bottle.TEMPLATE_PATH = "~/Dropbox/Programming/PyServer/views/"
 # bottle.TEMPLATE_PATH.insert(0, '/home/jan/Dropbox/Programming/KetoCalc')
@@ -604,7 +604,7 @@ def showRecipe(recipeID):
     return template('recipePage', recipe=recipe, ingredients=ingredients)
 
 
-@route('/recipe=<recipeID>/remove', method=POST)
+@route('/recipe=<recipeID>/remove', method='POST')
 def removeRecipe(recipeID):
     pass
 
