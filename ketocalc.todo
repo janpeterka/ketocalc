@@ -1,3 +1,8 @@
+Errors
+
+Design
+	- Bílkoviny Tuky Sacharidy
+	+-4 diakritika
 
 +Login + Register
 	+- design
@@ -28,10 +33,11 @@
 	+- intial load recipes by AJAX
 	+- diety
 
-+Recipe page
+Recipe page
 	+- design
 	+-3 load recipe from database
-	-2 
+	-2 mazání receptů
+
 
 
 New recipe
@@ -58,15 +64,17 @@ New recipe
 	+- save to database
 	+- kontrola formu
 
-+Show diet
+Show diet
 	+- design
 	+-3 load from database
+	-2 mazání diet
 
 New ingredint
 	+- design
 	+- save to database
-	-2 ml nebo gramy? V čem ukládat, v čem měřit?
+	- ml nebo gramy? V čem ukládat, v čem měřit?
 	+- kontrola formu
+	-2 mazání ingrediencí
 
 Calculator
 	- make it work!!!
@@ -98,3 +106,5 @@ Bonusy
 	- zapomenuté heslo
 		- poslat dočasný?
 		- poslat odkaz, kde se dá změnit/obnovit?
+	-2 Dieta 3,5 : 1 ????
+		- vůbec nevím, co to znamená

@@ -22,7 +22,7 @@
         <div class="col-4">
             <table id="ingredients" class="table">
                 <tr>
-                    <th>Cukr</th>
+                    <th>Sacharidy</th>
                     <th>Tuk</th>
                     <th>Bílkovina</th>
                 </tr>

@@ -116,7 +116,7 @@
                         <tr>
                             <th>ID</th>
                             <th>Název</th>
-                            <th>Cukr</th>
+                            <th>Sacharidy</th>
                             <th>Tuk</th>
                             <th>Bílkovina</th>
                         </tr>
@@ -148,7 +148,7 @@
                         <tr>
                             <th>ID</th>
                             <th>Název</th>
-                            <th>Cukr</th>
+                            <th>Sacharidy</th>
                             <th>Tuk</th>
                             <th>Bílkovina</th>
                             <th>Množství</th>
