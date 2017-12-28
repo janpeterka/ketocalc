@@ -32,6 +32,7 @@
     </script>
 </head>
 <body>
+    % include('navbar_login.tpl')
 	<div class="col-sm-6">
 		<form id="loginForm" action="/login" method="post" class="form-group" >
 	        <label for="username">Přihlašovací email</label>

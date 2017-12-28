@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Vítejte {{username}}</title>
+	<title>Vítejte {{firstname}}</title>
     % include('bootstrap.tpl')
     % include('styleBody.tpl')
 
@@ -40,7 +40,6 @@
 <body>
     % include('navbar.tpl')
     <div class="container row">
-
         <div class="col">
             Seznam receptů:
             <ul id="recipeList">

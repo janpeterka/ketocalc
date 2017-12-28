@@ -22,7 +22,7 @@
         <div class="col-4">
             <table id="ingredients" class="table">
                 <tr>
-                    <th>Cukr</th>
+                    <th>Sacharidy</th>
                     <th>Tuk</th>
                     <th>Bílkovina</th>
                 </tr>
@@ -35,6 +35,10 @@
         </div>     
         
     </div> 
+
+    <form id="removeIngredient" action="/diet={{diet.id}}/remove" method="post" accept-charset="utf-8">
+        <input id="ajaxButton" type="submit" class="btn btn-danger" value="Smazat dietu" />
+    </form>
 
 </body>
 </html>
