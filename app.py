@@ -606,11 +606,10 @@ def showRecipe(recipeID):
 
 @route('/recipe=<recipeID>/remove', method=POST)
 def removeRecipe(recipeID):
-
+    pass
 
 
 # NEW INGREDIENT PAGE
-
 @get('/newingredient')
 def newingredient():
     session = getSession()
