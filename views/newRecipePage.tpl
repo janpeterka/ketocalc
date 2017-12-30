@@ -42,11 +42,20 @@
                         url: '/calcRecipeAJAX',
                         data: $(this).serialize(),
                         success: function(response){
+                            totalSugar = 0;
+                            totalFat = 0;
+                            totalProtein = 0;
                             var ingredients = response.array;
                             // ingredients to table
                             for (i = 0; i<response.array.length; i++ ){
-                                $('#selectedIngredientsAdd').append("<tr><td>" + ingredients[i].id + "</td><td>" + ingredients[i].name + "</td><td>" + ingredients[i].sugar+ "</td><td>" + ingredients[i].fat + "</td><td>" + ingredients[i].protein + "</td><td>" + ingredients[i].amount + "</td></tr>");
+                                $('#selectedIngredientsAdd').append("<tr><td>" + ingredients[i].id + "</td><td>" + ingredients[i].name + "</td><td>" + ingredients[i].protein+ "</td><td>" + ingredients[i].fat + "</td><td>" + ingredients[i].sugar + "</td><td>" + Math.round(ingredients[i].amount*100)+ "</td></tr>");  // wip
+                                totalSugar += ingredients[i].sugar*ingredients[i].amount;
+                                totalFat += ingredients[i].fat*ingredients[i].amount;
+                                totalProtein += ingredients[i].protein*ingredients[i].amount;
                             }
+                            
+
+                            // $('#selectedIngredientsAdd').append("<tr><td>" + "-" + "</td><td>" + "Součty" + "</td><td>" + totalProtein+ "</td><td>" + totalFat + "</td><td>" + totalSugar+ "</td><td>" + "-" + "</td></tr>");
 
                             $('#ingredientsArray').val("");
 
@@ -66,9 +75,9 @@
                             for (i = 0; i<ingredients.length; i++ ){
                                 var temp_array2 = $('#ingredientsAmount2').val();
                                 if (temp_array2.length === 0) {
-                                    $('#ingredientsAmount2').val(ingredients[i].amount);
+                                    $('#ingredientsAmount2').val(Math.round(ingredients[i].amount*100));
                                 } else {
-                                    $('#ingredientsAmount2').val(temp_array2 + ", " + ingredients[i].amount);
+                                    $('#ingredientsAmount2').val(temp_array2 + ", " + Math.round(ingredients[i].amount*100));
                                 }
                             }
 
@@ -116,9 +125,9 @@
                         <tr>
                             <th>ID</th>
                             <th>Název</th>
-                            <th>Sacharidy</th>
-                            <th>Tuk</th>
                             <th>Bílkovina</th>
+                            <th>Tuk</th>
+                            <th>Sacharidy</th>
                         </tr>
                     </table>
                 </div>

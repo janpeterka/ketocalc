@@ -658,7 +658,7 @@ def calcRecipeAJAX():
 
     for i in range(len(ingredients)):
         ingredient = loadIngredient(ingredients[i])
-        json_ingredient = {'id': ingredient.id, 'name': ingredient.name, 'sugar': ingredient.sugar, 'fat': ingredient.fat, 'protein': ingredient.protein, 'amount': math.ceil(amounts[i] * 100) / 100}
+        json_ingredient = {'id': ingredient.id, 'name': ingredient.name, 'sugar': ingredient.sugar, 'fat': ingredient.fat, 'protein': ingredient.protein, 'amount': math.ceil(amounts[i] * 10000) / 10000}  # wip
         ingredients[i] = json_ingredient
 
     array_ingredients = {'array': ingredients, 'dietID': dietID}
@@ -759,7 +759,7 @@ def newIngredienttoRecipeAJAX():
         return template('newIngredientPage', name=ingredient.name, sugar=ingredient.sugar, fat=ingredient.fat, protein=ingredient.protein, problem=problem)
 
     saveIngredient(ingredient, session['username'])
-    redirect('/newrecipe')
+    redirect('/newingredient')
 
 
 @route('/ingredient=<ingredientID>')
@@ -784,9 +784,9 @@ def allingredients():
         redirect('/login')
     ingredients = loadAllIngredients(session['username'])
     return template("allIngredientsPage", ingredients=ingredients)
+
+
 # CALCULATE RECIPE
-
-
 # Calc for 3 ingredients
 def calc(ingredients, diet):
     # if len(ingredients) == 0:  # wip
@@ -795,6 +795,7 @@ def calc(ingredients, diet):
     #     return [1, 2]
     # if len(ingredients) == 2:  # wip
     #     return [1, 2, 3]
+
     if len(ingredients) == 3:  # wip
         a = numpy.array([[ingredients[0].sugar, ingredients[1].sugar, ingredients[2].sugar],
                          [ingredients[0].fat, ingredients[1].fat, ingredients[2].fat],

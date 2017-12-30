@@ -16,16 +16,16 @@
             <tr>
                 <th>ID</th>
                 <th>Název</th>
-                <th>Sacharidy</th>
-                <th>Tuk</th>
                 <th>Bílkovina</th>
+                <th>Tuk</th>
+                <th>Sacharidy</th>
             </tr>
             <tr>
                 <td>{{ingredient.id}}</td>
                 <td>{{ingredient.name}}</td>
-                <td>{{ingredient.sugar}}</td>
-                <td>{{ingredient.fat}}</td>
                 <td>{{ingredient.protein}}</td>
+                <td>{{ingredient.fat}}</td>
+                <td>{{ingredient.sugar}}</td>
             </tr>    
         </table>
 

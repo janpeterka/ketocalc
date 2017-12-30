@@ -45,9 +45,9 @@
             <tr>
                 <th>ID</th>
                 <th>Název</th>
-                <th>Sacharidy</th>
-                <th>Tuk</th>
                 <th>Bílkovina</th>
+                <th>Tuk</th>
+                <th>Sacharidy</th>
                 <th>Množství</th>
             </tr>
             % for ingredient in ingredients:
@@ -56,9 +56,9 @@
                     <td>
                         <a href="/ingredient={{ingredient.id}}">{{ingredient.name}}</a>
                     </td>
-                    <td>{{ingredient.sugar}}</td>
-                    <td>{{ingredient.fat}}</td>
                     <td>{{ingredient.protein}}</td>
+                    <td>{{ingredient.fat}}</td>
+                    <td>{{ingredient.sugar}}</td>
                     <td>{{ingredient.amount}}</td>
                 </tr>
             % end     

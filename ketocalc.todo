@@ -1,9 +1,17 @@
+	+- new ingredient > redirect #
+		-celkove redirecty
+	- ubrat špatně přidanou surovinu
+	+-3 recepty musí mít součet
+	- desetinná čárka
+
+
+
 Errors
 	+-3 při načítání receptu není množství suroviny
 		- db? load?
 
-Design
-	- Bílkoviny Tuky Sacharidy
++Design
+	+- Bílkoviny Tuky Sacharidy
 	+-4 diakritika
 
 +Login + Register
@@ -39,10 +47,10 @@ Recipes
 	+- design
 	+-3 load recipe from database
 	+-2 mazání receptů
-	+- design
 	-4 AJAX Calculator
 		- když míň než tři, vyhoď chybu
 		- aspoň pro 3 suroviny
+			-4 ošetřit záporná čísla
 		- Wolfram?
 	-4 když spočítám jednu a pak přidám další, tak to počítá nové, ale neaktualizuje pravou tabulku
 	+-4 save to database (w/ diet)
@@ -61,19 +69,17 @@ Diets
 	+- design
 	+- save to database
 	+- kontrola formu
-	+- design
 	+-3 load from database
 	+-2 mazání diet
-	-2 seznam diet
+	+-2 seznam diet
 
 Ingredints
 	+- design
 	+- save to database
 	- ml nebo gramy? V čem ukládat, v čem měřit?
 	+- kontrola formu
-	-1 mazání ingrediencí
-		-0 mazání všech receptů, kde je použitý (po dotazu)
-	-2 seznam ingrediencí
+	+-1 mazání ingrediencí
+	+-2 seznam ingrediencí
 
 
 Calculator
@@ -98,6 +104,7 @@ Deploy!
 	- testování
 
 Bonusy
+	-2 surovina energie
 	- recepty podle surovin
 	-2 přepočítání receptů na jinou dietu
 	-2 tisk receptu (ze stránky receptu)
@@ -106,5 +113,5 @@ Bonusy
 	- zapomenuté heslo
 		- poslat dočasný?
 		- poslat odkaz, kde se dá změnit/obnovit?
-	-2 Dieta 3,5 : 1 ????
+	-3 Dieta 3,5 : 1 ????
 		- vůbec nevím, co to znamená

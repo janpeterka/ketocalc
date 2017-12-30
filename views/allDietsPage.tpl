@@ -14,16 +14,16 @@
         <table id="diets" class="table">
             <tr>
                 <th>Název</th>
-                <th>Sacharidy</th>
-                <th>Tuk</th>
                 <th>Bílkovina</th>
+                <th>Tuk</th>
+                <th>Sacharidy</th>
             </tr>
             %for diet in diets:
                 <tr>
                     <td><a href="/diet={{diet.id}}">{{diet.name}}</a></td>
-                    <td>{{diet.sugar}}</td>
-                    <td>{{diet.fat}}</td>
                     <td>{{diet.protein}}</td>
+                    <td>{{diet.fat}}</td>
+                    <td>{{diet.sugar}}</td>
                 </tr>
             %end
         </table>
