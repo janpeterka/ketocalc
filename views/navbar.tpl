@@ -1,47 +1,53 @@
-<!--  <nav class="navbar navbar-expand navbar-fixed-top">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#">Ketogenní kalkulačka</a>
-        </div>
-        <div id="navbar" class="collapse navbar-collapse">
-            <ul class="nav navbar-nav">
-                <li><a href="/user">Hlavní stránka</a></li>
-                <li><a href="/newrecipe">Nový recept</a></li>
-                <li><a href="/newdiet">Nová dieta</a></li>
-                <li> <a href="/newingredient">Nová surovina</a></li>
-                <li> <a href="/logout">Odhlásit se</a></li>
-        </div>
-    </div>
-</nav> -->
-
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <a class="navbar-brand" href="#">Ketogenní kalkulačka</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link" href="/user">Hlavní stránka</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/newrecipe">Nový recept</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/newdiet">Nová dieta</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/newingredient">Nová surovina</a>
-        </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/logout">Odhlásit se</a>
-      </li>
-    </ul>
+  <div class="container">
+    <a class="navbar-brand" href="#">Ketogenní kalkulačka</a>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbarNav" class="collapse navbar-collapse">
+
+        <ul class="nav navbar-nav navbar-center">
+            <li class="nav-item">
+              <a class="nav-link" href="/user">Hlavní stránka</a>
+            </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Přidat nové
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="/newrecipe">Nový recept</a>
+              <a class="dropdown-item" href="/newdiet">Nová dieta</a>
+              <a class="dropdown-item" href="/newingredient">Nová surovina</a>
+            </div>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Seznamy
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="/allingredients">Všechny suroviny</a>
+              <a class="dropdown-item" href="/alldiets">Všechny diety</a>
+              <!-- <div class="dropdown-divider"></div> -->
+              <a class="dropdown-item" href="/allrecipes">Všechny recepty</a>
+            </div>
+          </li>
+
+        </ul>
+
+        <ul class="nav navbar-nav navbar-right ml-auto" >
+          <li class="nav-item">
+            <a class="nav-link" href="/logout">Odhlásit se</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link small" href="/changelog">Changelog</a>
+          </li>
+        </ul>
+
+    </div>
+
   </div>
 </nav>

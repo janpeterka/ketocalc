@@ -13,4 +13,8 @@ input{
 	color: red;
 }
 
+.changelog{
+	margin: 10px;
+}
+
 </style>

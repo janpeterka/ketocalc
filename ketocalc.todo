@@ -43,6 +43,7 @@ Recipes
 	-4 AJAX Calculator
 		- když míň než tři, vyhoď chybu
 		- aspoň pro 3 suroviny
+		- Wolfram?
 	-4 když spočítám jednu a pak přidám další, tak to počítá nové, ale neaktualizuje pravou tabulku
 	+-4 save to database (w/ diet)
 		- hidden pole id ingrediencí

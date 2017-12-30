@@ -174,23 +174,24 @@ def deleteRecipe(recipeID):
 
 
 def loadUserRecipes(username):
+    recipes = []
+    diets = loadUserDiets(username)
+    for diet in diets:
+        temp_recipes = loadDietRecipes(diet.id)
+        for recipe in temp_recipes:
+            recipes.append(recipe)
+
+    return recipes
+
+
+def loadRecipeDietID(recipeID):
     db = dbConnect()
     cursor = db.cursor()
-    temp_query = ("SELECT users.id FROM users WHERE users.username = '{}';".format(username))
-    cursor.execute(temp_query)
-    user_id = cursor.fetchone()
-
-    query = ("SELECT recipes.id, recipes.name FROM recipes JOIN diets_has_recipes ON recipes.id=diets_has_recipes.recipes_id JOIN diets ON diets.id=diets_has_recipes.diets_id JOIN users_has_diets ON diets.id=users_has_diets.diets_id JOIN users ON users_has_diets.users_id= '{}';".format(user_id[0]))
+    query = ("SELECT diets_has_recipes.diets_id FROM diets_has_recipes WHERE recipes_id='{}';".format(recipeID))
     cursor.execute(query)
     response = cursor.fetchall()
 
-    # convert to array of objects
-    recipes = []
-    for i in range(len(response)):
-        temp_recipe = Recipe(response[i][0], response[i][1])
-        recipes.append(temp_recipe)
-
-    return recipes
+    return response[0][0]
 
 
 def loadDietRecipes(dietID):
@@ -301,7 +302,20 @@ def loadAllIngredients(username):
     cursor.execute(query)
     response = cursor.fetchall()
 
-    return response
+    # ingredients = []
+    # for i in response:
+    #     ingredient = Ingredient(i[0], i[1], i[2], i[3], i[4])
+    #     ingredients.append(ingredient)
+
+    temp_ingredients = []
+    for ingredient in response:
+        temp_ingredient = Ingredient(ingredient[0], ingredient[1], ingredient[2], ingredient[3], ingredient[4])
+        temp_ingredients.append(temp_ingredient)
+
+    temp_ingredients.sort(key=lambda x: x.name)
+    temp_ingredients = sorted(temp_ingredients, key=lambda x: x.name)
+
+    return temp_ingredients
 
 
 def loadIngredient(ingredientID):
@@ -592,6 +606,16 @@ def removeDiet(dietID):
         return template('failure', problem="Tato dieta má recepty, nelze smazat")
 
 
+@route('/alldiets')
+def allDiets():
+    session = getSession()
+    if session.get('username') is None:
+        redirect('/login')
+
+    diets = loadUserDiets(session['username'])
+    return template('allDietsPage', diets=diets)
+
+
 # NEW RECIPE PAGE
 @route('/newrecipe')
 def newRecipe():
@@ -601,14 +625,7 @@ def newRecipe():
 
     diets = loadUserDiets(session['username'])
     ingredients = loadAllIngredients(session['username'])
-    temp_ingredients = []
-    for ingredient in ingredients:
-        temp_ingredient = Ingredient(ingredient[0], ingredient[1], ingredient[2], ingredient[3], ingredient[4])
-        temp_ingredients.append(temp_ingredient)
-
-    temp_ingredients.sort(key=lambda x: x.name)
-    temp_ingredients = sorted(temp_ingredients, key=lambda x: x.name)
-    return template('newRecipePage', ingredients=temp_ingredients, diets=diets, problem="")
+    return template('newRecipePage', ingredients=ingredients, diets=diets, problem="")
 
 
 @route('/addIngredientAJAX', method='POST')
@@ -694,6 +711,19 @@ def removeRecipe(recipeID):
     redirect('/user')
 
 
+@route('/allrecipes')
+def allrecipes():
+    session = getSession()
+    if session.get('username') is None:
+        redirect('/login')
+    recipes = loadUserRecipes(session['username'])
+    for recipe in recipes:
+        recipe.dietID = loadRecipeDietID(recipe.id)
+        recipe.dietName = loadDiet(recipe.dietID).name
+
+    return template("allRecipesPage", recipes=recipes)
+
+
 # NEW INGREDIENT PAGE
 @get('/newingredient')
 def newingredient():
@@ -747,6 +777,13 @@ def removeIngredient(ingredientID):
         return template('failure', problem="Tato surovina je použita, nelze smazat")
 
 
+@route('/allingredients')
+def allingredients():
+    session = getSession()
+    if session.get('username') is None:
+        redirect('/login')
+    ingredients = loadAllIngredients(session['username'])
+    return template("allIngredientsPage", ingredients=ingredients)
 # CALCULATE RECIPE
 
 
@@ -776,6 +813,11 @@ def calc(ingredients, diet):
 @route('/index.html')
 def indexhtml():
     redirect('/')
+
+
+@route('/changelog')
+def changelog():
+    return template('changelog')
 
 
 # ERROR
