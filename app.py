@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
 # run by pyserver
 
 import bottle
@@ -10,7 +9,6 @@ from bottle import route, template
 from bottle import error, redirect
 from bottle import get, post, request
 # from bottle import static_file
-
 
 # Session manager
 from beaker.middleware import SessionMiddleware
@@ -23,6 +21,12 @@ import hashlib
 
 # Math library
 import numpy
+import sympy as sp
+# from sympy import solve_rational_inequalities as solvein
+from sympy import solve_poly_inequality as solvei
+# from sympy import Union
+# from sympy import Poly
+from sympy import poly
 import math
 
 from sys import argv
@@ -30,9 +34,6 @@ from sys import argv
 # dev var - LOCAL / DEPLOY
 # APP_MODE = "LOCAL"
 APP_MODE = "DEPLOY"
-
-# bottle.TEMPLATE_PATH = "~/Dropbox/Programming/PyServer/views/"
-# bottle.TEMPLATE_PATH.insert(0, '/home/jan/Dropbox/Programming/KetoCalc')
 
 bottle.TEMPLATE_PATH.insert(0, '/home/jan/Dropbox/Programming/ketoCalc/views')
 bottle.TEMPLATE_PATH.insert(0, './views')
@@ -645,9 +646,13 @@ def calcRecipeAJAX():
         redirect('/login')
 
     ingredients = request.forms.ingredientsArray
+    if len(ingredients) == 0:
+        return "False"
     ingredients = [word.strip() for word in ingredients.split(',')]
 
     dietID = request.forms.recipeDiet
+    if dietID is None:
+        return "False"
 
     temp_ingredients = []
     for i in range(len(ingredients)):
@@ -655,10 +660,14 @@ def calcRecipeAJAX():
         temp_ingredients.append(ingredient)
 
     amounts = calc(temp_ingredients, loadDiet(dietID))
+    if amounts is None:
+        return "False"
 
     for i in range(len(ingredients)):
         ingredient = loadIngredient(ingredients[i])
-        json_ingredient = {'id': ingredient.id, 'name': ingredient.name, 'sugar': ingredient.sugar, 'fat': ingredient.fat, 'protein': ingredient.protein, 'amount': math.ceil(amounts[i] * 100) / 100}
+        if amounts[i] < 0:
+            return "False"
+        json_ingredient = {'id': ingredient.id, 'name': ingredient.name, 'sugar': ingredient.sugar, 'fat': ingredient.fat, 'protein': ingredient.protein, 'amount': math.ceil(amounts[i] * 10000) / 10000}  # wip
         ingredients[i] = json_ingredient
 
     array_ingredients = {'array': ingredients, 'dietID': dietID}
@@ -759,7 +768,7 @@ def newIngredienttoRecipeAJAX():
         return template('newIngredientPage', name=ingredient.name, sugar=ingredient.sugar, fat=ingredient.fat, protein=ingredient.protein, problem=problem)
 
     saveIngredient(ingredient, session['username'])
-    redirect('/newrecipe')
+    redirect('/newingredient')
 
 
 @route('/ingredient=<ingredientID>')
@@ -784,29 +793,97 @@ def allingredients():
         redirect('/login')
     ingredients = loadAllIngredients(session['username'])
     return template("allIngredientsPage", ingredients=ingredients)
+
+
 # CALCULATE RECIPE
-
-
-# Calc for 3 ingredients
 def calc(ingredients, diet):
-    # if len(ingredients) == 0:  # wip
-    #     return None
-    # if len(ingredients) == 1:  # wip
-    #     return [1, 2]
-    # if len(ingredients) == 2:  # wip
-    #     return [1, 2, 3]
-    if len(ingredients) == 3:  # wip
+    if len(ingredients) == 0:
+        return None
+    elif len(ingredients) == 1:
+        return None
+    elif len(ingredients) == 2:
+        a = numpy.array([[ingredients[0].sugar, ingredients[1].sugar], [ingredients[0].fat, ingredients[1].fat]])
+        b = numpy.array([diet.sugar, diet.fat])
+        x = numpy.linalg.solve(a, b)
+
+        if x[0] * ingredients[0].protein + x[1] * ingredients[1].protein == diet.protein:
+            return [x[0], x[1]]
+        else:
+            return None
+    elif len(ingredients) == 3:
         a = numpy.array([[ingredients[0].sugar, ingredients[1].sugar, ingredients[2].sugar],
                          [ingredients[0].fat, ingredients[1].fat, ingredients[2].fat],
                          [ingredients[0].protein, ingredients[1].protein, ingredients[2].protein]])
         b = numpy.array([diet.sugar, diet.fat, diet.protein])
         x = numpy.linalg.solve(a, b)
         return [x[0], x[1], x[2]]
+    elif len(ingredients) == 4:
+        # a = numpy.array([[ingredients[0].sugar, ingredients[1].sugar, ingredients[2].sugar, ingredients[3].sugar],
+        #                  [ingredients[0].fat, ingredients[1].fat, ingredients[2].fat, ingredients[3].fat],
+        #                  [ingredients[0].protein, ingredients[1].protein, ingredients[2].protein, ingredients[3].protein]])
+        # b = numpy.array([diet.sugar, diet.fat, diet.protein])
+        # x = numpy.linalg.solve(a, b)
+        # temp_print("{}, {}, {}".format(x[0], x[1], x[2]))
+        # return [x[0], x[1], x[2]]
+
+        x, y, z = sp.symbols('x, y, z')
+        e = sp.symbols('e')
+        f1 = ingredients[0].sugar * x + ingredients[1].sugar * y + ingredients[2].sugar * z + ingredients[3].sugar * e - diet.sugar
+        f2 = ingredients[0].fat * x + ingredients[1].fat * y + ingredients[2].fat * z + ingredients[3].fat * e - diet.fat
+        f3 = ingredients[0].protein * x + ingredients[1].protein * y + ingredients[2].protein * z + ingredients[3].protein * e - diet.protein
+
+        in1 = sp.solvers.solve((f1, f2, f3), (x, y, z))[x]
+        # temp_print(in1)
+        in2 = sp.solvers.solve((f1, f2, f3), (x, y, z))[y]
+        # temp_print(in2)
+        in3 = sp.solvers.solve((f1, f2, f3), (x, y, z))[z]
+        # temp_print(in3)
+
+        # Faster way?? wip
+        result1 = solvei(poly(in1), ">=")
+        # temp_print(result1)
+
+        result2 = solvei(poly(in2), ">=")
+        # temp_print(result2)
+
+        result3 = solvei(poly(in3), ">=")
+        # temp_print(result3)
+
+        interval = (result1[0].intersect(result2[0])).intersect(result3[0])
+        # temp_print(interval)
+
+        max_sol = float(math.floor(interval.right * 10000) / 10000)
+        # temp_print("max solution: {}".format(max_sol))
+        sol = max_sol / 2
+
+        in1_dict = in1.as_coefficients_dict()
+        # temp_print("e coef: {}".format(in1_dict[e]))
+        # temp_print("1 coef: {}".format(in1_dict[1]))
+        x = in1_dict[e] * sol + in1_dict[1]
+        # temp_print("x solution: {}".format(x))
+
+        in2_dict = in2.as_coefficients_dict()
+        # temp_print("e coef: {}".format(in2_dict[e]))
+        # temp_print("1 coef: {}".format(in2_dict[1]))
+        y = in2_dict[e] * sol + in2_dict[1]
+        # temp_print("y solution: {}".format(y))
+
+        in3_dict = in3.as_coefficients_dict()
+        # temp_print("e coef: {}".format(in3_dict[e]))
+        # temp_print("1 coef: {}".format(in3_dict[1]))
+        z = in3_dict[e] * sol + in3_dict[1]
+        # temp_print("z solution: {}".format(z))
+
+        x = float(math.floor(x * 10000) / 10000)
+        y = float(math.floor(y * 10000) / 10000)
+        z = float(math.floor(z * 10000) / 10000)
+
+        if max_sol >= 0:
+            return [x, y, z, sol]
+        else:
+            return None
     else:
-        temp_array = []
-        for i in range(len(ingredients)):
-            temp_array.append(1)
-        return temp_array
+        return None
 
 
 # S'MORE

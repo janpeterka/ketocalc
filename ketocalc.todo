@@ -1,9 +1,18 @@
+	+- new ingredient > redirect #
+		-celkove redirecty
+	- ubrat špatně přidanou surovinu
+	+-3 recepty musí mít součet
+	- desetinná čárka
+
+
+
 Errors
 	+-3 při načítání receptu není množství suroviny
 		- db? load?
+	- disable adding same ing more times
 
-Design
-	- Bílkoviny Tuky Sacharidy
++Design
+	+- Bílkoviny Tuky Sacharidy
 	+-4 diakritika
 
 +Login + Register
@@ -39,12 +48,15 @@ Recipes
 	+- design
 	+-3 load recipe from database
 	+-2 mazání receptů
-	+- design
-	-4 AJAX Calculator
-		- když míň než tři, vyhoď chybu
-		- aspoň pro 3 suroviny
+	-1 AJAX Calculator 4
+		+- když míň než tři, vyhoď chybu
+		+- aspoň pro 3 suroviny
+			+-4 ošetřit záporná čísla
 		- Wolfram?
-	-4 když spočítám jednu a pak přidám další, tak to počítá nové, ale neaktualizuje pravou tabulku
+		- slider for variable
+			-3 choose which variable
+	-3 AJAX Calculator 5
+	+-4 když spočítám jednu a pak přidám další, tak to počítá nové, ale neaktualizuje pravou tabulku
 	+-4 save to database (w/ diet)
 		- hidden pole id ingrediencí
 	+- load diet from database
@@ -57,32 +69,27 @@ Recipes
 			- pokud ne, nic to neudělá
 		+- (2.) jestli je tam název
 			- řešeno přes HTML require
-Diets
++Diets
 	+- design
 	+- save to database
 	+- kontrola formu
-	+- design
 	+-3 load from database
 	+-2 mazání diet
-	-2 seznam diet
+	+-2 seznam diet
 
 Ingredints
 	+- design
 	+- save to database
 	- ml nebo gramy? V čem ukládat, v čem měřit?
 	+- kontrola formu
-	-1 mazání ingrediencí
-		-0 mazání všech receptů, kde je použitý (po dotazu)
-	-2 seznam ingrediencí
+	+-1 mazání ingrediencí
+	+-2 seznam ingrediencí
 
 
-Calculator
-	- make it work!!!
-
-Calculator(3 ings)
-	- x,y,z > 0
-	- ERR Singular matrix error
-	- <0 cannot be created in db
++Calculator(3 ings)
++	- x,y,z > 0
++	- ERR Singular matrix error
++	- <0 cannot be created in db
 
 +Use case
 	+- špatná registrace
@@ -98,6 +105,7 @@ Deploy!
 	- testování
 
 Bonusy
+	-2 surovina energie
 	- recepty podle surovin
 	-2 přepočítání receptů na jinou dietu
 	-2 tisk receptu (ze stránky receptu)
@@ -106,5 +114,5 @@ Bonusy
 	- zapomenuté heslo
 		- poslat dočasný?
 		- poslat odkaz, kde se dá změnit/obnovit?
-	-2 Dieta 3,5 : 1 ????
+	-3 Dieta 3,5 : 1 ????
 		- vůbec nevím, co to znamená

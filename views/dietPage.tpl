@@ -22,14 +22,14 @@
             <div class="col-4">
                 <table id="ingredients" class="table">
                     <tr>
-                        <th>Sacharidy</th>
-                        <th>Tuk</th>
                         <th>Bílkovina</th>
+                        <th>Tuk</th>
+                        <th>Sacharidy</th>
                     </tr>
                     <tr>
-                        <td>{{diet.sugar}}</td>
-                        <td>{{diet.fat}}</td>
                         <td>{{diet.protein}}</td>
+                        <td>{{diet.fat}}</td>
+                        <td>{{diet.sugar}}</td>
                     </tr>
                 </table>
             </div>     
