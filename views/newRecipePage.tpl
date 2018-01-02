@@ -9,13 +9,19 @@
         % include('styleBody.tpl')
 
         <script type="text/javascript">
+            $(document).ready(function() {
+                selectAllIngredients = String(document.getElementById("ingredientSelect").innerHTML);
+            });
+
+
             $(document).on("submit", "#addIngredientForm", function(e) {
                     $.ajax({
                         type: 'POST',
                         url: '/addIngredientAJAX',
                         data: $(this).serialize(),
                         success: function(response) {
-                            $('#selectedIngredients').append("<tr><td>" + response.id + "</td><td>" + response.name + "</td><td>" + response.sugar+ "</td><td>" + response.fat + "</td><td>" + response.protein + "</td></tr>");
+                            $("#ingredientSelect option[value='"+response.id+"']").remove();
+                            $('#selectedIngredients').append("<tr><td>" + response.name + "</td><td>" + response.protein+ "</td><td>" + response.fat + "</td><td>" + response.sugar + "</td></tr>");
                             // console.log($('#ingredientsArray').val());
                             var temp_array = $('#ingredientsArray').val();
                             if (temp_array.length === 0) {
@@ -24,9 +30,10 @@
                                 $('#ingredientsArray').val(temp_array + ", " + response.id);
                             }
 
-                            // remove option
-                            $("#ingredientSelect option[value='"+response.id+"']").remove();
-
+                            $("#addRecipe").css('visibility', 'hidden');
+                            $("#right").css('visibility', 'hidden');
+                            $("#wrong").css('visibility', 'hidden');
+                            
                         },
                         error: function(error) {
                             console.log(error);
@@ -42,13 +49,30 @@
                         url: '/calcRecipeAJAX',
                         data: $(this).serialize(),
                         success: function(response){
+
+                            $('#ingredientsArray').val("");
+                            $('#selectedIngredients').empty();
+                            $('#selectedIngredients').append('<tr><th>Název</th><th>Bílkovina</th><th>Tuk</th><th>Sacharidy</th></tr>');
+
+                            $('#ingredientSelect').empty();
+                            $('#ingredientSelect').append(selectAllIngredients);
+
+                            $('#selectedIngredientsAdd').empty();
+                            $("#selectedIngredientsAdd").append('<tr><th>Název</th><th>Bílkovina</th><th>Tuk</th><th>Sacharidy</th></tr>');
+
+
+                            if (response=="False"){
+                                console.log("False");
+                                $("#wrong").css('visibility', 'visible');
+                                return;
+                            }
                             totalSugar = 0;
                             totalFat = 0;
                             totalProtein = 0;
                             var ingredients = response.array;
                             // ingredients to table
                             for (i = 0; i<response.array.length; i++ ){
-                                $('#selectedIngredientsAdd').append("<tr><td>" + ingredients[i].id + "</td><td>" + ingredients[i].name + "</td><td>" + ingredients[i].protein+ "</td><td>" + ingredients[i].fat + "</td><td>" + ingredients[i].sugar + "</td><td>" + Math.round(ingredients[i].amount*100)+ "</td></tr>");  // wip
+                                $('#selectedIngredientsAdd').append("<tr><td>" + ingredients[i].name + "</td><td>" + ingredients[i].protein+ "</td><td>" + ingredients[i].fat + "</td><td>" + ingredients[i].sugar + "</td><td>" + Math.round(ingredients[i].amount*100)+ " g</td></tr>");  // wip
                                 totalSugar += ingredients[i].sugar*ingredients[i].amount;
                                 totalFat += ingredients[i].fat*ingredients[i].amount;
                                 totalProtein += ingredients[i].protein*ingredients[i].amount;
@@ -57,7 +81,6 @@
 
                             // $('#selectedIngredientsAdd').append("<tr><td>" + "-" + "</td><td>" + "Součty" + "</td><td>" + totalProtein+ "</td><td>" + totalFat + "</td><td>" + totalSugar+ "</td><td>" + "-" + "</td></tr>");
 
-                            $('#ingredientsArray').val("");
 
                             // ingredient IDs
                             
@@ -86,6 +109,7 @@
 
                             // change visibility
                             $("#addRecipe").css('visibility', 'visible');
+                            $("#right").css('visibility', 'visible');
 
                         },
                         error: function(error) {
@@ -101,12 +125,16 @@
             #addRecipe{
                 visibility: hidden;
             }
+
+            #wrong{
+                visibility: hidden;
+            }
         </style>
     </head>
     <body>
         % include('navbar.tpl')
         <div class="container row">
-            <div class="col">
+            <div class="col-md-7">
 
                 <div class="form-group col-sm-12">
                     <form id="addIngredientForm" method="POST" action="/addIngredientAJAX">
@@ -123,7 +151,6 @@
                 <div id="selectedIngredientsDiv" class="col-sm-12">
                     <table id="selectedIngredients" class="table">
                         <tr>
-                            <th>ID</th>
                             <th>Název</th>
                             <th>Bílkovina</th>
                             <th>Tuk</th>
@@ -148,30 +175,38 @@
             </div>
 
 
-            <div class="col-md-4" id=addRecipe>
-                <form id="addRecipeForm" method="POST" action="/saveRecipeAJAX" class="form-group">
-                    <label for="recipeName">Název receptu</label>
-                    <input type="text" name="recipeName" required class="form-control"/>
-                    
-                    <table id="selectedIngredientsAdd" class="table">
-                        <tr>
-                            <th>ID</th>
-                            <th>Název</th>
-                            <th>Sacharidy</th>
-                            <th>Tuk</th>
-                            <th>Bílkovina</th>
-                            <th>Množství</th>
-                        </tr>
-                    </table>
+            <div class="col-md-4" id=addRecipe style="position: relative;">
 
-                    <input id="addRecipeButton" type="submit" class="btn btn-primary" value="Uložit mezi recepty" />
-                    
-                    <input type="hidden" id="ingredientsArray2" name="ingredientsArray2" value="" />
-                    <input type="hidden" id="selectedDietID" name="selectedDietID" value="" />
-                    <input type="hidden" id="ingredientsAmount2" name="ingredientsAmount2" value="" />
+                <div id="wrong" style="position:absolute; top:0px;">
+                    <span class="problem" style="text-align: center">Recept nelze vytvořit</span>
+                </div>
 
-                </form>
+                <div id="right" style="position:absolute; top:0px;">
+                    <form id="addRecipeForm" method="POST" action="/saveRecipeAJAX" class="form-group">
+                        <label for="recipeName">Název receptu</label>
+                        <input type="text" name="recipeName" required class="form-control"/>
+                        
+                        <table id="selectedIngredientsAdd" class="table">
+                            <tr>
+                                <th>Název</th>
+                                <th>Bílkovina</th>
+                                <th>Tuk</th>
+                                <th>Sacharidy</th>
+                                <th>Množství</th>
+                            </tr>
+                        </table>
+
+                        <input id="addRecipeButton" type="submit" class="btn btn-primary" value="Uložit mezi recepty" />
+                        
+                        <input type="hidden" id="ingredientsArray2" name="ingredientsArray2" value="" />
+                        <input type="hidden" id="selectedDietID" name="selectedDietID" value="" />
+                        <input type="hidden" id="ingredientsAmount2" name="ingredientsAmount2" value="" />
+
+                    </form>
+                </div>
             </div>
+
+            
         </div>
 
     </body>

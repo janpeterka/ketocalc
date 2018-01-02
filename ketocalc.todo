@@ -9,6 +9,7 @@
 Errors
 	+-3 při načítání receptu není množství suroviny
 		- db? load?
+	- disable adding same ing more times
 
 +Design
 	+- Bílkoviny Tuky Sacharidy
@@ -47,12 +48,15 @@ Recipes
 	+- design
 	+-3 load recipe from database
 	+-2 mazání receptů
-	-4 AJAX Calculator
-		- když míň než tři, vyhoď chybu
-		- aspoň pro 3 suroviny
-			-4 ošetřit záporná čísla
+	-1 AJAX Calculator 4
+		+- když míň než tři, vyhoď chybu
+		+- aspoň pro 3 suroviny
+			+-4 ošetřit záporná čísla
 		- Wolfram?
-	-4 když spočítám jednu a pak přidám další, tak to počítá nové, ale neaktualizuje pravou tabulku
+		- slider for variable
+			-3 choose which variable
+	-3 AJAX Calculator 5
+	+-4 když spočítám jednu a pak přidám další, tak to počítá nové, ale neaktualizuje pravou tabulku
 	+-4 save to database (w/ diet)
 		- hidden pole id ingrediencí
 	+- load diet from database
@@ -65,7 +69,7 @@ Recipes
 			- pokud ne, nic to neudělá
 		+- (2.) jestli je tam název
 			- řešeno přes HTML require
-Diets
++Diets
 	+- design
 	+- save to database
 	+- kontrola formu
@@ -82,13 +86,10 @@ Ingredints
 	+-2 seznam ingrediencí
 
 
-Calculator
-	- make it work!!!
-
-Calculator(3 ings)
-	- x,y,z > 0
-	- ERR Singular matrix error
-	- <0 cannot be created in db
++Calculator(3 ings)
++	- x,y,z > 0
++	- ERR Singular matrix error
++	- <0 cannot be created in db
 
 +Use case
 	+- špatná registrace

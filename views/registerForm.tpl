@@ -66,7 +66,7 @@
     </script>
 </head>
 <body>
-    % include ('navbar_login.tpl')
+    % include('navbar_login.tpl')
 	<form id="registerForm" action="/register" method="post" class="col-sm-6">
 
             <label for="username">Přihlašovací email</label>
