@@ -1,15 +1,58 @@
+v2.1
+	- ubrat špatně přidanou surovinu
+	- Calculator 4
+		- slider for variable
+		- choose which variable
+	- Dieta 3,5 : 1 ????
+		- vůbec nevím, co to znamená
+	- surovina energie
+	- ml nebo gramy? V čem ukládat, v čem měřit?
+
+v2.2
+	- disable adding same ingredient more times
+	- přepočítání receptů na jinou dietu
+	- tisk receptu (ze stránky receptu)
+
+v2.3 aka Private publish
+
+
+v3.0
+	- Calculator 5
+	- register captcha
+	- změna hesla
+	- zapomenuté heslo
+		- poslat dočasný?
+		- poslat odkaz, kde se dá změnit/obnovit?
+
+Someday
+	- Calculator 4 speed
+	- testování
+	- recepty podle surovin
+
+
+
+
+
+
+
+
+
+
+
+
+
+
++Old
 	+- new ingredient > redirect #
 		-celkove redirecty
-	- ubrat špatně přidanou surovinu
 	+-3 recepty musí mít součet
-	- desetinná čárka
+	+- desetinná čárka
+	+-3 recipe calc loading animation 
 
 
-
-Errors
++Errors
 	+-3 při načítání receptu není množství suroviny
-		- db? load?
-	- disable adding same ing more times
+		- db? load?	
 
 +Design
 	+- Bílkoviny Tuky Sacharidy
@@ -44,18 +87,16 @@ Errors
 	+- intial load recipes by AJAX
 	+- diety
 
-Recipes
-	+- design
-	+-3 load recipe from database
-	+-2 mazání receptů
++Recipes
 	-1 AJAX Calculator 4
 		+- když míň než tři, vyhoď chybu
 		+- aspoň pro 3 suroviny
 			+-4 ošetřit záporná čísla
-		- Wolfram?
-		- slider for variable
-			-3 choose which variable
-	-3 AJAX Calculator 5
+		- speed
+
+	+- design
+	+-3 load recipe from database
+	+-2 mazání receptů
 	+-4 když spočítám jednu a pak přidám další, tak to počítá nové, ale neaktualizuje pravou tabulku
 	+-4 save to database (w/ diet)
 		- hidden pole id ingrediencí
@@ -77,10 +118,10 @@ Recipes
 	+-2 mazání diet
 	+-2 seznam diet
 
-Ingredints
++Ingredints
+
 	+- design
 	+- save to database
-	- ml nebo gramy? V čem ukládat, v čem měřit?
 	+- kontrola formu
 	+-1 mazání ingrediencí
 	+-2 seznam ingrediencí
@@ -98,21 +139,13 @@ Ingredints
 +Design
 	+- navigation
 
-Deploy!
++Deploy!
+	- testování
 	+-5 run
 	+- change TEMPLATE_PATH
 	+- change database info
-	- testování
 
 Bonusy
-	-2 surovina energie
-	- recepty podle surovin
-	-2 přepočítání receptů na jinou dietu
-	-2 tisk receptu (ze stránky receptu)
-	- register captcha
-	- změna hesla
-	- zapomenuté heslo
-		- poslat dočasný?
-		- poslat odkaz, kde se dá změnit/obnovit?
-	-3 Dieta 3,5 : 1 ????
-		- vůbec nevím, co to znamená
+
+
+

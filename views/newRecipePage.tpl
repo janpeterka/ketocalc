@@ -11,8 +11,11 @@
         <script type="text/javascript">
             $(document).ready(function() {
                 selectAllIngredients = String(document.getElementById("ingredientSelect").innerHTML);
+                // $("#addRecipe").css('visibility', 'hidden');
+                $("#right").css('visibility', 'hidden');
+                $("#wrong").css('visibility', 'hidden');
+                $(".loader").css('visibility', 'hidden');
             });
-
 
             $(document).on("submit", "#addIngredientForm", function(e) {
                     $.ajax({
@@ -30,9 +33,10 @@
                                 $('#ingredientsArray').val(temp_array + ", " + response.id);
                             }
 
-                            $("#addRecipe").css('visibility', 'hidden');
+                            // $("#addRecipe").css('visibility', 'hidden');
                             $("#right").css('visibility', 'hidden');
                             $("#wrong").css('visibility', 'hidden');
+                            $(".loader").css('visibility', 'hidden');
                             
                         },
                         error: function(error) {
@@ -41,6 +45,10 @@
 
                     });
                     e.preventDefault();
+            });
+
+            $(document).on("click", "#calcRecipe", function() {
+                $(".loader").css('visibility', 'visible');
             });
 
             $(document).on("submit", "#calcRecipeForm", function(e) {
@@ -63,7 +71,11 @@
 
                             if (response=="False"){
                                 console.log("False");
+                                // $("#addRecipe").css('visibility', 'visible');
+                                $(".loader").css('visibility', 'hidden');
+                                $("#right").css('visibility', 'hidden');
                                 $("#wrong").css('visibility', 'visible');
+
                                 return;
                             }
                             totalSugar = 0;
@@ -108,7 +120,9 @@
                             $('#selectedDietID').val(response.dietID);
 
                             // change visibility
-                            $("#addRecipe").css('visibility', 'visible');
+                            // $("#addRecipe").css('visibility', 'visible');
+                            $(".loader").css('visibility', 'hidden');
+                            $("#wrong").css('visibility', 'hidden');
                             $("#right").css('visibility', 'visible');
 
                         },
@@ -121,20 +135,35 @@
 
         </script>
         <style type="text/css" media="screen">
-
-            #addRecipe{
+            #wrong{
                 visibility: hidden;
             }
 
-            #wrong{
+            #right{
                 visibility: hidden;
+            }
+
+            .loader {
+                visibility: hidden;
+                border: 16px solid #f3f3f3; /* Light grey */
+                border-top: 16px solid #337ab7; /* Blue */
+                border-radius: 50%;
+                width: 120px;
+                height: 120px;
+                animation: spin 2s linear infinite;
+                margin: 40px auto;
+            }
+
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
             }
         </style>
     </head>
     <body>
         % include('navbar.tpl')
         <div class="container row">
-            <div class="col-md-7">
+            <div class="col-md-7" style="margin-top: 40px">
 
                 <div class="form-group col-sm-12">
                     <form id="addIngredientForm" method="POST" action="/addIngredientAJAX">
@@ -175,9 +204,11 @@
             </div>
 
 
-            <div class="col-md-4" id=addRecipe style="position: relative;">
+            <div class="col-md-5" id=addRecipe style="position: relative;">
 
-                <div id="wrong" style="position:absolute; top:0px;">
+                <div class="loader"></div>
+
+                <div id="wrong" class="offset-md-6" style="position:absolute; top:0px;">
                     <span class="problem" style="text-align: center">Recept nelze vytvořit</span>
                 </div>
 
