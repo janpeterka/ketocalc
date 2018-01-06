@@ -905,7 +905,7 @@ def error404(error):
 
 @error(500)
 def error500(error):
-    return 'Something went wrong! (Err500) <br>' + str(error)
+    return 'Something went wrong! (Err500) <br>'
 
 
 # application = bottle.default_app()

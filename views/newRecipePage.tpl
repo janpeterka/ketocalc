@@ -9,12 +9,52 @@
         % include('styleBody.tpl')
 
         <script type="text/javascript">
+
+            // On ready - change visibility to default
             $(document).ready(function() {
                 selectAllIngredients = String(document.getElementById("ingredientSelect").innerHTML);
                 // $("#addRecipe").css('visibility', 'hidden');
                 $("#right").css('visibility', 'hidden');
                 $("#wrong").css('visibility', 'hidden');
                 $(".loader").css('visibility', 'hidden');
+            });
+
+            $(function(){
+                  $('#selectedIngredients').on('click','tr button.remove',function(e){
+                     e.preventDefault();
+                    $(this).parents('tr').remove();
+
+                    temp_id = $(this).attr('id');
+                    temp_array=$('#ingredientsArray').val().split(", ");
+                    temp_array.splice($.inArray(temp_id, temp_array),1);
+
+
+                    $('#ingredientsArray').val("");
+                    for (let i = 0; i < temp_array.length; i++) {
+                        temp_val = $('#ingredientsArray').val();
+                        if (temp_val === "") {
+                            $('#ingredientsArray').val(temp_array[i]);
+                        }else{
+                            $('#ingredientsArray').val(temp_val + ", " + temp_array[i]);
+                        }
+                    }
+                    // console.log($('#ingredientsArray').val());
+
+                    // Restore default options
+                    $('#ingredientSelect').empty();
+                    $('#ingredientSelect').append(selectAllIngredients);
+
+
+                    console.log($('#ingredientSelect'));
+                    // Remove used options
+                    for (let j = 0; j < temp_array.length; j++) {
+                        console.log(temp_array[j]);
+                        $('#ingredientSelect option[value="' + temp_array[j] + '"]').remove(); // wip
+                    }
+
+                    
+
+                  });
             });
 
             $(document).on("submit", "#addIngredientForm", function(e) {
@@ -24,8 +64,8 @@
                         data: $(this).serialize(),
                         success: function(response) {
                             $("#ingredientSelect option[value='"+response.id+"']").remove();
-                            $('#selectedIngredients').append("<tr><td>" + response.name + "</td><td>" + response.protein+ "</td><td>" + response.fat + "</td><td>" + response.sugar + "</td></tr>");
-                            // console.log($('#ingredientsArray').val());
+                            $('#selectedIngredients').append("<tr><td>" + response.id + "</td><td>" + response.name + "</td><td>" + response.protein+ "</td><td>" + response.fat + "</td><td>" + response.sugar + "</td><td>" + '<button id="' + response.id + '" class="remove btn btn-warning">Ubrat</button>' + "</td></tr>");
+                            // console.log($('#selectedIngredients').val());
                             var temp_array = $('#ingredientsArray').val();
                             if (temp_array.length === 0) {
                                 $('#ingredientsArray').val(response.id);
@@ -132,8 +172,8 @@
                     });
                     e.preventDefault();
                 });
-
         </script>
+        
         <style type="text/css" media="screen">
             #wrong{
                 visibility: hidden;
@@ -184,6 +224,7 @@
                             <th>Bílkovina</th>
                             <th>Tuk</th>
                             <th>Sacharidy</th>
+                            <th></th>
                         </tr>
                     </table>
                 </div>
@@ -239,7 +280,6 @@
 
             
         </div>
-
     </body>
 </html>
 

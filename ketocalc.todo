@@ -1,11 +1,11 @@
 v2.1
-	- ubrat špatně přidanou surovinu
+	+- ubrat špatně přidanou surovinu
 	- Calculator 4
 		- slider for variable
 		- choose which variable
 	- Dieta 3,5 : 1 ????
 		- vůbec nevím, co to znamená
-	- surovina energie
+	- surovina energie??
 	- ml nebo gramy? V čem ukládat, v čem měřit?
 
 v2.2
@@ -14,7 +14,7 @@ v2.2
 	- tisk receptu (ze stránky receptu)
 
 v2.3 aka Private publish
-
+	- SQL injection
 
 v3.0
 	- Calculator 5
