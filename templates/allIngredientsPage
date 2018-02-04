@@ -4,12 +4,12 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>Všechny suroviny</title>
-    % include('bootstrap.tpl')
-    % include('styleBody.tpl')        
+    {% include('bootstrap') %}
+    {% include('styleBody') %}        
     </script>
 </head>
 <body>
-    % include('navbar.tpl')
+    {% include('navbar') %}
     <div class="col-6">
         <table id="ingredients" class="table">
             <tr>
@@ -18,14 +18,14 @@
                 <th>Tuk</th>
                 <th>Sacharidy</th>
             </tr>
-            %for ingredient in ingredients:
+            {% for ingredient in ingredients: %}
                 <tr>
-                    <td><a href="/ingredient={{ingredient.id}}">{{ingredient.name}}</a></td>
-                    <td>{{ingredient.protein}}</td>
-                    <td>{{ingredient.fat}}</td>
-                    <td>{{ingredient.sugar}}</td>
+                    <td><a href="/ingredient={{ingredient.id}}">{{ ingredient.name }}</a></td>
+                    <td>{{ ingredient.protein }}</td>
+                    <td>{{ ingredient.fat }}</td>
+                    <td>{{ ingredient.sugar }}</td>
                 </tr>
-            %end
+            {% endfor %}
         </table>
     </div>    
 </body>

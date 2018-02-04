@@ -3,15 +3,13 @@
 
 # run by pyserver
 
-import bottle
-# from bottle import view
-from bottle import route, template
-from bottle import error, redirect
-from bottle import get, post, request
-# from bottle import static_file
+from flask import Flask, render_template as template, request, redirect
+from flask import jsonify
+from flask import session
 
 # Session manager
-from beaker.middleware import SessionMiddleware
+# from flask.sessions import SessionInterface
+# from beaker.middleware import SessionMiddleware
 
 # MySQL connector
 import MySQLdb
@@ -22,30 +20,13 @@ import hashlib
 # Math library
 import numpy
 import sympy as sp
-# from sympy import solve_rational_inequalities as solvein
 from sympy import solve_poly_inequality as solvei
-# from sympy import Union
-# from sympy import Poly
 from sympy import poly
 import math
 
-from sys import argv
 
-# dev var - LOCAL / DEPLOY
-# APP_MODE = "LOCAL"
-APP_MODE = "DEPLOY"
-
-bottle.TEMPLATE_PATH.insert(0, '/home/jan/Dropbox/Programming/ketoCalc/views')
-bottle.TEMPLATE_PATH.insert(0, './views')
-
-session_opts = {
-    'session.type': 'file',
-    'session.cookie_expires': 60000,
-    'session.data_dir': './data',
-    'session.auto': True
-}
-
-beaker_app = SessionMiddleware(bottle.app(), session_opts)
+# towards the beginging of the file, soon after imports
+app = Flask(__name__)
 
 
 def temp_print(input):
@@ -55,22 +36,25 @@ def temp_print(input):
 class Diet(object):
     """  For loading from database """
 
-    def __init__(self, dbID, name, sugar, fat, protein):
+    def __init__(self, dbID, name, sugar, fat, protein, small_size, big_size):
         super(Diet, self).__init__()
         self.id = dbID
         self.name = name
         self.sugar = sugar
         self.fat = fat
         self.protein = protein
+        self.small_size = small_size
+        self.big_size = big_size
 
 
 class Recipe(object):
     """  For loading from database """
 
-    def __init__(self, dbID, name):
+    def __init__(self, dbID, name, size):
         super(Recipe, self).__init__()
         self.id = dbID
         self.name = name
+        self.size = size
 
 
 class Ingredient(object):
@@ -98,27 +82,35 @@ class User(object):
         self.lastname = lastname
 
 
-# SESSION related functions
-def getSession():
-    session = bottle.request.environ.get('beaker.session')
-    return session
-
-
 # DATABASE related functions
 def dbConnect():
-    db = MySQLdb.connect(host='cvktne7b4wbj4ks1.chr7pe7iynqr.eu-west-1.rds.amazonaws.com', port=3306, user='sbn13vkg4k895di1', password='ot7aivfxw37d9tbr', database='nobexi41fwyb1088', charset='utf8', init_command='SET NAMES UTF8')
+    """Connects to database
+    Returns:
+        database connection
+    """
+    db = MySQLdb.connect(host='vlvlnl1grfzh34vj.chr7pe7iynqr.eu-west-1.rds.amazonaws.com', port=3306, user='qgqgujt50se6wg97', password='siod5gp2hnuus5dl', database='xlen3bfwr4nk4sr9', charset='utf8', init_command='SET NAMES UTF8')
     return db
 
 
 # Recipes
 def loadRecipe(recipeID):
+    """Load recipe and ingredients
+
+    Loads array with recipe and list of its ingredients IDs
+
+    Arguments:
+        recipeID {int} -- ID of recipe
+
+    Returns:
+        array[Recipe, Array[int]]
+    """
     db = dbConnect()
     cursor = db.cursor()
 
     query = ("SELECT * FROM recipes WHERE id='{}';".format(recipeID))
     cursor.execute(query)
     response = cursor.fetchone()
-    recipe = Recipe(response[0], response[1])
+    recipe = Recipe(response[0], response[1], response[2])
 
     query = ("SELECT recipes_has_ingredients.ingredients_id FROM recipes_has_ingredients WHERE recipes_has_ingredients.recipes_id='{}';".format(recipeID))
     cursor.execute(query)
@@ -126,30 +118,36 @@ def loadRecipe(recipeID):
 
     ingredientIDs = []
     for i in range(len(response)):
-        ingrID = response[i][0]
-        ingredientIDs.append(ingrID)
+        ingredientIDs.append(response[i][0])
 
     return [recipe, ingredientIDs]
-    """ recipe (Recipe: id, name); ingredientIDs (Array: ingredientID (Int))"""
 
 
 def saveRecipe(recipe, ingredients, dietID):
-    """ recipe (Object: name), ingredients (Array of ingredient (Object: id, amount), dietID (Int)"""
+    """Save recipe to database
+
+    [description]
+
+    Arguments:
+        recipe {Recipe} -- recipe to be added
+        ingredients {array[Ingredients]} -- array of ingredient in recipe
+        dietID {int} -- id of diet for this recipe
+
+    Returns:
+        int -- ID of newly added recipe
+    """
 
     db = dbConnect()
     cursor = db.cursor()
 
-    """ Save to recipe table """
-    query = ("INSERT INTO recipes(name) VALUES ('{}');".format(recipe.name))
+    query = ("INSERT INTO recipes(name, type) VALUES ('{}', '{}');".format(recipe.name, recipe.size))
     cursor.execute(query)
     last_id = db.insert_id()
 
-    """ Save to recipe/ingredient table"""
     for ingredient in ingredients:
         query = ("INSERT INTO recipes_has_ingredients(recipes_id, ingredients_id, amount) VALUES({}, {}, {})".format(last_id, ingredient.id, ingredient.amount))
         cursor.execute(query)
 
-    """ save to diet/recipe table"""
     query = ("INSERT INTO diets_has_recipes(diets_id, recipes_id) VALUES ({}, {});".format(dietID, last_id))
     cursor.execute(query)
 
@@ -159,6 +157,11 @@ def saveRecipe(recipe, ingredients, dietID):
 
 
 def deleteRecipe(recipeID):
+    """Delete recipe from database
+
+    Arguments:
+        recipeID {int} -- ID of recipe to be removed
+    """
     db = dbConnect()
     cursor = db.cursor()
 
@@ -175,6 +178,14 @@ def deleteRecipe(recipeID):
 
 
 def loadUserRecipes(username):
+    """Loads all user's recipes
+
+    Arguments:
+        username {str} -- [description]
+
+    Returns:
+        array -- all user Recipes
+    """
     recipes = []
     diets = loadUserDiets(username)
     for diet in diets:
@@ -186,6 +197,16 @@ def loadUserRecipes(username):
 
 
 def loadRecipeDietID(recipeID):
+    """get ID of diet for recipe
+
+    used in allrecipes and showRecipe
+
+    Arguments:
+        recipeID {int} -- [description]
+
+    Returns:
+        int -- diet.id
+    """
     db = dbConnect()
     cursor = db.cursor()
     query = ("SELECT diets_has_recipes.diets_id FROM diets_has_recipes WHERE recipes_id='{}';".format(recipeID))
@@ -196,6 +217,16 @@ def loadRecipeDietID(recipeID):
 
 
 def loadDietRecipes(dietID):
+    """Get all Recipes for Diet
+
+    [description]
+
+    Arguments:
+        dietID {int} -- [description]
+
+    Returns:
+        array -- array of Recipes
+    """
     db = dbConnect()
     cursor = db.cursor()
     query = ("SELECT diets_has_recipes.recipes_id FROM diets_has_recipes WHERE diets_id='{}';".format(dietID))
@@ -206,15 +237,24 @@ def loadDietRecipes(dietID):
 
     for i in range(len(response)):
         temp_recipe = loadRecipe(response[i][0])[0]    # get only recipe
-        recipe = Recipe(temp_recipe.id, temp_recipe.name)
+        recipe = Recipe(temp_recipe.id, temp_recipe.name, temp_recipe.size)  # wip - je to potřeba?
         recipes.append(recipe)
 
     return recipes
-    """ recipe (Recipe: id, name)"""
 
 
 # Diets
 def loadDiet(dietID):
+    """Get diet by ID
+
+    [description]
+
+    Arguments:
+        dietID {int} -- [description]
+
+    Returns:
+        diet -- [description]
+    """
     db = dbConnect()
     cursor = db.cursor()
 
@@ -222,17 +262,26 @@ def loadDiet(dietID):
     cursor.execute(query)
     response = cursor.fetchone()
 
-    diet = Diet(response[0], response[1], response[2], response[3], response[4])
+    diet = Diet(response[0], response[1], response[2], response[3], response[4], response[5], response[6])
 
     return diet
-    """ diet (Diet: id, name, sugar, fat, protein) """
 
 
-def saveDiet(diet):             # diet as object (name, sugar, fat, protein)
+def saveDiet(diet):
+    """[summary]
+
+    [description]
+
+    Arguments:
+        diet {Diet} -- [description]
+
+    Returns:
+        int -- [description]
+    """
     db = dbConnect()
     cursor = db.cursor()
 
-    query = ("INSERT INTO diets(name, sugar, fat, protein) VALUES ('{}', '{}', '{}', '{}');".format(diet.name, diet.sugar, diet.fat, diet.protein))
+    query = ("INSERT INTO diets(name, sugar, fat, protein, small_size, big_size) VALUES ('{}', '{}', '{}', '{}', '{}', '{}');".format(diet.name, diet.sugar, diet.fat, diet.protein, diet.small_size, diet.big_size))
     cursor.execute(query)
 
     last_id = db.insert_id()
@@ -245,6 +294,16 @@ def saveDiet(diet):             # diet as object (name, sugar, fat, protein)
 
 
 def deleteDietCheck(dietID):
+    """check if diet has recipes
+
+    [description]
+
+    Arguments:
+        dietID {int} -- [description]
+
+    Returns:
+        bool -- [description]
+    """
     db = dbConnect()
     cursor = db.cursor()
 
@@ -258,6 +317,13 @@ def deleteDietCheck(dietID):
 
 
 def deleteDiet(dietID):
+    """Deletes diet
+
+    WIP: makes orphan recipes
+
+    Arguments:
+        dietID {int} -- [description]
+    """
     db = dbConnect()
     cursor = db.cursor()
 
@@ -275,20 +341,30 @@ def deleteDiet(dietID):
 
 
 def loadUserDiets(username):
+    """Load diets for user
+
+    [description]
+
+    Arguments:
+        username {str} -- [description]
+
+    Returns:
+        array -- array of Diets
+    """
     db = dbConnect()
     cursor = db.cursor()
     temp_query = ("SELECT users.id FROM users WHERE users.username = '{}';".format(username))
     cursor.execute(temp_query)
     user_id = cursor.fetchone()
 
-    query = ("SELECT diets.id, diets.name, diets.sugar, diets.fat, diets.protein FROM diets JOIN users_has_diets ON diets.id=users_has_diets.diets_id WHERE users_has_diets.users_id= '{}' ;".format(user_id[0]))
+    query = ("SELECT diets.id, diets.name, diets.sugar, diets.fat, diets.protein, diets.small_size, diets.big_size FROM diets JOIN users_has_diets ON diets.id=users_has_diets.diets_id WHERE users_has_diets.users_id= '{}' ;".format(user_id[0]))
     cursor.execute(query)
     response = cursor.fetchall()
 
     # convert to array of objects
     diets = []
     for i in range(len(response)):
-        temp_diet = Diet(response[i][0], response[i][1], response[i][2], response[i][3], response[i][4], )
+        temp_diet = Diet(response[i][0], response[i][1], response[i][2], response[i][3], response[i][4], response[i][5], response[i][6],)
         diets.append(temp_diet)
 
     return diets
@@ -296,17 +372,22 @@ def loadUserDiets(username):
 
 # Ingredients
 def loadAllIngredients(username):
+    """Get all Ingredients for user
+
+    used in newRecipe
+
+    Arguments:
+        username {str} -- [description]
+
+    Returns:
+        array -- alphabetically sorted array of Ingredients
+    """
     db = dbConnect()
     cursor = db.cursor()
 
     query = ("SELECT * FROM ingredients WHERE author='{}';".format(username))
     cursor.execute(query)
     response = cursor.fetchall()
-
-    # ingredients = []
-    # for i in response:
-    #     ingredient = Ingredient(i[0], i[1], i[2], i[3], i[4])
-    #     ingredients.append(ingredient)
 
     temp_ingredients = []
     for ingredient in response:
@@ -320,6 +401,16 @@ def loadAllIngredients(username):
 
 
 def loadIngredient(ingredientID):
+    """[summary]
+
+    [description]
+
+    Arguments:
+        ingredientID {int} -- [description]
+
+    Returns:
+        Ingredient -- [description]
+    """
     db = dbConnect()
     cursor = db.cursor()
 
@@ -333,17 +424,39 @@ def loadIngredient(ingredientID):
 
 
 def loadAmount(ingredientID, recipeID):
+    """[summary]
+
+    [description]
+
+    Arguments:
+        ingredientID {int} -- [description]
+        recipeID {int} -- [description]
+
+    Returns:
+        int -- amount of Ingredinent in Recipe
+    """
     db = dbConnect()
     cursor = db.cursor()
 
     query = ("SELECT amount FROM recipes_has_ingredients WHERE recipes_has_ingredients.ingredients_id = '{}' AND recipes_has_ingredients.recipes_id = '{}'".format(ingredientID, recipeID))
     cursor.execute(query)
-    response = cursor.fetchone()
+    amount = cursor.fetchone()
 
-    return response
+    return amount
 
 
-def saveIngredient(ingredient, username):  # ingredient as object (name, sugar, fat, protein)
+def saveIngredient(ingredient, username):
+    """
+
+    [description]
+
+    Arguments:
+        ingredient {Ingredient} -- [description]
+        username {str} -- [description]
+
+    Returns:
+        int -- [description]
+    """
     db = dbConnect()
     cursor = db.cursor()
 
@@ -357,6 +470,16 @@ def saveIngredient(ingredient, username):  # ingredient as object (name, sugar, 
 
 
 def deleteIngredientCheck(ingredientID):
+    """[summary]
+
+    [description]
+
+    Arguments:
+        ingredientID {int} -- [description]
+
+    Returns:
+        bool -- [description]
+    """
     db = dbConnect()
     cursor = db.cursor()
 
@@ -370,6 +493,13 @@ def deleteIngredientCheck(ingredientID):
 
 
 def deleteIngredient(ingredientID):
+    """[summary]
+
+    WIP: leaves orphan ingredients
+
+    Arguments:
+        ingredientID {[type]} -- [description]
+    """
     db = dbConnect()
     cursor = db.cursor()
 
@@ -382,6 +512,19 @@ def deleteIngredient(ingredientID):
 
 # Users
 def saveUser(username, password_hash, firstname, lastname):
+    """[summary]
+
+    [description]
+
+    Arguments:
+        username {str} -- [description]
+        password_hash {str} -- [description]
+        firstname {str} -- [description]
+        lastname {str} -- [description]
+
+    Returns:
+        bool -- success
+    """
     db = dbConnect()
     cursor = db.cursor()
 
@@ -390,10 +533,23 @@ def saveUser(username, password_hash, firstname, lastname):
 
     db.commit()
 
-    return cursor.rowcount
+    if cursor.rowcount == 1:
+        return True
+    else:
+        return False
 
 
 def loadUser(username):
+    """[summary]
+
+    [description]
+
+    Arguments:
+        username {str} -- [description]
+
+    Returns:
+        User or None -- [description]
+    """
     db = dbConnect()
     cursor = db.cursor()
 
@@ -410,34 +566,36 @@ def loadUser(username):
 
 # MAIN
 
-@route('/')
+@app.before_request
+def session_management():
+    # make the session last indefinitely until it is cleared
+    session.permanent = True
+
+
+@app.route('/', methods=['GET'])
 def main():
-    if getSession().get('username') is not None:
-        redirect('/user')
+    if 'username' not in session:
+        return redirect('/user')
     else:
-        redirect('login')
+        return redirect('login')
 
 
 # LOGIN
-@get('/login')
+@app.route('/login', methods=['GET'])
 def login():
-    session = getSession()
-    if session.get('username') is not None:
-        redirect('/user')
+    if 'username' in session:
+        return redirect('/user')
     else:
         return template('loginForm')
 
 
-@post('/login')
+@app.route('/login', methods=['POST'])
 def do_login():
-    username = request.forms.username
-    password = request.forms.password
+    username = request.form['username']
+    password = request.form['password']
     if check_login(username, password):
-        # return "<p>Your login information was correct.</p>"
-        session = getSession()
         session['username'] = username
-        session.save()
-        redirect('/user')
+        return redirect('/user')
     else:
         return False
 
@@ -458,31 +616,29 @@ def check_login(username, password):
         return False
 
 
-@route('/logout')
+@app.route('/logout')
 def logout():
-    session = getSession()
-    session['username'] = None
-    session.save()
-    redirect('/login')
+    session.pop('username', None)
+    return redirect('/login')
 
 
-@get('/register')
+@app.route('/register', methods=['GET'])
 def register():
     return template('registerForm', username="", firstname="", lastname="", problem="")
 
 
-@post('/register')
+@app.route('/register', methods=['POST'])
 def do_register():
-    username = request.forms.username
+    username = request.form['username']
     # check uniquness of username
 
-    temp_password = str(request.forms.password)
-    temp_password_2 = str(request.forms.againPassword)
+    temp_password = str(request.form['password'])
+    temp_password_2 = str(request.form['againPassword'])
 
-    password_hash = hashlib.sha256(temp_password).hexdigest()
-    firstname = request.forms.firstname
+    password_hash = hashlib.sha256(temp_password.encode('utf-8')).hexdigest()
+    firstname = request.form['firstname']
 
-    lastname = request.forms.lastname
+    lastname = request.form['lastname']
 
     problem = ""
 
@@ -502,70 +658,65 @@ def do_register():
 
     response = saveUser(username, password_hash, firstname, lastname)
 
-    if response == 1:
-        redirect('/login')
+    if response:
+        return redirect('/login')
     else:
         return template('failure', problem="Registrace neproběhla v pořádku")
 
 
-@post('/registerValidate')
+@app.route('/registerValidate', methods=['POST'])
 def validateRegister():
-    username = request.forms.username
+    username = request.form['username']
     if loadUser(username) is not None:
         return "False"
     else:
         return "True"
 
+
 # USER PAGE
-
-
-@route('/user')
+@app.route('/user')
 def user():
-    session = getSession()
-    if session.get('username') is None:
-        redirect('/login')
+    if 'username' not in session:
+        return redirect('/login')
     diets = loadUserDiets(session['username'])
     user = loadUser(session['username'])
     return template('userPage', username=session['username'], diets=diets, firstname=user.firstname)
 
 
-@route('/selectDietAJAX', method='POST')
+@app.route('/selectDietAJAX', methods=['POST'])
 def selectDietAJAX():
-    session = getSession()
-    if session.get('username') is None:
-        redirect('/login')
-    dietID = request.forms.selectDiet
+    if 'username' not in session:
+        return redirect('/login')
+    dietID = request.form['selectDiet']
     recipes = loadDietRecipes(dietID)
-
     for i in range(len(recipes)):
         recipe = recipes[i]
         json_recipe = {'id': recipe.id, 'name': recipe.name}
         recipes[i] = json_recipe
 
     array_recipes = {'array': recipes, 'dietID': dietID}
-    return array_recipes
+    return jsonify(array_recipes)
 
 
 # NEW DIET
-@get('/newdiet')
+@app.route('/newdiet', methods=['GET'])
 def newDietShow():
-    session = getSession()
-    if session.get('username') is None:
-        redirect('/login')
+    if 'username' not in session:
+        return redirect('/login')
     return template('newDietPage', name="", sugar="", fat="", protein="", problem="")
 
 
-@post('/newdiet')
+@app.route('/newdiet', methods=['POST'])
 def addDietAJAX():
-    session = getSession()
-    if session.get('username') is None:
-        redirect('/login')
+    if 'username' not in session:
+        return redirect('/login')
     diet = type('', (), {})()               # Magický trik, jak udělat prázdný objekt
-    diet.name = request.forms.name
-    diet.sugar = request.forms.sugar
-    diet.fat = request.forms.fat
-    diet.protein = request.forms.protein
-
+    diet.name = request.form['name']
+    diet.sugar = request.form['sugar']
+    diet.fat = request.form['fat']
+    diet.protein = request.form['protein']
+    diet.small_size = request.form['small_size']
+    diet.big_size = request.form['big_size']
     problem = ""
 
     if len(diet.protein) == 0:
@@ -582,15 +733,14 @@ def addDietAJAX():
 
     diet.username = session['username']
     last_id = saveDiet(diet)
-    redirect('/diet={}'.format(last_id))
+    return redirect('/diet={}'.format(last_id))
 
 
 # SHOW DIET PAGE
-@route('/diet=<dietID>')
+@app.route('/diet=<dietID>')
 def showDiet(dietID):
-    session = getSession()
-    if session.get('username') is None:
-        redirect('/login')
+    if 'username' not in session:
+        return redirect('/login')
 
     diet = loadDiet(dietID)
     recipes = loadDietRecipes(diet.id)
@@ -598,94 +748,152 @@ def showDiet(dietID):
     return template('dietPage', diet=diet, recipes=recipes)
 
 
-@route('/diet=<dietID>/remove', method='POST')
+@app.route('/diet=<dietID>/remove', methods=['POST'])
 def removeDiet(dietID):
     if deleteDietCheck(dietID):  # wip
         deleteDiet(dietID)
-        redirect("/user")
+        return redirect("/user")
     else:
         return template('failure', problem="Tato dieta má recepty, nelze smazat")
 
 
-@route('/alldiets')
+@app.route('/alldiets')
 def allDiets():
-    session = getSession()
-    if session.get('username') is None:
-        redirect('/login')
+    if 'username' not in session:
+        return redirect('/login')
 
     diets = loadUserDiets(session['username'])
     return template('allDietsPage', diets=diets)
 
 
 # NEW RECIPE PAGE
-@route('/newrecipe')
+@app.route('/newrecipe')
 def newRecipe():
-    session = getSession()
-    if session.get('username') is None:
-        redirect('/login')
+
+    if 'username' not in session:
+        return redirect('/login')
 
     diets = loadUserDiets(session['username'])
     ingredients = loadAllIngredients(session['username'])
     return template('newRecipePage', ingredients=ingredients, diets=diets, problem="")
 
 
-@route('/addIngredientAJAX', method='POST')
+@app.route('/addIngredientAJAX', methods=['POST'])
 def addIngredienttoRecipeAJAX():
-    session = getSession()
-    if session.get('username') is None:
-        redirect('/login')
-    ingredient = loadIngredient(request.forms.ingredient)
+    if 'username' not in session:
+        return redirect('/login')
+    ingredient = loadIngredient(request.form['ingredient'])
     json_ingredient = {'id': ingredient.id, 'name': ingredient.name, 'sugar': ingredient.sugar, 'fat': ingredient.fat, 'protein': ingredient.protein}
-    return json_ingredient
+    return jsonify(json_ingredient)
 
 
-@route('/calcRecipeAJAX', method='POST')
+@app.route('/calcRecipeAJAX', methods=['POST'])
 def calcRecipeAJAX():
-    session = getSession()
-    if session.get('username') is None:
-        redirect('/login')
+    if 'username' not in session:
+        return redirect('/login')
 
-    ingredients = request.forms.ingredientsArray
+    ingredients = request.form['ingredientsArray']
     if len(ingredients) == 0:
+        temp_print("No ingredients")
         return "False"
     ingredients = [word.strip() for word in ingredients.split(',')]
 
-    dietID = request.forms.recipeDiet
+    dietID = request.form['recipeDiet']
     if dietID is None:
+        temp_print("No diet")
         return "False"
 
+    mainIngredientID = request.form['mainIngredientID']
+    # temp solve problem with default WIP (problem with 3)
+    if mainIngredientID == "":
+        mainIngredientID = ingredients[0]
+
+    ingredients.remove(mainIngredientID)
+
+    # reaarange, so last ingredient is the main ingredient
     temp_ingredients = []
     for i in range(len(ingredients)):
         ingredient = loadIngredient(ingredients[i])
         temp_ingredients.append(ingredient)
+    temp_ingredients.append(loadIngredient(mainIngredientID))
 
-    amounts = calc(temp_ingredients, loadDiet(dietID))
-    if amounts is None:
+    ingredients.append(mainIngredientID)
+    temp_print(ingredients)
+
+    solution = calc(temp_ingredients, loadDiet(dietID))
+    if solution is None:
+        temp_print("No solution")
         return "False"
-
+    temp_print(solution.vars)
     for i in range(len(ingredients)):
         ingredient = loadIngredient(ingredients[i])
-        if amounts[i] < 0:
+        if solution.vars[i] < 0:
+            temp_print("Solution < 0")
             return "False"
-        json_ingredient = {'id': ingredient.id, 'name': ingredient.name, 'sugar': ingredient.sugar, 'fat': ingredient.fat, 'protein': ingredient.protein, 'amount': math.ceil(amounts[i] * 10000) / 10000}  # wip
+        json_ingredient = {'id': ingredient.id, 'name': ingredient.name, 'sugar': ingredient.sugar, 'fat': ingredient.fat, 'protein': ingredient.protein, 'amount': math.ceil(solution.vars[i] * 10000) / 100}  # wip
         ingredients[i] = json_ingredient
 
-    array_ingredients = {'array': ingredients, 'dietID': dietID}
-    return array_ingredients
+    if len(ingredients) <= 3:
+        array_ingredients = {'ingredients': ingredients, 'dietID': dietID, }
+    else:
+        array_ingredients = {'ingredients': ingredients, 'dietID': dietID, 'mainIngredientID': mainIngredientID, 'mainIngredientMin': math.ceil(solution.min_sol * 10000) / 100, 'mainIngredientMax': math.ceil(solution.max_sol * 10000) / 100}
+    return jsonify(array_ingredients)
 
 
-@route('/saveRecipeAJAX', method='POST')
+@app.route('/recalcRecipeAJAX', methods=['POST'])
+def recalcRecipeAJAX():
+    # get data
+    mainID = request.json['mainID']
+    mainIngredient = loadIngredient(mainID)
+
+    temp_ingredientsArray = request.json['ingredientsArray']
+    temp_ingredients = [word.strip() for word in temp_ingredientsArray.split(',')]
+    temp_ingredients.remove(mainID)
+    ingredients = []
+    for i in temp_ingredients:
+        ingredients.append(loadIngredient(i))
+
+    dietID = request.json['dietID']
+    diet = loadDiet(dietID)
+
+    slider = request.json['slider']
+    slider = float(slider)
+
+    # recalc
+    a = numpy.array([
+        [ingredients[0].protein, ingredients[1].protein, ingredients[2].protein],
+        [ingredients[0].fat, ingredients[1].fat, ingredients[2].fat],
+        [ingredients[0].sugar, ingredients[1].sugar, ingredients[2].sugar],
+    ])
+    b = numpy.array([
+        (diet.protein * 10000 - mainIngredient.protein * math.ceil(slider * 100)) / 10000,
+        (diet.fat * 10000 - mainIngredient.fat * math.ceil(slider * 100)) / 10000,
+        (diet.sugar * 10000 - mainIngredient.sugar * math.ceil(slider * 100)) / 10000,
+    ])
+    results = numpy.linalg.solve(a, b)
+    for i in range(len(results)):
+        results[i] = math.ceil(results[i] * 10000) / 100
+    x = {'id': temp_ingredients[0], 'amount': results[0]}
+    y = {'id': temp_ingredients[1], 'amount': results[1]}
+    z = {'id': temp_ingredients[2], 'amount': results[2]}
+    slider = {'id': mainID, 'amount': slider}
+    solutionJSON = {'x': x, 'y': y, 'z': z, 'slider': slider}
+
+    # give ids with amounts
+    return jsonify(solutionJSON)
+
+
+@app.route('/saveRecipeAJAX', methods=['POST'])
 def addRecipeAJAX():
-    session = getSession()
-    if session.get('username') is None:
-        redirect('/login')
+    if 'username' not in session:
+        return redirect('/login')
 
-    dietID = request.forms.selectedDietID
+    dietID = request.form['selectedDietID']
 
-    temp_ingredients = request.forms.ingredientsArray2
+    temp_ingredients = request.form['ingredientsArray2']
     temp_ingredients = [word.strip() for word in temp_ingredients.split(',')]
 
-    amounts = request.forms.ingredientsAmount2
+    amounts = request.form['ingredientsAmount2']
     amounts = [word.strip() for word in amounts.split(',')]
 
     ingredients = []
@@ -696,35 +904,57 @@ def addRecipeAJAX():
         ingredients.append(ingredient)
 
     recipe = type('', (), {})()
-    recipe.name = request.forms.recipeName
+    recipe.name = request.form['recipeName']
+    recipe.size = request.form['size']
     last_id = saveRecipe(recipe, ingredients, dietID)
-    redirect('/recipe=' + str(last_id))
+    return redirect('/recipe=' + str(last_id))
 
 
-@route('/recipe=<recipeID>')
+@app.route('/recipe=<recipeID>')
 def showRecipe(recipeID):
     recipe = loadRecipe(recipeID)[0]
+    diet = loadDiet(loadRecipeDietID(recipe.id))
+    if recipe.size == "big":
+        coef = diet.big_size / 100
+    else:
+        coef = diet.small_size / 100
+
     ingredientIDs = loadRecipe(recipeID)[1]
     ingredients = []
     for ID in ingredientIDs:
         ingredients.append(loadIngredient(ID))
     for i in ingredients:
-        i.amount = float(loadAmount(i.id, recipeID)[0])
+        i.amount = float(math.floor(loadAmount(i.id, recipeID)[0] * coef * 100000)) / 100000
 
-    return template('recipePage', recipe=recipe, ingredients=ingredients)
+    totals = type('', (), {})()
+    totals.protein = 0
+    totals.fat = 0
+    totals.sugar = 0
+    totals.amount = 0
+    for i in ingredients:
+        totals.protein += i.amount * i.protein
+        totals.fat += i.amount * i.fat
+        totals.sugar += i.amount * i.sugar
+        totals.amount += i.amount
+
+    totals.protein = math.floor(totals.protein * coef) / 100
+    totals.fat = math.floor(totals.fat * coef) / 100
+    totals.sugar = math.floor(totals.sugar * coef) / 100
+    totals.amount = math.floor(totals.amount)
+    totals.eq = math.floor((totals.fat / (totals.protein + totals.sugar)) * 10) / 10
+    return template('recipePage', recipe=recipe, ingredients=ingredients, totals=totals, diet=diet)
 
 
-@route('/recipe=<recipeID>/remove', method='POST')
+@app.route('/recipe=<recipeID>/remove', methods=['POST'])
 def removeRecipe(recipeID):
     deleteRecipe(recipeID)
-    redirect('/user')
+    return redirect('/user')
 
 
-@route('/allrecipes')
+@app.route('/allrecipes')
 def allrecipes():
-    session = getSession()
-    if session.get('username') is None:
-        redirect('/login')
+    if 'username' not in session:
+        return redirect('/login')
     recipes = loadUserRecipes(session['username'])
     for recipe in recipes:
         recipe.dietID = loadRecipeDietID(recipe.id)
@@ -734,25 +964,23 @@ def allrecipes():
 
 
 # NEW INGREDIENT PAGE
-@get('/newingredient')
+@app.route('/newingredient', methods=['GET'])
 def newingredient():
-    session = getSession()
-    if session.get('username') is None:
-        redirect('/login')
+    if 'username' not in session:
+        return redirect('/login')
     return template('newIngredientPage', name="", sugar="", fat="", protein="", problem="")
 
 
-@post('/newIngredient')
+@app.route('/newIngredient', methods=['POST'])
 def newIngredienttoRecipeAJAX():
-    session = getSession()
-    if session.get('username') is None:
-        redirect('/login')
+    if 'username' not in session:
+        return redirect('/login')
 
     ingredient = type('', (), {})()
-    ingredient.name = request.forms.name
-    ingredient.sugar = request.forms.sugar
-    ingredient.fat = request.forms.fat
-    ingredient.protein = request.forms.protein
+    ingredient.name = request.form['name']
+    ingredient.sugar = request.form['sugar']
+    ingredient.fat = request.form['fat']
+    ingredient.protein = request.form['protein']
 
     problem = ""
     if len(ingredient.protein) == 0:
@@ -768,29 +996,28 @@ def newIngredienttoRecipeAJAX():
         return template('newIngredientPage', name=ingredient.name, sugar=ingredient.sugar, fat=ingredient.fat, protein=ingredient.protein, problem=problem)
 
     saveIngredient(ingredient, session['username'])
-    redirect('/newingredient')
+    return redirect('/newingredient')
 
 
-@route('/ingredient=<ingredientID>')
+@app.route('/ingredient=<ingredientID>')
 def showingredient(ingredientID):
     ingredient = loadIngredient(ingredientID)
     return template('ingredientPage', ingredient=ingredient)
 
 
-@route('/ingredient=<ingredientID>/remove', method='POST')
+@app.route('/ingredient=<ingredientID>/remove', methods=['POST'])
 def removeIngredient(ingredientID):
     if deleteIngredientCheck(ingredientID):  # wip
         deleteIngredient(ingredientID)
-        redirect("/user")
+        return redirect("/user")
     else:
         return template('failure', problem="Tato surovina je použita, nelze smazat")
 
 
-@route('/allingredients')
+@app.route('/allingredients')
 def allingredients():
-    session = getSession()
-    if session.get('username') is None:
-        redirect('/login')
+    if 'username' not in session:
+        return redirect('/login')
     ingredients = loadAllIngredients(session['username'])
     return template("allIngredientsPage", ingredients=ingredients)
 
@@ -807,7 +1034,9 @@ def calc(ingredients, diet):
         x = numpy.linalg.solve(a, b)
 
         if x[0] * ingredients[0].protein + x[1] * ingredients[1].protein == diet.protein:
-            return [x[0], x[1]]
+            solution = type('', (), {})()
+            solution.vars = [x[0], x[1]]
+            return solution
         else:
             return None
     elif len(ingredients) == 3:
@@ -816,70 +1045,67 @@ def calc(ingredients, diet):
                          [ingredients[0].protein, ingredients[1].protein, ingredients[2].protein]])
         b = numpy.array([diet.sugar, diet.fat, diet.protein])
         x = numpy.linalg.solve(a, b)
-        return [x[0], x[1], x[2]]
-    elif len(ingredients) == 4:
-        # a = numpy.array([[ingredients[0].sugar, ingredients[1].sugar, ingredients[2].sugar, ingredients[3].sugar],
-        #                  [ingredients[0].fat, ingredients[1].fat, ingredients[2].fat, ingredients[3].fat],
-        #                  [ingredients[0].protein, ingredients[1].protein, ingredients[2].protein, ingredients[3].protein]])
-        # b = numpy.array([diet.sugar, diet.fat, diet.protein])
-        # x = numpy.linalg.solve(a, b)
-        # temp_print("{}, {}, {}".format(x[0], x[1], x[2]))
-        # return [x[0], x[1], x[2]]
+        solution = type('', (), {})()
+        solution.vars = [x[0], x[1], x[2]]
+        return solution
 
+    elif len(ingredients) == 4:
         x, y, z = sp.symbols('x, y, z')
         e = sp.symbols('e')
+
+        # set of linear equations
         f1 = ingredients[0].sugar * x + ingredients[1].sugar * y + ingredients[2].sugar * z + ingredients[3].sugar * e - diet.sugar
         f2 = ingredients[0].fat * x + ingredients[1].fat * y + ingredients[2].fat * z + ingredients[3].fat * e - diet.fat
         f3 = ingredients[0].protein * x + ingredients[1].protein * y + ingredients[2].protein * z + ingredients[3].protein * e - diet.protein
 
+        # solve equations with args
         in1 = sp.solvers.solve((f1, f2, f3), (x, y, z))[x]
-        # temp_print(in1)
         in2 = sp.solvers.solve((f1, f2, f3), (x, y, z))[y]
-        # temp_print(in2)
         in3 = sp.solvers.solve((f1, f2, f3), (x, y, z))[z]
-        # temp_print(in3)
 
         # Faster way?? wip
+        # solve for positive numbers
         result1 = solvei(poly(in1), ">=")
-        # temp_print(result1)
-
         result2 = solvei(poly(in2), ">=")
-        # temp_print(result2)
-
         result3 = solvei(poly(in3), ">=")
-        # temp_print(result3)
 
         interval = (result1[0].intersect(result2[0])).intersect(result3[0])
-        # temp_print(interval)
+        if interval.right > 100:
+            max_sol = 100
+        else:
+            max_sol = float(math.floor(interval.right * 10000) / 10000)
 
-        max_sol = float(math.floor(interval.right * 10000) / 10000)
-        # temp_print("max solution: {}".format(max_sol))
+        if interval.left < 0:
+            min_sol = 0
+        else:
+            min_sol = float(math.floor(interval.left * 10000) / 10000)
+
+        if max_sol < min_sol:
+            return None
+        # max_sol = max for e (variable )
         sol = max_sol / 2
 
         in1_dict = in1.as_coefficients_dict()
-        # temp_print("e coef: {}".format(in1_dict[e]))
-        # temp_print("1 coef: {}".format(in1_dict[1]))
         x = in1_dict[e] * sol + in1_dict[1]
-        # temp_print("x solution: {}".format(x))
 
         in2_dict = in2.as_coefficients_dict()
-        # temp_print("e coef: {}".format(in2_dict[e]))
-        # temp_print("1 coef: {}".format(in2_dict[1]))
         y = in2_dict[e] * sol + in2_dict[1]
-        # temp_print("y solution: {}".format(y))
 
         in3_dict = in3.as_coefficients_dict()
-        # temp_print("e coef: {}".format(in3_dict[e]))
-        # temp_print("1 coef: {}".format(in3_dict[1]))
         z = in3_dict[e] * sol + in3_dict[1]
-        # temp_print("z solution: {}".format(z))
 
-        x = float(math.floor(x * 10000) / 10000)
-        y = float(math.floor(y * 10000) / 10000)
-        z = float(math.floor(z * 10000) / 10000)
+        x = float(math.floor(x * 100000) / 100000)
+        y = float(math.floor(y * 100000) / 100000)
+        z = float(math.floor(z * 100000) / 100000)
 
         if max_sol >= 0:
-            return [x, y, z, sol]
+            solution = type('', (), {})()
+            solution.vars = [x, y, z, sol]
+            solution.sol = sol
+            solution.min_sol = min_sol
+            solution.max_sol = max_sol
+            # return [x, y, z, f1, f2, f3, sol, min_sol, max_sol]
+            return solution
         else:
             return None
     else:
@@ -887,31 +1113,30 @@ def calc(ingredients, diet):
 
 
 # S'MORE
-@route('/index.html')
+@app.route('/index.html')
 def indexhtml():
-    redirect('/')
+    return redirect('/')
 
 
-@route('/changelog')
+@app.route('/changelog')
 def changelog():
     return template('changelog')
 
 
 # ERROR
-@error(404)
+@app.errorhandler(404)
 def error404(error):
     return 'Nothing here, sorry. (Err404)'
 
 
-@error(500)
+@app.errorhandler(500)
 def error500(error):
-    return 'Something went wrong! (Err500) <br>' + str(error)
+    return 'Something went wrong! (Err500) <br>'
 
 
-# application = bottle.default_app()
-# bottle.run(app=app)
+app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
-if APP_MODE == "LOCAL":
-    bottle.run(host='127.0.0.1', port=8080, app=beaker_app)
-elif APP_MODE == "DEPLOY":
-    bottle.run(host='0.0.0.0', port=argv[1], app=beaker_app)
+
+if __name__ == "__main__":
+    # app.wsgi_app = SessionMiddleware(app.wsgi_app, session_opts)
+    app.run(debug=True)

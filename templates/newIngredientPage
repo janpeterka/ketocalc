@@ -4,23 +4,23 @@
     	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     	<!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
     	<title>Nová surovina</title>
-        % include('bootstrap.tpl')
-        % include('styleBody.tpl')
+        {% include('bootstrap') %}
+        {% include('styleBody') %}
     </head>
     <body>
-        % include('navbar.tpl')
+        {% include('navbar') %}
         <form id="newIngredientForm" method="POST" action="/newIngredient" class="form-group col-sm-4" accept-charset="UTF-8">
 
             <label for="name">Název suroviny</label>
             <input type="text" name="name" class="form-control"  required value={{name}}>
             <label for="protein">Množství bílkovin / 100 g</label>
-            <input type="number" name="protein" class="form-control" step="0.01" required value={{protein}}><br>
+            <input type="text" pattern="[0-9]+([\.][0-9]+)?" name="protein" class="form-control" step="0.01" required value={{protein}}>
             <label for="fat">Množství tuku / 100 g</label>
-            <input type="number" name="fat" class="form-control" step="0.01" required value={{fat}}>
+            <input type="text" pattern="[0-9]+([\.][0-9]+)?" name="fat" class="form-control" step="0.01" required value={{fat}}>
             <label for="sugar">Množství sacharidů / 100 g</label>
-            <input type="number" name="sugar" class="form-control" step="0.01" required value={{sugar}}>
+            <input type="text" pattern="[0-9]+([\.][0-9]+)?" name="sugar" class="form-control" step="0.01" required value={{sugar}}>
             <input id="ajaxButton" type="submit" class="btn btn-primary" value="Přidat surovinu" /><br>
-            <span id=genProblem class="problem">{{problem}}</span>
+            <span id=genProblem class="problem">{{ problem }}</span>
         </form>
     </body>
 </html>

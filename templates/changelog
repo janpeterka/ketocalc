@@ -4,11 +4,11 @@
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<title>Changelog</title>
-	    % include('bootstrap.tpl')
-	    % include('styleBody.tpl')
+	    {% include('bootstrap') %}
+	    {% include('styleBody') %}
 	</head>
 	<body>
-		% include('navbar.tpl')
+		{% include('navbar') %}
 		<div class="changelog">
 			<h3>Alpha</h3>
 			v1
@@ -43,14 +43,13 @@
 						<li>vylepšený formulář přidání receptu</li>
 					</ul>
 				</li>
-				<i>
-					<li>v2.1
-						<ul>
-							<li>variable slide</li>
-							<li>ubrání chybně přidané suroviny (Nový recept)</li>
-						</ul>
-					</li>
-				</i>
+				<li>v2.1
+					<ul>
+						<li>možnost nastavení množství 4. suroviny <i>/bug: nefunguje při výběru poslední suroviny/</i></li>
+						<li>ubrání chybně přidané suroviny (Nový recept)</li>
+						<li>nastavení velkého a malého jídla</li>
+					</ul>
+				</li>
 			</ul>
 			
 

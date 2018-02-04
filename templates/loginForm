@@ -4,8 +4,8 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>Přihlašování</title>
-	% include('bootstrap.tpl')
-	% include('styleBody.tpl')
+	{% include('bootstrap') %}
+	{% include('styleBody') %}
 	<script type="text/javascript">
         $(document).on("submit", "#loginForm", function(e) {
         // $("#loginForm").on("submit", function(e) {
@@ -32,7 +32,7 @@
     </script>
 </head>
 <body>
-    % include('navbar_login.tpl')
+    {% include('navbar_login') %}
 	<div class="col-sm-6">
 		<form id="loginForm" action="/login" method="post" class="form-group" >
 	        <label for="username">Přihlašovací email</label>
@@ -45,7 +45,6 @@
 	        <input name="loginButton" value="Přihlásit" type="submit" class="btn btn-primary col-sm-3" />
         	<a class="col-sm-2" href="/register">Registrovat</a>
 	    </form>
-	    
 	</div>
 </body>
 </html>

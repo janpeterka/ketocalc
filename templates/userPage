@@ -4,8 +4,8 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>Vítejte {{firstname}}</title>
-    % include('bootstrap.tpl')
-    % include('styleBody.tpl')
+    {% include('bootstrap') %}
+    {% include('styleBody') %}
 
     <script type="text/javascript">
 
@@ -38,7 +38,7 @@
     </script>
 </head>
 <body>
-    % include('navbar.tpl')
+    {% include('navbar') %}
     <div class="container row">
         <div class="col">
             Seznam receptů:
@@ -49,9 +49,9 @@
         <div class="form-inline col" style="display: block;">
             <form id="selectDietForm" method="POST" action="/selectDietAJAX">
                 <select id="selectDiet" name="selectDiet" class="form-control">
-                    %for diet in diets:
-                        <option value="{{diet.id}}">{{diet.name}}</option>
-                    %end
+                    {% for diet in diets: %}
+                        <option value="{{diet.id}}">{{ diet.name }}</option>
+                    {% endfor %}
                 </select>
                 <input id="ajaxButton" type="submit" class="btn btn-primary" value="Změnit dietu" />
             </form>

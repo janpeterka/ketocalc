@@ -4,12 +4,12 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>Surovina</title>
-    % include('bootstrap.tpl')
-    % include('styleBody.tpl')
+    {% include('bootstrap') %}
+    {% include('styleBody') %}
 
 </head>
 <body>
-    % include('navbar.tpl')
+    {% include('navbar') %}
     <div class="col-6">
         <!-- <span>{{ingredient.name}}</span> -->
         <table id="ingredients" class="table">
@@ -20,10 +20,10 @@
                 <th>Sacharidy</th>
             </tr>
             <tr>
-                <td>{{ingredient.name}}</td>
-                <td>{{ingredient.protein}}</td>
-                <td>{{ingredient.fat}}</td>
-                <td>{{ingredient.sugar}}</td>
+                <td>{{ ingredient.name }}</td>
+                <td>{{ ingredient.protein }}</td>
+                <td>{{ ingredient.fat }}</td>
+                <td>{{ ingredient.sugar }}</td>
             </tr>    
         </table>
 

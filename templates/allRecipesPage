@@ -4,24 +4,24 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>Všechny recepty</title>
-    % include('bootstrap.tpl')
-    % include('styleBody.tpl')        
+    {% include('bootstrap') %}
+    {% include('styleBody') %}        
     </script>
 </head>
 <body>
-    % include('navbar.tpl')
+    {% include('navbar') %}
     <div class="col-6">
         <table id="diets" class="table">
             <tr>
                 <th>Název</th>
                 <th>Dieta</th>
             </tr>
-            %for recipe in recipes:
+            {% for recipe in recipes: %}
                 <tr>
-                    <td><a href="/recipe={{recipe.id}}">{{recipe.name}}</a></td>
-                    <td><a href="/diet={{recipe.dietID}}">{{recipe.dietName}}</a></td>
+                    <td><a href="/recipe={{recipe.id}}">{{ recipe.name }}</a></td>
+                    <td><a href="/diet={{recipe.dietID}}">{{ recipe.dietName }}</a></td>
                 </tr>
-            %end
+            {% endfor %}
         </table>
     </div>    
 </body>

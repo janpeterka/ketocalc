@@ -2,6 +2,8 @@ asn1crypto==0.22.0
 Beaker==1.9.0
 bottle==0.12.13
 bottle-session==0.8
+Flask==0.12.2
+gunicorn
 certifi==2017.4.17
 chardet==3.0.4
 cryptography==1.9

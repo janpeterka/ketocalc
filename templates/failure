@@ -4,13 +4,13 @@
     	<meta charset="utf-8">
     	<meta http-equiv="X-UA-Compatible" content="IE=edge">
     	<title>Chyba!</title>
-        % include('bootstrap.tpl')
-        % include('styleBody.tpl')
+        {% include('bootstrap') %}
+        {% include('styleBody') %}
 
     </head>
     <body>
-        % include('navbar.tpl')
-        {{problem}}
+        {% include('navbar') %}
+        {{ problem }}
         </form>
 
     </body>

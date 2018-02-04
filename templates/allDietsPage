@@ -4,12 +4,12 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>Všechny diety</title>
-    % include('bootstrap.tpl')
-    % include('styleBody.tpl')        
+    {% include('bootstrap') %}
+    {% include('styleBody') %}        
     </script>
 </head>
 <body>
-    % include('navbar.tpl')
+    {% include('navbar') %}
     <div class="col-6">
         <table id="diets" class="table">
             <tr>
@@ -18,14 +18,14 @@
                 <th>Tuk</th>
                 <th>Sacharidy</th>
             </tr>
-            %for diet in diets:
+            {% for diet in diets: %}
                 <tr>
-                    <td><a href="/diet={{diet.id}}">{{diet.name}}</a></td>
-                    <td>{{diet.protein}}</td>
-                    <td>{{diet.fat}}</td>
-                    <td>{{diet.sugar}}</td>
+                    <td><a href="/diet={{diet.id}}">{{ diet.name }}</a></td>
+                    <td>{{ diet.protein }}</td>
+                    <td>{{ diet.fat }}</td>
+                    <td>{{ diet.sugar }}</td>
                 </tr>
-            %end
+            {% endfor %}
         </table>
     </div>    
 </body>
