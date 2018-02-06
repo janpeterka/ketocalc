@@ -12,147 +12,189 @@
 
             /// On ready - change visibility to default
             $(document).ready(function() {
-                selectAllIngredients = String(document.getElementById("ingredientSelect").innerHTML);
-                // $("#addRecipe").css('visibility', 'hidden');
-                $("#right").css('visibility', 'hidden');
-                $("#wrong").css('visibility', 'hidden');
-                $(".loader").css('visibility', 'hidden');
+                allIngredients = $(".prerecipe__add-ingredient__form__select").html();
+                $(".recipe__right").css('visibility', 'hidden');
+                $(".recipe__wrong").css('visibility', 'hidden');
+                $(".recipe__loader").css('visibility', 'hidden');
             });
 
-            /// Removing ingredient from list of selected ingredients
-            $(function(){
-                  $('#selectedIngredients').on('click','tr button.remove',function(e){
-                     e.preventDefault();
-                    $(this).parents('tr').remove();
+            // ingredient select to actual
+            function prerecipe__addIngredient__form__select__refresh(){
+                $('.prerecipe__add-ingredient__form__select').empty();
+                $('.prerecipe__add-ingredient__form__select').append(allIngredients);
 
-                    temp_id = $(this).attr('id');
-                    temp_array=$('#ingredientsArray').val().split(", ");
-                    temp_array.splice($.inArray(temp_id, temp_array),1);
+                temp_array=$('.prerecipe__calc__form input[name=ingredients]').val().split(", ");
+                for (let j = 0; j < temp_array.length; j++) {
+                    $('.prerecipe__add-ingredient__form__select option[value="' + temp_array[j] + '"]').remove(); // wip
+                }
+            }
 
-
-                    $('#ingredientsArray').val("");
-                    for (let i = 0; i < temp_array.length; i++) {
-                        temp_val = $('#ingredientsArray').val();
-                        if (temp_val === "") {
-                            $('#ingredientsArray').val(temp_array[i]);
-                        }else{
-                            $('#ingredientsArray').val(temp_val + ", " + temp_array[i]);
-                        }
-                    }
-
-                    // Restore default options
-                    $('#ingredientSelect').empty();
-                    $('#ingredientSelect').append(selectAllIngredients);
+            // ingredient select to default
+            function prerecipe__addIngredient__form__select__renew(){
+                $('.prerecipe__add-ingredient__form__select').empty();
+                $('.prerecipe__add-ingredient__form__select').append(allIngredients);
+            }
 
 
-                    // Remove used options
-                    for (let j = 0; j < temp_array.length; j++) {
-                        $('#ingredientSelect option[value="' + temp_array[j] + '"]').remove(); // wip
-                    }
-                  });
-            });
+            // empty prerecipe ingredients table
+            function prerecipe__selectedIngredients__table__empty(){
+                $('.prerecipe__selected-ingredients__table').empty();
+                $(".prerecipe__selected-ingredients__table").append(
+                    '<tr>'+
+                        '<th>Název</th>'+
+                        '<th>Bílkovina</th>'+
+                        '<th>Tuk</th>'+
+                        '<th>Sacharidy</th>'+
+                        '<th></th>'+
+                        '<th>Nastavitelné?</th>'+
+                    '</tr>');
+            }
 
-            /// Adding ingredient from select to list of selected ingredients
-            $(document).on("submit", "#addIngredientForm", function(e) {
-                    $.ajax({
-                        type: 'POST',
-                        url: '/addIngredientAJAX',
-                        data: $(this).serialize(),
-                        success: function(response) {
-                            $("#ingredientSelect option[value='" + response.id + "']").remove();
-                            $('#selectedIngredients').append(
-                                "<tr>" + 
-                                    "<td>" + response.name + "</td>" +
-                                    "<td>" + response.protein+ "</td>" +
-                                    "<td>" + response.fat + "</td>"+
-                                    "<td>" + response.sugar + "</td>"+
-                                    "<td>" +
-                                        '<button id="' + response.id + '" class="remove btn btn-warning">Ubrat</button>' +
-                                    "</td>"+
-                                    "<td>" +
-                                        '<input type="radio" onclick="setMainIngredient('+ response.id +')" class="form-check-input" name="Proměnná"/>' +
-                                    "</td>"+
-                                "</tr>");
+            function prerecipe__selectedIngredients__table__add(ingredient){
+                $('.prerecipe__selected-ingredients__table').append(
+                "<tr>" + 
+                    "<td>" + ingredient.name + "</td>" +
+                    "<td>" + ingredient.protein+ "</td>" +
+                    "<td>" + ingredient.fat + "</td>"+
+                    "<td>" + ingredient.sugar + "</td>"+
+                    "<td>" +
+                        '<button id="' + ingredient.id + '" class="remove btn btn-warning">Ubrat</button>' +
+                    "</td>"+
+                    "<td>" +
+                        '<input type="radio" onclick="setMainIngredient('+ ingredient.id +')" class="form-check-input" name="Proměnná"/>' +
+                    "</td>"+
+                "</tr>");
+            }
 
-                            var temp_array = $('#ingredientsArray').val();
-                            if (temp_array.length === 0) {
-                                $('#ingredientsArray').val(response.id);
-                            } else {
-                                $('#ingredientsArray').val(temp_array + ", " + response.id);
-                            }
+            // empty recipe ingredients table
+            function recipe__right__form__ingredientTable__empty(){
+                $('.recipe__right__form__ingredient-table').empty();
+                $('.recipe__right__form__ingredient-table').append(
+                    '<tr>'+
+                        '<th>Název</th>'+
+                        '<th>Bílkovina</th>'+
+                        '<th>Tuk</th>'+
+                        '<th>Sacharidy</th>'+
+                        '<th>Množství</th>'+
+                        '<th></th>'+
+                    '</tr>');
+            }
 
-                            // $("#addRecipe").css('visibility', 'hidden');
-                            $("#right").css('visibility', 'hidden');
-                            $("#wrong").css('visibility', 'hidden');
-                            $(".loader").css('visibility', 'hidden');
-                            
-                        },
-                        error: function(error) {
-                            // console.log(error);
-                        }
+            // add ingredient to recipe
+            function recipe__right__form__addIngredient(ingredient){
+                var tempVal = $('.recipe__right__form input[name=ingredients]').val();
+                if (tempVal.length === 0) {
+                    $('.recipe__right__form input[name=ingredients]').val(ingredient.id);
+                } else {
+                    $('.recipe__right__form input[name=ingredients]').val(tempVal + ", " + ingredient.id);
+                }
+            }
 
-                    });
-                    e.preventDefault();
-            });
+            // add ingredient amount to recipe
+            function recipe__right__form__addAmount(ingredient){
+                var tempVal = $('.recipe__right__form input[name=amounts]').val();
+                if (tempVal.length === 0) {
+                    $('.recipe__right__form input[name=amounts]').val(Math.round(ingredient.amount));
+                } else {
+                    $('.recipe__right__form input[name=amounts]').val(tempVal + ", " + Math.round(ingredient.amount));
+                }
+            }
 
-            /// Running loader animation
-            $(document).on("click", "#calcRecipe", function() {
-                $(".loader").css('visibility', 'visible');
-            });
+            // empty prerecipe form values
+            function prerecipe__calc__form__empty(){
+                $('.prerecipe__calc__form input[name=main-ID]').val("");
+                $('.prerecipe__calc__form input[name=ingredients]').val("");
+            }
+
+            // empty recipe form values
+            function recipe__right__form__empty(){
+                $('.recipe__right__form input[name=ingredients]').val("");
+                $('.recipe__right__form input[name=amounts]').val("");
+                $('.recipe__right__form input[name=diet-ID]').val("");
+            }
+
+            // remove prerecipe__form ingredient
+            function prerecipe__calc__form__ingredients__remove(id){
+                var temp_array = $('.prerecipe__calc__form input[name=ingredients]').val().split(", ");
+                temp_array.splice($.inArray(id, temp_array),1);
+
+                $('.prerecipe__calc__form input[name=ingredients]').val("");
+
+                for (var i = 0; i < temp_array.length; i++) {
+                    prerecipe__calc__form__ingredients__add(temp_array[i]);
+                }
+            }
+
+            // add prerecipe__form ingredient
+            function prerecipe__calc__form__ingredients__add(id){
+                var temp_array = $('.prerecipe__calc__form input[name=ingredients]').val();
+                if (temp_array.length === 0) {
+                    $('.prerecipe__calc__form input[name=ingredients]').val(id);
+                } else {
+                    $('.prerecipe__calc__form input[name=ingredients]').val(temp_array + ", " + id);
+                }
+            }
+            
+
+            // visibility
+            function recipe__loader__show(){
+                $(".recipe__loader").css('visibility', 'visible');
+                $(".recipe__right").css('visibility', 'hidden');
+                $(".recipe__wrong").css('visibility', 'hidden');
+            }
+
+            function recipe__wrong__show(){
+                $(".recipe__loader").css('visibility', 'hidden');
+                $(".recipe__wrong").css('visibility', 'visible');
+                $(".recipe__right").css('visibility', 'hidden');
+            }
+
+            function recipe__right__show(){
+                $(".recipe__loader").css('visibility', 'hidden');
+                $(".recipe__wrong").css('visibility', 'hidden');
+                $(".recipe__right").css('visibility', 'visible');
+            }
+
+            function recipe__hideAll(){
+                $(".recipe__loader").css('visibility', 'hidden');
+                $(".recipe__wrong").css('visibility', 'hidden');
+                $(".recipe__right").css('visibility', 'hidden');
+            }
 
 
-            /// Making recipe table for confirmation and costumization
-            $(document).on("submit", "#calcRecipeForm", function(e) {
+            $(document).on("submit", ".prerecipe__calc__form", function(e) {
                     $.ajax({
                         type: 'POST',
                         url: '/calcRecipeAJAX',
                         data: $(this).serialize(),
                         success: function(response){
 
-                            $('#ingredientsArray2').val("");        //solution?
-                            $('#ingredientsAmount').val("");        //solution?
-                            $('#ingredientsArray').val("");
-                            $('#selectedIngredients').empty();
+                            // empty form datas
+                            prerecipe__calc__form__empty();
+                            recipe__right__form__empty();
 
-                            $("#selectedIngredients").append(
-                                '<tr>'+
-                                    '<th>Název</th>'+
-                                    '<th>Bílkovina</th>'+
-                                    '<th>Tuk</th>'+
-                                    '<th>Sacharidy</th>'+
-                                    '<th></th>'+
-                                    '<th>Nastavitelné?</th>'+
-                                '</tr>');
+                            // empty tables
+                            prerecipe__selectedIngredients__table__empty();
+                            recipe__right__form__ingredientTable__empty();
 
-                            $('#ingredientSelect').empty();
-                            $('#ingredientSelect').append(selectAllIngredients);
-
-                            $('#selectedIngredientsAdd').empty();
-                            $('#selectedIngredientsAdd').append(
-                                '<tr>'+
-                                    '<th>Název</th>'+
-                                    '<th>Bílkovina</th>'+
-                                    '<th>Tuk</th>'+
-                                    '<th>Sacharidy</th>'+
-                                    '<th>Množství</th>'+
-                                    '<th></th>'+
-                                '</tr>');
+                            // renew selection
+                            prerecipe__addIngredient__form__select__renew();
 
                             if (response=="False"){
-                                $(".loader").css('visibility', 'hidden');
-                                $("#right").css('visibility', 'hidden');
-                                $("#wrong").css('visibility', 'visible');
+                                recipe__wrong__show();
                                 return;
                             }
-                            totalSugar = 0;
-                            totalFat = 0;
-                            totalProtein = 0;
+
+                            var totalSugar = 0;
+                            var totalFat = 0;
+                            var totalProtein = 0;
                             var ingredients = response.ingredients;
+
                             // ingredients to table
                             for (i = 0; i<response.ingredients.length; i++ ){
 
                                 if (response.mainIngredientID == ingredients[i].id){
-                                    $('#selectedIngredientsAdd').append(
+                                    $('.recipe__right__form__ingredient-table').append(
                                         "<tr>" +
                                         "<td>" + ingredients[i].name + "</td>" +
                                         "<td>" + ingredients[i].protein + "</td>" +
@@ -173,7 +215,7 @@
                                         '</tr>');
                                 }
                                 else {
-                                    $('#selectedIngredientsAdd').append(
+                                    $('.recipe__right__form__ingredient-table').append(
                                         "<tr>" +
                                         "<td>" + ingredients[i].name + "</td>" +
                                         "<td>" + ingredients[i].protein + "</td>" +
@@ -188,44 +230,39 @@
                                 totalSugar += ingredients[i].sugar*ingredients[i].amount;
                             }
 
-                            $('#selectedIngredientsAdd').append(
+                            $('.recipe__right__form__ingredient-table').append(
                                 "<tr>" +
-                                "<td><strong>Součet</strong></td>" +
-                                "<td>" + Math.round(totalProtein/100) + "</td>" + 
-                                "<td>" + Math.round(totalFat/100) + "</td>" + 
-                                "<td>" + Math.round(totalSugar/100) + "</td>" + 
-                                "</tr>");
+                                    '<td>'+
+                                        '<strong>Součet</strong>'+
+                                    '</td>'+
+                                    '<td>'+
+                                        '<span id="totalProtein">' + 
+                                        Math.round(totalProtein/100) +
+                                        '</span>'+
+                                    '</td>' + 
+                                    '<td>'+
+                                        '<span id="totalFat">' + 
+                                        Math.round(totalFat/100) +
+                                        '</span>' +
+                                    '</td>' + 
+                                    '<td>'+
+                                        '<span id="totalSugar">' + 
+                                        Math.round(totalSugar/100) +
+                                        '</span>' +
+                                    '</td>' + 
+                                '</tr>');
 
-                            // ingredient IDs
-                            
+                            // ingredient IDs and amounts to inputs
                             for (i = 0; i<ingredients.length; i++ ){
-                                var temp_array = $('#ingredientsArray2').val();
-                                if (temp_array.length === 0) {
-                                    $('#ingredientsArray2').val(ingredients[i].id);
-                                } else {
-                                    $('#ingredientsArray2').val(temp_array + ", " + ingredients[i].id);
-                                }
-                            }
-
-                            // ingredient amounts
-                            
-                            for (i = 0; i<ingredients.length; i++ ){
-                                var temp_array2 = $('#ingredientsAmount').val();
-                                if (temp_array2.length === 0) {
-                                    $('#ingredientsAmount').val(Math.round(ingredients[i].amount));
-                                } else {
-                                    $('#ingredientsAmount').val(temp_array2 + ", " + Math.round(ingredients[i].amount));
-                                }
+                                recipe__right__form__addIngredient(ingredients[i]);
+                                recipe__right__form__addAmount(ingredients[i]);
                             }
 
                             // diet ID
-                            $('#selectedDietID').val(response.dietID);
+                            $('.recipe__right__form input[name=diet-ID]').val(response.dietID);
 
                             // change visibility
-                            // $("#addRecipe").css('visibility', 'visible');
-                            $(".loader").css('visibility', 'hidden');
-                            $("#wrong").css('visibility', 'hidden');
-                            $("#right").css('visibility', 'visible');
+                            recipe__right__show();
 
                         },
                         error: function(error) {
@@ -235,11 +272,54 @@
                     e.preventDefault();
                 });
 
+            /// Adding ingredient from select to list of selected ingredients
+            $(document).on("submit", ".prerecipe__add-ingredient__form", function(e) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/addIngredientAJAX',
+                        data: $(this).serialize(),
+                        success: function(response) {
+                            var ingredient = response;
+                            prerecipe__calc__form__ingredients__add(ingredient.id);
+                            prerecipe__addIngredient__form__select__refresh();
+                            prerecipe__selectedIngredients__table__add(ingredient); // gets data from form__ings
+                            recipe__hideAll();
+                        },
+                        error: function(error) {
+                            // console.log(error);
+                        }
+                    });
+                    e.preventDefault();
+            });
+
+            /// Removing ingredient from list of selected ingredients
+            $(function(){
+                  $('.prerecipe__selected-ingredients__table').on('click','tr button.remove',function(e){
+                     e.preventDefault();
+
+                    // remove table line
+                    $(this).parents('tr').remove();
+
+                    // remove from list
+                    prerecipe__calc__form__ingredients__remove($(this).attr('id'));
+
+                    // Refresh selection
+                    prerecipe__addIngredient__form__select__refresh();
+                  });
+            });
+
+            
+            /// Running loader animation
+            $(document).on("click", ".prerecipe__calc__form__submit", function() {
+                recipe__loader__show();
+            });
+            
+
             /// Recalculating amounts 
             $(document).on("change", "#slider", function(e) {
-                // $(".loader").css('visibility', 'visible');
-                dietID = $('#selectedDietID').val();
-                ingredientsArray = $('#ingredientsArray2').val();
+
+                dietID = $('.recipe__right__form input[name=diet-ID]').val();
+                ingredientsArray = $('.recipe__right__form input[name=ingredients]').val();
                 slider = $('#slider').val();
                 mainIngredientID = $('#slider_tr').attr('name');
 
@@ -250,7 +330,8 @@
                         contentType: 'application/json;charset=UTF-8',
 
                         success: function(response) {
-                            // alert("success");
+
+                            // new amounts
                             x = response.x;
                             $('#amount_'+x.id).text(x.amount + " g");
                             y = response.y;
@@ -260,18 +341,17 @@
                             slider = response.slider;
                             $('#amount_'+ slider.id).text(slider.amount + " g");
 
-                            ingredients = [x,y,z,slider];
+                            // new totals 
+                            $('#totalFat').text(response.totals.fat);
+                            $('#totalSugar').text(response.totals.sugar);
+                            $('#totalProtein').text(response.totals.protein);
 
-                            $('#ingredientsAmount').val("");
-                            for (i = 0; i<ingredients.length; i++ ){
-                                var temp_array2 = $('#ingredientsAmount').val();
-                                if (temp_array2.length === 0) {
-                                    $('#ingredientsAmount').val(ingredients[i].amount);
-                                } else {
-                                    $('#ingredientsAmount').val(temp_array2 + ", " + ingredients[i].amount);
-                                }
+                            // new amounts in form
+                            ingredients = [x, y, z, slider];
+                            $('.recipe__right__form input[name=amounts]').val("");
+                            for (i = 0; i < ingredients.length; i++ ){
+                                recipe__right__form__addAmount(ingredients[i]);
                             }
-                            console.log($('#ingredientsAmount').val());
 
                         },
                         error: function(error) {
@@ -282,7 +362,7 @@
             });
 
             function setMainIngredient(id){
-                $('#mainIngredientID').val(id);
+                $('.prerecipe__calc__form input[name=main-ID]').val(id);
             }
 
             function showSliderVal(value){
@@ -292,15 +372,15 @@
         </script>
         
         <style type="text/css" media="screen">
-            #wrong{
+            .recipe__wrong{
                 visibility: hidden;
             }
 
-            #right{
+            .recipe__right{
                 visibility: hidden;
             }
 
-            .loader {
+            .recipe__loader {
                 visibility: hidden;
                 border: 16px solid #f3f3f3; /* Light grey */
                 border-top: 16px solid #337ab7; /* Blue */
@@ -320,23 +400,23 @@
     <body>
         {% include('navbar') %}
         <div class="container row">
-            <div class="col-md-6" style="margin-top: 40px">
+            <div class="prerecipe col-md-6" style="margin-top: 40px">
 
-                <div class="form-group col-sm-12">
-                    <form id="addIngredientForm" method="POST" action="/addIngredientAJAX">
-                        <select id="ingredientSelect" name="ingredient" class="form-control">
+                <div class="prerecipe__add-ingredient form-group col-sm-12">
+                    <form class="prerecipe__add-ingredient__form">
+                        <select class="prerecipe__add-ingredient__form__select form-control"
+                        name="prerecipe__add-ingredient__form__select">
                         {% for ingredient in ingredients: %}
                             <option name={{ingredient.name}} value="{{ingredient.id}}">{{ingredient.name}}</option>
                         {% endfor %}
                         </select>
-                        <input id="ajaxButton" type="submit" class="btn btn-primary" value="Přidat surovinu" />
+                        <input type="submit" class="btn btn-primary" value="Přidat surovinu" />
                     </form>
                 </div>
                 
-
-                <div id="selectedIngredientsDiv" class="col-sm-12">
-                    <form id="selectMain" method="POST" class="form-group">
-                        <table id="selectedIngredients" class="table">
+                <div class="prerecipe__selected-ingredients col-sm-12">
+                    <form class="form-group">
+                        <table class="prerecipe__selected-ingredients__table table">
                             <tr>
                                 <th>Název</th>
                                 <th>Bílkovina</th>
@@ -349,37 +429,37 @@
                     </form>
                 </div>
 
-                <div class="col-sm-12">
-                    <form id="calcRecipeForm" method="POST" class="form-group" action="/calcRecipeAJAX">
-                        <label for="recipeDiet">Název diety</label>
-                        <select name="recipeDiet" class="form-control">
+                <div class="prerecipe__calc col-sm-12">
+                    <form class="prerecipe__calc__form form-group">
+                        <label for="select-diet">Název diety</label>
+                        <select name="select-diet" class="form-control">
                         {% for diet in diets: %}
                             <option value="{{diet.id}}">{{ diet.name }}</option>
                         {% endfor %}
                         </select>
-                        <input id="calcRecipe" type="submit" class="btn btn-primary" value="Spočítat množství!" />
-                        <input type="hidden" id="ingredientsArray" name="ingredientsArray" value="" />
-                        <input type="hidden" id="mainIngredientID" name="mainIngredientID" value="" />
+                        <input type="submit" class=" prerecipe__calc__form__submit btn btn-primary" value="Spočítat množství!" />
+                        <input type="hidden" name="ingredients" value="" />
+                        <input type="hidden" name="main-ID" value="" />
                     </form>
                 </div>
 
             </div>
 
 
-            <div class="col-md-6" id=addRecipe style="position: relative;">
+            <div class="recipe col-md-6" id=addRecipe style="position: relative;">
 
-                <div class="loader"></div>
+                <div class="recipe__loader"></div>
 
-                <div id="wrong" class="offset-md-6" style="position:absolute; top:0px;">
+                <div class="recipe__wrong" class="offset-md-6" style="position:absolute; top:0px;">
                     <span class="problem" style="text-align: center">Recept nelze vytvořit</span>
                 </div>
 
-                <div id="right" style="position:absolute; top:0px;">
-                    <form id="addRecipeForm" method="POST" action="/saveRecipeAJAX" class="form-group">
-                        <label for="recipeName">Název receptu</label>
-                        <input type="text" name="recipeName" required class="form-control"/>
+                <div class="recipe__right" style="position:absolute; top:0px;">
+                    <form method="post" class="recipe__right__form form-group"  action="/saveRecipeAJAX" >
+                        <label for="recipe__right__form__name-input">Název receptu</label>
+                        <input type="text" name="recipe__right__form__name-input" required class="form-control"/>
                         
-                        <table id="selectedIngredientsAdd" class="table">
+                        <table class="recipe__right__form__ingredient-table table">
                             <tr>
                                 <th>Název</th>
                                 <th>Bílkovina</th>
@@ -391,22 +471,17 @@
                         </table>
                         
                         <div class="form-inline">
-                            <div class="col-md-4">
-                                <select name="size" id="food_size" class="form-control">
-                                    <option value="big">Velké jídlo</option>
-                                    <option value="small">Malé jídlo</option>
-                                </select>
-                            </div>
-                            <div class="col-md-1">
-                            </div>
-                            <div class="col-md-4">
-                                <input id="addRecipeButton" type="submit" class="btn btn-primary" value="Uložit mezi recepty" />
-                            </div>
+                            <select name="recipe__right__form__size-select" class="form-control col-md-3">
+                                <option value="big">Velké jídlo</option>
+                                <option value="small">Malé jídlo</option>
+                            </select>
+                            <span class="col-md-2"></span>
+                            <input type="submit" class="btn btn-primary col-md-4 " value="Uložit mezi recepty" />
                         </div>
                         
-                        <input type="hidden" id="ingredientsArray2" name="ingredientsArray2" value="" />
-                        <input type="hidden" id="selectedDietID" name="selectedDietID" value="" />
-                        <input type="hidden" id="ingredientsAmount" name="ingredientsAmount" value="" />
+                        <input type="hidden" name="ingredients" value="" />
+                        <input type="hidden" name="diet-ID" value="" />
+                        <input type="hidden" name="amounts" value="" />
                     </form>
                 </div>
             </div>

@@ -782,7 +782,7 @@ def newRecipe():
 def addIngredienttoRecipeAJAX():
     if 'username' not in session:
         return redirect('/login')
-    ingredient = loadIngredient(request.form['ingredient'])
+    ingredient = loadIngredient(request.form["prerecipe__add-ingredient__form__select"])
     json_ingredient = {'id': ingredient.id, 'name': ingredient.name, 'sugar': ingredient.sugar, 'fat': ingredient.fat, 'protein': ingredient.protein}
     return jsonify(json_ingredient)
 
@@ -792,23 +792,26 @@ def calcRecipeAJAX():
     if 'username' not in session:
         return redirect('/login')
 
-    ingredients = request.form['ingredientsArray']
+    ingredients = request.form['ingredients']
     if len(ingredients) == 0:
-        temp_print("No ingredients")
+        # temp_print("No ingredients")
         return "False"
     ingredients = [word.strip() for word in ingredients.split(',')]
 
-    dietID = request.form['recipeDiet']
+    # temp_print("ingredientIDs: {}".format(ingredients))
+
+    dietID = request.form['select-diet']
     if dietID is None:
-        temp_print("No diet")
+        # temp_print("No diet")
         return "False"
 
-    mainIngredientID = request.form['mainIngredientID']
+    mainIngredientID = request.form['main-ID']
     # temp solve problem with default WIP (problem with 3)
     if mainIngredientID == "":
         mainIngredientID = ingredients[0]
 
     ingredients.remove(mainIngredientID)
+    # temp_print("ingredientIDs \main: {}".format(ingredients))
 
     # reaarange, so last ingredient is the main ingredient
     temp_ingredients = []
@@ -818,13 +821,12 @@ def calcRecipeAJAX():
     temp_ingredients.append(loadIngredient(mainIngredientID))
 
     ingredients.append(mainIngredientID)
-    temp_print(ingredients)
 
     solution = calc(temp_ingredients, loadDiet(dietID))
+    temp_print(solution.vars)
     if solution is None:
         temp_print("No solution")
         return "False"
-    temp_print(solution.vars)
     for i in range(len(ingredients)):
         ingredient = loadIngredient(ingredients[i])
         if solution.vars[i] < 0:
@@ -876,8 +878,12 @@ def recalcRecipeAJAX():
     x = {'id': temp_ingredients[0], 'amount': results[0]}
     y = {'id': temp_ingredients[1], 'amount': results[1]}
     z = {'id': temp_ingredients[2], 'amount': results[2]}
+    totalProtein = loadIngredient(temp_ingredients[0]).protein * results[0] + loadIngredient(temp_ingredients[1]).protein * results[1] + loadIngredient(temp_ingredients[2]).protein * results[2] + loadIngredient(mainID).protein * slider
+    totalSugar = loadIngredient(temp_ingredients[0]).sugar * results[0] + loadIngredient(temp_ingredients[1]).sugar * results[1] + loadIngredient(temp_ingredients[2]).sugar * results[2] + loadIngredient(mainID).sugar * slider
+    totalFat = loadIngredient(temp_ingredients[0]).fat * results[0] + loadIngredient(temp_ingredients[1]).fat * results[1] + loadIngredient(temp_ingredients[2]).fat * results[2] + loadIngredient(mainID).fat * slider
+    totals = {'protein': math.ceil(totalProtein) / 100, 'sugar': math.ceil(totalSugar) / 100, 'fat': math.ceil(totalFat) / 100}
     slider = {'id': mainID, 'amount': slider}
-    solutionJSON = {'x': x, 'y': y, 'z': z, 'slider': slider}
+    solutionJSON = {'x': x, 'y': y, 'z': z, 'slider': slider, 'totals': totals}
 
     # give ids with amounts
     return jsonify(solutionJSON)
@@ -888,13 +894,17 @@ def addRecipeAJAX():
     if 'username' not in session:
         return redirect('/login')
 
-    dietID = request.form['selectedDietID']
+    dietID = request.form['diet-ID']
 
-    temp_ingredients = request.form['ingredientsArray2']
+    temp_ingredients = request.form['ingredients']
     temp_ingredients = [word.strip() for word in temp_ingredients.split(',')]
 
-    amounts = request.form['ingredientsAmount2']
+    temp_print(temp_ingredients)
+
+    amounts = request.form['amounts']
     amounts = [word.strip() for word in amounts.split(',')]
+
+    temp_print(amounts)
 
     ingredients = []
     for i in range(len(temp_ingredients)):
@@ -904,8 +914,8 @@ def addRecipeAJAX():
         ingredients.append(ingredient)
 
     recipe = type('', (), {})()
-    recipe.name = request.form['recipeName']
-    recipe.size = request.form['size']
+    recipe.name = request.form['recipe__right__form__name-input']
+    recipe.size = request.form['recipe__right__form__size-select']
     last_id = saveRecipe(recipe, ingredients, dietID)
     return redirect('/recipe=' + str(last_id))
 
@@ -918,6 +928,7 @@ def showRecipe(recipeID):
         coef = diet.big_size / 100
     else:
         coef = diet.small_size / 100
+    # temp_print(coef)
 
     ingredientIDs = loadRecipe(recipeID)[1]
     ingredients = []
@@ -937,9 +948,10 @@ def showRecipe(recipeID):
         totals.sugar += i.amount * i.sugar
         totals.amount += i.amount
 
-    totals.protein = math.floor(totals.protein * coef) / 100
-    totals.fat = math.floor(totals.fat * coef) / 100
-    totals.sugar = math.floor(totals.sugar * coef) / 100
+    # temp_print(totals.fat)
+    totals.protein = math.floor(totals.protein) / 100
+    totals.fat = math.floor(totals.fat) / 100
+    totals.sugar = math.floor(totals.sugar) / 100
     totals.amount = math.floor(totals.amount)
     totals.eq = math.floor((totals.fat / (totals.protein + totals.sugar)) * 10) / 10
     return template('recipePage', recipe=recipe, ingredients=ingredients, totals=totals, diet=diet)
@@ -1066,8 +1078,11 @@ def calc(ingredients, diet):
         # Faster way?? wip
         # solve for positive numbers
         result1 = solvei(poly(in1), ">=")
+        temp_print(result1)
         result2 = solvei(poly(in2), ">=")
+        temp_print(result2)
         result3 = solvei(poly(in3), ">=")
+        temp_print(result3)
 
         interval = (result1[0].intersect(result2[0])).intersect(result3[0])
         if interval.right > 100:
@@ -1083,7 +1098,7 @@ def calc(ingredients, diet):
         if max_sol < min_sol:
             return None
         # max_sol = max for e (variable )
-        sol = max_sol / 2
+        sol = (min_sol + max_sol) / 2
 
         in1_dict = in1.as_coefficients_dict()
         x = in1_dict[e] * sol + in1_dict[1]

@@ -1,9 +1,8 @@
 improve
 	- improve newRecipe js handling
+		- better ingredients storage (array, json)
 bugfix
-	- recipe totals *10 (small_size)
-	- Calc4 - unable to select last? or some wrong calculation?
-
+	
 +v2.1
 	+- ubrat špatně přidanou surovinu
 	+-2 velké / malé jídlo v rámci diety (kolik procent)
@@ -33,12 +32,16 @@ bugfix
 		+- default variable - last one
 
 v2.2
-	-0 disable adding same ingredient more times
 	-2 přepočítání receptů na jinou dietu
 	-2 tisk receptu (ze stránky receptu)
-	- úprava suroviny (název)
-	- úprava diety (název)
-	- úprava receptu (název)
+	- úprava suroviny
+		- název
+		- množství (pokud není použitý)
+	- úprava diety
+		- název
+		- množství (pokud nemá recept)
+	- úprava receptu
+		- název
 	- validation in form
 
 
