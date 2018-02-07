@@ -6,7 +6,6 @@
 	<title>Vítejte {{firstname}}</title>
     {% include('bootstrap') %}
     {% include('styleBody') %}
-
     <script type="text/javascript">
 
         $(document).ready(function() {

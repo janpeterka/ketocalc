@@ -45,9 +45,13 @@
           <li class="nav-item">
             <a class="nav-link small" href="/changelog">Changelog</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link small" href="/feedback">Feedback</a>
+          </li>
         </ul>
 
     </div>
 
   </div>
 </nav>
+{% include('flashing') %}

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Feedback - Dejte nám vědět!</title>
+    {% include('bootstrap') %}
+    {% include('styleBody') %}
+
+</head>
+<body>
+    {% include('navbar') %}
+        <div class="col-4">
+            <form class="form-control" method="POST" action="/feedback" enctype = "multipart/form-data">
+                <label for="message">Co je špatně?</label>
+                <input type="text" name="message" class="form-control" />
+                <label for="sender">Váš email (pro případ nutnosti upřesnění problému)</label>
+                <input type="text" name="sender" class="form-control" />
+                <label for="file">Screenshot s problémem</label>
+                <input type="file" name="file">
+                <input type="submit" class="btn btn-primary form-control" value="Poslat feedback" />
+            </form>
+        </div>
+
+</body>
+</html>

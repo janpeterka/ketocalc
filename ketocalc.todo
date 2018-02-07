@@ -34,6 +34,9 @@ bugfix
 v2.2
 	-2 přepočítání receptů na jinou dietu
 	-2 tisk receptu (ze stránky receptu)
+	- feedback form
+		+- basic
+		- w/ file upload
 	- úprava suroviny
 		- název
 		- množství (pokud není použitý)
@@ -43,6 +46,8 @@ v2.2
 	- úprava receptu
 		- název
 	- validation in form
+
+	- message flashing
 
 
 v2.3 aka Private version

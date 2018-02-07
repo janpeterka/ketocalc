@@ -6,6 +6,10 @@
 from flask import Flask, render_template as template, request, redirect
 from flask import jsonify
 from flask import session
+from flask import flash
+
+from flask_mail import Mail, Message
+from werkzeug import secure_filename
 
 # Session manager
 # from flask.sessions import SessionInterface
@@ -23,10 +27,27 @@ import sympy as sp
 from sympy import solve_poly_inequality as solvei
 from sympy import poly
 import math
-
+import os
 
 # towards the beginging of the file, soon after imports
+
+UPLOAD_FOLDER = '/tmp'
+# UPLOAD_FOLDER = '/home/jan/Dropbox/Programming/ketoCalc/uploads/feedback'
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+
 app = Flask(__name__)
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+app.config.update(dict(
+    MAIL_SERVER='smtp.googlemail.com',
+    MAIL_PORT=465,
+    MAIL_USE_TLS=False,
+    MAIL_USE_SSL=True,
+    MAIL_USERNAME='ketocalc.jmp@gmail.com',
+    MAIL_PASSWORD='60i#8%n*$vsW#F76D1hR3*&@fBgeEO34LMf^GMoU8hm6#JQmGr'
+))
+mail = Mail(app)
 
 
 def temp_print(input):
@@ -595,6 +616,7 @@ def do_login():
     password = request.form['password']
     if check_login(username, password):
         session['username'] = username
+        flash("Byl jste úspěšně přihlášen.")
         return redirect('/user')
     else:
         return False
@@ -604,12 +626,9 @@ def check_login(username, password):
     user = loadUser(username)
     if user is None:
         return False
-
     pwdhash = user.pwdhash
-
     temp_password = password.encode('utf-8')
     password_hash = hashlib.sha256(temp_password).hexdigest()
-
     if password_hash == pwdhash:
         return True
     else:
@@ -619,6 +638,7 @@ def check_login(username, password):
 @app.route('/logout')
 def logout():
     session.pop('username', None)
+    flash("Byl jste úspěšně odhlášen.")
     return redirect('/login')
 
 
@@ -659,6 +679,7 @@ def do_register():
     response = saveUser(username, password_hash, firstname, lastname)
 
     if response:
+        flash("Byl jste úspěšně zaregistrován.")
         return redirect('/login')
     else:
         return template('failure', problem="Registrace neproběhla v pořádku")
@@ -733,6 +754,7 @@ def addDietAJAX():
 
     diet.username = session['username']
     last_id = saveDiet(diet)
+    flash("Dieta byla vytvořena.")
     return redirect('/diet={}'.format(last_id))
 
 
@@ -752,6 +774,7 @@ def showDiet(dietID):
 def removeDiet(dietID):
     if deleteDietCheck(dietID):  # wip
         deleteDiet(dietID)
+        flash("Dieta byla smazána")
         return redirect("/user")
     else:
         return template('failure', problem="Tato dieta má recepty, nelze smazat")
@@ -794,15 +817,11 @@ def calcRecipeAJAX():
 
     ingredients = request.form['ingredients']
     if len(ingredients) == 0:
-        # temp_print("No ingredients")
         return "False"
     ingredients = [word.strip() for word in ingredients.split(',')]
 
-    # temp_print("ingredientIDs: {}".format(ingredients))
-
     dietID = request.form['select-diet']
     if dietID is None:
-        # temp_print("No diet")
         return "False"
 
     mainIngredientID = request.form['main-ID']
@@ -811,7 +830,6 @@ def calcRecipeAJAX():
         mainIngredientID = ingredients[0]
 
     ingredients.remove(mainIngredientID)
-    # temp_print("ingredientIDs \main: {}".format(ingredients))
 
     # reaarange, so last ingredient is the main ingredient
     temp_ingredients = []
@@ -823,14 +841,13 @@ def calcRecipeAJAX():
     ingredients.append(mainIngredientID)
 
     solution = calc(temp_ingredients, loadDiet(dietID))
-    temp_print(solution.vars)
     if solution is None:
-        temp_print("No solution")
+        # temp_print("No solution")
         return "False"
     for i in range(len(ingredients)):
         ingredient = loadIngredient(ingredients[i])
         if solution.vars[i] < 0:
-            temp_print("Solution < 0")
+            # temp_print("Solution < 0")
             return "False"
         json_ingredient = {'id': ingredient.id, 'name': ingredient.name, 'sugar': ingredient.sugar, 'fat': ingredient.fat, 'protein': ingredient.protein, 'amount': math.ceil(solution.vars[i] * 10000) / 100}  # wip
         ingredients[i] = json_ingredient
@@ -899,12 +916,8 @@ def addRecipeAJAX():
     temp_ingredients = request.form['ingredients']
     temp_ingredients = [word.strip() for word in temp_ingredients.split(',')]
 
-    temp_print(temp_ingredients)
-
     amounts = request.form['amounts']
     amounts = [word.strip() for word in amounts.split(',')]
-
-    temp_print(amounts)
 
     ingredients = []
     for i in range(len(temp_ingredients)):
@@ -917,6 +930,7 @@ def addRecipeAJAX():
     recipe.name = request.form['recipe__right__form__name-input']
     recipe.size = request.form['recipe__right__form__size-select']
     last_id = saveRecipe(recipe, ingredients, dietID)
+    flash("Recept byl uložen")
     return redirect('/recipe=' + str(last_id))
 
 
@@ -928,7 +942,6 @@ def showRecipe(recipeID):
         coef = diet.big_size / 100
     else:
         coef = diet.small_size / 100
-    # temp_print(coef)
 
     ingredientIDs = loadRecipe(recipeID)[1]
     ingredients = []
@@ -948,7 +961,6 @@ def showRecipe(recipeID):
         totals.sugar += i.amount * i.sugar
         totals.amount += i.amount
 
-    # temp_print(totals.fat)
     totals.protein = math.floor(totals.protein) / 100
     totals.fat = math.floor(totals.fat) / 100
     totals.sugar = math.floor(totals.sugar) / 100
@@ -960,6 +972,7 @@ def showRecipe(recipeID):
 @app.route('/recipe=<recipeID>/remove', methods=['POST'])
 def removeRecipe(recipeID):
     deleteRecipe(recipeID)
+    flash("Recept byl smazán.")
     return redirect('/user')
 
 
@@ -984,7 +997,7 @@ def newingredient():
 
 
 @app.route('/newIngredient', methods=['POST'])
-def newIngredienttoRecipeAJAX():
+def newIngredientAJAX():
     if 'username' not in session:
         return redirect('/login')
 
@@ -1008,6 +1021,7 @@ def newIngredienttoRecipeAJAX():
         return template('newIngredientPage', name=ingredient.name, sugar=ingredient.sugar, fat=ingredient.fat, protein=ingredient.protein, problem=problem)
 
     saveIngredient(ingredient, session['username'])
+    flash("Nová surovina byla vytvořena")
     return redirect('/newingredient')
 
 
@@ -1021,6 +1035,7 @@ def showingredient(ingredientID):
 def removeIngredient(ingredientID):
     if deleteIngredientCheck(ingredientID):  # wip
         deleteIngredient(ingredientID)
+        flash("Surovina byla smazána")
         return redirect("/user")
     else:
         return template('failure', problem="Tato surovina je použita, nelze smazat")
@@ -1078,11 +1093,8 @@ def calc(ingredients, diet):
         # Faster way?? wip
         # solve for positive numbers
         result1 = solvei(poly(in1), ">=")
-        temp_print(result1)
         result2 = solvei(poly(in2), ">=")
-        temp_print(result2)
         result3 = solvei(poly(in3), ">=")
-        temp_print(result3)
 
         interval = (result1[0].intersect(result2[0])).intersect(result3[0])
         if interval.right > 100:
@@ -1125,6 +1137,44 @@ def calc(ingredients, diet):
             return None
     else:
         return None
+
+
+@app.route('/feedback', methods=['GET'])
+def showFeedback():
+    return template('feedback')
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@app.route('/feedback', methods=['POST'])
+def sendFeedback():
+    msg = Message('[ketocalc] [feedback]', sender='ketocalc', recipients=['ketocalc.jmp@gmail.com'])
+    msg.body = "Message: {}\n".format(request.form['message'])
+    msg.body += "Send by: {}".format(request.form['sender'])
+    if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+    file = request.files['file']
+    if file.filename == '':
+        flash('No selected file')
+        return redirect(request.url)
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+    ext = filename.split(".")[1]
+    temp_print(ext)
+
+    with app.open_resource(os.path.join(app.config['UPLOAD_FOLDER'], filename)) as fp:
+        msg.attach("screenshot", "image/{}".format(ext), fp.read())
+
+    mail.send(msg)
+    # flash("Vaše připomínka byla zaslána na vyšší místa.")
+    flash('Soubor byl uložen')
+    return redirect('/user')
 
 
 # S'MORE

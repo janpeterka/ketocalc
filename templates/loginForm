@@ -5,7 +5,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>Přihlašování</title>
 	{% include('bootstrap') %}
-	{% include('styleBody') %}
+    {% include('styleBody') %}
 	<script type="text/javascript">
         $(document).on("submit", "#loginForm", function(e) {
         // $("#loginForm").on("submit", function(e) {
