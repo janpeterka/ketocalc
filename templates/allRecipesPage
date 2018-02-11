@@ -10,19 +10,21 @@
 </head>
 <body>
     {% include('navbar') %}
-    <div class="col-6">
-        <table id="diets" class="table">
-            <tr>
-                <th>Název</th>
-                <th>Dieta</th>
-            </tr>
-            {% for recipe in recipes: %}
+    <div class="container">
+        <div class="col-6">
+            <table id="diets" class="table">
                 <tr>
-                    <td><a href="/recipe={{recipe.id}}">{{ recipe.name }}</a></td>
-                    <td><a href="/diet={{recipe.dietID}}">{{ recipe.dietName }}</a></td>
+                    <th>Název</th>
+                    <th>Dieta</th>
                 </tr>
-            {% endfor %}
-        </table>
-    </div>    
+                {% for recipe in recipes: %}
+                    <tr>
+                        <td><a href="/recipe={{recipe.id}}">{{ recipe.name }}</a></td>
+                        <td><a href="/diet={{recipe.dietID}}">{{ recipe.dietName }}</a></td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>    
+    </div>
 </body>
 </html>

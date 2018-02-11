@@ -7,20 +7,36 @@
     {% include('bootstrap') %}
     {% include('styleBody') %}
 
+    <style type="text/css" media="screen">
+    </style>
+
 </head>
 <body>
     {% include('navbar') %}
-        <div class="col-4">
-            <form class="form-control" method="POST" action="/feedback" enctype = "multipart/form-data">
-                <label for="message">Co je špatně?</label>
-                <input type="text" name="message" class="form-control" />
-                <label for="sender">Váš email (pro případ nutnosti upřesnění problému)</label>
+    <div class="container">
+        <!-- <div class="col-6"> -->
+            <form class="form-control col-6" method="POST" action="/feedback" enctype = "multipart/form-data">
+                <label for="type">Vyberte typ reakce</label>
+                <select name="type" class="form-control">
+                    <option value="bug">Chyba v programu</option>
+                    <option value="ux">Problém s používáním uživatelského rozhraní</option>
+                    <option value="suggestion">Doporučení na zlepšení aplikace</option>
+                </select>
+                
+                <label for="message">Popište<span style="color: black">*</span></label>
+                <input type="text" name="message" class="form-control" required oninvalid="this.setCustomValidity('Popište situaci')"
+                    oninput="setCustomValidity('')"  /> 
+                
+                <label for="sender">Váš email (pro případ nutnosti upřesnění)</label>
                 <input type="text" name="sender" class="form-control" />
+                
                 <label for="file">Screenshot s problémem</label>
-                <input type="file" name="file">
-                <input type="submit" class="btn btn-primary form-control" value="Poslat feedback" />
+                <input type="file" name="file" class="form-control screenshot_file" value="Nahrajte screenshot">
+                
+                <input type="submit" class="btn btn-primary form-control" value="Poslat reakci" />
             </form>
-        </div>
+        <!-- </div> -->
+    </div>
 
 </body>
 </html>

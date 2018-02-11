@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Recept</title>
+    {% include('bootstrap') %}
+    {% include('styleBody') %}
+
+        <style type="text/css" media="screen">
+			.totals {
+				background-color: lightgrey;
+			}      
+
+			@media print {
+				body {-webkit-print-color-adjust: exact;}
+				.totals {
+					background-color: lightgrey;
+				}
+			}
+        </style>
+
+</head>
+<body>
+    <div class="container">
+        <div class="col-12 d-print-flex">
+
+            <span class="data__table d-print-table"><h2>{{ recipe.name }}</h2></span>            
+            <table id="ingredients" class="table">
+                <tr>
+                    <th><strong>Název</strong></th>
+                    <th><strong>Bílkovina</strong></th>
+                    <th><strong>Tuk</strong></th>
+                    <th><strong>Sacharidy</strong></th>
+                    <th><strong>Množství</strong></th>
+                    <th></th>
+                </tr>
+
+                {% for ingredient in ingredients: %}
+                    <tr>
+                        <td><strong>{{ ingredient.name }}</strong></td>
+                        <td>{{ ingredient.protein }}</td>
+                        <td>{{ ingredient.fat }}</td>
+                        <td>{{ ingredient.sugar }}</td>
+                        <td>{{ ingredient.amount}}</td>
+                        <td></td>
+                    </tr>
+                {% endfor %}
+
+                <tr class="totals">
+                    <td><strong>Celkem</strong></td>
+                    <td>{{ totals.protein }}</td>
+                    <td>{{ totals.fat }}</td>
+                    <td>{{ totals.sugar }}</td>
+                    <td>{{ totals.eq }} : 1</td>
+                </tr>
+            </table>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+</html>

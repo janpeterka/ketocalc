@@ -10,23 +10,25 @@
 </head>
 <body>
     {% include('navbar') %}
-    <div class="col-6">
-        <table id="ingredients" class="table">
-            <tr>
-                <th>Název</th>
-                <th>Bílkovina</th>
-                <th>Tuk</th>
-                <th>Sacharidy</th>
-            </tr>
-            {% for ingredient in ingredients: %}
+    <div class="container">
+        <div class="col-6">
+            <table id="ingredients" class="table">
                 <tr>
-                    <td><a href="/ingredient={{ingredient.id}}">{{ ingredient.name }}</a></td>
-                    <td>{{ ingredient.protein }}</td>
-                    <td>{{ ingredient.fat }}</td>
-                    <td>{{ ingredient.sugar }}</td>
+                    <th>Název</th>
+                    <th>Bílkovina</th>
+                    <th>Tuk</th>
+                    <th>Sacharidy</th>
                 </tr>
-            {% endfor %}
-        </table>
-    </div>    
+                {% for ingredient in ingredients: %}
+                    <tr>
+                        <td><a href="/ingredient={{ingredient.id}}">{{ ingredient.name }}</a></td>
+                        <td>{{ ingredient.protein }}</td>
+                        <td>{{ ingredient.fat }}</td>
+                        <td>{{ ingredient.sugar }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div> 
+    </div>   
 </body>
 </html>

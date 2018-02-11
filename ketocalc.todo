@@ -1,8 +1,69 @@
 improve
+	- design
+		- loading animation in centre
 	- improve newRecipe js handling
 		- better ingredients storage (array, json)
+	- validation in form (html/js)
+	+-0 feedback form - select issue
+	-
+ 
 bugfix
-	
+	- no flash on login
+	+- newRecipe overlapping cols
+
+v2.2
+	-2 přepočítání receptů na jinou dietu
+		+- přepočítat všechny (ale bez záruky)
+		- nahrát jeden do newRecipe
+			+- ukázat v recipe__ dietu
+		- loader
+	-2 tisk receptu (ze stránky receptu)
+	+- recalc loader
+	+- úprava suroviny
+	+	- název
+	+	- množství (pokud není použitý)
+	+- úprava diety
+	+	- název
+	+	- množství (pokud nemá recept)
+	+- úprava receptu
+	+	- název
+	+- feedback form
+		+- basic
+		+- w/ file upload
+	+- message flashing
+
+
+v2.3 aka Private version
+	- SQL injection
+	- redirects (use-cases)
+
+v3.0
+	- Calculator 5
+
+v3.1
+	- recepty podle surovin
+
+v3.2
+	- register captcha
+	- změna hesla
+	- zapomenuté heslo
+		- poslat dočasný?
+		- poslat odkaz, kde se dá změnit/obnovit?
+
+v3.3 aka Public version
+
+
+Someday
+	- Calculator 4 speed
+	- testování
+	- deaktivace diety
+	-0 surovina energie
+
+
+_________________________________________________________________________________________________
+
+
+
 +v2.1
 	+- ubrat špatně přidanou surovinu
 	+-2 velké / malé jídlo v rámci diety (kolik procent)
@@ -30,65 +91,6 @@ bugfix
 			+- to arrayAmounts
 		+- choose which variable
 		+- default variable - last one
-
-v2.2
-	-2 přepočítání receptů na jinou dietu
-	-2 tisk receptu (ze stránky receptu)
-	+- feedback form
-		+- basic
-		+- w/ file upload
-	- úprava suroviny
-		- název
-		- množství (pokud není použitý)
-	- úprava diety
-		- název
-		- množství (pokud nemá recept)
-	- úprava receptu
-		- název
-	- validation in form
-
-	+- message flashing
-
-
-v2.3 aka Private version
-	- SQL injection
-	- redirects (use-cases)
-
-v3.0
-	- Calculator 5
-
-v3.1
-	- recepty podle surovin
-	- deaktivace diety
-
-v3.2
-	- register captcha
-	- změna hesla
-	- zapomenuté heslo
-		- poslat dočasný?
-		- poslat odkaz, kde se dá změnit/obnovit?
-
-v3.3 aka Public version
-
-
-Someday
-	- Calculator 4 speed
-	- testování
-	-0 surovina energie
-	- loading animation center
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 +Old

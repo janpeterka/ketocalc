@@ -50,14 +50,17 @@
 						<li>nastavení velkého a malého jídla</li>
 					</ul>
 				</li>
+				<li>v2.2
+					<ul>
+						<li>úprava suroviny, receptu, diety</li>
+						<li>feedback formulář</li>
+					</ul>
+				</li>
 				<i>
 					<li>v2.2 (ve vývoji)
 						<ul>
 							<li><strong>přepočítávání receptu do jiné diety</strong></li>
 							<li><strong>tisk receptu</strong></li>
-							<li>úprava suroviny, receptu, diety</li>
-							<li>lepší formuláře</li>
-							<li>feedback formulář</li>
 						</ul>
 					</li>
 				</i>

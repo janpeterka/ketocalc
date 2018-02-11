@@ -5,6 +5,10 @@ input{
 	margin-bottom: 5px;
 }
 
+.form-inline > * {
+   margin:5px 3px;
+}
+
 .navbar{
 	margin-bottom: 15px;
 }

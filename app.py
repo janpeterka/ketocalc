@@ -29,6 +29,9 @@ from sympy import poly
 import math
 import os
 
+# Printing
+import pdfkit
+
 # towards the beginging of the file, soon after imports
 
 UPLOAD_FOLDER = '/tmp'
@@ -198,6 +201,15 @@ def deleteRecipe(recipeID):
     db.commit()
 
 
+def editRecipe(recipe):
+    db = dbConnect()
+    cursor = db.cursor()
+
+    query = ("UPDATE recipes SET recipes.name = '{}' WHERE recipes.id = {};".format(recipe.name, recipe.id))
+    cursor.execute(query)
+    db.commit()
+
+
 def loadUserRecipes(username):
     """Loads all user's recipes
 
@@ -282,10 +294,11 @@ def loadDiet(dietID):
     query = ("SELECT * FROM diets WHERE id='{}';".format(dietID))
     cursor.execute(query)
     response = cursor.fetchone()
-
-    diet = Diet(response[0], response[1], response[2], response[3], response[4], response[5], response[6])
-
-    return diet
+    if response is None:
+        return None
+    else:
+        diet = Diet(response[0], response[1], response[2], response[3], response[4], response[5], response[6])
+        return diet
 
 
 def saveDiet(diet):
@@ -358,6 +371,26 @@ def deleteDiet(dietID):
     query = ("DELETE FROM diets WHERE diets.id = {};".format(dietID))
     cursor.execute(query)
 
+    db.commit()
+
+
+def editDiet(diet):
+    """[summary]
+
+    [description]
+
+    Arguments:
+        diet {[type]} -- [description]
+    """
+    db = dbConnect()
+    cursor = db.cursor()
+
+    if hasattr(diet, 'protein'):
+        query = ("UPDATE diets SET diets.name = '{}', diets.protein = '{}', diets.fat = '{}', diets.sugar = '{}' WHERE diets.id = {};".format(diet.name, diet.protein, diet.fat, diet.sugar, diet.id))
+        cursor.execute(query)
+    else:
+        query = ("UPDATE diets SET diets.name = '{}' WHERE diets.id = {};".format(diet.name, diet.id))
+        cursor.execute(query)
     db.commit()
 
 
@@ -444,10 +477,36 @@ def loadIngredient(ingredientID):
     return ingredient
 
 
+def loadRecipeIngredients(recipeID):
+    """load all ingredients for recipe
+
+    [description]
+
+    Arguments:
+        recipeID {int} -- [description]
+
+    Returns:
+        array -- of Ingredients
+    """
+    db = dbConnect()
+    cursor = db.cursor()
+
+    query = ("SELECT recipes_has_ingredients.ingredients_id FROM recipes_has_ingredients WHERE recipes_has_ingredients.recipes_id='{}';".format(int(recipeID)))
+    cursor.execute(query)
+    response = cursor.fetchall()
+
+    ingredients = []
+    for item in response:
+        ingredient = loadIngredient(item[0])
+        ingredients.append(ingredient)
+
+    return ingredients
+
+
 def loadAmount(ingredientID, recipeID):
     """[summary]
 
-    [description]
+    [description]recipes_has_ingredients
 
     Arguments:
         ingredientID {int} -- [description]
@@ -531,7 +590,28 @@ def deleteIngredient(ingredientID):
     db.commit()
 
 
+def editIngredient(ingredient):
+    """[summary]
+
+    [description]
+
+    Arguments:
+        ingredient {[type]} -- [description]
+    """
+    db = dbConnect()
+    cursor = db.cursor()
+
+    if hasattr(ingredient, 'protein'):
+        query = ("UPDATE ingredients SET ingredients.name = '{}', ingredients.protein = '{}', ingredients.fat = '{}', ingredients.sugar = '{}' WHERE ingredients.id = {};".format(ingredient.name, ingredient.protein, ingredient.fat, ingredient.sugar, ingredient.id))
+        cursor.execute(query)
+    else:
+        query = ("UPDATE ingredients SET ingredients.name = '{}' WHERE ingredients.id = {};".format(ingredient.name, ingredient.id))
+        cursor.execute(query)
+    db.commit()
+
 # Users
+
+
 def saveUser(username, password_hash, firstname, lastname):
     """[summary]
 
@@ -623,6 +703,17 @@ def do_login():
 
 
 def check_login(username, password):
+    """[summary]
+
+    [description]
+
+    Arguments:
+        username {[type]} -- [description]
+        password {[type]} -- [description]
+
+    Returns:
+        bool -- [description]
+    """
     user = loadUser(username)
     if user is None:
         return False
@@ -644,7 +735,7 @@ def logout():
 
 @app.route('/register', methods=['GET'])
 def register():
-    return template('registerForm', username="", firstname="", lastname="", problem="")
+    return template('registerForm', username="", firstname="", lastname="")
 
 
 @app.route('/register', methods=['POST'])
@@ -660,21 +751,21 @@ def do_register():
 
     lastname = request.form['lastname']
 
-    problem = ""
-
     if len(lastname) == 0:
-        problem = "Příjmení je příliš krátké"
+        flash("Příjmení je příliš krátké")
+        redirect(request.url)
     if len(firstname) == 0:
-        problem = "Jméno je příliš krátké"
+        flash("Jméno je příliš krátké")
+        redirect(request.url)
     if len(temp_password) < 8:
-        problem = "Heslo je příliš krátké"
+        flash("Heslo je příliš krátké")
+        redirect(request.url)
     if temp_password_2 != temp_password:
-        problem = "Hesla jsou rozdílná!"
+        flash("Hesla jsou rozdílná!")
+        redirect(request.url)
     if loadUser(username) is not None:
-        problem = "Uživatelské jméno nelze použít"
-
-    if problem != "":
-        return template('registerForm', username=username, firstname=firstname, lastname=lastname, problem=problem)
+        flash("Uživatelské jméno nelze použít")
+        redirect(request.url)
 
     response = saveUser(username, password_hash, firstname, lastname)
 
@@ -682,7 +773,8 @@ def do_register():
         flash("Byl jste úspěšně zaregistrován.")
         return redirect('/login')
     else:
-        return template('failure', problem="Registrace neproběhla v pořádku")
+        flash("Registrace neproběhla v pořádku")
+        return redirect('/register')
 
 
 @app.route('/registerValidate', methods=['POST'])
@@ -724,7 +816,7 @@ def selectDietAJAX():
 def newDietShow():
     if 'username' not in session:
         return redirect('/login')
-    return template('newDietPage', name="", sugar="", fat="", protein="", problem="")
+    return template('newDietPage', name="", sugar="", fat="", protein="")
 
 
 @app.route('/newdiet', methods=['POST'])
@@ -738,19 +830,19 @@ def addDietAJAX():
     diet.protein = request.form['protein']
     diet.small_size = request.form['small_size']
     diet.big_size = request.form['big_size']
-    problem = ""
 
     if len(diet.protein) == 0:
-        problem = "Vyplňte množství bílkoviny"
+        flash("Vyplňte množství bílkoviny")
+        return redirect(request.url)
     if len(diet.fat) == 0:
-        problem = "Vyplňte množství tuku"
+        flash("Vyplňte množství tuku")
+        return redirect(request.url)
     if len(diet.sugar) == 0:
-        problem = "Vyplňte množství sacharidů"
+        flash("Vyplňte množství sacharidů")
+        return redirect(request.url)
     if len(diet.name) == 0:
-        problem = "Vyplňte název"
-
-    if problem != "":
-        return template('newDietPage', name=diet.name, sugar=diet.sugar, fat=diet.fat, protein=diet.protein, problem=problem)
+        flash("Vyplňte název")
+        return redirect(request.url)
 
     diet.username = session['username']
     last_id = saveDiet(diet)
@@ -766,8 +858,10 @@ def showDiet(dietID):
 
     diet = loadDiet(dietID)
     recipes = loadDietRecipes(diet.id)
+    used = not deleteDietCheck(dietID)
+    diets = loadUserDiets(session['username'])
 
-    return template('dietPage', diet=diet, recipes=recipes)
+    return template('dietPage', diet=diet, recipes=recipes, used=used, diets=diets)
 
 
 @app.route('/diet=<dietID>/remove', methods=['POST'])
@@ -777,7 +871,45 @@ def removeDiet(dietID):
         flash("Dieta byla smazána")
         return redirect("/user")
     else:
-        return template('failure', problem="Tato dieta má recepty, nelze smazat")
+        flash("Tato dieta má recepty, nelze smazat")
+        return redirect('/diet={}'.format(dietID))
+
+
+@app.route('/diet=<dietID>/export', methods=['POST'])
+def exportDiet(dietID):
+    # newDietID = request.form['diet']
+    recipes = loadDietRecipes(dietID)
+    newDietID = int(request.form['diet'])
+    newDiet = loadDiet(newDietID)
+    for recipe in recipes:
+        ingredients = loadRecipeIngredients(recipe.id)
+        solution = calc(ingredients, newDiet)
+        if solution is None:
+            continue
+        else:
+            for i in range(len(ingredients)):
+                ingredients[i].amount = math.ceil(solution.vars[i] * 10000) / 100
+            recipe.name = "{} {}".format(recipe.name, newDiet.name)
+            saveRecipe(recipe, ingredients, newDietID)
+    return redirect('/diet={}'.format(newDietID))
+
+
+@app.route('/diet=<dietID>/edit', methods=['POST'])
+def editDietAJAX(dietID):
+    diet = type('', (), {})()
+    diet.name = request.form['name']
+    diet.id = dietID
+    if deleteDietCheck(dietID):  # wip
+        diet.protein = request.form['protein']
+        diet.fat = request.form['fat']
+        diet.sugar = request.form['sugar']
+        editDiet(diet)
+        flash("Surovina byla upravena.")
+        return redirect('/diet={}'.format(dietID))
+    else:
+        editDiet(diet)
+        flash("Název byl upraven.")
+        return redirect('/diet={}'.format(dietID))
 
 
 @app.route('/alldiets')
@@ -798,7 +930,7 @@ def newRecipe():
 
     diets = loadUserDiets(session['username'])
     ingredients = loadAllIngredients(session['username'])
-    return template('newRecipePage', ingredients=ingredients, diets=diets, problem="")
+    return template('newRecipePage', ingredients=ingredients, diets=diets)
 
 
 @app.route('/addIngredientAJAX', methods=['POST'])
@@ -823,9 +955,9 @@ def calcRecipeAJAX():
     dietID = request.form['select-diet']
     if dietID is None:
         return "False"
+    dietName = loadDiet(dietID).name
 
     mainIngredientID = request.form['main-ID']
-    # temp solve problem with default WIP (problem with 3)
     if mainIngredientID == "":
         mainIngredientID = ingredients[0]
 
@@ -853,9 +985,9 @@ def calcRecipeAJAX():
         ingredients[i] = json_ingredient
 
     if len(ingredients) <= 3:
-        array_ingredients = {'ingredients': ingredients, 'dietID': dietID, }
+        array_ingredients = {'ingredients': ingredients, 'dietID': dietID, 'dietName': dietName}
     else:
-        array_ingredients = {'ingredients': ingredients, 'dietID': dietID, 'mainIngredientID': mainIngredientID, 'mainIngredientMin': math.ceil(solution.min_sol * 10000) / 100, 'mainIngredientMax': math.ceil(solution.max_sol * 10000) / 100}
+        array_ingredients = {'ingredients': ingredients, 'dietID': dietID, 'dietName': dietName, 'mainIngredientID': mainIngredientID, 'mainIngredientMin': math.ceil(solution.min_sol * 10000) / 100, 'mainIngredientMax': math.ceil(solution.max_sol * 10000) / 100}
     return jsonify(array_ingredients)
 
 
@@ -938,6 +1070,7 @@ def addRecipeAJAX():
 def showRecipe(recipeID):
     recipe = loadRecipe(recipeID)[0]
     diet = loadDiet(loadRecipeDietID(recipe.id))
+    diets = loadUserDiets(session['username'])
     if recipe.size == "big":
         coef = diet.big_size / 100
     else:
@@ -966,14 +1099,59 @@ def showRecipe(recipeID):
     totals.sugar = math.floor(totals.sugar) / 100
     totals.amount = math.floor(totals.amount)
     totals.eq = math.floor((totals.fat / (totals.protein + totals.sugar)) * 10) / 10
-    return template('recipePage', recipe=recipe, ingredients=ingredients, totals=totals, diet=diet)
+    return template('recipePage', recipe=recipe, ingredients=ingredients, totals=totals, diet=diet, diets=diets)
+
+
+@app.route('/recipe=<recipeID>/print')
+def printRecipe(recipeID):
+    recipe = loadRecipe(recipeID)[0]
+    diet = loadDiet(loadRecipeDietID(recipe.id))
+    if recipe.size == "big":
+        coef = diet.big_size / 100
+    else:
+        coef = diet.small_size / 100
+
+    ingredientIDs = loadRecipe(recipeID)[1]
+    ingredients = []
+    for ID in ingredientIDs:
+        ingredients.append(loadIngredient(ID))
+    for i in ingredients:
+        i.amount = float(math.floor(loadAmount(i.id, recipeID)[0] * coef * 100000)) / 100000
+
+    totals = type('', (), {})()
+    totals.protein = 0
+    totals.fat = 0
+    totals.sugar = 0
+    totals.amount = 0
+    for i in ingredients:
+        totals.protein += i.amount * i.protein
+        totals.fat += i.amount * i.fat
+        totals.sugar += i.amount * i.sugar
+        totals.amount += i.amount
+
+    totals.protein = math.floor(totals.protein) / 100
+    totals.fat = math.floor(totals.fat) / 100
+    totals.sugar = math.floor(totals.sugar) / 100
+    totals.amount = math.floor(totals.amount)
+    totals.eq = math.floor((totals.fat / (totals.protein + totals.sugar)) * 10) / 10
+    return template('printRecipePage', recipe=recipe, ingredients=ingredients, totals=totals, diet=diet)
 
 
 @app.route('/recipe=<recipeID>/remove', methods=['POST'])
-def removeRecipe(recipeID):
+def removeRecipeAJAX(recipeID):
     deleteRecipe(recipeID)
     flash("Recept byl smazán.")
     return redirect('/user')
+
+
+@app.route('/recipe=<recipeID>/edit', methods=['POST'])
+def editRecipeAJAX(recipeID):
+    recipe = type('', (), {})()
+    recipe.name = request.form['name']
+    recipe.id = recipeID
+    editRecipe(recipe)
+    flash("Název byl upraven.")
+    return redirect('/recipe={}'.format(recipeID))
 
 
 @app.route('/allrecipes')
@@ -990,13 +1168,13 @@ def allrecipes():
 
 # NEW INGREDIENT PAGE
 @app.route('/newingredient', methods=['GET'])
-def newingredient():
+def newIngredient():
     if 'username' not in session:
         return redirect('/login')
-    return template('newIngredientPage', name="", sugar="", fat="", protein="", problem="")
+    return template('newIngredientPage', name="", sugar="", fat="", protein="")
 
 
-@app.route('/newIngredient', methods=['POST'])
+@app.route('/newingredient', methods=['POST'])
 def newIngredientAJAX():
     if 'username' not in session:
         return redirect('/login')
@@ -1007,18 +1185,18 @@ def newIngredientAJAX():
     ingredient.fat = request.form['fat']
     ingredient.protein = request.form['protein']
 
-    problem = ""
     if len(ingredient.protein) == 0:
-        problem = "Zadejte množství bílkoviny"
+        flash("Zadejte množství bílkoviny")
+        return redirect(request.url)
     if len(ingredient.fat) == 0:
-        problem = "Zadejte množství tuku"
+        flash("Zadejte množství tuku")
+        return redirect(request.url)
     if len(ingredient.sugar) == 0:
-        problem = "Zadejte množství sacharidů"
+        flash("Zadejte množství sacharidů")
+        return redirect(request.url)
     if len(ingredient.name) == 0:
-        problem = "Zadejte název suroviny"
-
-    if problem != "":
-        return template('newIngredientPage', name=ingredient.name, sugar=ingredient.sugar, fat=ingredient.fat, protein=ingredient.protein, problem=problem)
+        flash("Zadejte název suroviny")
+        return redirect(request.url)
 
     saveIngredient(ingredient, session['username'])
     flash("Nová surovina byla vytvořena")
@@ -1028,17 +1206,37 @@ def newIngredientAJAX():
 @app.route('/ingredient=<ingredientID>')
 def showingredient(ingredientID):
     ingredient = loadIngredient(ingredientID)
-    return template('ingredientPage', ingredient=ingredient)
+    used = not deleteIngredientCheck(ingredientID)
+    return template('ingredientPage', ingredient=ingredient, used=used)
 
 
 @app.route('/ingredient=<ingredientID>/remove', methods=['POST'])
-def removeIngredient(ingredientID):
+def removeIngredientAJAX(ingredientID):
     if deleteIngredientCheck(ingredientID):  # wip
         deleteIngredient(ingredientID)
         flash("Surovina byla smazána")
         return redirect("/user")
     else:
-        return template('failure', problem="Tato surovina je použita, nelze smazat")
+        flash("Tato surovina je použita, nelze smazat")
+        return redirect('/ingredient={}'.format(ingredientID))
+
+
+@app.route('/ingredient=<ingredientID>/edit', methods=['POST'])
+def editIngredientAJAX(ingredientID):
+    ingredient = type('', (), {})()
+    ingredient.name = request.form['name']
+    ingredient.id = ingredientID
+    if deleteIngredientCheck(ingredientID):  # wip
+        ingredient.protein = request.form['protein']
+        ingredient.fat = request.form['fat']
+        ingredient.sugar = request.form['sugar']
+        editIngredient(ingredient)
+        flash("Surovina byla upravena.")
+        return redirect('/ingredient={}'.format(ingredientID))
+    else:
+        editIngredient(ingredient)
+        flash("Název byl upraven.")
+        return redirect('/ingredient={}'.format(ingredientID))
 
 
 @app.route('/allingredients')
@@ -1051,6 +1249,17 @@ def allingredients():
 
 # CALCULATE RECIPE
 def calc(ingredients, diet):
+    """[summary]
+
+    [description]
+
+    Arguments:
+        ingredients {array} -- array of Ingredients
+        diet {Diet} -- Diet
+
+    Returns:
+        [type] -- solution object
+    """
     if len(ingredients) == 0:
         return None
     elif len(ingredients) == 1:
@@ -1131,7 +1340,6 @@ def calc(ingredients, diet):
             solution.sol = sol
             solution.min_sol = min_sol
             solution.max_sol = max_sol
-            # return [x, y, z, f1, f2, f3, sol, min_sol, max_sol]
             return solution
         else:
             return None
@@ -1151,30 +1359,29 @@ def allowed_file(filename):
 
 @app.route('/feedback', methods=['POST'])
 def sendFeedback():
-    msg = Message('[ketocalc] [feedback]', sender='ketocalc', recipients=['ketocalc.jmp@gmail.com'])
+    msg = Message('[ketocalc] [{}]'.format(request.form['type']), sender='ketocalc', recipients=['ketocalc.jmp@gmail.com'])
     msg.body = "Message: {}\n".format(request.form['message'])
-    msg.body += "Send by: {}".format(request.form['sender'])
+    msg.body += "Send by: {} [user: {}]".format(request.form['sender'], session['username'])
     if 'file' not in request.files:
-            flash('No file part')
-            return redirect(request.url)
-    file = request.files['file']
+        mail.send(msg)
+        flash("Vaše připomínka byla zaslána na vyšší místa.")
+        return redirect('/user')
+    else:
+        file = request.files['file']
+
     if file.filename == '':
-        flash('No selected file')
-        return redirect(request.url)
+        mail.send(msg)
+        flash("Vaše připomínka byla zaslána na vyšší místa.")
+        return redirect('/user')
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        with app.open_resource(os.path.join(app.config['UPLOAD_FOLDER'], filename)) as fp:
+            msg.attach("screenshot", "image/{}".format(filename.split(".")[1]), fp.read())
 
-    ext = filename.split(".")[1]
-    temp_print(ext)
-
-    with app.open_resource(os.path.join(app.config['UPLOAD_FOLDER'], filename)) as fp:
-        msg.attach("screenshot", "image/{}".format(ext), fp.read())
-
-    mail.send(msg)
-    # flash("Vaše připomínka byla zaslána na vyšší místa.")
-    flash('Soubor byl uložen')
-    return redirect('/user')
+        mail.send(msg)
+        flash("Vaše připomínka byla zaslána na vyšší místa.")
+        return redirect('/user')
 
 
 # S'MORE
