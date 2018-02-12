@@ -17,6 +17,9 @@ from werkzeug import secure_filename
 
 # MySQL connector
 import MySQLdb
+import db_data as db_data
+
+import mail_data as mail_data
 
 # Hashing library
 import hashlib
@@ -35,7 +38,6 @@ import pdfkit
 # towards the beginging of the file, soon after imports
 
 UPLOAD_FOLDER = '/tmp'
-# UPLOAD_FOLDER = '/home/jan/Dropbox/Programming/ketoCalc/uploads/feedback'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 app = Flask(__name__)
@@ -47,8 +49,8 @@ app.config.update(dict(
     MAIL_PORT=465,
     MAIL_USE_TLS=False,
     MAIL_USE_SSL=True,
-    MAIL_USERNAME='ketocalc.jmp@gmail.com',
-    MAIL_PASSWORD='60i#8%n*$vsW#F76D1hR3*&@fBgeEO34LMf^GMoU8hm6#JQmGr'
+    MAIL_USERNAME=mail_data.MAIL_USERNAME,
+    MAIL_PASSWORD=mail_data.MAIL_PASSWORD
 ))
 mail = Mail(app)
 
@@ -113,7 +115,7 @@ def dbConnect():
     Returns:
         database connection
     """
-    db = MySQLdb.connect(host='vlvlnl1grfzh34vj.chr7pe7iynqr.eu-west-1.rds.amazonaws.com', port=3306, user='qgqgujt50se6wg97', password='siod5gp2hnuus5dl', database='xlen3bfwr4nk4sr9', charset='utf8', init_command='SET NAMES UTF8')
+    db = MySQLdb.connect(host=db_data.host, port=3306, user=db_data.user, password=db_data.password, database=db_data.database, charset='utf8', init_command='SET NAMES UTF8')
     return db
 
 
@@ -1107,42 +1109,42 @@ def showRecipe(recipeID):
     return template('recipePage', recipe=recipe, ingredients=ingredients, totals=totals, diet=diet, diets=diets)
 
 
-# @app.route('/recipe=<recipeID>/print')
-# def printRecipe(recipeID):
-#     recipe = loadRecipe(recipeID)[0]
-#     diet = loadDiet(loadRecipeDietID(recipe.id))
-#     if recipe.size == "big":
-#         coef = diet.big_size / 100
-#     else:
-#         coef = diet.small_size / 100
+@app.route('/recipe=<recipeID>/print')
+def printRecipe(recipeID):
+    recipe = loadRecipe(recipeID)[0]
+    diet = loadDiet(loadRecipeDietID(recipe.id))
+    if recipe.size == "big":
+        coef = diet.big_size / 100
+    else:
+        coef = diet.small_size / 100
 
-#     ingredientIDs = loadRecipe(recipeID)[1]
-#     ingredients = []
-#     for ID in ingredientIDs:
-#         ingredients.append(loadIngredient(ID))
-#     for i in ingredients:
-#         i.amount = float(math.floor(loadAmount(i.id, recipeID)[0] * coef * 100000)) / 100000
+    ingredientIDs = loadRecipe(recipeID)[1]
+    ingredients = []
+    for ID in ingredientIDs:
+        ingredients.append(loadIngredient(ID))
+    for i in ingredients:
+        i.amount = float(math.floor(loadAmount(i.id, recipeID)[0] * coef * 100000)) / 100000
 
-#     totals = type('', (), {})()
-#     totals.calorie = 0
-#     totals.protein = 0
-#     totals.fat = 0
-#     totals.sugar = 0
-#     totals.amount = 0
-#     for i in ingredients:
-#         totals.calorie += i.amount * i.calorie
-#         totals.protein += i.amount * i.protein
-#         totals.fat += i.amount * i.fat
-#         totals.sugar += i.amount * i.sugar
-#         totals.amount += i.amount
+    totals = type('', (), {})()
+    totals.calorie = 0
+    totals.protein = 0
+    totals.fat = 0
+    totals.sugar = 0
+    totals.amount = 0
+    for i in ingredients:
+        totals.calorie += i.amount * i.calorie
+        totals.protein += i.amount * i.protein
+        totals.fat += i.amount * i.fat
+        totals.sugar += i.amount * i.sugar
+        totals.amount += i.amount
 
-#     totals.calorie = math.floor(totals.calorie) / 100
-#     totals.protein = math.floor(totals.protein) / 100
-#     totals.fat = math.floor(totals.fat) / 100
-#     totals.sugar = math.floor(totals.sugar) / 100
-#     totals.amount = math.floor(totals.amount)
-#     totals.eq = math.floor((totals.fat / (totals.protein + totals.sugar)) * 10) / 10
-#     return template('printRecipePage', recipe=recipe, ingredients=ingredients, totals=totals, diet=diet)
+    totals.calorie = math.floor(totals.calorie) / 100
+    totals.protein = math.floor(totals.protein) / 100
+    totals.fat = math.floor(totals.fat) / 100
+    totals.sugar = math.floor(totals.sugar) / 100
+    totals.amount = math.floor(totals.amount)
+    totals.eq = math.floor((totals.fat / (totals.protein + totals.sugar)) * 10) / 10
+    return template('printRecipePage', recipe=recipe, ingredients=ingredients, totals=totals, diet=diet)
 
 
 @app.route('/recipe=<recipeID>/remove', methods=['POST'])

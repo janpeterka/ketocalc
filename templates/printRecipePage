@@ -39,10 +39,10 @@
                 {% for ingredient in ingredients: %}
                     <tr>
                         <td><strong>{{ ingredient.name }}</strong></td>
-                        <td>{{ ingredient.protein }}</td>
-                        <td>{{ ingredient.fat }}</td>
-                        <td>{{ ingredient.sugar }}</td>
-                        <td>{{ ingredient.amount}}</td>
+                        <td>{{ ingredient.protein }} g</td>
+                        <td>{{ ingredient.fat }} g</td>
+                        <td>{{ ingredient.sugar }} g</td>
+                        <td>{{ ingredient.amount}} g</td>
                         <td></td>
                     </tr>
                 {% endfor %}
@@ -52,6 +52,7 @@
                     <td>{{ totals.protein }}</td>
                     <td>{{ totals.fat }}</td>
                     <td>{{ totals.sugar }}</td>
+                    <td>{{ totals.amount }} g</td>
                     <td>{{ totals.eq }} : 1</td>
                 </tr>
             </table>
