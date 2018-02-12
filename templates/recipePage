@@ -27,8 +27,6 @@
                 var win = window.open(window.location.href + '/print');
                 win.focus();
             });
-
-
     
         </script>
 
@@ -62,6 +60,7 @@
             <table id="ingredients" class="table">
                 <tr>
                     <th>Název</th>
+                    <th>Kalorie</th>
                     <th>Bílkovina</th>
                     <th>Tuk</th>
                     <th>Sacharidy</th>
@@ -74,6 +73,7 @@
                         <td>
                             <a href="/ingredient={{ingredient.id}}">{{ ingredient.name }}</a>
                         </td>
+                        <td>{{ ingredient.calorie }} kcal</td>
                         <td>{{ ingredient.protein }} g</td>
                         <td>{{ ingredient.fat }} g</td>
                         <td>{{ ingredient.sugar }} g</td>
@@ -84,6 +84,7 @@
 
                 <tr>
                     <td>Celkem</td>
+                    <td>{{ totals.calorie }}</td>
                     <td>{{ totals.protein }} g</td>
                     <td>{{ totals.fat }} g</td>
                     <td>{{ totals.sugar }} g</td>

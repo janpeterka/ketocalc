@@ -84,10 +84,11 @@ class Recipe(object):
 class Ingredient(object):
     """  For loading from database """
 
-    def __init__(self, dbID, name, sugar, fat, protein):
+    def __init__(self, dbID, name, calorie, sugar, fat, protein):
         super(Ingredient, self).__init__()
         self.id = dbID
         self.name = name
+        self.calorie = calorie
         self.sugar = sugar
         self.fat = fat
         self.protein = protein
@@ -445,7 +446,7 @@ def loadAllIngredients(username):
 
     temp_ingredients = []
     for ingredient in response:
-        temp_ingredient = Ingredient(ingredient[0], ingredient[1], ingredient[2], ingredient[3], ingredient[4])
+        temp_ingredient = Ingredient(ingredient[0], ingredient[1], ingredient[2], ingredient[3], ingredient[4], ingredient[5])
         temp_ingredients.append(temp_ingredient)
 
     temp_ingredients.sort(key=lambda x: x.name)
@@ -472,7 +473,7 @@ def loadIngredient(ingredientID):
     cursor.execute(query)
     response = cursor.fetchone()
 
-    ingredient = Ingredient(response[0], response[1], response[2], response[3], response[4])
+    ingredient = Ingredient(response[0], response[1], response[2], response[3], response[4], response[5])
 
     return ingredient
 
@@ -540,7 +541,7 @@ def saveIngredient(ingredient, username):
     db = dbConnect()
     cursor = db.cursor()
 
-    query = ("INSERT INTO ingredients(name, sugar, fat, protein, author) VALUES ('{}', '{}', '{}', '{}', '{}');".format(ingredient.name, ingredient.sugar, ingredient.fat, ingredient.protein, username))
+    query = ("INSERT INTO ingredients(name, calorie, sugar, fat, protein, author) VALUES ('{}', '{}', '{}', '{}', '{}', '{}');".format(ingredient.name, ingredient.calorie, ingredient.sugar, ingredient.fat, ingredient.protein, username))
     cursor.execute(query)
     last_id = db.insert_id()
 
@@ -602,10 +603,10 @@ def editIngredient(ingredient):
     cursor = db.cursor()
 
     if hasattr(ingredient, 'protein'):
-        query = ("UPDATE ingredients SET ingredients.name = '{}', ingredients.protein = '{}', ingredients.fat = '{}', ingredients.sugar = '{}' WHERE ingredients.id = {};".format(ingredient.name, ingredient.protein, ingredient.fat, ingredient.sugar, ingredient.id))
+        query = ("UPDATE ingredients SET ingredients.name = '{}', ingredients.calorie = '{}', ingredients.protein = '{}', ingredients.fat = '{}', ingredients.sugar = '{}' WHERE ingredients.id = {};".format(ingredient.name, ingredient.calorie, ingredient.protein, ingredient.fat, ingredient.sugar, ingredient.id))
         cursor.execute(query)
     else:
-        query = ("UPDATE ingredients SET ingredients.name = '{}' WHERE ingredients.id = {};".format(ingredient.name, ingredient.id))
+        query = ("UPDATE ingredients SET ingredients.name = '{}', ingredients.calorie = '{}' WHERE ingredients.id = {};".format(ingredient.name, ingredient.calorie, ingredient.id))
         cursor.execute(query)
     db.commit()
 
@@ -938,7 +939,7 @@ def addIngredienttoRecipeAJAX():
     if 'username' not in session:
         return redirect('/login')
     ingredient = loadIngredient(request.form["prerecipe__add-ingredient__form__select"])
-    json_ingredient = {'id': ingredient.id, 'name': ingredient.name, 'sugar': ingredient.sugar, 'fat': ingredient.fat, 'protein': ingredient.protein}
+    json_ingredient = {'id': ingredient.id, 'name': ingredient.name, 'calorie': ingredient.calorie, 'sugar': ingredient.sugar, 'fat': ingredient.fat, 'protein': ingredient.protein}
     return jsonify(json_ingredient)
 
 
@@ -1027,10 +1028,11 @@ def recalcRecipeAJAX():
     x = {'id': temp_ingredients[0], 'amount': results[0]}
     y = {'id': temp_ingredients[1], 'amount': results[1]}
     z = {'id': temp_ingredients[2], 'amount': results[2]}
+    totalCalorie = loadIngredient(temp_ingredients[0]).calorie * results[0] + loadIngredient(temp_ingredients[1]).calorie * results[1] + loadIngredient(temp_ingredients[2]).calorie * results[2] + loadIngredient(mainID).calorie * slider
     totalProtein = loadIngredient(temp_ingredients[0]).protein * results[0] + loadIngredient(temp_ingredients[1]).protein * results[1] + loadIngredient(temp_ingredients[2]).protein * results[2] + loadIngredient(mainID).protein * slider
     totalSugar = loadIngredient(temp_ingredients[0]).sugar * results[0] + loadIngredient(temp_ingredients[1]).sugar * results[1] + loadIngredient(temp_ingredients[2]).sugar * results[2] + loadIngredient(mainID).sugar * slider
     totalFat = loadIngredient(temp_ingredients[0]).fat * results[0] + loadIngredient(temp_ingredients[1]).fat * results[1] + loadIngredient(temp_ingredients[2]).fat * results[2] + loadIngredient(mainID).fat * slider
-    totals = {'protein': math.ceil(totalProtein) / 100, 'sugar': math.ceil(totalSugar) / 100, 'fat': math.ceil(totalFat) / 100}
+    totals = {'calorie': math.ceil(totalCalorie) / 100, 'protein': math.ceil(totalProtein) / 100, 'sugar': math.ceil(totalSugar) / 100, 'fat': math.ceil(totalFat) / 100}
     slider = {'id': mainID, 'amount': slider}
     solutionJSON = {'x': x, 'y': y, 'z': z, 'slider': slider, 'totals': totals}
 
@@ -1084,16 +1086,19 @@ def showRecipe(recipeID):
         i.amount = float(math.floor(loadAmount(i.id, recipeID)[0] * coef * 100000)) / 100000
 
     totals = type('', (), {})()
+    totals.calorie = 0
     totals.protein = 0
     totals.fat = 0
     totals.sugar = 0
     totals.amount = 0
     for i in ingredients:
+        totals.calorie += i.amount * i.calorie
         totals.protein += i.amount * i.protein
         totals.fat += i.amount * i.fat
         totals.sugar += i.amount * i.sugar
         totals.amount += i.amount
 
+    totals.calorie = math.floor(totals.calorie) / 100
     totals.protein = math.floor(totals.protein) / 100
     totals.fat = math.floor(totals.fat) / 100
     totals.sugar = math.floor(totals.sugar) / 100
@@ -1102,39 +1107,42 @@ def showRecipe(recipeID):
     return template('recipePage', recipe=recipe, ingredients=ingredients, totals=totals, diet=diet, diets=diets)
 
 
-@app.route('/recipe=<recipeID>/print')
-def printRecipe(recipeID):
-    recipe = loadRecipe(recipeID)[0]
-    diet = loadDiet(loadRecipeDietID(recipe.id))
-    if recipe.size == "big":
-        coef = diet.big_size / 100
-    else:
-        coef = diet.small_size / 100
+# @app.route('/recipe=<recipeID>/print')
+# def printRecipe(recipeID):
+#     recipe = loadRecipe(recipeID)[0]
+#     diet = loadDiet(loadRecipeDietID(recipe.id))
+#     if recipe.size == "big":
+#         coef = diet.big_size / 100
+#     else:
+#         coef = diet.small_size / 100
 
-    ingredientIDs = loadRecipe(recipeID)[1]
-    ingredients = []
-    for ID in ingredientIDs:
-        ingredients.append(loadIngredient(ID))
-    for i in ingredients:
-        i.amount = float(math.floor(loadAmount(i.id, recipeID)[0] * coef * 100000)) / 100000
+#     ingredientIDs = loadRecipe(recipeID)[1]
+#     ingredients = []
+#     for ID in ingredientIDs:
+#         ingredients.append(loadIngredient(ID))
+#     for i in ingredients:
+#         i.amount = float(math.floor(loadAmount(i.id, recipeID)[0] * coef * 100000)) / 100000
 
-    totals = type('', (), {})()
-    totals.protein = 0
-    totals.fat = 0
-    totals.sugar = 0
-    totals.amount = 0
-    for i in ingredients:
-        totals.protein += i.amount * i.protein
-        totals.fat += i.amount * i.fat
-        totals.sugar += i.amount * i.sugar
-        totals.amount += i.amount
+#     totals = type('', (), {})()
+#     totals.calorie = 0
+#     totals.protein = 0
+#     totals.fat = 0
+#     totals.sugar = 0
+#     totals.amount = 0
+#     for i in ingredients:
+#         totals.calorie += i.amount * i.calorie
+#         totals.protein += i.amount * i.protein
+#         totals.fat += i.amount * i.fat
+#         totals.sugar += i.amount * i.sugar
+#         totals.amount += i.amount
 
-    totals.protein = math.floor(totals.protein) / 100
-    totals.fat = math.floor(totals.fat) / 100
-    totals.sugar = math.floor(totals.sugar) / 100
-    totals.amount = math.floor(totals.amount)
-    totals.eq = math.floor((totals.fat / (totals.protein + totals.sugar)) * 10) / 10
-    return template('printRecipePage', recipe=recipe, ingredients=ingredients, totals=totals, diet=diet)
+#     totals.calorie = math.floor(totals.calorie) / 100
+#     totals.protein = math.floor(totals.protein) / 100
+#     totals.fat = math.floor(totals.fat) / 100
+#     totals.sugar = math.floor(totals.sugar) / 100
+#     totals.amount = math.floor(totals.amount)
+#     totals.eq = math.floor((totals.fat / (totals.protein + totals.sugar)) * 10) / 10
+#     return template('printRecipePage', recipe=recipe, ingredients=ingredients, totals=totals, diet=diet)
 
 
 @app.route('/recipe=<recipeID>/remove', methods=['POST'])
@@ -1181,12 +1189,16 @@ def newIngredientAJAX():
 
     ingredient = type('', (), {})()
     ingredient.name = request.form['name']
+    ingredient.calorie = request.form['calorie']
     ingredient.sugar = request.form['sugar']
     ingredient.fat = request.form['fat']
     ingredient.protein = request.form['protein']
 
     if len(ingredient.protein) == 0:
         flash("Zadejte množství bílkoviny")
+        return redirect(request.url)
+    if len(ingredient.calorie) == 0:
+        flash("Zadejte kalorie")
         return redirect(request.url)
     if len(ingredient.fat) == 0:
         flash("Zadejte množství tuku")
@@ -1226,6 +1238,7 @@ def editIngredientAJAX(ingredientID):
     ingredient = type('', (), {})()
     ingredient.name = request.form['name']
     ingredient.id = ingredientID
+    ingredient.calorie = request.form['calorie']
     if deleteIngredientCheck(ingredientID):  # wip
         ingredient.protein = request.form['protein']
         ingredient.fat = request.form['fat']
@@ -1235,7 +1248,7 @@ def editIngredientAJAX(ingredientID):
         return redirect('/ingredient={}'.format(ingredientID))
     else:
         editIngredient(ingredient)
-        flash("Název byl upraven.")
+        flash("Název a kalorická hodnota byly upraveny.")
         return redirect('/ingredient={}'.format(ingredientID))
 
 

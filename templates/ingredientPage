@@ -39,12 +39,13 @@
 <body>
     {% include('navbar') %}
     <div class="container">
-        <div class="col-6">
+        <div class="col-8">
 
             <form action="/ingredient={{ingredient.id}}/edit" class="edit__form form-group" method="post" accept-charset="utf-8">
                 <table class="table">
                     <tr>
                         <th>Název</th>
+                        <th>Kalorie</th>
                         <th>Bílkovina</th>
                         <th>Tuk</th>
                         <th>Sacharidy</th>
@@ -53,6 +54,9 @@
                     <tr>
                         <td>
                             <input type="text" class="form-control" name="name" value="{{ ingredient.name }}" />
+                        </td>
+                        <td>
+                            <input type="text" class="form-control" name="calorie" value="{{ ingredient.calorie }}" />
                         </td>
                         <td>
                             {% if used == False %}
@@ -85,17 +89,17 @@
             <table class=" data__table table">
                 <tr>
                     <th>Název</th>
+                    <th>Kalorie</th>
                     <th>Bílkovina</th>
                     <th>Tuk</th>
                     <th>Sacharidy</th>
-                    <th>Upravit</th>
                 </tr>
                 <tr>
                     <td>{{ ingredient.name }}</td>
+                    <td>{{ ingredient.calorie }}</td>
                     <td>{{ ingredient.protein }}</td>
                     <td>{{ ingredient.fat }}</td>
                     <td>{{ ingredient.sugar }}</td>
-                    <td></td>
                 </tr>
              </table>
 

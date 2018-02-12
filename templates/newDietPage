@@ -14,11 +14,11 @@
             <form id="newDietForm" method="POST" action="/newdiet" class="form-group col-6">
                 <label for="name">Název diety</label>
                 <input type="text" name="name" class="form-control"  value={{name}}>
-                <label for="protein">Množství bílkovin / 1 jídlo</label>
+                <label for="protein">Množství bílkovin / den</label>
                 <input type="text" pattern="[0-9]+([\.][0-9]+)?" name="protein" class="form-control" step="0.01" value={{protein}}><br>
-                <label for="fat">Množství tuku / 1 jídlo</label>
+                <label for="fat">Množství tuku / den</label>
                 <input type="text" pattern="[0-9]+([\.][0-9]+)?" name="fat" class="form-control" step="0.01" value={{fat}}>
-                <label for="sugar">Množství sacharidů / 1 jídlo</label>
+                <label for="sugar">Množství sacharidů / den</label>
                 <input type="text" pattern="[0-9]+([\.][0-9]+)?" name="sugar" class="form-control" step="0.01" value={{sugar}}>
                 <label for="small_size">Procentuální velikost malého jídla</label>
                 <input type="text" pattern="[0-9]+([\.][0-9]+)?" name="small_size" class="form-control" step="0.1" value="0">

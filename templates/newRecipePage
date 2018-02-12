@@ -43,6 +43,7 @@
                 $(".prerecipe__selected-ingredients__table").append(
                     '<tr>'+
                         '<th>Název</th>'+
+                        '<th>Kalorie</th>'+
                         '<th>Bílkovina</th>'+
                         '<th>Tuk</th>'+
                         '<th>Sacharidy</th>'+
@@ -54,6 +55,7 @@
                 $('.prerecipe__selected-ingredients__table').append(
                 "<tr>" + 
                     "<td>" + ingredient.name + "</td>" +
+                    "<td>" + ingredient.calorie + "</td>" +
                     "<td>" + ingredient.protein+ "</td>" +
                     "<td>" + ingredient.fat + "</td>"+
                     "<td>" + ingredient.sugar + "</td>"+
@@ -72,6 +74,7 @@
                 $('.recipe__right__form__ingredient-table').append(
                     '<tr>'+
                         '<th>Název</th>'+
+                        '<th>Kalorie</th>'+
                         '<th>Bílkovina</th>'+
                         '<th>Tuk</th>'+
                         '<th>Sacharidy</th>'+
@@ -185,9 +188,10 @@
                                 return;
                             }
 
-                            var totalSugar = 0;
-                            var totalFat = 0;
+                            var totalCalorie = 0;
                             var totalProtein = 0;
+                            var totalFat = 0;
+                            var totalSugar = 0;
                             var ingredients = response.ingredients;
 
                             // ingredients to table
@@ -197,6 +201,7 @@
                                     $('.recipe__right__form__ingredient-table').append(
                                         '<tr>' +
                                         "<td>" + ingredients[i].name + "</td>" +
+                                        "<td>" + ingredients[i].calorie + "</td>" +
                                         "<td>" + ingredients[i].protein + "</td>" +
                                         "<td>" + ingredients[i].fat + "</td>" +
                                         "<td>" + ingredients[i].sugar + "</td>" +
@@ -236,13 +241,15 @@
                                     $('.recipe__right__form__ingredient-table').append(
                                         "<tr>" +
                                         "<td>" + ingredients[i].name + "</td>" +
+                                        "<td>" + ingredients[i].calorie + "</td>" +
                                         "<td>" + ingredients[i].protein + "</td>" +
                                         "<td>" + ingredients[i].fat + "</td>" +
                                         "<td>" + ingredients[i].sugar + "</td>" +
                                         '<td><span id="amount_' + ingredients[i].id + '">' + Math.round(ingredients[i].amount)+ " g</span></td>" +
                                         "</tr>");
                                 }
-                                
+
+                                totalCalorie += ingredients[i].calorie*ingredients[i].amount;
                                 totalProtein += ingredients[i].protein*ingredients[i].amount;
                                 totalFat += ingredients[i].fat*ingredients[i].amount;
                                 totalSugar += ingredients[i].sugar*ingredients[i].amount;
@@ -253,6 +260,12 @@
                                     '<td>'+
                                         '<strong>Součet</strong>'+
                                     '</td>'+
+                                    '<td>'+
+                                        '<span id="totalCalorie">' + 
+                                        Math.round(totalCalorie/100) +
+                                        '</span>'+
+                                    '</td>' + 
+
                                     '<td>'+
                                         '<span id="totalProtein">' + 
                                         Math.round(totalProtein/100) +
@@ -365,6 +378,8 @@
                             $('#totalFat').text(response.totals.fat);
                             $('#totalSugar').text(response.totals.sugar);
                             $('#totalProtein').text(response.totals.protein);
+                            $('#totalCalorie').text(response.totals.calorie);
+
 
                             // new amounts in form
                             ingredients = [x, y, z, slider];
@@ -486,6 +501,7 @@
                             <table class="recipe__right__form__ingredient-table table">
                                 <tr>
                                     <th>Název</th>
+                                    <th>Kalorie</th>
                                     <th>Bílkovina</th>
                                     <th>Tuk</th>
                                     <th>Sacharidy</th>
