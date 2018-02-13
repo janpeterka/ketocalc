@@ -10,7 +10,7 @@
     <body>
         {% include('navbar') %}
         <div class="container">
-            <form id="newIngredientForm" method="POST" action="/newIngredient" class="form-group col-6" accept-charset="UTF-8">
+            <form id="newIngredientForm" method="POST" action="/newingredient" class="form-group col-6" accept-charset="UTF-8">
 
                 <label for="name">Název suroviny</label>
                 <input type="text" name="name" class="form-control"  required value={{name}}>

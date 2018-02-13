@@ -16,11 +16,16 @@
                 $('.editHideButton').show();
             });
 
-             $(document).on("click", ".editHideButton", function() {
+            $(document).on("click", ".editHideButton", function() {
                 $('.edit__form').hide();
                 $('.data__table').show();
                 $('.editShowButton').show();
                 $('.editHideButton').hide();
+            });
+
+            $(document).on("click", ".export__button", function() {
+                $('.row').hide();
+                $('.loader').show();
             });
     
         </script>
@@ -32,7 +37,23 @@
 
             .editHideButton{
                 display: none;
-            }            
+            }    
+
+            .loader {
+                display: none;
+                border: 16px solid #f3f3f3; /* Light grey */
+                border-top: 16px solid #337ab7; /* Blue */
+                border-radius: 50%;
+                width: 300px;
+                height: 300px;
+                animation: spin 2s linear infinite;
+                margin: 80px auto;
+            }
+
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }        
         </style>
     </head>
     <body>
@@ -49,12 +70,14 @@
                     </ul>
 
                     <form action="/diet={{ diet.id }}/export" class="form-inline" method="post">
-                        <input type="submit" class="btn btn-default" value="Exportovat recepty do diety">
-                        <select name="diet" class="form-control">
-                        {% for diet in diets %}
-                            <option value="{{ diet.id }}">{{ diet.name }}</option>
-                        {% endfor %}
-                        </select>
+                        {% if recipes|length > 0 %}
+                            <input type="submit" class="btn btn-default export__button" value="Exportovat recepty do diety">
+                            <select name="diet" class="form-control">
+                            {% for diet in diets %}
+                                <option value="{{ diet.id }}">{{ diet.name }}</option>
+                            {% endfor %}
+                            </select>
+                        {% endif %}
                     </form>
                 </div>
 
@@ -74,6 +97,21 @@
                         </tr>
                     </table>
 
+                    <table class="table data__table">
+                        <tr>
+                            <th>Velikost jídla</th>
+                            <th>Podíl</th>
+                        </tr>
+                        <tr>
+                            <td>Velké jídlo</td>
+                            <td>{{ diet.big_size }} %</td>
+                        </tr>
+                        <tr>
+                            <td>Malé jídlo</td>
+                            <td>{{ diet.small_size }} %</td>
+                        </tr>
+                    </table>
+
                     <form action="/diet={{diet.id}}/edit" class="edit__form form-group" method="post" accept-charset="utf-8">
                         <table class="table">
                             <tr>
@@ -81,11 +119,10 @@
                                 <th>Bílkovina</th>
                                 <th>Tuk</th>
                                 <th>Sacharidy</th>
-                                <th>Upravit</th>
                             </tr>
                             <tr>
                                 <td>
-                                    <input type="text" class="form-control" name="name" value="{{ diet.name }}" />
+                                    <input type="text" class="form-control" name="name" size="12" value="{{ diet.name }}" />
                                 </td>
                                 <td>
                                     {% if used == False %}
@@ -108,36 +145,41 @@
                                         {{ diet.sugar }}
                                     {% endif %}
                                 </td>
+                            </tr>
+                        </table>
+
+                        <table class="table edit__form">
+                            <tr>
+                                <th>Velikost jídla</th>
+                                <th>Podíl</th>
+                            </tr>
+                            <tr>
+                                <td>Velké jídlo</td>
                                 <td>
-                                    <input type="submit" class="btn btn-warning" value="Uložit změnu" />
+                                    <input type="text" class="form-control" name="big_size" value="{{ diet.big_size }}" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Malé jídlo</td>
+                                <td>
+                                    <input type="text" class="form-control" name="small_size"  value="{{ diet.small_size }}" /> 
                                 </td>
                             </tr>
                         </table>
+                        <input type="submit" class="btn btn-warning" value="Uložit změnu" />
                     </form>
 
-                    <table class="table">
-                        <tr>
-                            <th>Velikost jídla</th>
-                            <th>Podíl</th>
-                        </tr>
-                        <tr>
-                            <td>Velké jídlo</td>
-                            <td>{{ diet.big_size }} %</td>
-                        </tr>
-                        <tr>
-                            <td>Malé jídlo</td>
-                            <td>{{ diet.small_size }} %</td>
-                        </tr>
-                        
-                    </table>
 
                     <form action="/diet={{ diet.id }}/remove" method="post" accept-charset="utf-8">
-                        <input type="submit" class="btn btn-danger" value="Smazat dietu" />
                         <input type="button" class="editShowButton btn btn-warning" value="Upravit dietu" />
-                        <input type="button" class="editHideButton btn btn-warning" value="Zrušit úpravy" />
+                        <input type="button" class="editHideButton btn" value="Zrušit úpravy" />
+                        {% if used == False %}
+                        <input type="submit" class="btn btn-danger" value="Smazat dietu" />
+                        {% endif %}
                     </form>
                 </div>  
-            </div>   
+            </div>  
+            <div class="loader"></div> 
         </div> 
 
 

@@ -104,9 +104,13 @@
              </table>
 
             <form action="/ingredient={{ingredient.id}}/remove" method="post" accept-charset="utf-8">
-                <input type="submit" class="btn btn-danger" value="Smazat surovinu" />
                 <input type="button" class="editShowButton btn btn-warning" value="Upravit surovinu" />
                 <input type="button" class="editHideButton btn btn-warning" value="Zrušit úpravy" />
+                {% if used == False %}
+                    <input type="submit" class="btn btn-danger" value="Smazat surovinu" />
+                {% else %}
+                    <!-- <input type="submit" class="btn btn-danger" disabled value="Smazat surovinu" /> -->
+                {% endif %}
             
             </form>
         </div>

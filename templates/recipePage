@@ -46,17 +46,25 @@
     <div class="container">
         <div class="col-12">
             <form action="/recipe={{recipe.id}}/edit" class="form-inline edit__form" method="post" accept-charset="utf-8">
-                <input type="text" name="name" class="form-control col-4" value="{{ recipe.name }}">
-                <input type="submit" value="Změnit název" class="btn btn-warning">
+                <input type="text" name="name" class="form-control col-4" value="{{ recipe.name }}"><br>
+                <select name="size" class="form-control">
+                    <option value="small">Malé jídlo ({{ diet.small_size }})</option>
+                    <option value="big">Velké jídlo ({{ diet.big_size }})</option>
+                </select>
+                <input type="submit" value="Změnit recept" class="btn btn-warning">
             </form>
 
-            <span class="data__table"><h2>{{ recipe.name }}</h2></span>
+            <span class="data__table">
+
+                <h2>{{ recipe.name }}</h2>
 
             {% if recipe.size == "small" %}
                 <h5>Malé jídlo ({{ diet.small_size }}%)</h5>
             {% elif recipe.size == "big" %}
                 <h5>Velké jídlo ({{ diet.big_size }}%)</h5> 
             {% endif %}
+
+        </span>
             <table id="ingredients" class="table">
                 <tr>
                     <th>Název</th>
@@ -94,22 +102,22 @@
             </table>
             <div class="row">
                 <form action="/recipe={{recipe.id}}/remove" method="post" class="form col-5"  accept-charset="utf-8">
-                    <input type="submit" class="btn btn-danger" value="Smazat recept" />
                     <input type="button" class="editShowButton btn btn-warning" value="Upravit recept" />
                     <input type="button" class="editHideButton btn btn-warning" value="Zrušit úpravy" />
                     <input type="button" class="printButton btn" value="Vytisknout" />
+                    <input type="submit" class="btn btn-danger" value="Smazat recept" />
                 </form>
 
                 <span class="col-2"></span>
 
-                <form action="/recipe={{recipe.id}}/export" class="form-inline col-5" method="post" accept-charset="utf-8">
+<!--                 <form action="/recipe={{recipe.id}}/export" class="form-inline col-5" method="post" accept-charset="utf-8">
                     <input type="submit" class="btn" value="Exportovat recept do diety" />
                     <select name="diet" class="form-control">
                             {% for diet in diets %}
                                 <option value="{{ diet.id }}">{{ diet.name }}</option>
                             {% endfor %}
                     </select>
-                </form>
+                </form> -->
             </div>
         </div>
     </div>

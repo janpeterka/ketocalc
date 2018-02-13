@@ -6,6 +6,11 @@
 	<title>Všechny suroviny</title>
     {% include('bootstrap') %}
     {% include('styleBody') %}        
+    <script>
+        $(document).on("click", ".newIngredient", function() {
+            var win = window.open('/newingredient');
+            win.focus();
+        });
     </script>
 </head>
 <body>
@@ -30,6 +35,7 @@
                     </tr>
                 {% endfor %}
             </table>
+            <button class="newIngredient btn">Přidat surovinu</button>
         </div> 
     </div>   
 </body>

@@ -6,6 +6,11 @@
 	<title>Všechny diety</title>
     {% include('bootstrap') %}
     {% include('styleBody') %}        
+    <script>
+        $(document).on("click", ".newDiet", function() {
+            var win = window.open('/newdiet');
+            win.focus();
+        });
     </script>
 </head>
 <body>
@@ -28,6 +33,7 @@
                     </tr>
                 {% endfor %}
             </table>
+            <button class="newDiet btn">Přidat dietu</button>
         </div>    
     </div>
 </body>

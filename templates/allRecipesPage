@@ -6,6 +6,11 @@
 	<title>Všechny recepty</title>
     {% include('bootstrap') %}
     {% include('styleBody') %}        
+    <script>
+        $(document).on("click", ".newRecipe", function() {
+            var win = window.open('/newrecipe');
+            win.focus();
+        });
     </script>
 </head>
 <body>
@@ -24,10 +29,12 @@
                     </tr>
                 {% endfor %}
             </table>
-            <form action="/printallrecipes">
+            <form action="/printallrecipes" class="form-inline">
+                <button class="newRecipe btn">Přidat recept</button>    
                 <input type="submit" class="btn" value="Vytisknout všechny recepty" />
             </form>
         </div>    
     </div>
+
 </body>
 </html>

@@ -25,8 +25,8 @@
                 $('.prerecipe__add-ingredient__form__select').append(allIngredients);
 
                 temp_array=$('.prerecipe__calc__form input[name=ingredients]').val().split(", ");
-                for (let j = 0; j < temp_array.length; j++) {
-                    $('.prerecipe__add-ingredient__form__select option[value="' + temp_array[j] + '"]').remove(); // wip
+                for (let i = 0; i < temp_array.length; i++) {
+                    $('.prerecipe__add-ingredient__form__select option[value="' + temp_array[i] + '"]').remove(); // wip
                 }
             }
 
@@ -123,7 +123,7 @@
 
                 $('.prerecipe__calc__form input[name=ingredients]').val("");
 
-                for (var i = 0; i < temp_array.length; i++) {
+                for (let i = 0; i < temp_array.length; i++) {
                     prerecipe__calc__form__ingredients__add(temp_array[i]);
                 }
             }
@@ -172,16 +172,16 @@
                         data: $(this).serialize(),
                         success: function(response){
 
-                            // empty form datas
-                            prerecipe__calc__form__empty();
+                            // // empty form datas
+                            // prerecipe__calc__form__empty();
                             recipe__right__form__empty();
 
-                            // empty tables
-                            prerecipe__selectedIngredients__table__empty();
+                            // // empty tables
+                            // prerecipe__selectedIngredients__table__empty();
                             recipe__right__form__ingredientTable__empty();
 
-                            // renew selection
-                            prerecipe__addIngredient__form__select__renew();
+                            // // renew selection
+                            // prerecipe__addIngredient__form__select__renew();
 
                             if (response=="False"){
                                 recipe__wrong__show();
@@ -195,7 +195,7 @@
                             var ingredients = response.ingredients;
 
                             // ingredients to table
-                            for (i = 0; i<response.ingredients.length; i++ ){
+                            for ( let i = 0; i<response.ingredients.length; i++ ){
 
                                 if (response.mainIngredientID == ingredients[i].id){
                                     $('.recipe__right__form__ingredient-table').append(
@@ -284,7 +284,7 @@
                                 '</tr>');
 
                             // ingredient IDs and amounts to inputs
-                            for (i = 0; i<ingredients.length; i++ ){
+                            for (let i = 0; i<ingredients.length; i++ ){
                                 recipe__right__form__addIngredient(ingredients[i]);
                                 recipe__right__form__addAmount(ingredients[i]);
                             }
@@ -351,10 +351,10 @@
             $(document).on("change", "#slider", function(e) {
                 recipe__loader__show();
 
-                dietID = $('.recipe__right__form input[name=diet-ID]').val();
-                ingredientsArray = $('.recipe__right__form input[name=ingredients]').val();
-                slider = $('#slider').val();
-                mainIngredientID = $('#slider_tr').attr('name');
+                var dietID = $('.recipe__right__form input[name=diet-ID]').val();
+                var ingredientsArray = $('.recipe__right__form input[name=ingredients]').val();
+                var slider = $('#slider').val();
+                var mainIngredientID = $('#slider_tr').attr('name');
 
                 $.ajax({
                         type: 'POST',
@@ -365,13 +365,13 @@
                         success: function(response) {
 
                             // new amounts
-                            x = response.x;
+                            var x = response.x;
                             $('#amount_'+x.id).text(x.amount + " g");
-                            y = response.y;
+                            var y = response.y;
                             $('#amount_'+y.id).text(y.amount + " g");
-                            z = response.z;
+                            var z = response.z;
                             $('#amount_'+z.id).text(z.amount + " g");
-                            slider = response.slider;
+                            var slider = response.slider;
                             $('#amount_'+ slider.id).text(slider.amount + " g");
 
                             // new totals 
@@ -384,7 +384,7 @@
                             // new amounts in form
                             ingredients = [x, y, z, slider];
                             $('.recipe__right__form input[name=amounts]').val("");
-                            for (i = 0; i < ingredients.length; i++ ){
+                            for (let i = 0; i < ingredients.length; i++ ){
                                 recipe__right__form__addAmount(ingredients[i]);
                             }
 

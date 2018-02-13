@@ -1,42 +1,39 @@
 improve
-	- design
-		- loading animation in centre
 	- improve newRecipe js handling
 		- better ingredients storage (array, json)
 	- validation in form (html/js)
 	- Class.json (less editing)
-	+-0 feedback form - select issue
+	- tisk receptu - design
 
 bugfix
 	- no flash on login
-	+- newRecipe overlapping cols
 
 v2.2
-	-5 skript na suroviny (xlsx -> db)
 	-2 přepočítání receptů na jinou dietu
-		+- přepočítat všechny (ale bez záruky)
 		- nahrát jeden do newRecipe
-			+- ukázat v recipe__ dietu
-		- loader
-	-2 tisk receptu (ze stránky receptu)
 	- newRecipe nová surovina - začít psát název suroviny
-	- 
+		+- přepočítat všechny (ale bez záruky)
+			+- ukázat v recipe__ dietu
+		+- loader
+	+- tisk receptu (ze stránky receptu)
+	+- úprava diety
+		+- název
+		+- množství (pokud nemá recept)
+		+- velikosti jídel
+	+- úprava receptu
+		+- název
+		+- velikost jídla
+	+-5 skript na suroviny (xlsx -> db)
 	+- surovina energie
 	+- recalc loader
 	+- úprava suroviny
 	+	- název
 		+- množství (pokud není použitý)
-	- úprava diety
-		+- název
-		+- množství (pokud nemá recept)
-		- velikosti jídel
-	- úprava receptu
-		+- název
-		- velikost jídla
 	+- feedback form
 		+- basic
 		+- w/ file upload
 	+- message flashing
+	+- loading animation in centre
 
 
 v2.3 aka Private version
@@ -66,6 +63,7 @@ Someday
 
 	- řazení all listů podle abecedy/id/?
 		- rychlé vyhledávání
+	- používání cizích ingrediencí
 
 
 _________________________________________________________________________________________________
