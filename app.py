@@ -1118,10 +1118,7 @@ def printRecipe(recipeID):
     else:
         coef = diet.small_size / 100
 
-    ingredientIDs = loadRecipe(recipeID)[1]
-    ingredients = []
-    for ID in ingredientIDs:
-        ingredients.append(loadIngredient(ID))
+    ingredients = loadRecipeIngredients(recipeID)
     for i in ingredients:
         i.amount = float(math.floor(loadAmount(i.id, recipeID)[0] * coef * 100000)) / 100000
 
@@ -1174,6 +1171,47 @@ def allrecipes():
         recipe.dietName = loadDiet(recipe.dietID).name
 
     return template("allRecipesPage", recipes=recipes)
+
+
+@app.route('/printallrecipes')
+def printAllRecipes():
+    if 'username' not in session:
+        return redirect('/login')
+    recipes = loadUserRecipes(session['username'])
+    for recipe in recipes:
+        recipe.dietID = loadRecipeDietID(recipe.id)
+        recipe.dietName = loadDiet(recipe.dietID).name
+        recipe.diet = loadDiet(recipe.dietID)
+        recipe.ingredients = loadRecipeIngredients(recipe.id)
+        if recipe.size == "big":
+            coef = recipe.diet.big_size / 100
+        else:
+            coef = recipe.diet.small_size / 100
+
+        for i in recipe.ingredients:
+            i.amount = float(math.floor(loadAmount(i.id, recipe.id)[0] * coef * 100000)) / 100000
+
+        recipe.totals = type('', (), {})()
+        recipe.totals.calorie = 0
+        recipe.totals.protein = 0
+        recipe.totals.fat = 0
+        recipe.totals.sugar = 0
+        recipe.totals.amount = 0
+        for i in recipe.ingredients:
+            recipe.totals.calorie += i.amount * i.calorie
+            recipe.totals.protein += i.amount * i.protein
+            recipe.totals.fat += i.amount * i.fat
+            recipe.totals.sugar += i.amount * i.sugar
+            recipe.totals.amount += i.amount
+
+        recipe.totals.calorie = math.floor(recipe.totals.calorie) / 100
+        recipe.totals.protein = math.floor(recipe.totals.protein) / 100
+        recipe.totals.fat = math.floor(recipe.totals.fat) / 100
+        recipe.totals.sugar = math.floor(recipe.totals.sugar) / 100
+        recipe.totals.amount = math.floor(recipe.totals.amount)
+        recipe.totals.eq = math.floor((recipe.totals.fat / (recipe.totals.protein + recipe.totals.sugar)) * 10) / 10
+
+    return template("printAllRecipes", recipes=recipes)
 
 
 # NEW INGREDIENT PAGE

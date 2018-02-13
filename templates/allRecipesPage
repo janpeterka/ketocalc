@@ -24,6 +24,9 @@
                     </tr>
                 {% endfor %}
             </table>
+            <form action="/printallrecipes">
+                <input type="submit" class="btn" value="Vytisknout všechny recepty" />
+            </form>
         </div>    
     </div>
 </body>
