@@ -80,7 +80,7 @@ def login():
     if 'username' in session:
         return redirect('/user')
     else:
-        return template('loginForm')
+        return template('login.tpl')
 
 
 @app.route('/login', methods=['POST'])
@@ -128,7 +128,7 @@ def logout():
 
 @app.route('/register', methods=['GET'])
 def register():
-    return template('registerForm', username="", firstname="", lastname="")
+    return template('register.tpl', username="", firstname="", lastname="")
 
 
 @app.route('/register', methods=['POST'])
@@ -186,7 +186,7 @@ def user():
         return redirect('/login')
     diets = loadUserDiets(session['username'])
     user = loadUser(session['username'])
-    return template('userPage', username=session['username'], diets=diets, firstname=user.firstname)
+    return template('dashboard.tpl', username=session['username'], diets=diets, firstname=user.firstname)
 
 
 @app.route('/selectDietAJAX', methods=['POST'])
@@ -197,8 +197,9 @@ def selectDietAJAX():
     recipes = loadDietRecipes(dietID)
     for i in range(len(recipes)):
         recipe = recipes[i]
-        json_recipe = {'id': recipe.id, 'name': recipe.name}
-        recipes[i] = json_recipe
+        # json_recipe = {'id': recipe.id, 'name': recipe.name}
+        # recipes[i] = json_recipe
+        recipes[i] = recipe.json
 
     array_recipes = {'array': recipes, 'dietID': dietID}
     return jsonify(array_recipes)
@@ -209,7 +210,7 @@ def selectDietAJAX():
 def newDietShow():
     if 'username' not in session:
         return redirect('/login')
-    return template('newDietPage', name="", sugar="", fat="", protein="")
+    return template('newDiet.tpl', name="", sugar="", fat="", protein="")
 
 
 @app.route('/newdiet', methods=['POST'])
@@ -254,7 +255,7 @@ def showDiet(dietID):
     used = not deleteDietCheck(dietID)
     diets = loadUserDiets(session['username'])
 
-    return template('dietPage', diet=diet, recipes=recipes, used=used, diets=diets)
+    return template('showDiet.tpl', diet=diet, recipes=recipes, used=used, diets=diets)
 
 
 @app.route('/diet=<dietID>/remove', methods=['POST'])
@@ -313,7 +314,7 @@ def allDiets():
         return redirect('/login')
 
     diets = loadUserDiets(session['username'])
-    return template('allDietsPage', diets=diets)
+    return template('allDiets.tpl', diets=diets)
 
 
 # NEW RECIPE PAGE
@@ -325,7 +326,7 @@ def newRecipe():
 
     diets = loadUserDiets(session['username'])
     ingredients = loadAllIngredients(session['username'])
-    return template('newRecipePage', ingredients=ingredients, diets=diets)
+    return template('newRecipe.tpl', ingredients=ingredients, diets=diets)
 
 
 @app.route('/addIngredientAJAX', methods=['POST'])
@@ -333,8 +334,9 @@ def addIngredienttoRecipeAJAX():
     if 'username' not in session:
         return redirect('/login')
     ingredient = loadIngredient(request.form["prerecipe__add-ingredient__form__select"])
-    json_ingredient = {'id': ingredient.id, 'name': ingredient.name, 'calorie': ingredient.calorie, 'sugar': ingredient.sugar, 'fat': ingredient.fat, 'protein': ingredient.protein}
-    return jsonify(json_ingredient)
+    # json_ingredient = {'id': ingredient.id, 'name': ingredient.name, 'calorie': ingredient.calorie, 'sugar': ingredient.sugar, 'fat': ingredient.fat, 'protein': ingredient.protein}
+    # return jsonify(json_ingredient)
+    return jsonify(ingredient.json)
 
 
 @app.route('/calcRecipeAJAX', methods=['POST'])
@@ -498,7 +500,7 @@ def showRecipe(recipeID):
     totals.sugar = math.floor(totals.sugar) / 100
     totals.amount = math.floor(totals.amount)
     totals.eq = math.floor((totals.fat / (totals.protein + totals.sugar)) * 10) / 10
-    return template('recipePage', recipe=recipe, ingredients=ingredients, totals=totals, diet=diet, diets=diets)
+    return template('showRecipe.tpl', recipe=recipe, ingredients=ingredients, totals=totals, diet=diet, diets=diets)
 
 
 @app.route('/recipe=<recipeID>/print')
@@ -533,7 +535,7 @@ def printRecipe(recipeID):
     totals.sugar = math.floor(totals.sugar) / 100
     totals.amount = math.floor(totals.amount)
     totals.eq = math.floor((totals.fat / (totals.protein + totals.sugar)) * 10) / 10
-    return template('printRecipePage', recipe=recipe, ingredients=ingredients, totals=totals, diet=diet)
+    return template('printRecipe.tpl', recipe=recipe, ingredients=ingredients, totals=totals, diet=diet)
 
 
 @app.route('/recipe=<recipeID>/remove', methods=['POST'])
@@ -563,7 +565,7 @@ def allrecipes():
         recipe.dietID = loadRecipeDietID(recipe.id)
         recipe.dietName = loadDiet(recipe.dietID).name
 
-    return template("allRecipesPage", recipes=recipes)
+    return template("allRecipes.tpl", recipes=recipes)
 
 
 @app.route('/printallrecipes')
@@ -604,7 +606,7 @@ def printAllRecipes():
         recipe.totals.amount = math.floor(recipe.totals.amount)
         recipe.totals.eq = math.floor((recipe.totals.fat / (recipe.totals.protein + recipe.totals.sugar)) * 10) / 10
 
-    return template("printAllRecipes", recipes=recipes)
+    return template("printAllRecipes.tpl", recipes=recipes)
 
 
 # NEW INGREDIENT PAGE
@@ -612,7 +614,7 @@ def printAllRecipes():
 def newIngredient():
     if 'username' not in session:
         return redirect('/login')
-    return template('newIngredientPage', name="", sugar="", fat="", protein="")
+    return template('newIngredient.tpl', name="", sugar="", fat="", protein="")
 
 
 @app.route('/newingredient', methods=['POST'])
@@ -652,7 +654,7 @@ def newIngredientAJAX():
 def showingredient(ingredientID):
     ingredient = loadIngredient(ingredientID)
     used = not deleteIngredientCheck(ingredientID)
-    return template('ingredientPage', ingredient=ingredient, used=used)
+    return template('showIngredient.tlp', ingredient=ingredient, used=used)
 
 
 @app.route('/ingredient=<ingredientID>/remove', methods=['POST'])
@@ -690,7 +692,7 @@ def allingredients():
     if 'username' not in session:
         return redirect('/login')
     ingredients = loadAllIngredients(session['username'])
-    return template("allIngredientsPage", ingredients=ingredients)
+    return template("allIngredients.tpl", ingredients=ingredients)
 
 
 # CALCULATE RECIPE
@@ -860,7 +862,7 @@ def calc(ingredients, diet):
 
 @app.route('/feedback', methods=['GET'])
 def showFeedback():
-    return template('feedback')
+    return template('feedback.tpl')
 
 
 def allowed_file(filename):
@@ -903,7 +905,7 @@ def indexhtml():
 
 @app.route('/changelog')
 def changelog():
-    return template('changelog')
+    return template('changelog.tpl')
 
 
 # ERROR

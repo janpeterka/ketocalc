@@ -1,14 +1,10 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<title>Changelog</title>
-	    {% include('bootstrap') %}
-	    {% include('styleBody') %}
-	</head>
-	<body>
-		{% include('navbar') %}
+{% extends "base.tpl" %}
+{% block title %}
+    Changelog
+{% endblock %}
+
+{% block content %}
+    {% include('navbar.tpl') %}
 		<div class="changelog">
 			<h3>Alpha</h3>
 			v1
@@ -76,5 +72,4 @@
 			</ul>
 			</i>
 		</div>
-	</body>
-</html>
+{% endblock %}

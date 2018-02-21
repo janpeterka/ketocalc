@@ -28,6 +28,7 @@ class Recipe(object):
         self.id = dbID
         self.name = name
         self.size = size
+        self.json = {'id': self.id, 'name': self.name, 'size': self.size}
 
 
 class Ingredient(object):
@@ -42,6 +43,7 @@ class Ingredient(object):
         self.fat = fat
         self.protein = protein
         self.amount = 0
+        self.json = {'id': self.id, 'name': self.name, 'calorie': self.calorie, 'sugar': self.sugar, 'fat': self.fat, 'protein': self.protein}
 
 
 class User(object):

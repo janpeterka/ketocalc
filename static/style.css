@@ -1,5 +1,3 @@
-<style>
-
 input{
 	margin-top: 5px;
 	margin-bottom: 5px;
@@ -33,6 +31,26 @@ input{
     animation-fill-mode: forwards;
 
 }
+
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    color: grey;
+    font-size: 10px;
+    text-align: center;
+}
+
+.header {
+    width: 100%;
+    height: 23px;
+    background-color: #ef3b3b;
+    color: #222222;
+    font-size: 14px;
+    text-align: center;
+}
+
 @keyframes cssAnimation {
     to {
         width:0;
@@ -47,5 +65,3 @@ input{
         visibility:hidden;
     }
 }
-
-</style>
