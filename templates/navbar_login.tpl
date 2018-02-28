@@ -14,3 +14,4 @@
     </ul>
   </div>
 </nav>
+{% include('flashing') %}

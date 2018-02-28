@@ -1,8 +1,74 @@
 improve
 	- improve newRecipe js handling
+		- better ingredients storage (array, json)
+	- validation in form (html/js)
+	- Class.json (less editing)
+	- tisk receptu - design
+
 bugfix
-	- recipe totals *10 (small_size)
-	- Calc4 - unable to select last? or some wrong calculation?
+	- no flash on login
+
+v2.2
+	-2 přepočítání receptů na jinou dietu
+		- nahrát jeden do newRecipe
+	- newRecipe nová surovina - začít psát název suroviny
+		+- přepočítat všechny (ale bez záruky)
+			+- ukázat v recipe__ dietu
+		+- loader
+	+- tisk receptu (ze stránky receptu)
+	+- úprava diety
+		+- název
+		+- množství (pokud nemá recept)
+		+- velikosti jídel
+	+- úprava receptu
+		+- název
+		+- velikost jídla
+	+-5 skript na suroviny (xlsx -> db)
+	+- surovina energie
+	+- recalc loader
+	+- úprava suroviny
+	+	- název
+		+- množství (pokud není použitý)
+	+- feedback form
+		+- basic
+		+- w/ file upload
+	+- message flashing
+	+- loading animation in centre
+
+
+v2.3 aka Private version
+	- SQL injection
+	- redirects (use-cases)
+
+v3.0
+	- Calculator 5
+
+v3.1
+	- recepty podle surovin
+
+v3.2
+	- register captcha
+	- změna hesla
+	- zapomenuté heslo
+		- poslat dočasný?
+		- poslat odkaz, kde se dá změnit/obnovit?
+
+v3.3 aka Public version
+
+
+Someday
+	- Calculator 4 speed
+	- testování
+	- deaktivace diety
+
+	- řazení all listů podle abecedy/id/?
+		- rychlé vyhledávání
+	- používání cizích ingrediencí
+
+
+_________________________________________________________________________________________________
+
+
 
 +v2.1
 	+- ubrat špatně přidanou surovinu
@@ -31,56 +97,6 @@ bugfix
 			+- to arrayAmounts
 		+- choose which variable
 		+- default variable - last one
-
-v2.2
-	-0 disable adding same ingredient more times
-	-2 přepočítání receptů na jinou dietu
-	-2 tisk receptu (ze stránky receptu)
-	- úprava suroviny (název)
-	- úprava diety (název)
-	- úprava receptu (název)
-	- validation in form
-
-
-v2.3 aka Private version
-	- SQL injection
-	- redirects (use-cases)
-
-v3.0
-	- Calculator 5
-
-v3.1
-	- recepty podle surovin
-	- deaktivace diety
-
-v3.2
-	- register captcha
-	- změna hesla
-	- zapomenuté heslo
-		- poslat dočasný?
-		- poslat odkaz, kde se dá změnit/obnovit?
-
-v3.3 aka Public version
-
-
-Someday
-	- Calculator 4 speed
-	- testování
-	-0 surovina energie
-	- loading animation center
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 +Old

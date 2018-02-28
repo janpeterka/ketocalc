@@ -43,7 +43,10 @@
             <a class="nav-link" href="/logout">Odhlásit se</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link small" href="/changelog">Changelog</a>
+            <a class="nav-link small" href="/changelog">Změny</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link small" href="/feedback">Připomínky</a>
           </li>
         </ul>
 
@@ -51,3 +54,4 @@
 
   </div>
 </nav>
+{% include('flashing') %}
