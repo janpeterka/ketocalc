@@ -75,9 +75,9 @@
                     '<tr>'+
                         '<th>Název</th>'+
                         '<th>Kalorie</th>'+
-                        '<th>Bílkovina</th>'+
+                        '<th>Bílk.</th>'+
                         '<th>Tuk</th>'+
-                        '<th>Sacharidy</th>'+
+                        '<th>Sach.</th>'+
                         '<th>Hlavní?</th>'+
                     '</tr>');
             }
@@ -92,7 +92,8 @@
                     "<td>" + ingredient.sugar + "</td>"+
                     "<td>" +
                         '<input type="radio" onclick="setMainIngredient('+ ingredient.id +')" class="form-check-input" name="Proměnná"/>' +
-                        '<button id="' + ingredient.id + '" class="remove btn btn-warning">Ubrat</button>' +
+                        '<input type="text" style="width: 40px;" onchange="setIngredientAmount('+ingredient.id+')" />' +
+                        '<button id="' + ingredient.id + '" class="remove btn btn-warning">Odebrat</button>' +
                     // "</td>"+
                     // "<td>" +
                     "</td>"+

@@ -499,7 +499,7 @@ def showRecipe(recipeID):
     totals.fat = math.floor(totals.fat) / 100
     totals.sugar = math.floor(totals.sugar) / 100
     totals.amount = math.floor(totals.amount)
-    totals.eq = math.floor((totals.fat / (totals.protein + totals.sugar)) * 10) / 10
+    totals.eq = math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
     return template('showRecipe.tpl', recipe=recipe, ingredients=ingredients, totals=totals, diet=diet, diets=diets)
 
 
@@ -534,7 +534,7 @@ def printRecipe(recipeID):
     totals.fat = math.floor(totals.fat) / 100
     totals.sugar = math.floor(totals.sugar) / 100
     totals.amount = math.floor(totals.amount)
-    totals.eq = math.floor((totals.fat / (totals.protein + totals.sugar)) * 10) / 10
+    totals.eq = math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
     return template('printRecipe.tpl', recipe=recipe, ingredients=ingredients, totals=totals, diet=diet)
 
 
