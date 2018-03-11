@@ -22,7 +22,7 @@ from werkzeug import secure_filename
 import mail_data as mail_data
 
 from database import *
-from forms import *
+# from forms import *
 
 # Hashing library
 import hashlib
@@ -428,7 +428,8 @@ def recalcRecipeAJAX():
     totalProtein = loadIngredient(temp_ingredients[0]).protein * results[0] + loadIngredient(temp_ingredients[1]).protein * results[1] + loadIngredient(temp_ingredients[2]).protein * results[2] + loadIngredient(mainID).protein * slider
     totalSugar = loadIngredient(temp_ingredients[0]).sugar * results[0] + loadIngredient(temp_ingredients[1]).sugar * results[1] + loadIngredient(temp_ingredients[2]).sugar * results[2] + loadIngredient(mainID).sugar * slider
     totalFat = loadIngredient(temp_ingredients[0]).fat * results[0] + loadIngredient(temp_ingredients[1]).fat * results[1] + loadIngredient(temp_ingredients[2]).fat * results[2] + loadIngredient(mainID).fat * slider
-    totals = {'calorie': math.ceil(totalCalorie) / 100, 'protein': math.ceil(totalProtein) / 100, 'sugar': math.ceil(totalSugar) / 100, 'fat': math.ceil(totalFat) / 100}
+    totalWeight = results[0] + results[1] + results[2] + slider
+    totals = {'calorie': math.ceil(totalCalorie) / 100, 'protein': math.ceil(totalProtein) / 100, 'sugar': math.ceil(totalSugar) / 100, 'fat': math.ceil(totalFat) / 100, 'weight': math.ceil(totalWeight)}
     slider = {'id': mainID, 'amount': slider}
     solutionJSON = {'x': x, 'y': y, 'z': z, 'slider': slider, 'totals': totals}
 

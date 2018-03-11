@@ -92,7 +92,7 @@
                     "<td>" + ingredient.sugar + "</td>"+
                     "<td>" +
                         '<input type="radio" onclick="setMainIngredient('+ ingredient.id +')" class="form-check-input" name="Proměnná"/>' +
-                        '<input type="text" style="width: 40px;" onchange="setIngredientAmount('+ingredient.id+')" />' +
+                        // '<input type="text" style="width: 40px;" onchange="setIngredientAmount('+ingredient.id+')" />' +
                         '<button id="' + ingredient.id + '" class="remove btn btn-warning">Odebrat</button>' +
                     // "</td>"+
                     // "<td>" +
@@ -224,6 +224,7 @@
                             var totalProtein = 0;
                             var totalFat = 0;
                             var totalSugar = 0;
+                            var totalWeight = 0;
                             var ingredients = response.ingredients;
 
                             // ingredients to table
@@ -285,6 +286,7 @@
                                 totalProtein += ingredients[i].protein*ingredients[i].amount;
                                 totalFat += ingredients[i].fat*ingredients[i].amount;
                                 totalSugar += ingredients[i].sugar*ingredients[i].amount;
+                                totalWeight += ingredients[i].amount;
                             }
 
                             $('.recipe__right__form__ingredient-table').append(
@@ -313,6 +315,12 @@
                                         Math.round(totalSugar/100) +
                                         '</span>' +
                                     '</td>' + 
+                                    '<td>'+
+                                        '<span id="totalWeight">' + 
+                                        Math.round(totalWeight)  + 
+                                        '</span>' + " g" +
+                                    '</td>' + 
+
                                 '</tr>');
 
                             // ingredient IDs and amounts to inputs
@@ -411,6 +419,7 @@
                             $('#totalSugar').text(response.totals.sugar);
                             $('#totalProtein').text(response.totals.protein);
                             $('#totalCalorie').text(response.totals.calorie);
+                            $('#totalWeight').text(response.totals.weight);
 
 
                             // new amounts in form
