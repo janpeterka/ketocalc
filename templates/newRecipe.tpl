@@ -28,6 +28,10 @@
             margin: 40px auto;
         }
 
+        .fa-times {
+            color: #8b0000;
+        }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -78,7 +82,7 @@
                         '<th>Bílk.</th>'+
                         '<th>Tuk</th>'+
                         '<th>Sach.</th>'+
-                        '<th>Hlavní?</th>'+
+                        '<th></th>'+
                     '</tr>');
             }
 
@@ -92,8 +96,9 @@
                     "<td>" + ingredient.sugar + "</td>"+
                     "<td>" +
                         '<input type="radio" onclick="setMainIngredient('+ ingredient.id +')" class="form-check-input" name="Proměnná"/>' +
+                        '<i id_value="' + ingredient.id + '" class="remove fa fa-times fa-2x"></i>' +
                         // '<input type="text" style="width: 40px;" onchange="setIngredientAmount('+ingredient.id+')" />' +
-                        '<button id="' + ingredient.id + '" class="remove btn btn-warning">Odebrat</button>' +
+                        // '<button id="' + ingredient.id + '" class="remove btn btn-warning">Odebrat</button>' +
                     // "</td>"+
                     // "<td>" +
                     "</td>"+
@@ -366,14 +371,14 @@
 
             /// Removing ingredient from list of selected ingredients
             $(function(){
-                  $('.prerecipe__selected-ingredients__table').on('click','tr button.remove',function(e){
+                  $('.prerecipe__selected-ingredients__table').on('click','tr i.remove',function(e){
                      e.preventDefault();
 
                     // remove table line
                     $(this).parents('tr').remove();
 
                     // remove from list
-                    prerecipe__calc__form__ingredients__remove($(this).attr('id'));
+                    prerecipe__calc__form__ingredients__remove($(this).attr('id_value'));
 
                     // Refresh selection
                     prerecipe__addIngredient__form__select__refresh();
@@ -452,7 +457,7 @@
 
 {% block content %}
 	{% include('navbar.tpl') %}
-        <div class="container container__main">
+        <div class="container-fluid container__main">
             <div class="row">
                 <div class="prerecipe col-lg-6 col-md-12">
 

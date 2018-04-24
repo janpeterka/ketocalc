@@ -9,7 +9,7 @@ def temp_print(input):
 class Diet(object):
     """  For loading from database """
 
-    def __init__(self, dbID, name, sugar, fat, protein, small_size, big_size):
+    def __init__(self, dbID, name, sugar, fat, protein, small_size, big_size, active):
         super(Diet, self).__init__()
         self.id = dbID
         self.name = name
@@ -18,6 +18,10 @@ class Diet(object):
         self.protein = protein
         self.small_size = small_size
         self.big_size = big_size
+        if active == 1:
+            self.active = True
+        else:
+            self.active = False
 
 
 class Recipe(object):
@@ -249,7 +253,7 @@ def loadDiet(dietID):
     if response is None:
         return None
     else:
-        diet = Diet(response[0], response[1], response[2], response[3], response[4], response[5], response[6])
+        diet = Diet(response[0], response[1], response[2], response[3], response[4], response[5], response[6], response[7])
         return diet
 
 
@@ -267,7 +271,7 @@ def saveDiet(diet):
     db = dbConnect()
     cursor = db.cursor()
 
-    query = ("INSERT INTO diets(name, sugar, fat, protein, small_size, big_size) VALUES ('{}', '{}', '{}', '{}', '{}', '{}');".format(diet.name, diet.sugar, diet.fat, diet.protein, diet.small_size, diet.big_size))
+    query = ("INSERT INTO diets(name, sugar, fat, protein, small_size, big_size, active) VALUES ('{}', '{}', '{}', '{}', '{}', '{}', 1);".format(diet.name, diet.sugar, diet.fat, diet.protein, diet.small_size, diet.big_size))
     cursor.execute(query)
 
     last_id = db.insert_id()
@@ -326,6 +330,40 @@ def deleteDiet(dietID):
     db.commit()
 
 
+def disableDiet(dietID):  # wip
+    db = dbConnect()
+    cursor = db.cursor()
+
+    query = ("""
+        UPDATE
+            diets
+        SET
+            active = 0
+        WHERE
+            diets.id = {};
+        """.format(dietID))
+    cursor.execute(query)
+
+    db.commit()
+
+
+def enableDiet(dietID):
+    db = dbConnect()
+    cursor = db.cursor()
+
+    query = ("""
+        UPDATE
+            diets
+        SET
+            active = 1
+        WHERE
+            diets.id = {};
+        """.format(dietID))
+    cursor.execute(query)
+
+    db.commit()
+
+
 def editDiet(diet):
     """[summary]
 
@@ -346,7 +384,7 @@ def editDiet(diet):
     db.commit()
 
 
-def loadUserDiets(username):
+def loadUserDiets(username, active=1):
     """Load diets for user
 
     [description]
@@ -359,18 +397,35 @@ def loadUserDiets(username):
     """
     db = dbConnect()
     cursor = db.cursor()
-    temp_query = ("SELECT users.id FROM users WHERE users.username = '{}';".format(username))
-    cursor.execute(temp_query)
-    user_id = cursor.fetchone()
+    query = ("""
+        SELECT
+            diets.id,
+            diets.name,
+            diets.sugar,
+            diets.fat,
+            diets.protein,
+            diets.small_size,
+            diets.big_size,
+            diets.active
+        FROM
+            users
+            JOIN users_has_diets ON users_has_diets.users_id = users.id
+            JOIN diets ON diets.id = users_has_diets.diets_id AND IF({}=1, diets.active = 1, 1=1)
+        WHERE
+            users.username = '{}'
+        ORDER BY
+            diets.active DESC,
+            diets.name ASC
+            ;
+        """.format(active, username))
 
-    query = ("SELECT diets.id, diets.name, diets.sugar, diets.fat, diets.protein, diets.small_size, diets.big_size FROM diets JOIN users_has_diets ON diets.id=users_has_diets.diets_id WHERE users_has_diets.users_id= '{}' ;".format(user_id[0]))
     cursor.execute(query)
     response = cursor.fetchall()
 
     # convert to array of objects
     diets = []
     for i in range(len(response)):
-        temp_diet = Diet(response[i][0], response[i][1], response[i][2], response[i][3], response[i][4], response[i][5], response[i][6],)
+        temp_diet = Diet(response[i][0], response[i][1], response[i][2], response[i][3], response[i][4], response[i][5], response[i][6], response[i][7])
         diets.append(temp_diet)
 
     return diets
@@ -615,4 +670,4 @@ def loadUser(username):
         return None
     else:
         return User(response[0], response[1], response[2], response[3], response[4])
-# 
+#

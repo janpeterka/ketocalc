@@ -252,10 +252,10 @@ def showDiet(dietID):
 
     diet = loadDiet(dietID)
     recipes = loadDietRecipes(diet.id)
-    used = not deleteDietCheck(dietID)
+    diet.used = not deleteDietCheck(dietID)
     diets = loadUserDiets(session['username'])
 
-    return template('showDiet.tpl', diet=diet, recipes=recipes, used=used, diets=diets)
+    return template('showDiet.tpl', diet=diet, recipes=recipes, diets=diets)
 
 
 @app.route('/diet=<dietID>/remove', methods=['POST'])
@@ -266,6 +266,17 @@ def removeDiet(dietID):
         return redirect("/user")
     else:
         flash("Tato dieta má recepty, nelze smazat")
+        return redirect('/diet={}'.format(dietID))
+
+
+@app.route('/diet=<dietID>/archive', methods=['POST'])
+def archiveDiet(dietID):
+        if loadDiet(dietID).active:
+            disableDiet(dietID)
+            flash("Dieta byla archivována")
+        else:
+            enableDiet(dietID)
+            flash("Dieta byla aktivována")
         return redirect('/diet={}'.format(dietID))
 
 
@@ -313,7 +324,7 @@ def allDiets():
     if 'username' not in session:
         return redirect('/login')
 
-    diets = loadUserDiets(session['username'])
+    diets = loadUserDiets(session['username'], 0)
     return template('allDiets.tpl', diets=diets)
 
 

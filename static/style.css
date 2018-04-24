@@ -4,7 +4,7 @@ input{
 }
 
 .form-inline > * {
-   margin:5px 3px;
+   margin: 5px 3px;
 }
 
 .navbar{
@@ -17,6 +17,10 @@ input{
 
 .changelog{
 	margin: 10px;
+}
+
+.remove {
+    cursor: pointer;
 }
 
 .flashes {

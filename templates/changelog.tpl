@@ -6,8 +6,51 @@
 {% block content %}
     {% include('navbar.tpl') %}
 		<div class="changelog">
+			<h3>Beta</h3>
+			<h6>v2</h6>
+			<ul>
+				<i>
+					<li>v2.2 (ve vývoji)
+						<ul>
+							<li><strong>počítání pro více surovin (s fixním množstvím)</strong></li>
+							<li><strong>přepočítávání receptu do jiné diety</strong></li>
+						</ul>
+					</li>
+				</i>
+
+				<li>v2.2.1 <i>(24.4.2018)</i>
+					<ul>
+						<li>archivování diety</li>
+					</ul>
+				</li>
+
+				<li>v2.2
+					<ul>
+						<li>tisk receptu</li>
+						<li>úprava suroviny, receptu, diety</li>
+						<li>feedback formulář</li>
+						<li>přidání kalorií k surovinám</li>
+						<li>výpis všech receptů k tisku</li>
+						<li>lepší přidávání nových receptů</li>
+					</ul>
+				</li>
+				<li>v2.1
+					<ul>
+						<li>možnost nastavení množství 4. suroviny </li>
+						<li>ubrání chybně přidané suroviny (Nový recept)</li>
+						<li>nastavení velkého a malého jídla</li>
+					</ul>
+				</li>
+				<li>v2.0
+					<ul>
+						<li>výpočet pro 4 suroviny</li>
+						<li>vylepšený formulář přidání receptu</li>
+					</ul>
+				</li>
+			</ul>
+
 			<h3>Alpha</h3>
-			v1
+			<h6>v1</h6>
 			<ul>
 				<li>v1.0
 					<ul>
@@ -31,45 +74,14 @@
 				</li>
 			</ul>
 
-			v2
-			<ul>
-				<li>v2.0
-					<ul>
-						<li>výpočet pro 4 suroviny</li>
-						<li>vylepšený formulář přidání receptu</li>
-					</ul>
-				</li>
-				<li>v2.1
-					<ul>
-						<li>možnost nastavení množství 4. suroviny </li>
-						<li>ubrání chybně přidané suroviny (Nový recept)</li>
-						<li>nastavení velkého a malého jídla</li>
-					</ul>
-				</li>
-				<li>v2.2
-					<ul>
-						<li>úprava suroviny, receptu, diety</li>
-						<li>feedback formulář</li>
-						<li>přidání kalorií k surovinám</li>
-						<li>výpis všech receptů k tisku</li>
-						<li>lepší přidávání nových receptů</li>
-					</ul>
-				</li>
-				<i>
-					<li>v2.2 (ve vývoji)
-						<ul>
-							<li><strong>přepočítávání receptu do jiné diety</strong></li>
-							<li><strong>tisk receptu</strong></li>
-						</ul>
-					</li>
-				</i>
-			</ul>
+			
+
 			
 
 			<i>v3 (ve vývoji)
-			<ul>
-				<li>výpočet pro 5 surovin</li>
-			</ul>
+				<ul>
+					<li>výpočet pro 5 surovin</li>
+				</ul>
 			</i>
 		</div>
 {% endblock %}
