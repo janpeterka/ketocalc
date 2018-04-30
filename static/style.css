@@ -33,7 +33,6 @@ input{
     animation: cssAnimation 0s ease-in 5s forwards;
     -webkit-animation-fill-mode: forwards;
     animation-fill-mode: forwards;
-
 }
 
 .footer {

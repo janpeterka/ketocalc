@@ -64,14 +64,16 @@ mail = Mail(app)
 def session_management():
     # make the session last indefinitely until it is cleared
     session.permanent = True
+    # if 'username' not in session:
+    #     return redirect('/login')
 
 
 @app.route('/', methods=['GET'])
 def main():
-    if 'username' not in session:
+    if 'username' in session:
         return redirect('/user')
     else:
-        return redirect('login')
+        return redirect('/user')
 
 
 # LOGIN
@@ -271,13 +273,13 @@ def removeDiet(dietID):
 
 @app.route('/diet=<dietID>/archive', methods=['POST'])
 def archiveDiet(dietID):
-        if loadDiet(dietID).active:
-            disableDiet(dietID)
-            flash("Dieta byla archivována")
-        else:
-            enableDiet(dietID)
-            flash("Dieta byla aktivována")
-        return redirect('/diet={}'.format(dietID))
+    if loadDiet(dietID).active:
+        disableDiet(dietID)
+        flash("Dieta byla archivována")
+    else:
+        enableDiet(dietID)
+        flash("Dieta byla aktivována")
+    return redirect('/diet={}'.format(dietID))
 
 
 @app.route('/diet=<dietID>/export', methods=['POST'])
@@ -355,37 +357,41 @@ def calcRecipeAJAX():
     if 'username' not in session:
         return redirect('/login')
 
-    ingredients = request.form['ingredients']
-    if len(ingredients) == 0:
-        return "False"
-    ingredients = [word.strip() for word in ingredients.split(',')]
+    ingredients = request.json['ingredients']
 
-    dietID = request.form['select-diet']
+    dietID = request.json['dietID']
     if dietID is None:
         return "False"
     dietName = loadDiet(dietID).name
 
-    mainIngredientID = request.form['main-ID']
-    if mainIngredientID == "":
-        mainIngredientID = ingredients[0]
-
-    ingredients.remove(mainIngredientID)
+    # get main ingredient and remove it from *ingredients*
+    mainIngredient = ingredients[0]
+    for i in range(len(ingredients)):
+        if ingredients[i]['main'] is True:
+            mainIngredient = ingredients[i]
+            ingredients.pop(i)
+            break
 
     # reaarange, so last ingredient is the main ingredient
     temp_ingredients = []
     for i in range(len(ingredients)):
-        ingredient = loadIngredient(ingredients[i])
+        ingredient = loadIngredient(ingredients[i]['id'])  # bug wip
         temp_ingredients.append(ingredient)
-    temp_ingredients.append(loadIngredient(mainIngredientID))
 
-    ingredients.append(mainIngredientID)
+    temp_ingredients.append(loadIngredient(mainIngredient['id']))
+    ingredients.append(mainIngredient)
 
+    # temp_print(ingredients)
+    # temp_print(temp_ingredients)
+
+    # temp_print("Starting calculations..")
     solution = calc(temp_ingredients, loadDiet(dietID))
+    # temp_print("Calculation finished.")
     if solution is None:
         # temp_print("No solution")
         return "False"
     for i in range(len(ingredients)):
-        ingredient = loadIngredient(ingredients[i])
+        ingredient = loadIngredient(ingredients[i]['id'])
         if solution.vars[i] < 0:
             # temp_print("Solution < 0")
             return "False"
@@ -395,22 +401,28 @@ def calcRecipeAJAX():
     if len(ingredients) <= 3:
         array_ingredients = {'ingredients': ingredients, 'dietID': dietID, 'dietName': dietName}
     else:
-        array_ingredients = {'ingredients': ingredients, 'dietID': dietID, 'dietName': dietName, 'mainIngredientID': mainIngredientID, 'mainIngredientMin': math.ceil(solution.min_sol * 10000) / 100, 'mainIngredientMax': math.ceil(solution.max_sol * 10000) / 100}
+        array_ingredients = {'ingredients': ingredients, 'dietID': dietID, 'dietName': dietName, 'mainIngredientID': mainIngredient['id'], 'mainIngredientMin': math.ceil(solution.min_sol * 10000) / 100, 'mainIngredientMax': math.ceil(solution.max_sol * 10000) / 100}
     return jsonify(array_ingredients)
 
 
 @app.route('/recalcRecipeAJAX', methods=['POST'])
 def recalcRecipeAJAX():
     # get data
-    mainID = request.json['mainID']
-    mainIngredient = loadIngredient(mainID)
+    # mainID = request.json['mainID']
+    # mainIngredient = loadIngredient(mainID)
 
-    temp_ingredientsArray = request.json['ingredientsArray']
-    temp_ingredients = [word.strip() for word in temp_ingredientsArray.split(',')]
-    temp_ingredients.remove(mainID)
+    temp_ingredients = request.json['ingredientsArray']
+
+    # remove main
+    for i in range(len(temp_ingredients)):
+        if temp_ingredients[i]['main']:
+            mainIngredient = loadIngredient(temp_ingredients[i]['id'])
+            temp_ingredients.pop(i)
+            break
+
     ingredients = []
-    for i in temp_ingredients:
-        ingredients.append(loadIngredient(i))
+    for ingredient in temp_ingredients:
+        ingredients.append(loadIngredient(ingredient['id']))
 
     dietID = request.json['dietID']
     diet = loadDiet(dietID)
@@ -432,16 +444,16 @@ def recalcRecipeAJAX():
     results = numpy.linalg.solve(a, b)
     for i in range(len(results)):
         results[i] = math.ceil(results[i] * 10000) / 100
-    x = {'id': temp_ingredients[0], 'amount': results[0]}
-    y = {'id': temp_ingredients[1], 'amount': results[1]}
-    z = {'id': temp_ingredients[2], 'amount': results[2]}
-    totalCalorie = loadIngredient(temp_ingredients[0]).calorie * results[0] + loadIngredient(temp_ingredients[1]).calorie * results[1] + loadIngredient(temp_ingredients[2]).calorie * results[2] + loadIngredient(mainID).calorie * slider
-    totalProtein = loadIngredient(temp_ingredients[0]).protein * results[0] + loadIngredient(temp_ingredients[1]).protein * results[1] + loadIngredient(temp_ingredients[2]).protein * results[2] + loadIngredient(mainID).protein * slider
-    totalSugar = loadIngredient(temp_ingredients[0]).sugar * results[0] + loadIngredient(temp_ingredients[1]).sugar * results[1] + loadIngredient(temp_ingredients[2]).sugar * results[2] + loadIngredient(mainID).sugar * slider
-    totalFat = loadIngredient(temp_ingredients[0]).fat * results[0] + loadIngredient(temp_ingredients[1]).fat * results[1] + loadIngredient(temp_ingredients[2]).fat * results[2] + loadIngredient(mainID).fat * slider
+    x = {'id': temp_ingredients[0]['id'], 'amount': results[0]}
+    y = {'id': temp_ingredients[1]['id'], 'amount': results[1]}
+    z = {'id': temp_ingredients[2]['id'], 'amount': results[2]}
+    totalCalorie = ingredients[0].calorie * results[0] + ingredients[1].calorie * results[1] + ingredients[2].calorie * results[2] + mainIngredient.calorie * slider
+    totalProtein = ingredients[0].protein * results[0] + ingredients[1].protein * results[1] + ingredients[2].protein * results[2] + mainIngredient.protein * slider
+    totalSugar = ingredients[0].sugar * results[0] + ingredients[1].sugar * results[1] + ingredients[2].sugar * results[2] + mainIngredient.sugar * slider
+    totalFat = ingredients[0].fat * results[0] + ingredients[1].fat * results[1] + ingredients[2].fat * results[2] + mainIngredient.fat * slider
     totalWeight = results[0] + results[1] + results[2] + slider
     totals = {'calorie': math.ceil(totalCalorie) / 100, 'protein': math.ceil(totalProtein) / 100, 'sugar': math.ceil(totalSugar) / 100, 'fat': math.ceil(totalFat) / 100, 'weight': math.ceil(totalWeight)}
-    slider = {'id': mainID, 'amount': slider}
+    slider = {'id': mainIngredient.id, 'amount': slider}
     solutionJSON = {'x': x, 'y': y, 'z': z, 'slider': slider, 'totals': totals}
 
     # give ids with amounts
@@ -453,27 +465,29 @@ def addRecipeAJAX():
     if 'username' not in session:
         return redirect('/login')
 
-    dietID = request.form['diet-ID']
+    # dietID = request.form['diet-ID']
 
-    temp_ingredients = request.form['ingredients']
-    temp_ingredients = [word.strip() for word in temp_ingredients.split(',')]
+    temp_ingredients = request.json['ingredients']
+    dietID = request.json['dietID']
 
-    amounts = request.form['amounts']
-    amounts = [word.strip() for word in amounts.split(',')]
+    # temp_ingredients = [word.strip() for word in temp_ingredients.split(',')]
+
+    # amounts = request.form['amounts']
+    # amounts = [word.strip() for word in amounts.split(',')]
 
     ingredients = []
     for i in range(len(temp_ingredients)):
-        ingredient = type('', (), {})()
-        ingredient.id = temp_ingredients[i]
-        ingredient.amount = amounts[i]
-        ingredients.append(ingredient)
+        ingredients.append(loadIngredient(temp_ingredients[i]['id']))
+        ingredients[i].amount = temp_ingredients[i]['amount']
 
     recipe = type('', (), {})()
-    recipe.name = request.form['recipe__right__form__name-input']
-    recipe.size = request.form['recipe__right__form__size-select']
+    recipe.name = request.json['name']
+    recipe.size = request.json['size']
+
     last_id = saveRecipe(recipe, ingredients, dietID)
     flash("Recept byl uložen")
-    return redirect('/recipe=' + str(last_id))
+    # return redirect('/recipe=' + str(last_id))
+    return ('/recipe=' + str(last_id))
 
 
 @app.route('/recipe=<recipeID>')
@@ -666,7 +680,7 @@ def newIngredientAJAX():
 def showingredient(ingredientID):
     ingredient = loadIngredient(ingredientID)
     used = not deleteIngredientCheck(ingredientID)
-    return template('showIngredient.tlp', ingredient=ingredient, used=used)
+    return template('showIngredient.tpl', ingredient=ingredient, used=used)
 
 
 @app.route('/ingredient=<ingredientID>/remove', methods=['POST'])
@@ -818,9 +832,9 @@ def calc(ingredients, diet):
         in2 = sp.solvers.solve((f1, f2, f3), (x, y, z))[y]
         in3 = sp.solvers.solve((f1, f2, f3), (x, y, z))[z]
 
-        temp_print(in1)
-        temp_print(in2)
-        temp_print(in3)
+        # temp_print(in1)
+        # temp_print(in2)
+        # temp_print(in3)
 
         # Faster way?? wip
         # solve for positive numbers

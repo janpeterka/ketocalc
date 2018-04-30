@@ -18,9 +18,10 @@
 					</li>
 				</i>
 
-				<li>v2.2.1 <i>(24.4.2018)</i>
+				<li>v2.2.1 <i>(24.4.2018 - )</i>
 					<ul>
 						<li>archivování diety</li>
+						<li>lepší hlavní surovina (s podbarvením)</li>
 					</ul>
 				</li>
 
