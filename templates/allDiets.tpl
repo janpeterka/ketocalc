@@ -4,7 +4,16 @@
 {% endblock %}
 
 {% block style %}
-    
+    <style>
+    .False {
+        background-color: lightgrey;
+        color: grey;
+    }
+    .False a{
+        color: grey;
+        
+    }
+    </style>
 {% endblock %}
 
 {% block script %}
@@ -26,13 +35,20 @@
                     <th>Bílkovina</th>
                     <th>Tuk</th>
                     <th>Sacharidy</th>
+                    <th>Aktivní</th>
                 </tr>
                 {% for diet in diets: %}
-                    <tr>
+                    <tr class= {{ diet.active }}>                         
                         <td><a href="/diet={{diet.id}}">{{ diet.name }}</a></td>
                         <td>{{ diet.protein }}</td>
                         <td>{{ diet.fat }}</td>
                         <td>{{ diet.sugar }}</td>
+                        <td>
+                            {% if diet.active %}
+                                Ano
+                            {% else %}
+                                Ne
+                            {% endif %}
                     </tr>
                 {% endfor %}
             </table>

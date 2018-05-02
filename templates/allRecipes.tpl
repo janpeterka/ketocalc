@@ -32,10 +32,14 @@
                     </tr>
                 {% endfor %}
             </table>
-            <form action="/printallrecipes" class="form-inline">
-                <button class="newRecipe btn">Přidat recept</button>    
-                <input type="submit" class="btn" value="Vytisknout všechny recepty" />
-            </form>
+            <div class="row">
+                <form action="" class="form-inline">
+                    <button class="newRecipe btn">Přidat recept</button>        
+                </form>
+                <form action="/printallrecipes" class="form-inline">
+                    <input type="submit" class="btn" value="Vytisknout všechny recepty" />
+                </form>
+            </div>
         </div>    
     </div>
 {% endblock %}

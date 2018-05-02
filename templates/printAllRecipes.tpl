@@ -26,7 +26,12 @@
     <div class="container">
         <div class="col-12 d-print-flex">
             {% for recipe in recipes:%}
-                <h2>{{ recipe.name }}</h2>   
+                <h2>{{ recipe.name }}</h2>
+                {% if recipe.size == "small" %}
+                    <h5>Malé jídlo ({{ recipe.diet.small_size }}%)</h5>
+                {% elif recipe.size == "big" %}
+                    <h5>Velké jídlo ({{ recipe.diet.big_size }}%)</h5> 
+                {% endif %}
                 <table id="ingredients" class="table">
                     <tr>
                         <th><strong>Název</strong></th>

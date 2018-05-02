@@ -124,21 +124,21 @@
                                 <input type="text" class="form-control" name="name" size="12" value="{{ diet.name }}" />
                             </td>
                             <td>
-                                {% if used == False %}
+                                {% if diet.used == False %}
                                     <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="protein" value="{{ diet.protein }}"/>
                                 {% else %}
                                     {{ diet.protein }}
                                 {% endif %}
                             </td>
                             <td>
-                                {% if used == False %}
+                                {% if diet.used == False %}
                                     <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="fat" value="{{ diet.fat }}"/>
                                 {% else %}
                                     {{ diet.fat }}
                                 {% endif %}
                             </td>
                             <td>
-                                {% if used == False %}
+                                {% if diet.used == False %}
                                     <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="sugar" value="{{ diet.sugar }}"/>
                                 {% else %}
                                     {{ diet.sugar }}
@@ -171,8 +171,15 @@
                 <form action="/diet={{ diet.id }}/remove" method="post" accept-charset="utf-8">
                     <input type="button" class="editShowButton btn btn-warning" value="Upravit dietu" />
                     <input type="button" class="editHideButton btn" value="Zrušit úpravy" />
-                    {% if used == False %}
+                    {% if diet.used == False %}
                     <input type="submit" class="btn btn-danger" value="Smazat dietu" />
+                    {% endif %}
+                </form>
+                <form action="/diet={{ diet.id }}/archive" method="post" accept-charset="utf-8">
+                    {% if diet.active == True %}
+                        <input type="submit" class="btn " value="Archivovat dietu" />
+                    {% else %}
+                        <input type="submit" class="btn " value="Aktivovat dietu" />
                     {% endif %}
                 </form>
             </div>  

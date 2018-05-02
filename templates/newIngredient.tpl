@@ -23,7 +23,7 @@
                 <input type="text" pattern="[0-9]+([\.][0-9]+)?" name="fat" class="form-control" step="0.01" required value={{fat}}>
                 <label for="sugar">Množství sacharidů / 100 g</label>
                 <input type="text" pattern="[0-9]+([\.][0-9]+)?" name="sugar" class="form-control" step="0.01" required value={{sugar}}>
-                <label for="sugar">Množství kalorií / 100 g</label>
+                <label for="sugar">Množství kalorií (kcal)/ 100 g</label>
                 <input type="text" pattern="[0-9]+([\.][0-9]+)?" name="calorie" class="form-control" step="0.01" required value={{calorie}}>
                 <input id="ajaxButton" type="submit" class="btn btn-primary" value="Přidat surovinu" /><br>
             </form>
