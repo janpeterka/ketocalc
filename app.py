@@ -64,8 +64,6 @@ mail = Mail(app)
 def session_management():
     # make the session last indefinitely until it is cleared
     session.permanent = True
-    # if 'username' not in session:
-    #     return redirect('/login')
 
 
 @app.route('/', methods=['GET'])
@@ -136,7 +134,7 @@ def register():
 @app.route('/register', methods=['POST'])
 def do_register():
     username = request.form['username']
-    # check uniquness of username
+    # check uniqueness of username
 
     temp_password = str(request.form['password'])
     temp_password_2 = str(request.form['againPassword'])
@@ -159,7 +157,7 @@ def do_register():
         flash("Hesla jsou rozdílná!")
         redirect(request.url)
     if loadUser(username) is not None:
-        flash("Uživatelské jméno nelze použít")
+        flash("Uživatelské jméno nelze použít")  # wip - není korektní
         redirect(request.url)
 
     response = saveUser(username, password_hash, firstname, lastname)
@@ -186,6 +184,7 @@ def validateRegister():
 def user():
     if 'username' not in session:
         return redirect('/login')
+
     diets = loadUserDiets(session['username'])
     user = loadUser(session['username'])
     return template('dashboard.tpl', username=session['username'], diets=diets, firstname=user.firstname)
@@ -195,12 +194,11 @@ def user():
 def selectDietAJAX():
     if 'username' not in session:
         return redirect('/login')
+
     dietID = request.form['selectDiet']
     recipes = loadDietRecipes(dietID)
     for i in range(len(recipes)):
         recipe = recipes[i]
-        # json_recipe = {'id': recipe.id, 'name': recipe.name}
-        # recipes[i] = json_recipe
         recipes[i] = recipe.json
 
     array_recipes = {'array': recipes, 'dietID': dietID}
@@ -212,6 +210,7 @@ def selectDietAJAX():
 def newDietShow():
     if 'username' not in session:
         return redirect('/login')
+
     return template('newDiet.tpl', name="", sugar="", fat="", protein="")
 
 
@@ -284,7 +283,6 @@ def archiveDiet(dietID):
 
 @app.route('/diet=<dietID>/export', methods=['POST'])
 def exportDiet(dietID):
-    # newDietID = request.form['diet']
     recipes = loadDietRecipes(dietID)
     newDietID = int(request.form['diet'])
     newDiet = loadDiet(newDietID)
@@ -333,7 +331,6 @@ def allDiets():
 # NEW RECIPE PAGE
 @app.route('/newrecipe')
 def newRecipe():
-
     if 'username' not in session:
         return redirect('/login')
 
@@ -346,9 +343,8 @@ def newRecipe():
 def addIngredienttoRecipeAJAX():
     if 'username' not in session:
         return redirect('/login')
+
     ingredient = loadIngredient(request.form["prerecipe__add-ingredient__form__select"])
-    # json_ingredient = {'id': ingredient.id, 'name': ingredient.name, 'calorie': ingredient.calorie, 'sugar': ingredient.sugar, 'fat': ingredient.fat, 'protein': ingredient.protein}
-    # return jsonify(json_ingredient)
     return jsonify(ingredient.json)
 
 
@@ -381,19 +377,12 @@ def calcRecipeAJAX():
     temp_ingredients.append(loadIngredient(mainIngredient['id']))
     ingredients.append(mainIngredient)
 
-    # temp_print(ingredients)
-    # temp_print(temp_ingredients)
-
-    # temp_print("Starting calculations..")
     solution = calc(temp_ingredients, loadDiet(dietID))
-    # temp_print("Calculation finished.")
     if solution is None:
-        # temp_print("No solution")
         return "False"
     for i in range(len(ingredients)):
         ingredient = loadIngredient(ingredients[i]['id'])
         if solution.vars[i] < 0:
-            # temp_print("Solution < 0")
             return "False"
         json_ingredient = {'id': ingredient.id, 'calorie': ingredient.calorie, 'name': ingredient.name, 'sugar': ingredient.sugar, 'fat': ingredient.fat, 'protein': ingredient.protein, 'amount': math.ceil(solution.vars[i] * 10000) / 100}  # wip
         ingredients[i] = json_ingredient
@@ -408,9 +397,6 @@ def calcRecipeAJAX():
 @app.route('/recalcRecipeAJAX', methods=['POST'])
 def recalcRecipeAJAX():
     # get data
-    # mainID = request.json['mainID']
-    # mainIngredient = loadIngredient(mainID)
-
     temp_ingredients = request.json['ingredientsArray']
 
     # remove main
@@ -483,6 +469,8 @@ def addRecipeAJAX():
     recipe = type('', (), {})()
     recipe.name = request.json['name']
     recipe.size = request.json['size']
+
+    temp_print('recipe: {}, ingredient[0].amount: {},  ingredient[0].id: {}, dietID: {}'.format(recipe, ingredients[0].amount, ingredients[0].id, dietID))
 
     last_id = saveRecipe(recipe, ingredients, dietID)
     flash("Recept byl uložen")
@@ -942,7 +930,7 @@ def error404(error):
 
 @app.errorhandler(500)
 def error500(error):
-    return 'Something went wrong! (Err500) <br>'
+    return 'Something went wrong! (Err500)'
 
 
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'

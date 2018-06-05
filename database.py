@@ -90,7 +90,7 @@ def loadRecipe(recipeID):
     query = ("""
 
         SELECT
-            *
+            id, name, type
         FROM
             recipes
         WHERE
@@ -190,7 +190,6 @@ def deleteRecipe(recipeID):
             diets_has_recipes
         WHERE
             diets_has_recipes.recipes_id = {};
-
 
         """.format(recipeID))
     cursor.execute(query)
@@ -338,7 +337,7 @@ def loadDiet(dietID):
     query = ("""
 
         SELECT
-            *
+            id, name, sugar, fat, protein, small_size, big_size, active
         FROM
             diets
         WHERE
@@ -544,7 +543,7 @@ def editDiet(diet):                         # wip - proč je tam if:else?
 
 
 def loadUserDiets(username, active=1):
-    """Load diets for user
+    """Load diets for user ordered by name
 
     [description]
 
@@ -917,7 +916,7 @@ def loadUser(username):
     query = ("""
 
         SELECT
-            *
+            id, username, pwdhash, firstname, lastname
         FROM
             users
         WHERE
@@ -932,4 +931,3 @@ def loadUser(username):
         return None
     else:
         return User(response[0], response[1], response[2], response[3], response[4])
-#

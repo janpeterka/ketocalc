@@ -240,8 +240,10 @@
                     $.ajax({
                         type: 'POST',
                         url: '/calcRecipeAJAX',
-                        data: JSON.stringify(
-                            {'ingredients' : prerecipe__ingredient_array, 'dietID' : $('.select-diet').val()}),
+                        data: JSON.stringify({
+                            'ingredients' : prerecipe__ingredient_array,
+                            'dietID' : $('.select-diet').val()
+                        }),
                         contentType: 'application/json;charset=UTF-8',
                         success: function(response){
 
@@ -470,12 +472,14 @@
 
 
                             // new amounts in form
-                            ingredientAmounts = [x, y, z, slider];
+                            ingredientAmounts = [x.amount, y.amount, z.amount, slider.amount];
                             for (let i = 0; i < recipe__ingredient_array.length; i++ ){
-                                recipe__ingredient_array[i]['amount'] = ingredientAmounts[i]
+                                recipe__ingredient_array[i]['amount'] = ingredientAmounts[i] // wip není hezký
                             }
 
                             recipe__right__show();
+
+                            console.log(recipe__ingredient_array);
 
                         },
                         error: function(error) {
