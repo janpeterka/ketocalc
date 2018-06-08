@@ -10,13 +10,20 @@
 			<h6>v2</h6>
 			<ul>
 				<i>
-					<li>v2.2 (ve vývoji)
+					<li>v2.3.1 (ve vývoji)
 						<ul>
-							<li><strong>počítání pro více surovin (s fixním množstvím)</strong></li>
 							<li><strong>přepočítávání receptu do jiné diety</strong></li>
+							<li>nápověda</li>
+							<li></li>
 						</ul>
 					</li>
 				</i>
+
+				<li>v2.3 <i>8.6.2018</i>
+					<ul>
+						<li>Fixní suroviny - počítání s více surovinami</li>
+					</ul>
+				</li>
 
 				<li>v2.2.1 <i>(24.4.2018 - )</i>
 					<ul>

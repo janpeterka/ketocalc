@@ -48,10 +48,10 @@
                 $('.editHideButton').hide();
             });
 
-            $(document).on("click", ".export__button", function() {
-                $('.row').hide();
-                $('.loader').show();
-            });
+            // $(document).on("click", ".export__button", function() {
+            //     $('.row').hide();
+            //     $('.loader').show();
+            // });
     
         </script>
 {% endblock %}
@@ -70,7 +70,7 @@
 
                 <form action="/diet={{ diet.id }}/export" class="form-inline" method="post">
                     {% if recipes|length > 0 %}
-                        <input type="submit" class="btn btn-default export__button" value="Exportovat recepty do diety">
+                        <!-- <input type="submit" class="btn btn-default export__button" value="Exportovat recepty do diety"> -->
                         <select name="diet" class="form-control">
                         {% for diet in diets %}
                             <option value="{{ diet.id }}">{{ diet.name }}</option>

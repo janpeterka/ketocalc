@@ -22,6 +22,8 @@ class Diet(object):
             self.active = True
         else:
             self.active = False
+        self.json = {'id': self.id, 'name': self.name, 'sugar': self.sugar, 'fat': self.fat,
+                     'protein': self.protein, 'small_size': self.small_size, 'big_size': self.big_size}
 
 
 class Recipe(object):

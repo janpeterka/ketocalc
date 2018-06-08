@@ -33,6 +33,15 @@
    
     <!-- My style -->
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Bootstrap slider -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.2/css/bootstrap-slider.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.2/bootstrap-slider.min.js"></script>
+    
+    <!-- Bootstrap alert, prompt -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
+   
+    
     {% block style %} {% endblock %}
     {% block script %} {% endblock %}
 
@@ -40,7 +49,7 @@
     {% endblock head %}
 </head>
 <body>
-    <!-- <div class="header"> Upozornění: Toto je testovací verze programu. Optimalizováno pro prohlížeč Chrome, v jiných prohlížečích se může konat nepředvídatelně.</div> -->
+    <!-- <div class="header"> Upozornění: Optimalizováno pro prohlížeč Chrome, v jiných prohlížečích se může konat nepředvídatelně.</div> -->
     <div id="content">{% block content %}{% endblock %}</div>
     <div class="footer">
         {% block footer %}

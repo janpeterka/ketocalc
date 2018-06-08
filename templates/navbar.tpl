@@ -48,6 +48,9 @@
           <li class="nav-item">
             <a class="nav-link small" href="/feedback">Připomínky</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link small" href="/help">Nápověda</a>
+          </li>
         </ul>
 
     </div>

@@ -38,7 +38,6 @@ import os
 # Printing
 # import pdfkit
 
-# towards the beginging of the file, soon after imports
 
 UPLOAD_FOLDER = '/tmp'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
@@ -76,7 +75,7 @@ def main():
 
 # LOGIN
 @app.route('/login', methods=['GET'])
-def login():
+def showLogin():
     if 'username' in session:
         return redirect('/user')
     else:
@@ -84,10 +83,10 @@ def login():
 
 
 @app.route('/login', methods=['POST'])
-def do_login():
+def doLogin():
     username = request.form['username']
     password = request.form['password']
-    if check_login(username, password):
+    if checkLogin(username, password):
         session['username'] = username
         flash("Byl jste úspěšně přihlášen.")
         return redirect('/user')
@@ -95,7 +94,7 @@ def do_login():
         return False
 
 
-def check_login(username, password):
+def checkLogin(username, password):
     """[summary]
 
     [description]
@@ -120,19 +119,19 @@ def check_login(username, password):
 
 
 @app.route('/logout')
-def logout():
+def doLogout():
     session.pop('username', None)
     flash("Byl jste úspěšně odhlášen.")
     return redirect('/login')
 
 
 @app.route('/register', methods=['GET'])
-def register():
+def showRegister():
     return template('register.tpl', username="", firstname="", lastname="")
 
 
 @app.route('/register', methods=['POST'])
-def do_register():
+def doRegister():
     username = request.form['username']
     # check uniqueness of username
 
@@ -181,7 +180,7 @@ def validateRegister():
 
 # USER PAGE
 @app.route('/user')
-def user():
+def showUser():
     if 'username' not in session:
         return redirect('/login')
 
@@ -207,7 +206,7 @@ def selectDietAJAX():
 
 # NEW DIET
 @app.route('/newdiet', methods=['GET'])
-def newDietShow():
+def showNewDiet():
     if 'username' not in session:
         return redirect('/login')
 
@@ -281,22 +280,22 @@ def archiveDiet(dietID):
     return redirect('/diet={}'.format(dietID))
 
 
-@app.route('/diet=<dietID>/export', methods=['POST'])
-def exportDiet(dietID):
-    recipes = loadDietRecipes(dietID)
-    newDietID = int(request.form['diet'])
-    newDiet = loadDiet(newDietID)
-    for recipe in recipes:
-        ingredients = loadRecipeIngredients(recipe.id)
-        solution = calc(ingredients, newDiet)
-        if solution is None:
-            continue
-        else:
-            for i in range(len(ingredients)):
-                ingredients[i].amount = math.ceil(solution.vars[i] * 10000) / 100
-            recipe.name = "{} {}".format(recipe.name, newDiet.name)
-            saveRecipe(recipe, ingredients, newDietID)
-    return redirect('/diet={}'.format(newDietID))
+# @app.route('/diet=<dietID>/export', methods=['POST'])
+# def exportDiet(dietID):
+#     recipes = loadDietRecipes(dietID)
+#     newDietID = int(request.form['diet'])
+#     newDiet = loadDiet(newDietID)
+#     for recipe in recipes:
+#         ingredients = loadRecipeIngredients(recipe.id)
+#         solution = calc(ingredients, newDiet)
+#         if solution is None:
+#             continue
+#         else:
+#             for i in range(len(ingredients)):
+#                 ingredients[i].amount = math.ceil(solution.vars[i] * 10000) / 100
+#             recipe.name = "{} {}".format(recipe.name, newDiet.name)
+#             saveRecipe(recipe, ingredients, newDietID)
+#     return redirect('/diet={}'.format(newDietID))
 
 
 @app.route('/diet=<dietID>/edit', methods=['POST'])
@@ -320,7 +319,7 @@ def editDietAJAX(dietID):
 
 
 @app.route('/alldiets')
-def allDiets():
+def showAllDiets():
     if 'username' not in session:
         return redirect('/login')
 
@@ -330,7 +329,7 @@ def allDiets():
 
 # NEW RECIPE PAGE
 @app.route('/newrecipe')
-def newRecipe():
+def showNewRecipe():
     if 'username' not in session:
         return redirect('/login')
 
@@ -353,62 +352,82 @@ def calcRecipeAJAX():
     if 'username' not in session:
         return redirect('/login')
 
-    ingredients = request.json['ingredients']
+    json_ingredients = request.json['ingredients']
 
     dietID = request.json['dietID']
     if dietID is None:
         return "False"
-    dietName = loadDiet(dietID).name
+    diet = loadDiet(dietID)
 
-    # get main ingredient and remove it from *ingredients*
-    mainIngredient = ingredients[0]
-    for i in range(len(ingredients)):
-        if ingredients[i]['main'] is True:
-            mainIngredient = ingredients[i]
-            ingredients.pop(i)
-            break
+    ingredients = []
+    for i in range(len(json_ingredients)):
+        ingredient = loadIngredient(json_ingredients[i]['id'])
+        ingredient.fixed = json_ingredients[i]['fixed']
+        ingredient.main = json_ingredients[i]['main']
+        ingredient.amount = float(json_ingredients[i]['amount']) / 100
+        ingredients.append(ingredient)
 
-    # reaarange, so last ingredient is the main ingredient
-    temp_ingredients = []
-    for i in range(len(ingredients)):
-        ingredient = loadIngredient(ingredients[i]['id'])  # bug wip
-        temp_ingredients.append(ingredient)
+    # for i in ingredients:
+    #     temp_print(str(i.id) + ":" + i.name + ':' + str(i.amount))
 
-    temp_ingredients.append(loadIngredient(mainIngredient['id']))
-    ingredients.append(mainIngredient)
+    ingredients = calc(ingredients, diet)
+    # for i in ingredients:
+    #     temp_print(str(i.id) + ":" + i.name + ':' + str(i.amount))
 
-    solution = calc(temp_ingredients, loadDiet(dietID))
-    if solution is None:
+    json_ingredients = []
+    if ingredients is None:
         return "False"
-    for i in range(len(ingredients)):
-        ingredient = loadIngredient(ingredients[i]['id'])
-        if solution.vars[i] < 0:
-            return "False"
-        json_ingredient = {'id': ingredient.id, 'calorie': ingredient.calorie, 'name': ingredient.name, 'sugar': ingredient.sugar, 'fat': ingredient.fat, 'protein': ingredient.protein, 'amount': math.ceil(solution.vars[i] * 10000) / 100}  # wip
-        ingredients[i] = json_ingredient
+    for ing in ingredients:
 
-    if len(ingredients) <= 3:
-        array_ingredients = {'ingredients': ingredients, 'dietID': dietID, 'dietName': dietName}
-    else:
-        array_ingredients = {'ingredients': ingredients, 'dietID': dietID, 'dietName': dietName, 'mainIngredientID': mainIngredient['id'], 'mainIngredientMin': math.ceil(solution.min_sol * 10000) / 100, 'mainIngredientMax': math.ceil(solution.max_sol * 10000) / 100}
-    return jsonify(array_ingredients)
+        if ing.amount < 0:
+            return "False"
+
+        if hasattr(ing, 'min'):
+            json_ingredient = json_ingredient = {'id': ing.id, 'calorie': ing.calorie, 'name': ing.name, 'sugar': ing.sugar, 'fat': ing.fat, 'protein': ing.protein, 'amount': math.ceil(ing.amount * 10000) / 100, 'main': ing.main, 'fixed': ing.fixed, 'min': ing.min, 'max': ing.max}  # wip
+        else:
+            json_ingredient = json_ingredient = {'id': ing.id, 'calorie': ing.calorie, 'name': ing.name, 'sugar': ing.sugar, 'fat': ing.fat, 'protein': ing.protein, 'amount': math.ceil(ing.amount * 10000) / 100, 'main': ing.main, 'fixed': ing.fixed}  # wip
+
+        json_ingredients.append(json_ingredient)
+
+    result = {'ingredients': json_ingredients, 'diet': diet.json}
+
+    return jsonify(result)
 
 
 @app.route('/recalcRecipeAJAX', methods=['POST'])
 def recalcRecipeAJAX():
     # get data
-    temp_ingredients = request.json['ingredientsArray']
+    json_ingredients = request.json['ingredients']
 
-    # remove main
-    for i in range(len(temp_ingredients)):
-        if temp_ingredients[i]['main']:
-            mainIngredient = loadIngredient(temp_ingredients[i]['id'])
-            temp_ingredients.pop(i)
-            break
+    # temp_print(request.json)
 
     ingredients = []
-    for ingredient in temp_ingredients:
-        ingredients.append(loadIngredient(ingredient['id']))
+    for json_ingredient in json_ingredients:
+        ingredient = loadIngredient(json_ingredient['id'])  # bug wip
+        ingredient.fixed = json_ingredient['fixed']
+        ingredient.main = json_ingredient['main']
+        ingredient.amount = json_ingredient['amount']
+        ingredients.append(ingredient)
+
+    # remove main
+    for i in range(len(ingredients)):
+        if ingredients[i].main:
+            mainIngredient = ingredients[i]
+            ingredients.pop(i)
+            break
+
+    # count fixed values and remove from array (wip use calc instead - code duplicity)
+    fixedSugar = 0
+    fixedProtein = 0
+    fixedFat = 0
+    # fixedIngredients = []
+    for i in range(len(ingredients)):
+        if ingredients[i].fixed:
+            # fixedIngredients.append(ingredients[i])
+            fixedSugar += ingredients[i].sugar * ingredients[i].amount
+            fixedProtein += ingredients[i].protein * ingredient[i].amount
+            fixedFat += ingredients[i].fat * ingredient[i].amount
+            ingredients.pop(i)
 
     dietID = request.json['dietID']
     diet = loadDiet(dietID)
@@ -423,24 +442,42 @@ def recalcRecipeAJAX():
         [ingredients[0].sugar, ingredients[1].sugar, ingredients[2].sugar],
     ])
     b = numpy.array([
-        (diet.protein * 10000 - mainIngredient.protein * math.ceil(slider * 100)) / 10000,
-        (diet.fat * 10000 - mainIngredient.fat * math.ceil(slider * 100)) / 10000,
-        (diet.sugar * 10000 - mainIngredient.sugar * math.ceil(slider * 100)) / 10000,
+        (diet.protein * 10000 - mainIngredient.protein * math.ceil(slider * 100) - fixedProtein) / 10000,
+        (diet.fat * 10000 - mainIngredient.fat * math.ceil(slider * 100) - fixedFat) / 10000,
+        (diet.sugar * 10000 - mainIngredient.sugar * math.ceil(slider * 100) - fixedSugar) / 10000,
     ])
     results = numpy.linalg.solve(a, b)
     for i in range(len(results)):
         results[i] = math.ceil(results[i] * 10000) / 100
-    x = {'id': temp_ingredients[0]['id'], 'amount': results[0]}
-    y = {'id': temp_ingredients[1]['id'], 'amount': results[1]}
-    z = {'id': temp_ingredients[2]['id'], 'amount': results[2]}
+    x = {'id': ingredients[0].id, 'amount': results[0]}
+    y = {'id': ingredients[1].id, 'amount': results[1]}
+    z = {'id': ingredients[2].id, 'amount': results[2]}
+
     totalCalorie = ingredients[0].calorie * results[0] + ingredients[1].calorie * results[1] + ingredients[2].calorie * results[2] + mainIngredient.calorie * slider
     totalProtein = ingredients[0].protein * results[0] + ingredients[1].protein * results[1] + ingredients[2].protein * results[2] + mainIngredient.protein * slider
     totalSugar = ingredients[0].sugar * results[0] + ingredients[1].sugar * results[1] + ingredients[2].sugar * results[2] + mainIngredient.sugar * slider
     totalFat = ingredients[0].fat * results[0] + ingredients[1].fat * results[1] + ingredients[2].fat * results[2] + mainIngredient.fat * slider
     totalWeight = results[0] + results[1] + results[2] + slider
     totals = {'calorie': math.ceil(totalCalorie) / 100, 'protein': math.ceil(totalProtein) / 100, 'sugar': math.ceil(totalSugar) / 100, 'fat': math.ceil(totalFat) / 100, 'weight': math.ceil(totalWeight)}
-    slider = {'id': mainIngredient.id, 'amount': slider}
-    solutionJSON = {'x': x, 'y': y, 'z': z, 'slider': slider, 'totals': totals}
+
+    results = [x, y, z]
+    # temp_print(len(json_ingredients))
+    count = 0
+    for ing in json_ingredients:
+        # temp_print(str(ing['id']) + ":" + str(ing['main']) + ":" + str(ing['fixed']))
+        if ing['main'] == True:
+            ing['amount'] = slider
+            # temp_print("main")
+        elif ing['fixed'] == True:
+            pass
+        else:
+            # temp_print(str(count) + str(results[count]['amount']))
+            ing['amount'] = results[count]['amount']
+            count+=1
+
+    # slider = {'id': mainIngredient.id, 'amount': slider}
+    # solutionJSON = {'x': x, 'y': y, 'z': z, 'slider': slider, 'totals': totals}
+    solutionJSON = {'ingredients': json_ingredients, 'totals': totals}
 
     # give ids with amounts
     return jsonify(solutionJSON)
@@ -470,7 +507,7 @@ def addRecipeAJAX():
     recipe.name = request.json['name']
     recipe.size = request.json['size']
 
-    temp_print('recipe: {}, ingredient[0].amount: {},  ingredient[0].id: {}, dietID: {}'.format(recipe, ingredients[0].amount, ingredients[0].id, dietID))
+    # temp_print('recipe: {}, ingredient[0].amount: {},  ingredient[0].id: {}, dietID: {}'.format(recipe, ingredients[0].amount, ingredients[0].id, dietID))
 
     last_id = saveRecipe(recipe, ingredients, dietID)
     flash("Recept byl uložen")
@@ -571,7 +608,7 @@ def editRecipeAJAX(recipeID):
 
 
 @app.route('/allrecipes')
-def allrecipes():
+def showAllRecipes():
     if 'username' not in session:
         return redirect('/login')
     recipes = loadUserRecipes(session['username'])
@@ -625,14 +662,14 @@ def printAllRecipes():
 
 # NEW INGREDIENT PAGE
 @app.route('/newingredient', methods=['GET'])
-def newIngredient():
+def showNewIngredient():
     if 'username' not in session:
         return redirect('/login')
     return template('newIngredient.tpl', name="", sugar="", fat="", protein="")
 
 
 @app.route('/newingredient', methods=['POST'])
-def newIngredientAJAX():
+def addNewIngredientAJAX():
     if 'username' not in session:
         return redirect('/login')
 
@@ -665,7 +702,7 @@ def newIngredientAJAX():
 
 
 @app.route('/ingredient=<ingredientID>')
-def showingredient(ingredientID):
+def showIngredient(ingredientID):
     ingredient = loadIngredient(ingredientID)
     used = not deleteIngredientCheck(ingredientID)
     return template('showIngredient.tpl', ingredient=ingredient, used=used)
@@ -702,7 +739,7 @@ def editIngredientAJAX(ingredientID):
 
 
 @app.route('/allingredients')
-def allingredients():
+def showAllIngredients():
     if 'username' not in session:
         return redirect('/login')
     ingredients = loadAllIngredients(session['username'])
@@ -711,7 +748,8 @@ def allingredients():
 
 # CALCULATE RECIPE
 def calc(ingredients, diet):
-    """[summary]
+    """
+    [summary]
 
     [description]
 
@@ -721,31 +759,68 @@ def calc(ingredients, diet):
 
     Returns:
         [type] -- solution object
+        3 - ingredients {array} -- array of Ingredients (w/ amounts)
+        4 - ingredients {array} (last-main ing has min, max)
     """
+
+    # remove fixed
+    fixedSugar = 0
+    fixedProtein = 0
+    fixedFat = 0
+
+    fixedIngredients = []
+    for i in range(len(ingredients)):
+        if ingredients[i].fixed is True:
+            fixedSugar += ingredients[i].amount * ingredients[i].sugar
+            fixedProtein += ingredients[i].amount * ingredients[i].protein
+            fixedFat += ingredients[i].amount * ingredients[i].fat
+            fixedIngredients.append(ingredients[i])
+
+    for ing in fixedIngredients:
+        ingredients.remove(ing)
+
+    # sort for main ingredient # reaarange, so last ingredient is the main ingredient (better handling)
+    mainIngredient = ingredients[0]
+    for i in range(len(ingredients)):
+        if ingredients[i].main is True:
+            mainIngredient = ingredients[i]
+            ingredients.pop(i)
+            ingredients.append(mainIngredient)
+            break
+
     if len(ingredients) == 0:
         return None
     elif len(ingredients) == 1:
         return None
     elif len(ingredients) == 2:
-        a = numpy.array([[ingredients[0].sugar, ingredients[1].sugar], [ingredients[0].fat, ingredients[1].fat]])
-        b = numpy.array([diet.sugar, diet.fat])
-        x = numpy.linalg.solve(a, b)
+        # a = numpy.array([[ingredients[0].sugar, ingredients[1].sugar], [ingredients[0].fat, ingredients[1].fat]])
+        # b = numpy.array([diet.sugar, diet.fat])
+        # x = numpy.linalg.solve(a, b)
 
-        if x[0] * ingredients[0].protein + x[1] * ingredients[1].protein == diet.protein:
-            solution = type('', (), {})()
-            solution.vars = [x[0], x[1]]
-            return solution
-        else:
-            return None
+        # if x[0] * ingredients[0].protein + x[1] * ingredients[1].protein == diet.protein:
+        #     solution = type('', (), {})()
+        #     solution.vars = [x[0], x[1]]
+        #     return solution
+        # else:
+        return None
     elif len(ingredients) == 3:
         a = numpy.array([[ingredients[0].sugar, ingredients[1].sugar, ingredients[2].sugar],
                          [ingredients[0].fat, ingredients[1].fat, ingredients[2].fat],
                          [ingredients[0].protein, ingredients[1].protein, ingredients[2].protein]])
-        b = numpy.array([diet.sugar, diet.fat, diet.protein])
+        b = numpy.array([diet.sugar - fixedSugar, diet.fat - fixedFat, diet.protein - fixedProtein])
         x = numpy.linalg.solve(a, b)
-        solution = type('', (), {})()
-        solution.vars = [x[0], x[1], x[2]]
-        return solution
+
+        ingredients[0].amount = x[0]
+        ingredients[1].amount = x[1]
+        ingredients[2].amount = x[2]
+
+        for ing in fixedIngredients:
+            ingredients.append(ing)
+
+        # solution = type('', (), {})()
+        # solution.vars = [x[0], x[1], x[2]]
+        # return solution
+        return ingredients
 
     elif len(ingredients) == 4:
         x, y, z = sp.symbols('x, y, z')
@@ -796,29 +871,40 @@ def calc(ingredients, diet):
         y = float(math.floor(y * 100000) / 100000)
         z = float(math.floor(z * 100000) / 100000)
 
+        ingredients[0].amount = x
+        ingredients[1].amount = y
+        ingredients[2].amount = z
+        ingredients[3].amount = sol
+        ingredients[3].min = min_sol
+        ingredients[3].max = max_sol
+
+        for ing in fixedIngredients:
+            ingredients.append(ing)
+
         if max_sol >= 0:
-            solution = type('', (), {})()
-            solution.vars = [x, y, z, sol]
-            solution.sol = sol
-            solution.min_sol = min_sol
-            solution.max_sol = max_sol
-            return solution
+            # solution = type('', (), {})()
+            # solution.vars = [x, y, z, sol]
+            # solution.sol = sol
+            # solution.min_sol = min_sol
+            # solution.max_sol = max_sol
+            # return solution
+            return ingredients
         else:
             return None
     # 5 ingredients WIP
     elif len(ingredients) == 5:
-        x, y, z = sp.symbols('x, y, z')
-        e, f = sp.symbols('e, f')
-
-        # set of linear equations
-        f1 = ingredients[0].sugar * x + ingredients[1].sugar * y + ingredients[2].sugar * z + ingredients[3].sugar * e + ingredients[4].sugar * f - diet.sugar
-        f2 = ingredients[0].fat * x + ingredients[1].fat * y + ingredients[2].fat * z + ingredients[3].fat * e + ingredients[4].fat * f - diet.fat
-        f3 = ingredients[0].protein * x + ingredients[1].protein * y + ingredients[2].protein * z + ingredients[3].protein * e + ingredients[4].protein * f - diet.protein
-
-        # solve equations with args
-        in1 = sp.solvers.solve((f1, f2, f3), (x, y, z))[x]
-        in2 = sp.solvers.solve((f1, f2, f3), (x, y, z))[y]
-        in3 = sp.solvers.solve((f1, f2, f3), (x, y, z))[z]
+        # x, y, z = sp.symbols('x, y, z')
+        # e, f = sp.symbols('e, f')
+        #
+        # # set of linear equations
+        # f1 = ingredients[0].sugar * x + ingredients[1].sugar * y + ingredients[2].sugar * z + ingredients[3].sugar * e + ingredients[4].sugar * f - diet.sugar
+        # f2 = ingredients[0].fat * x + ingredients[1].fat * y + ingredients[2].fat * z + ingredients[3].fat * e + ingredients[4].fat * f - diet.fat
+        # f3 = ingredients[0].protein * x + ingredients[1].protein * y + ingredients[2].protein * z + ingredients[3].protein * e + ingredients[4].protein * f - diet.protein
+        #
+        # # solve equations with args
+        # in1 = sp.solvers.solve((f1, f2, f3), (x, y, z))[x]
+        # in2 = sp.solvers.solve((f1, f2, f3), (x, y, z))[y]
+        # in3 = sp.solvers.solve((f1, f2, f3), (x, y, z))[z]
 
         # temp_print(in1)
         # temp_print(in2)
@@ -869,7 +955,7 @@ def calc(ingredients, diet):
         #     solution.max_sol = max_sol
         #     return solution
         # else:
-        #     return None
+        return None
     else:
         return None
 
@@ -918,19 +1004,24 @@ def indexhtml():
 
 
 @app.route('/changelog')
-def changelog():
+def showChangelog():
     return template('changelog.tpl')
+
+
+@app.route('/help')
+def showHelp():
+    return template('help.tpl')
 
 
 # ERROR
 @app.errorhandler(404)
 def error404(error):
-    return 'Nothing here, sorry. (Err404)'
+    return 'Tady nic není (Err404)'
 
 
 @app.errorhandler(500)
 def error500(error):
-    return 'Something went wrong! (Err500)'
+    return 'Někde se stala chyba (Err500)'
 
 
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
