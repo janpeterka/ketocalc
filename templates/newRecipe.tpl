@@ -286,7 +286,7 @@
                     // values for fixed (wip - bootstrap)
                     for (var i = 0; i < prerecipe__ingredient_array.length; i++) {
                         if (prerecipe__ingredient_array[i].fixed) {
-                            prerecipe__ingredient_array[i].amount = prompt("Množství suroviny " + prerecipe__ingredient_array[i].name + ":","");
+                            prerecipe__ingredient_array[i].amount = parseFloat(prompt("Množství suroviny " + prerecipe__ingredient_array[i].name + ":","").replace(",","."));
                         }
                     }
 
@@ -327,7 +327,7 @@
                                         "<td>" + ingredients[i].protein + "</td>" +
                                         "<td>" + ingredients[i].fat + "</td>" +
                                         "<td>" + ingredients[i].sugar + "</td>" +
-                                        '<td><span id="amount_' + ingredients[i].id + '">' + Math.round(ingredients[i].amount)+ " g</span></td>" +
+                                        '<td><span id="amount_' + ingredients[i].id + '">' + Math.round(ingredients[i].amount * 10) / 10 + " g</span></td>" +
                                         '</tr>' +
 
                                         '<tr>' +
@@ -371,7 +371,7 @@
                                         "<td>" + ingredients[i].protein + "</td>" +
                                         "<td>" + ingredients[i].fat + "</td>" +
                                         "<td>" + ingredients[i].sugar + "</td>" +
-                                        '<td><span id="amount_' + ingredients[i].id + '">' + Math.round(ingredients[i].amount)+ " g</span></td>" +
+                                        '<td><span id="amount_' + ingredients[i].id + '">' + Math.round(ingredients[i].amount * 10) / 10 + " g</span></td>" +
                                         "</tr>");
                                 }
                                 else{
@@ -382,7 +382,7 @@
                                         "<td>" + ingredients[i].protein + "</td>" +
                                         "<td>" + ingredients[i].fat + "</td>" +
                                         "<td>" + ingredients[i].sugar + "</td>" +
-                                        '<td><span id="amount_' + ingredients[i].id + '">' + Math.round(ingredients[i].amount)+ " g</span></td>" +
+                                        '<td><span id="amount_' + ingredients[i].id + '">' + Math.round(ingredients[i].amount * 10) / 10 + " g</span></td>" +
                                         "</tr>");
                                 }
 
