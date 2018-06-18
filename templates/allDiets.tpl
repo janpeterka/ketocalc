@@ -4,7 +4,7 @@
 {% endblock %}
 
 {% block style %}
-    <style>
+    <style type="text/css" media="screen">
     .False {
         background-color: lightgrey;
         color: grey;

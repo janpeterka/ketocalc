@@ -1,5 +1,9 @@
 {% extends "base.tpl" %}
-{% block title %}Vítejte {{firstname}}{% endblock %}
+
+{% block title %}
+    Vítejte {{firstname}}
+{% endblock %}
+
 {% block script %}
 	   <script type="text/javascript">
 
@@ -17,7 +21,7 @@
                     var dietID = response.dietID[0];
                     // recipes to table
                     $('#recipeList').empty();
-                    for (i = 0; i<response.array.length; i++ ){
+                    for (i = 0; i < recipes.length; i++ ){
                         $('#recipeList').append("<li><a href='/recipe=" + recipes[i].id + "'>" + recipes[i].name + "</a></li>");
                     }
                 },
@@ -28,7 +32,7 @@
             });
             e.preventDefault();
         });
-        
+
     </script>
 {% endblock %}
 
@@ -54,4 +58,3 @@
         </div>
     </div>
 {% endblock %}
-

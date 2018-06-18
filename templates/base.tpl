@@ -41,8 +41,8 @@
     <!-- Bootstrap alert, prompt -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
    
-    
     {% block style %} {% endblock %}
+
     {% block script %} {% endblock %}
 
     <title>{% block title %}{% endblock %}</title>

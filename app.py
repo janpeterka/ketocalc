@@ -92,7 +92,7 @@ def doLogin():
         return redirect('/user')
     else:
         flash("Přihlášení se nezdařilo.")
-        return False
+        return redirect('/login')
 
 
 def checkLogin(username, password):
@@ -157,7 +157,7 @@ def doRegister():
         flash("Hesla jsou rozdílná!")
         return redirect(request.url)
     if loadUser(username) is not None:
-        flash("Něco je špatně")  # wip - není korektní
+        flash("Něco je špatně")
         return redirect(request.url)
 
     response = saveUser(username, password_hash, firstname, lastname)
@@ -368,12 +368,7 @@ def calcRecipeAJAX():
         ingredient.amount = float(json_ingredients[i]['amount']) / 100
         ingredients.append(ingredient)
 
-    # for i in ingredients:
-    #     temp_print(str(i.id) + ":" + i.name + ':' + str(i.amount))
-
     ingredients = calc(ingredients, diet)
-    # for i in ingredients:
-    #     temp_print(str(i.id) + ":" + i.name + ':' + str(i.amount))
 
     json_ingredients = []
     if ingredients is None:
@@ -400,11 +395,9 @@ def recalcRecipeAJAX():
     # get data
     json_ingredients = request.json['ingredients']
 
-    # temp_print(request.json)
-
     ingredients = []
     for json_ingredient in json_ingredients:
-        ingredient = loadIngredient(json_ingredient['id'])  # bug wip
+        ingredient = loadIngredient(json_ingredient['id'])
         ingredient.fixed = json_ingredient['fixed']
         ingredient.main = json_ingredient['main']
         ingredient.amount = float(json_ingredient['amount']) / 100
@@ -425,9 +418,6 @@ def recalcRecipeAJAX():
     for i in range(len(ingredients)):
         if ingredients[i].fixed:
             fixedIngredients.append(ingredients[i])
-            # temp_print("{}, type {}".format(ingredients[i].amount, type(ingredients[i].amount)))
-            # temp_print("{}, type {}".format(ingredients[i].sugar, type(ingredients[i].sugar)))
-            # # temp_print(ingredients[i].sugar)
             fixedSugar += ingredients[i].sugar * ingredients[i].amount
             fixedProtein += ingredients[i].protein * ingredients[i].amount
             fixedFat += ingredients[i].fat * ingredients[i].amount
@@ -467,7 +457,6 @@ def recalcRecipeAJAX():
     totals = {'calorie': math.ceil(totalCalorie) / 100, 'protein': math.ceil(totalProtein) / 100, 'sugar': math.ceil(totalSugar) / 100, 'fat': math.ceil(totalFat) / 100, 'weight': math.ceil(totalWeight)}
 
     results = [x, y, z]
-    # temp_print(len(json_ingredients))
     count = 0
     for ing in json_ingredients:
         # temp_print(str(ing['id']) + ":" + str(ing['main']) + ":" + str(ing['fixed']))
@@ -477,7 +466,6 @@ def recalcRecipeAJAX():
         elif ing['fixed'] == True:
             pass
         else:
-            # temp_print(str(count) + str(results[count]['amount']))
             ing['amount'] = results[count]['amount']
             count += 1
 

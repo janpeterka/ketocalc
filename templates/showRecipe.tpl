@@ -80,11 +80,11 @@
                         <td>
                             <a href="/ingredient={{ingredient.id}}">{{ ingredient.name }}</a>
                         </td>
-                        <td>{{ ingredient.calorie }} kcal</td>
-                        <td>{{ ingredient.protein }} g</td>
-                        <td>{{ ingredient.fat }} g</td>
-                        <td>{{ ingredient.sugar }} g</td>
-                        <td>{{ ingredient.amount}} g</td>
+                        <td>{{ (ingredient.calorie / 100 * ingredient.amount)|round(2,'common') }} kcal</td>
+                        <td>{{ (ingredient.protein / 100 * ingredient.amount)|round(2,'common') }} g</td>
+                        <td>{{ (ingredient.fat / 100 * ingredient.amount)|round(2,'common') }} g</td>
+                        <td>{{ (ingredient.sugar / 100 * ingredient.amount)|round(2,'common') }} g</td>
+                        <td>{{ ingredient.amount|round(2,'common') }} g</td>
                         <td></td>
                     </tr>
                 {% endfor %}
@@ -95,16 +95,16 @@
                     <td>{{ totals.protein }} g</td>
                     <td>{{ totals.fat }} g</td>
                     <td>{{ totals.sugar }} g</td>
-                    <td>{{ totals.amount }} g</td>
+                    <td>{{ totals.amount|round(2,'common')  }} g</td>
                     <td>Poměr: {{ totals.eq }} : 1</td>
                 </tr>
             </table>
             <div class="row">
-                <form action="/recipe={{recipe.id}}/remove" method="post" class="form col-5"  accept-charset="utf-8">
-                    <input type="button" class="editShowButton btn btn-warning" value="Upravit recept" />
-                    <input type="button" class="editHideButton btn btn-warning" value="Zrušit úpravy" />
-                    <input type="button" class="printButton btn" value="Vytisknout" />
-                    <input type="submit" class="btn btn-danger" value="Smazat recept" />
+                <form action="/recipe={{recipe.id}}/remove" method="post" class="form col-5"  accept-charset="utf-8" onsubmit="return confirm('Opravdu chcete smazat recept?');">
+                    <button type="button" class="editShowButton btn btn-warning">Upravit <i class="fas fa-pencil-alt"></i></button>
+                    <button type="button" class="editHideButton btn btn-warning">Zrušit úpravy <i class="fas fa-pencil-alt"></i></button>
+                    <button type="button" class="printButton btn">Tisk <i class="fas fa-print"></i></button>
+                    <button type="submit" class="btn btn-danger">Smazat recept <i class="fas fa-trash"></i></button>
                 </form>
 
                 <span class="col-2"></span>

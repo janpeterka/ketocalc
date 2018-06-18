@@ -71,7 +71,7 @@
 	<script type="text/javascript">
             var prerecipe__ingredient_array = [];
             var recipe__ingredient_array = [];
-            var recipe__ingredient_diet = "";
+            var recipe__ingredient_dietID = "";
 
             /// On ready - change visibility to default
             $(document).ready(function() {
@@ -223,7 +223,7 @@
                         url: '/saveRecipeAJAX',
                         data: JSON.stringify({
                             'ingredients' : recipe__ingredient_array,
-                            'dietID' : recipe__ingredient_diet,
+                            'dietID' : recipe__ingredient_dietID,
                             'name' : $('[name="recipe__right__form__name-input"]').val(),
                             'size' : $('[name="recipe__right__form__size-select"]').val()
                         }),
@@ -283,7 +283,7 @@
                         return;
                     }
 
-                    // values for fixed (wip - bootstrap)
+                    // values for fixed
                     for (var i = 0; i < prerecipe__ingredient_array.length; i++) {
                         if (prerecipe__ingredient_array[i].fixed) {
                             prerecipe__ingredient_array[i].amount = parseFloat(prompt("Množství suroviny " + prerecipe__ingredient_array[i].name + ":","").replace(",","."));
@@ -318,19 +318,26 @@
 
                             // ingredients to table
                             for ( let i = 0; i < ingredients.length; i++ ){
+                                var ingredient_tr = ""
 
                                 if (ingredients[i].main){
-                                    $('.recipe__right__form__ingredient-table').append(
-                                        '<tr class="tr-mainIngredient ">' +
-                                        "<td>" + ingredients[i].name + "</td>" +
-                                        "<td>" + ingredients[i].calorie + "</td>" +
-                                        "<td>" + ingredients[i].protein + "</td>" +
-                                        "<td>" + ingredients[i].fat + "</td>" +
-                                        "<td>" + ingredients[i].sugar + "</td>" +
-                                        '<td><span id="amount_' + ingredients[i].id + '">' + Math.round(ingredients[i].amount * 10) / 10 + " g</span></td>" +
-                                        '</tr>' +
+                                    ingredient_tr += '<tr class="tr-mainIngredient ">'
+                                } else if (ingredients[i].fixed){
+                                    ingredient_tr += '<tr class="tr-fixedIngredient">'
+                                } else {
+                                    ingredient_tr += '<tr class="tr-variableIngredient">' 
+                                }
 
-                                        '<tr>' +
+                                ingredient_tr +=    "<td>" + ingredients[i].name + "</td>" +
+                                                    "<td>" + ingredients[i].calorie + "</td>" +
+                                                    "<td>" + ingredients[i].protein + "</td>" +
+                                                    "<td>" + ingredients[i].fat + "</td>" +
+                                                    "<td>" + ingredients[i].sugar + "</td>" +
+                                                    '<td><span id="amount_' + ingredients[i].id + '">' + Math.round(ingredients[i].amount * 100) / 100 + " g</span></td>" +
+                                                    '</tr>'
+
+                                if (ingredients[i].main){
+                                    ingredient_tr += '<tr>' +
                                             '<td id="slider_tr" name="'+ ingredients[i].id +'" class="row">' +
                                                 '<input type="text"' +
                                                     'class="col"' +
@@ -343,8 +350,6 @@
                                                     'data-slider-step="0.1" ' + 
                                                     'data-slider-value="' + ingredients[i].amount + '" '+
                                                     'data-slider-tooltip="show"' +
-                                                    // 'oninput="showSliderVal(this.value, amount_' + ingredients[i].id + ')" '+
-                                                    // 'onchange="showSliderVal(this.value, amount_' + ingredients[i].id + ')">' +
                                             '</td>' +
 
                                             '<td colspan="2">' +
@@ -353,38 +358,11 @@
                                                 '</span>' +
                                             '</td>' +
 
-                                            '<td colspan="2">' +
-                                                // '<span id="sliderVal" class="col"></span>' +
-                                            '</td>' +
                                         '</tr>'
-
-                                        );
-
-                                    var mySlider = $("#slider").slider();
-
                                 }
-                                else if (ingredients[i].fixed){
-                                    $('.recipe__right__form__ingredient-table').append(
-                                        '<tr class="tr-fixedIngredient">' +
-                                        "<td>" + ingredients[i].name + "</td>" +
-                                        "<td>" + ingredients[i].calorie + "</td>" +
-                                        "<td>" + ingredients[i].protein + "</td>" +
-                                        "<td>" + ingredients[i].fat + "</td>" +
-                                        "<td>" + ingredients[i].sugar + "</td>" +
-                                        '<td><span id="amount_' + ingredients[i].id + '">' + Math.round(ingredients[i].amount * 10) / 10 + " g</span></td>" +
-                                        "</tr>");
-                                }
-                                else{
-                                    $('.recipe__right__form__ingredient-table').append(
-                                        '<tr>' +
-                                        "<td>" + ingredients[i].name + "</td>" +
-                                        "<td>" + ingredients[i].calorie + "</td>" +
-                                        "<td>" + ingredients[i].protein + "</td>" +
-                                        "<td>" + ingredients[i].fat + "</td>" +
-                                        "<td>" + ingredients[i].sugar + "</td>" +
-                                        '<td><span id="amount_' + ingredients[i].id + '">' + Math.round(ingredients[i].amount * 10) / 10 + " g</span></td>" +
-                                        "</tr>");
-                                }
+
+                                $('.recipe__right__form__ingredient-table').append(ingredient_tr);
+                                var mySlider = $("#slider").slider();
 
                                 totalCalorie += ingredients[i].calorie*ingredients[i].amount;
                                 totalProtein += ingredients[i].protein*ingredients[i].amount;
@@ -395,36 +373,12 @@
 
                             $('.recipe__right__form__ingredient-table').append(
                                 "<tr>" +
-                                    '<td>'+
-                                        '<strong>Součet</strong>'+
-                                    '</td>'+
-                                    '<td>'+
-                                        '<span id="totalCalorie">' +
-                                        Math.round(totalCalorie/100) +
-                                        '</span>'+
-                                    '</td>' +
-
-                                    '<td>'+
-                                        '<span id="totalProtein">' +
-                                        Math.round(totalProtein/100) +
-                                        '</span>'+
-                                    '</td>' +
-                                    '<td>'+
-                                        '<span id="totalFat">' +
-                                        Math.round(totalFat/100) +
-                                        '</span>' +
-                                    '</td>' +
-                                    '<td>'+
-                                        '<span id="totalSugar">' +
-                                        Math.round(totalSugar/100) +
-                                        '</span>' +
-                                    '</td>' +
-                                    '<td>'+
-                                        '<span id="totalWeight">' +
-                                        Math.round(totalWeight)  +
-                                        '</span>' + " g" +
-                                    '</td>' +
-
+                                    '<td><strong>Součet</strong></td>'+
+                                    '<td><span id="totalCalorie">'+Math.round(totalCalorie/100)+'</span></td>' +
+                                    '<td><span id="totalProtein">'+Math.round(totalProtein/100)+'</span></td>' +
+                                    '<td><span id="totalFat">'+Math.round(totalFat/100)+'</span></td>' +
+                                    '<td><span id="totalSugar">'+Math.round(totalSugar/100)+'</span>'+'</td>' +
+                                    '<td><span id="totalWeight">'+Math.round(totalWeight)+'</span> g</td>' +
                                 '</tr>');
 
                             // ingredients to inputs
@@ -433,7 +387,7 @@
                             }
 
                             // diet ID
-                            recipe__ingredient_diet = response.diet.id
+                            recipe__ingredient_dietID = response.diet.id
                             $('.recipe__right__form__diet-name').text(response.diet.name);
 
                             // change visibility
@@ -522,7 +476,7 @@
                         type: 'POST',
                         url: '/recalcRecipeAJAX',
                         data: JSON.stringify({
-                            'dietID'       : recipe__ingredient_diet,
+                            'dietID'       : recipe__ingredient_dietID,
                             'ingredients'  : prerecipe__ingredient_array,
                             'slider'       : $('#slider').val()},
                             null, '\t'), // wip not sure why
@@ -532,19 +486,9 @@
 
                             // ingredients
                             for (var i = 0; i < response.ingredients.length; i++) {
-                                $('#amount_' + response.ingredients[i].id).text(response.ingredients[i].amount + " g");
+                                $('#amount_'+response.ingredients[i].id).text(response.ingredients[i].amount+" g");
                             }
                             recipe__ingredient_array = response.ingredients
-
-                            // new amounts
-                            // var x = response.x;
-                            // $('#amount_' + x.id).text(x.amount + " g");
-                            // var y = response.y;
-                            // $('#amount_' + y.id).text(y.amount + " g");
-                            // var z = response.z;
-                            // $('#amount_' + z.id).text(z.amount + " g");
-                            // var slider = response.slider;
-                            // $('#amount_' + slider.id).text(slider.amount + " g");
 
                             // new totals
                             $('#totalFat').text(response.totals.fat);
@@ -552,17 +496,7 @@
                             $('#totalProtein').text(response.totals.protein);
                             $('#totalCalorie').text(response.totals.calorie);
                             $('#totalWeight').text(response.totals.weight);
-
-
-                            // new amounts in form
-                            // ingredientAmounts = [x.amount, y.amount, z.amount, slider.amount];
-                            // for (let i = 0; i < recipe__ingredient_array.length; i++ ){
-                            //     recipe__ingredient_array[i]['amount'] = ingredientAmounts[i] // wip není hezký
-                            // }
-
                             recipe__right__show();
-
-                            // console.log(recipe__ingredient_array);
 
                         },
                         error: function(error) {
@@ -603,11 +537,6 @@
                     }
                 }
             }
-
-            // function showSliderVal(value){
-            //     $('#sliderVal').text(value);
-            // }
-
         </script>
 {% endblock %}
 
@@ -649,7 +578,6 @@
 
                 </div>
 
-
                 <div class="recipe col-lg-6 col-md-12">
 
                     <div class="recipe__loader"></div>
@@ -684,10 +612,6 @@
                                 <span class="col-4">Dieta: <span class="recipe__right__form__diet-name"></span></span>
                                 <input type="submit" class="btn btn-primary col-4 " value="Uložit mezi recepty" />
                             </div>
-
-                            <!-- <input type="hidden" name="ingredients" value="" /> -->
-                            <!-- <input type="hidden" name="diet-ID" value="" /> -->
-                            <!-- <input type="hidden" name="amounts" value="" /> -->
                         </form>
                     </div>
                 </div>
