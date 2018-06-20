@@ -10,7 +10,7 @@
 
         <ul class="nav navbar-nav navbar-center">
             <li class="nav-item">
-              <a class="nav-link" href="/user">Hlavní stránka</a>
+              <a class="nav-link" href="/">Hlavní stránka</a>
             </li>
 
           <li class="nav-item dropdown">

@@ -9,7 +9,7 @@ def temp_print(input):
 class Diet(object):
     """  For loading from database """
 
-    def __init__(self, dbID, name, sugar, fat, protein, small_size, big_size, active):
+    def __init__(self, dbID, name, sugar, fat, protein, small_size, big_size, active, author):
         super(Diet, self).__init__()
         self.id = dbID
         self.name = name
@@ -18,6 +18,7 @@ class Diet(object):
         self.protein = protein
         self.small_size = small_size
         self.big_size = big_size
+        self.author = author
         if active == 1:
             self.active = True
         else:
@@ -40,7 +41,7 @@ class Recipe(object):
 class Ingredient(object):
     """  For loading from database """
 
-    def __init__(self, dbID, name, calorie, sugar, fat, protein):
+    def __init__(self, dbID, name, calorie, sugar, fat, protein, author):
         super(Ingredient, self).__init__()
         self.id = dbID
         self.name = name
@@ -49,6 +50,7 @@ class Ingredient(object):
         self.fat = fat
         self.protein = protein
         self.amount = 0
+        self.author = author
         self.json = {'id': self.id, 'name': self.name, 'calorie': self.calorie, 'sugar': self.sugar, 'fat': self.fat, 'protein': self.protein}
 
 
@@ -92,16 +94,23 @@ def loadRecipe(recipeID):
     query = ("""
 
         SELECT
-            id, name, type
+            R.id, R.name, R.type, U.username
         FROM
-            recipes
+            recipes AS R
+            JOIN diets_has_recipes AS DR ON DR.recipes_id = R.id
+            JOIN users_has_diets AS UR ON UR.diets_id = DR.diets_id
+            JOIN users AS U ON U.id = UR.users_id
         WHERE
-            id=%s;
+            R.id=%s;
 
         """)
     cursor.execute(query, (recipeID,))
     response = cursor.fetchone()
+    if response is None:
+        return None
+
     recipe = Recipe(response[0], response[1], response[2])
+    author = response[3]
 
     query = ("""
 
@@ -120,7 +129,7 @@ def loadRecipe(recipeID):
     for i in range(len(response)):
         ingredientIDs.append(response[i][0])
 
-    return [recipe, ingredientIDs]
+    return [recipe, ingredientIDs, author]
 
 
 def saveRecipe(recipe, ingredients, dietID):
@@ -339,11 +348,21 @@ def loadDiet(dietID):
     query = ("""
 
         SELECT
-            id, name, sugar, fat, protein, small_size, big_size, active
+            D.id,
+            D.name,
+            D.sugar,
+            D.fat,
+            D.protein,
+            D.small_size,
+            D.big_size,
+            D.active,
+            U.username
         FROM
-            diets
+            diets AS D
+            JOIN users_has_diets AS UD ON UD.diets_id = D.id
+            JOIN users AS U ON U.id = UD.users_id
         WHERE
-            diets.id=%s;
+            D.id=%s;
 
         """)
     cursor.execute(query, (dietID,))
@@ -351,7 +370,7 @@ def loadDiet(dietID):
     if response is None:
         return None
     else:
-        diet = Diet(response[0], response[1], response[2], response[3], response[4], response[5], response[6], response[7])
+        diet = Diet(response[0], response[1], response[2], response[3], response[4], response[5], response[6], response[7], response[8])
         return diet
 
 
@@ -585,7 +604,7 @@ def loadUserDiets(username, active=1):
     # convert to array of objects
     diets = []
     for i in range(len(response)):
-        temp_diet = Diet(response[i][0], response[i][1], response[i][2], response[i][3], response[i][4], response[i][5], response[i][6], response[i][7])
+        temp_diet = Diet(response[i][0], response[i][1], response[i][2], response[i][3], response[i][4], response[i][5], response[i][6], response[i][7], username)
         diets.append(temp_diet)
 
     return diets
@@ -609,7 +628,7 @@ def loadAllIngredients(username):
     query = ("""
 
         SELECT
-            *
+            id, name, calorie, sugar, fat, protein, author
         FROM
             ingredients
         WHERE
@@ -621,7 +640,7 @@ def loadAllIngredients(username):
 
     temp_ingredients = []
     for ingredient in response:
-        temp_ingredient = Ingredient(ingredient[0], ingredient[1], ingredient[2], ingredient[3], ingredient[4], ingredient[5])
+        temp_ingredient = Ingredient(ingredient[0], ingredient[1], ingredient[2], ingredient[3], ingredient[4], ingredient[5], ingredient[6])
         temp_ingredients.append(temp_ingredient)
 
     temp_ingredients.sort(key=lambda x: x.name)
@@ -647,7 +666,7 @@ def loadIngredient(ingredientID):
     query = ("""
 
         SELECT
-            id, name, calorie, sugar, fat, protein
+            id, name, calorie, sugar, fat, protein, author
         FROM
             ingredients
         WHERE
@@ -656,8 +675,10 @@ def loadIngredient(ingredientID):
         """)
     cursor.execute(query, (int(ingredientID),))
     response = cursor.fetchone()
+    if response is None:
+        return None
 
-    ingredient = Ingredient(response[0], response[1], response[2], response[3], response[4], response[5])
+    ingredient = Ingredient(response[0], response[1], response[2], response[3], response[4], response[5], response[6])
 
     return ingredient
 
@@ -926,6 +947,40 @@ def loadUser(username):
 
         """)
     cursor.execute(query, (username,))
+
+    response = cursor.fetchone()
+
+    if response is None:
+        return None
+    else:
+        return User(response[0], response[1], response[2], response[3], response[4])
+
+
+def loadUserById(userID):
+    """[summary]
+
+    [description]
+
+    Arguments:
+        username {str} -- [description]
+
+    Returns:
+        User or None -- [description]
+    """
+    db = dbConnect()
+    cursor = db.cursor()
+
+    query = ("""
+
+        SELECT
+            id, username, pwdhash, firstname, lastname
+        FROM
+            users
+        WHERE
+            id=%s;
+
+        """)
+    cursor.execute(query, (userID,))
 
     response = cursor.fetchone()
 

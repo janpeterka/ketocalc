@@ -7,6 +7,7 @@ from flask import Flask, render_template as template, request, redirect
 from flask import jsonify
 from flask import session
 from flask import flash
+from flask import abort
 
 from flask_mail import Mail, Message
 from werkzeug import secure_filename
@@ -68,16 +69,16 @@ def session_management():
 @app.route('/', methods=['GET'])
 def main():
     if 'username' in session:
-        return redirect('/user')
+        return redirect('/dashboard')
     else:
-        return redirect('/user')
+        return redirect('/login')
 
 
 # LOGIN
 @app.route('/login', methods=['GET'])
 def showLogin():
     if 'username' in session:
-        return redirect('/user')
+        return redirect('/')
     else:
         return template('login.tpl')
 
@@ -89,7 +90,7 @@ def doLogin():
     if checkLogin(username, password):
         session['username'] = username
         flash("Byl jste úspěšně přihlášen.")
-        return redirect('/user')
+        return redirect('/')
     else:
         flash("Přihlášení se nezdařilo.")
         return redirect('/login')
@@ -180,8 +181,8 @@ def validateRegister():
 
 
 # USER PAGE
-@app.route('/user')
-def showUser():
+@app.route('/dashboard')
+def showDashboard():
     if 'username' not in session:
         return redirect('/login')
 
@@ -252,6 +253,9 @@ def showDiet(dietID):
         return redirect('/login')
 
     diet = loadDiet(dietID)
+    if diet.author != session['username']:
+        return redirect('/wrongpage')
+
     recipes = loadDietRecipes(diet.id)
     diet.used = not deleteDietCheck(dietID)
     diets = loadUserDiets(session['username'])
@@ -261,10 +265,14 @@ def showDiet(dietID):
 
 @app.route('/diet=<dietID>/remove', methods=['POST'])
 def removeDiet(dietID):
+    diet = loadDiet(dietID)
+    if diet.author != session['username']:
+        return redirect('/wrongpage')
+
     if deleteDietCheck(dietID):  # wip
         deleteDiet(dietID)
         flash("Dieta byla smazána")
-        return redirect("/user")
+        return redirect("/")
     else:
         flash("Tato dieta má recepty, nelze smazat")
         return redirect('/diet={}'.format(dietID))
@@ -272,6 +280,10 @@ def removeDiet(dietID):
 
 @app.route('/diet=<dietID>/archive', methods=['POST'])
 def archiveDiet(dietID):
+    diet = loadDiet(dietID)
+    if diet.author != session['username']:
+        return redirect('/wrongpage')
+
     if loadDiet(dietID).active:
         disableDiet(dietID)
         flash("Dieta byla archivována")
@@ -301,6 +313,10 @@ def archiveDiet(dietID):
 
 @app.route('/diet=<dietID>/edit', methods=['POST'])
 def editDietAJAX(dietID):
+    temp_diet = loadDiet(dietID)
+    if temp_diet.author != session['username']:
+        return redirect('/wrongpage')
+
     diet = type('', (), {})()
     diet.name = request.form['name']
     diet.id = dietID
@@ -511,7 +527,11 @@ def addRecipeAJAX():
 
 @app.route('/recipe=<recipeID>')
 def showRecipe(recipeID):
-    recipe = loadRecipe(recipeID)[0]
+    recipeData = loadRecipe(recipeID)
+    recipe = recipeData[0]
+    author = recipeData[2]
+    if session['username'] != author:
+        return redirect('/wrongpage')
     diet = loadDiet(loadRecipeDietID(recipe.id))
     diets = loadUserDiets(session['username'])
     if recipe.size == "big":
@@ -519,7 +539,7 @@ def showRecipe(recipeID):
     else:
         coef = diet.small_size / 100
 
-    ingredientIDs = loadRecipe(recipeID)[1]
+    ingredientIDs = recipeData[1]
     ingredients = []
     for ID in ingredientIDs:
         ingredients.append(loadIngredient(ID))
@@ -550,7 +570,11 @@ def showRecipe(recipeID):
 
 @app.route('/recipe=<recipeID>/print')
 def printRecipe(recipeID):
-    recipe = loadRecipe(recipeID)[0]
+    recipeData = loadRecipe(recipeID)
+    recipe = recipeData[0]
+    author = recipeData[2]
+    if session['username'] != author:
+        return redirect('/wrongpage')
     diet = loadDiet(loadRecipeDietID(recipe.id))
     if recipe.size == "big":
         coef = diet.big_size / 100
@@ -585,13 +609,18 @@ def printRecipe(recipeID):
 
 @app.route('/recipe=<recipeID>/remove', methods=['POST'])
 def removeRecipeAJAX(recipeID):
+    if session['username'] != loadRecipe(recipeID)[2]:
+        return redirect('/wrongpage')
+
     deleteRecipe(recipeID)
     flash("Recept byl smazán.")
-    return redirect('/user')
+    return redirect('/')
 
 
 @app.route('/recipe=<recipeID>/edit', methods=['POST'])
 def editRecipeAJAX(recipeID):
+    if session['username'] != loadRecipe(recipeID)[2]:
+        return redirect('/wrongpage')
     recipe = type('', (), {})()
     recipe.name = request.form['name']
     recipe.id = recipeID
@@ -698,16 +727,24 @@ def addNewIngredientAJAX():
 @app.route('/ingredient=<ingredientID>')
 def showIngredient(ingredientID):
     ingredient = loadIngredient(ingredientID)
+    if ingredient is None:
+        abort(404)
     used = not deleteIngredientCheck(ingredientID)
+    if session['username'] != ingredient.author:
+        return redirect('/wrongpage')
     return template('showIngredient.tpl', ingredient=ingredient, used=used)
 
 
 @app.route('/ingredient=<ingredientID>/remove', methods=['POST'])
 def removeIngredientAJAX(ingredientID):
+    ingredient = loadIngredient(ingredientID)
+    if session['username'] != ingredient.author:
+        return redirect('/wrongpage')
+
     if deleteIngredientCheck(ingredientID):  # wip
         deleteIngredient(ingredientID)
         flash("Surovina byla smazána")
-        return redirect("/user")
+        return redirect("/")
     else:
         flash("Tato surovina je použita, nelze smazat")
         return redirect('/ingredient={}'.format(ingredientID))
@@ -715,6 +752,10 @@ def removeIngredientAJAX(ingredientID):
 
 @app.route('/ingredient=<ingredientID>/edit', methods=['POST'])
 def editIngredientAJAX(ingredientID):
+    ingredient = loadIngredient(ingredientID)
+    if session['username'] != ingredient.author:
+        return redirect('/wrongpage')
+
     ingredient = type('', (), {})()
     ingredient.name = request.form['name']
     ingredient.id = ingredientID
@@ -738,6 +779,37 @@ def showAllIngredients():
         return redirect('/login')
     ingredients = loadAllIngredients(session['username'])
     return template("allIngredients.tpl", ingredients=ingredients)
+
+
+@app.route('/user=<userID>')
+def showUser(userID):
+    user = loadUserById(userID)
+    if user.username != session['username']:
+        return redirect('/wrongpage')
+    temp_print(user.firstname)
+    return template('showUser.tpl', user=user)
+
+# @app.route('/ingredient=<ingredientID>/edit', methods=['POST'])
+# def editIngredientAJAX(ingredientID):
+#     ingredient = loadIngredient(ingredientID)
+#     if session['username'] != ingredient.author:
+#         return redirect('/wrongpage')
+
+#     ingredient = type('', (), {})()
+#     ingredient.name = request.form['name']
+#     ingredient.id = ingredientID
+#     ingredient.calorie = request.form['calorie']
+#     if deleteIngredientCheck(ingredientID):  # wip
+#         ingredient.protein = request.form['protein']
+#         ingredient.fat = request.form['fat']
+#         ingredient.sugar = request.form['sugar']
+#         editIngredient(ingredient)
+#         flash("Surovina byla upravena.")
+#         return redirect('/ingredient={}'.format(ingredientID))
+#     else:
+#         editIngredient(ingredient)
+#         flash("Název a kalorická hodnota byly upraveny.")
+#         return redirect('/ingredient={}'.format(ingredientID))
 
 
 # CALCULATE RECIPE
@@ -765,8 +837,6 @@ def calc(ingredients, diet):
     fixedIngredients = []
     for i in range(len(ingredients)):
         if ingredients[i].fixed is True:
-            temp_print(ingredients[i].amount)
-            temp_print(ingredients[i].sugar)
             fixedSugar += ingredients[i].amount * ingredients[i].sugar
             fixedProtein += ingredients[i].amount * ingredients[i].protein
             fixedFat += ingredients[i].amount * ingredients[i].fat
@@ -974,14 +1044,14 @@ def sendFeedback():
     if 'file' not in request.files:
         mail.send(msg)
         flash("Vaše připomínka byla zaslána na vyšší místa.")
-        return redirect('/user')
+        return redirect('/')
     else:
         file = request.files['file']
 
     if file.filename == '':
         mail.send(msg)
         flash("Vaše připomínka byla zaslána na vyšší místa.")
-        return redirect('/user')
+        return redirect('/')
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -990,7 +1060,7 @@ def sendFeedback():
 
         mail.send(msg)
         flash("Vaše připomínka byla zaslána na vyšší místa.")
-        return redirect('/user')
+        return redirect('/')
 
 
 # S'MORE
@@ -1010,14 +1080,27 @@ def showHelp():
 
 
 # ERROR
+@app.route('/wrongpage')
+def wrongPage():
+    return template('wrongPage.tpl')
+
+
 @app.errorhandler(404)
 def error404(error):
-    return 'Tady nic není (Err404)'
+    # Missing page
+    return template('err404.tpl')
+
+
+@app.errorhandler(405)
+def error405(error):
+    # Action not allowed (AJAX)
+    return template('wrongPage.tpl')
 
 
 @app.errorhandler(500)
 def error500(error):
-    return 'Někde se stala chyba (Err500)'
+    # internal error
+    return template('err500.tpl')
 
 
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
