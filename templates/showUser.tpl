@@ -72,8 +72,8 @@
              </table>
 
             <form>
-                <input type="button" disabled class="editShowButton btn btn-warning" value="Upravit uživatele" />
-                <input type="button" disabled class="editHideButton btn btn-warning" value="Zrušit úpravy" />
+                <button type="button" disabled class="editShowButton btn btn-warning">Upravit <i class="fas fa-pencil-alt"></i></button>
+                <button type="button" disabled class="editHideButton btn btn-warning">Zrušit úpravy <i class="fas fa-pencil-alt"></i></button>
             </form>
         </div>
     </div>
