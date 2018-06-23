@@ -9,18 +9,18 @@
     <div id="navbarNav" class="collapse navbar-collapse">
 
         <ul class="nav navbar-nav navbar-center">
-            <li class="nav-item">
-              <a class="nav-link" href="/">Hlavní stránka</a>
-            </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/user"><i class="fas fa-user-circle"></i></a>
+          </li>
 
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Přidat nové
+              Přidat
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a class="dropdown-item" href="/newrecipe">Nový recept</a>
-              <a class="dropdown-item" href="/newdiet">Nová dieta</a>
-              <a class="dropdown-item" href="/newingredient">Nová surovina</a>
+              <a class="dropdown-item" href="/newrecipe">recept</a>
+              <a class="dropdown-item" href="/newdiet">dietu</a>
+              <a class="dropdown-item" href="/newingredient">surovinu</a>
             </div>
           </li>
 
@@ -39,9 +39,7 @@
         </ul>
 
         <ul class="nav navbar-nav navbar-right ml-auto" >
-          <li class="nav-item">
-            <a class="nav-link" href="/logout">Odhlásit se</a>
-          </li>
+
           <li class="nav-item">
             <a class="nav-link small" href="/changelog">Změny</a>
           </li>
@@ -50,6 +48,9 @@
           </li>
           <li class="nav-item">
             <a class="nav-link small" href="/help">Nápověda</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/logout">Odhlásit se</a>
           </li>
         </ul>
 

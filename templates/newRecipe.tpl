@@ -35,7 +35,7 @@
         }
 
         .tr-mainIngredient {
-            background-color: #82b74b;
+            background-color: #a4f442;
         }
 
         .tr-fixedIngredient {

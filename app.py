@@ -39,6 +39,9 @@ import os
 # Printing
 # import pdfkit
 
+# security
+import bcrypt
+
 
 UPLOAD_FOLDER = '/tmp'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
@@ -528,6 +531,8 @@ def addRecipeAJAX():
 @app.route('/recipe=<recipeID>')
 def showRecipe(recipeID):
     recipeData = loadRecipe(recipeID)
+    if recipeData is None:
+            abort(404)
     recipe = recipeData[0]
     author = recipeData[2]
     if session['username'] != author:
@@ -573,6 +578,8 @@ def printRecipe(recipeID):
     recipeData = loadRecipe(recipeID)
     recipe = recipeData[0]
     author = recipeData[2]
+    if recipeData is None:
+        abort(404)
     if session['username'] != author:
         return redirect('/wrongpage')
     diet = loadDiet(loadRecipeDietID(recipe.id))
@@ -781,12 +788,40 @@ def showAllIngredients():
     return template("allIngredients.tpl", ingredients=ingredients)
 
 
-@app.route('/user=<userID>')
-def showUser(userID):
-    user = loadUserById(userID)
-    if user.username != session['username']:
+@app.route('/user')
+def showUser():
+    if 'username' not in session:
+        return redirect('/login')
+    user = loadUser(session['username'])
+    return template('showUser.tpl', user=user)
+
+
+@app.route('/user/edit', methods=['POST'])
+def editUserAJAX():
+    user = loadUser(session['username'])
+    user.firstname = request.form['firstname']
+    user.lastname = request.form['lastname']
+    success = editUser(user)
+    user = loadUserById(user.id)
+    if success:
+        flash("Uživatel byl upraven")
+    else:
+        flash("Nepovedlo se změnit uživatele")
+    return template('showUser.tpl', user=user)
+
+
+@app.route('/user/password_change', methods=['POST'])
+def changeUserAJAX():
+    user = loadUser(session['username'])
+    if user is None or user.username != session['username']:
         return redirect('/wrongpage')
-    temp_print(user.firstname)
+    password = request.form['password'].encode('utf-8')
+    user.password = hashlib.sha256(password).hexdigest()
+    success = changeUserPassword(user)
+    if success:
+        flash("Heslo bylo změněno")
+    else:
+        flash("Nepovedlo se změnit heslo")
     return template('showUser.tpl', user=user)
 
 # @app.route('/ingredient=<ingredientID>/edit', methods=['POST'])

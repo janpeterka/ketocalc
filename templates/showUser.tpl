@@ -6,7 +6,8 @@
 {% block style %}
     <style type="text/css" media="screen">
         .edit__form{display: none;}
-        .editHideButton{display: none;}            
+        .editHideButton{display: none;}     
+        .warning{color: red;}       
     </style>
 {% endblock %}
 
@@ -26,6 +27,38 @@
             $('.editShowButton').show();
             $('.editHideButton').hide();
         });
+
+        function validateRegister(){
+            if ($(".password").val().length < 8){
+                bootbox.alert("Heslo je příliš krátké!");
+                return false
+            }
+            else if ($(".password").val() != $(".againPassword").val()){
+                bootbox.alert("Hesla jsou rozdílná!");
+                return false
+            }
+            else {
+              return true  
+            }
+        }
+
+        $(document).on('blur','.password',function(){
+            if ($(this).val().length > 8){
+                $(".wrongPassword").empty();
+            } else {
+                $(".wrongPassword").empty();
+                $(".wrongPassword").append("<small class='form-text'>Heslo je příliš krátké!</small>");
+            }
+
+        });
+        $(document).on('blur','.againPassword',function(){
+            if ($(this).val() === $(".password").val()){
+                $(".diffPassword").empty();
+            } else {
+                $(".diffPassword").empty();
+                $(".diffPassword").append("<small class='form-text'>Hesla jsou rozdílná!</small>");
+            }
+        });
     
     </script>
 {% endblock %}
@@ -33,23 +66,25 @@
 {% block content %}
     {% include('navbar.tpl') %}
     <div class="container">
-        <div class="col-8">
-            <form action="/user={{user.id}}/edit" class="edit__form form-group" method="post" accept-charset="utf-8">
+        <div class="edit__form col-12">
+            <form action="/user/edit" class="form-group" method="post" accept-charset="utf-8">
                 <table class="table">
                     <tr>
                         <th>Přihlašovací jméno</th>
                         <th>Jméno</th>
                         <th>Příjmení</th>
+                        <th></th>
                     </tr>
                     <tr>
                         <td>
-                            <input type="text" class="form-control" name="name" value="{{ user.username }}" />
+                            {{ user.username }}
+                            {# <input type="text" class="form-control" value="{{ user.username }}" /> #}
                         </td>
                         <td>
-                            <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="fat" value="{{ user.firstname }}"/>
+                            <input name="firstname" type="text" class="form-control" value="{{ user.firstname }}"/>
                         </td>
                         <td>
-                            <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="sugar" value="{{ user.lastname }}"/>
+                            <input name="lastname" type="text" class="form-control" value="{{ user.lastname }}"/>
                         </td>
                         <td>
                             <input type="submit" class="btn btn-warning" value="Uložit změnu" />
@@ -58,7 +93,25 @@
                 </table>
             </form>
 
-            <table class=" data__table table">
+            <form action="/user/password_change" method="post" onsubmit="return validateRegister()" >
+                <table class="table">
+                    <td>
+                        <input name="password" type="password" class="form-control password" placeholder="Nové heslo" />
+                        <span class="warning wrongPassword"></span>
+                    </td>
+                    <td>
+                        <input type="password" class="form-control againPassword" placeholder="Nové heslo znovu" />
+                        <span class="warning diffPassword"></span>
+                    </td>
+                    <td>
+                        <input type="submit" class="btn btn-warning" value="Změnit heslo">
+                    </td>
+                </table>
+            </form>
+        </div>
+
+        <div class="data__table col-12">
+            <table class="table">
                 <tr>
                     <th>Přihlašovací jméno</th>
                     <th>Jméno</th>
@@ -70,10 +123,12 @@
                     <td>{{ user.lastname }}</td>
                 </tr>
              </table>
+        </div>
 
+        <div>
             <form>
-                <button type="button" disabled class="editShowButton btn btn-warning">Upravit <i class="fas fa-pencil-alt"></i></button>
-                <button type="button" disabled class="editHideButton btn btn-warning">Zrušit úpravy <i class="fas fa-pencil-alt"></i></button>
+                <button type="button" class="editShowButton btn btn-warning">Upravit <i class="fas fa-pencil-alt"></i></button>
+                <button type="button" class="editHideButton btn btn-warning">Zrušit úpravy <i class="fas fa-pencil-alt"></i></button>
             </form>
         </div>
     </div>

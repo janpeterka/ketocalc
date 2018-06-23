@@ -14,7 +14,6 @@
 						<ul>
 							<li><strong>přepočítávání receptu do jiné diety</strong></li>
 							<li>nápověda</li>
-							<li></li>
 						</ul>
 					</li>
 				</i>
@@ -22,10 +21,11 @@
 				<li>v2.3 <i>8.6.2018</i>
 					<ul>
 						<li>Fixní suroviny - počítání s více surovinami</li>
+						<li>Úprava uživatele - jméno, heslo <i>(23.6.2018)</i></li>
 					</ul>
 				</li>
 
-				<li>v2.2.1 <i>(24.4.2018 - )</i>
+				<li>v2.2.1 <i>24.4.2018</i>
 					<ul>
 						<li>archivování diety</li>
 						<li>lepší hlavní surovina (s podbarvením)</li>

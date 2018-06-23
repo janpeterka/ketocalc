@@ -59,6 +59,7 @@
 
                 <tr class="totals">
                     <td><strong>Celkem</strong></td>
+                    <td>{{ totals.calorie }} kcal</td>
                     <td>{{ totals.protein }} g</td>
                     <td>{{ totals.fat }} g</td>
                     <td>{{ totals.sugar }} g</td>
