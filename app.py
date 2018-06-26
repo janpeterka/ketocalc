@@ -1120,6 +1120,11 @@ def wrongPage():
     return template('wrongPage.tpl')
 
 
+@app.route('/google3748bc0390347e56.html')
+def googleVerification():
+    return template('google3748bc0390347e56.html')
+
+
 @app.errorhandler(404)
 def error404(error):
     # Missing page
