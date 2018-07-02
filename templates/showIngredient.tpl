@@ -97,12 +97,12 @@
              </table>
 
             <form action="/ingredient={{ingredient.id}}/remove" onsubmit="return confirm('Opravdu chcete smazat recept?');" method="post" accept-charset="utf-8">
-                <button type="button" class="editShowButton btn btn-warning">Upravit <i class="fas fa-pencil-alt"></i></button>
-                <button type="button" class="editHideButton btn btn-warning">Zrušit úpravy <i class="fas fa-pencil-alt"></i></button>
+                <button type="button" class="editShowButton btn btn-warning">Upravit {{ icons.edit }}</button>
+                <button type="button" class="editHideButton btn btn-warning">Zrušit úpravy {{ icons.edit }}</button>
                 {% if used == False %}
-                    <button type="submit" class="btn btn-danger">Smazat surovinu <i class="fas fa-trash"></i></button>
+                    <button type="submit" class="btn btn-danger">Smazat surovinu {{ icons.delete }}</button>
                 {% else %}
-                    <button type="submit" class="btn btn-danger" disabled>Nelze smazat <i class="fas fa-trash"></i></button>
+                    <button type="submit" class="btn btn-danger" disabled>Nelze smazat {{ icons.delete }}</button>
                     {# <input type="submit" class="btn btn-danger" disabled value="Nelze smazat" /> #}
                 {% endif %}
             </form>

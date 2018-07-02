@@ -124,9 +124,9 @@
                     "<td>" + ingredient.fat + "</td>"+
                     "<td>" + ingredient.sugar + "</td>"+
                     "<td>" +
-                        '<i id_value="' + ingredient.id + '" class="set_fixed fas fa-thumbtack"></i>' +
-                        '<i id_value="' + ingredient.id + '" class="set_main fas fa-hospital-symbol"></i>' +
-                        '<i id_value="' + ingredient.id + '" class="remove fa fa-times fa-2x"></i>' +
+                        '{{ icons.ingredient_fixed }}' +
+                        '{{ icons.ingredient_main }}' +
+                        '{{ icons.ingredient_remove }}' +
                     "</td>"+
                 "</tr>");
             }
@@ -270,17 +270,21 @@
                     //nefixních (počítaná + hlavní) > 4
                     if (variable_count + main_count > 4){
                         bootbox.alert("Příliš mnoho počítaných surovin - počítané suroviny musí být právě 3");
-                        return;
+                        $(".recipe__loader").hide();
+
+                        return false;
                     }
                     //počítaná > 3
                     if (variable_count > 3){
                         bootbox.alert("Příliš mnoho počítaných surovin - počítané suroviny musí být právě 3");
-                        return;
+                        $(".recipe__loader").hide();
+                        return false;
                     }
                     //málo počítaných surovin
                     if (variable_count + main_count < 3){
                         bootbox.alert("Příliš málo počítaných surovin - počítané suroviny musí být právě 3");
-                        return;
+                        $(".recipe__loader").hide();
+                        return false;
                     }
 
                     // values for fixed
@@ -427,11 +431,11 @@
                   $('.prerecipe__selected-ingredients__table').on('click','tr i.remove',function(e){
                      e.preventDefault();
 
+                    // remove from list
+                    prerecipe__calc__form__ingredients__remove($(this).parents('tr').attr('id_value'));
+
                     // remove table line
                     $(this).parents('tr').remove();
-
-                    // remove from list
-                    prerecipe__calc__form__ingredients__remove($(this).attr('id_value'));
 
                     // Refresh selection
                     prerecipe__addIngredient__form__select__refresh();
@@ -447,7 +451,7 @@
                      e.preventDefault();
 
                     // set main
-                    setMainIngredient($(this).attr('id_value'));
+                    setMainIngredient($(this).parents('tr').attr('id_value'));
                   });
             });
 
@@ -457,7 +461,7 @@
                      e.preventDefault();
 
                     // toggle fixes
-                    toggleFixedIngredient($(this).attr('id_value'));
+                    toggleFixedIngredient($(this).parents('tr').attr('id_value'));
                   });
             });
 

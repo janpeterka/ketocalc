@@ -10,7 +10,7 @@
 
         <ul class="nav navbar-nav navbar-center">
           <li class="nav-item">
-            <a class="nav-link" href="/user"><i class="fas fa-user-circle"></i></a>
+            <a class="nav-link" href="/user">{{ icons.user }}</a>
           </li>
 
           <li class="nav-item dropdown">
@@ -38,7 +38,7 @@
 
         </ul>
 
-        <ul class="nav navbar-nav navbar-right ml-auto" >
+        <ul class="nav navbar-nav navbar-right ml-auto">
 
           <li class="nav-item">
             <a class="nav-link small" href="/changelog">Změny</a>
@@ -46,9 +46,9 @@
           <li class="nav-item">
             <a class="nav-link small" href="/feedback">Připomínky</a>
           </li>
-          <li class="nav-item">
+{#           <li class="nav-item">
             <a class="nav-link small" href="/help">Nápověda</a>
-          </li>
+          </li> #}
           <li class="nav-item">
             <a class="nav-link" href="/logout">Odhlásit se</a>
           </li>

@@ -77,7 +77,7 @@
 {% block content %}
     {% include('navbar_login.tpl') %}
     <div class="container">
-    	<form id="registerForm" action="/register" onsubmit="return validateRegister()" method="post" class="col-sm-6">
+    	<form action="/register" onsubmit="return validateRegister()" method="post" class="col-sm-6" accept-charset="UTF-8">
 
                 <label for="username">Přihlašovací email</label>
                 <input id="username" name="username" type="email" class="form-control" required value={{username}} >
@@ -105,7 +105,7 @@
 
                 </div>
 
-                <input id="registerButton" value="Registrovat" type="submit" class="btn btn-primary" />
+                <input value="Registrovat" type="submit" class="btn btn-primary" />
                 <a class="col-sm-2" href="/login">Přihlásit se</a><br>
             </form>
     </div>

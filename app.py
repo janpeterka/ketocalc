@@ -17,13 +17,9 @@ from werkzeug import secure_filename
 # from flask.sessions import SessionInterface
 # from beaker.middleware import SessionMiddleware
 
-# MySQL connector
-
-
 import mail_data as mail_data
-
 from database import *
-# from forms import *
+import data as data
 
 # Hashing library
 import hashlib
@@ -59,6 +55,10 @@ app.config.update(dict(
     MAIL_PASSWORD=mail_data.MAIL_PASSWORD
 ))
 mail = Mail(app)
+
+@app.context_processor
+def inject_globals():
+    return dict(icons=data.icons)
 
 
 # MAIN
@@ -215,7 +215,7 @@ def showNewDiet():
     if 'username' not in session:
         return redirect('/login')
 
-    return template('newDiet.tpl', name="", sugar="", fat="", protein="")
+    return template('newDiet.tpl')
 
 
 @app.route('/newdiet', methods=['POST'])

@@ -101,10 +101,10 @@
             </table>
             <div class="row">
                 <form action="/recipe={{recipe.id}}/remove" method="post" class="form col-5"  accept-charset="utf-8" onsubmit="return confirm('Opravdu chcete smazat recept?');">
-                    <button type="button" class="editShowButton btn btn-warning">Upravit <i class="fas fa-pencil-alt"></i></button>
-                    <button type="button" class="editHideButton btn btn-warning">Zrušit úpravy <i class="fas fa-pencil-alt"></i></button>
-                    <button type="button" class="printButton btn">Tisk <i class="fas fa-print"></i></button>
-                    <button type="submit" class="btn btn-danger">Smazat recept <i class="fas fa-trash"></i></button>
+                    <button type="button" class="editShowButton btn btn-warning">Upravit {{ icons.edit }}</button>
+                    <button type="button" class="editHideButton btn btn-warning">Zrušit úpravy {{ icons.edit }}</button>
+                    <button type="button" class="printButton btn">Tisk {{ icons.print }}</button>
+                    <button type="submit" class="btn btn-danger">Smazat recept {{ icons.delete }}</button>
                 </form>
 
                 <span class="col-2"></span>

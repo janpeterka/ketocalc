@@ -172,17 +172,17 @@
                 </form>
 
                 <form action="/diet={{ diet.id }}/remove" method="post" accept-charset="utf-8">
-                    <button type="button" class="editShowButton btn btn-warning">Upravit <i class="fas fa-pencil-alt"></i></button>
-                    <button type="button" class="editHideButton btn btn-warning">Zrušit úpravy <i class="fas fa-pencil-alt"></i></button>
+                    <button type="button" class="editShowButton btn btn-warning">Upravit {{ icons.edit }}</button>
+                    <button type="button" class="editHideButton btn btn-warning">Zrušit úpravy {{ icons.edit }}</button>
                     {% if diet.used == False %}
-                    <button type="submit" class="btn btn-danger">Smazat dietu <i class="fas fa-trash"></i></button>
+                        <button type="submit" class="btn btn-danger">Smazat dietu {{ icons.delete }}</button>
                     {% endif %}
                 </form>
                 <form action="/diet={{ diet.id }}/archive" method="post" accept-charset="utf-8">
                     {% if diet.active == True %}
-                        <button type="submit" class="btn">Archivovat <i class="fas fa-archive"></i></button>
+                        <button type="submit" class="btn">Archivovat {{ icons.archive }}</button>
                     {% else %}
-                        <button type="submit" class="btn">Aktivovat <i class="fas fa-archive"></i></button>
+                        <button type="submit" class="btn">Aktivovat {{ icons.unarchive }}</button>
                     {% endif %}
                 </form>
             </div>  

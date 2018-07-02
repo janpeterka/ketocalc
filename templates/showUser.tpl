@@ -127,8 +127,8 @@
 
         <div>
             <form>
-                <button type="button" class="editShowButton btn btn-warning">Upravit <i class="fas fa-pencil-alt"></i></button>
-                <button type="button" class="editHideButton btn btn-warning">Zrušit úpravy <i class="fas fa-pencil-alt"></i></button>
+                <button type="button" class="editShowButton btn btn-warning">Upravit {{ icons.edit }}</button>
+                <button type="button" class="editHideButton btn btn-warning">Zrušit úpravy {{ icons.edit }}</button>
             </form>
         </div>
     </div>

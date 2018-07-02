@@ -473,7 +473,7 @@ def deleteDiet(dietID):
     query = ("""
 
         DELETE
-            DR
+            UD
         FROM
             users_has_diets AS UD
         WHERE
