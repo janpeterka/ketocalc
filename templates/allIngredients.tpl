@@ -19,7 +19,7 @@
 {% block content %}
     {% include('navbar.tpl') %}
     <div class="container">
-        <div class="col-6">
+        <div class="col-10">
             <table id="ingredients" class="table">
                 <tr>
                     <th>Název</th>

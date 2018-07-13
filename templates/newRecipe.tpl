@@ -319,6 +319,9 @@
                             var totalSugar = 0;
                             var totalWeight = 0;
                             var ingredients = response.ingredients;
+                            var totals = response.totals;
+                            console.log(totals)
+                            console.log(totals.sugar)
 
                             // ingredients to table
                             for ( let i = 0; i < ingredients.length; i++ ){
@@ -368,21 +371,21 @@
                                 $('.recipe__right__form__ingredient-table').append(ingredient_tr);
                                 var mySlider = $("#slider").slider();
 
-                                totalCalorie += ingredients[i].calorie*ingredients[i].amount;
-                                totalProtein += ingredients[i].protein*ingredients[i].amount;
-                                totalFat += ingredients[i].fat*ingredients[i].amount;
-                                totalSugar += ingredients[i].sugar*ingredients[i].amount;
-                                totalWeight += ingredients[i].amount;
+                                totalCalorie += ingredients[i].calorie * ingredients[i].amount;
+                                totalProtein += ingredients[i].protein * ingredients[i].amount;
+                                totalFat     += ingredients[i].fat     * ingredients[i].amount;
+                                totalSugar   += ingredients[i].sugar   * ingredients[i].amount;
+                                totalWeight  += ingredients[i].amount;
                             }
 
                             $('.recipe__right__form__ingredient-table').append(
                                 "<tr>" +
                                     '<td><strong>Součet</strong></td>'+
-                                    '<td><span id="totalCalorie">'+Math.round(totalCalorie/100)+'</span></td>' +
-                                    '<td><span id="totalProtein">'+Math.round(totalProtein/100)+'</span></td>' +
-                                    '<td><span id="totalFat">'+Math.round(totalFat/100)+'</span></td>' +
-                                    '<td><span id="totalSugar">'+Math.round(totalSugar/100)+'</span>'+'</td>' +
-                                    '<td><span id="totalWeight">'+Math.round(totalWeight)+'</span> g</td>' +
+                                    '<td><span id="totalCalorie">' +Math.round(totals.calorie)+'</span></td>' +
+                                    '<td><span id="totalProtein">' +Math.round(totals.protein)+'</span></td>' +
+                                    '<td><span id="totalFat">'     +Math.round(totals.fat)+'</span></td>' +
+                                    '<td><span id="totalSugar">'   +Math.round(totals.sugar)+'</span>'+'</td>' +
+                                    '<td><span id="totalWeight">'  +Math.round(totals.amount)+'</span> g</td>' +
                                 '</tr>');
 
                             // ingredients to inputs
@@ -499,7 +502,7 @@
                             $('#totalSugar').text(response.totals.sugar);
                             $('#totalProtein').text(response.totals.protein);
                             $('#totalCalorie').text(response.totals.calorie);
-                            $('#totalWeight').text(response.totals.weight);
+                            $('#totalWeight').text(response.totals.amount);
                             recipe__right__show();
 
                         },
