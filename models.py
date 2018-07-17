@@ -21,15 +21,15 @@ s = Session()
 
 t_diets_has_recipes = Table(
     'diets_has_recipes', metadata,
-    Column('diets_id', ForeignKey('diets.id'), primary_key=True, nullable=False, index=True),
+    Column('diet_id', ForeignKey('diets.id'), primary_key=True, nullable=False, index=True),
     Column('recipes_id', ForeignKey('recipes.id'), primary_key=True, nullable=False, index=True)
 )
 
 
 t_users_has_diets = Table(
     'users_has_diets', metadata,
-    Column('users_id', ForeignKey('users.id'), primary_key=True, nullable=False, index=True),
-    Column('diets_id', ForeignKey('diets.id'), primary_key=True, nullable=False, index=True)
+    Column('user_id', ForeignKey('users.id'), primary_key=True, nullable=False, index=True),
+    Column('diet_id', ForeignKey('diets.id'), primary_key=True, nullable=False, index=True)
 )
 
 
