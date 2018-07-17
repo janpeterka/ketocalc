@@ -1,6 +1,10 @@
 Flask
 
 Flask-Mail
+Flask-Login
+Flask-SQLAlchemy
+Flask-Bcrypt
+Flask-Dance
 
 mysqlclient
 
@@ -13,8 +17,6 @@ numpy
 sympy
 
 pytest
-
-bcrypt
 
 WTForms
 

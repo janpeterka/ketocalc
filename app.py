@@ -17,9 +17,12 @@ from werkzeug import secure_filename
 # from flask.sessions import SessionInterface
 # from beaker.middleware import SessionMiddleware
 
+import models as models
+
 import mail_data as mail_data
-from database import *
 import data as data
+
+from utils import *
 
 # Hashing library
 import hashlib
@@ -36,7 +39,6 @@ import os
 # import pdfkit
 
 # security
-import bcrypt
 
 
 UPLOAD_FOLDER = '/tmp'
@@ -45,6 +47,7 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 app = Flask(__name__)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 app.config.update(dict(
     MAIL_SERVER='smtp.googlemail.com',
@@ -55,6 +58,7 @@ app.config.update(dict(
     MAIL_PASSWORD=mail_data.MAIL_PASSWORD
 ))
 mail = Mail(app)
+
 
 @app.context_processor
 def inject_globals():
@@ -111,7 +115,7 @@ def checkLogin(username, password):
     Returns:
         bool -- [description]
     """
-    user = loadUser(username)
+    user = models.User.load(username)
     if user is None:
         return False
     pwdhash = user.pwdhash
@@ -137,21 +141,19 @@ def showRegister():
 
 @app.route('/register', methods=['POST'])
 def doRegister():
-    username = request.form['username']
-    # check uniqueness of username
-
     temp_password = str(request.form['password'])
     temp_password_2 = str(request.form['againPassword'])
 
-    password_hash = hashlib.sha256(temp_password.encode('utf-8')).hexdigest()
-    firstname = request.form['firstname']
+    user = models.User()
+    user.username = request.form['username']
+    user.password_hash = hashlib.sha256(temp_password.encode('utf-8')).hexdigest()
+    user.firstName = request.form['firstname']
+    user.lastName = request.form['lastname']
 
-    lastname = request.form['lastname']
-
-    if len(lastname) == 0:
+    if len(user.lastName) == 0:
         flash("Není vyplněné jméno")
         return redirect(request.url)
-    if len(firstname) == 0:
+    if len(user.firstName) == 0:
         flash("Není vyplněné příjmení")
         return redirect(request.url)
     if len(temp_password) < 8:
@@ -160,11 +162,11 @@ def doRegister():
     if temp_password_2 != temp_password:
         flash("Hesla jsou rozdílná!")
         return redirect(request.url)
-    if loadUser(username) is not None:
+    if models.User.load(user.username) is not None:
         flash("Něco je špatně")
         return redirect(request.url)
 
-    response = saveUser(username, password_hash, firstname, lastname)
+    response = user.save()
 
     if response:
         flash("Byl jste úspěšně zaregistrován.")
@@ -177,7 +179,7 @@ def doRegister():
 @app.route('/registerValidate', methods=['POST'])
 def validateRegister():
     username = request.form['username']
-    if loadUser(username) is not None:
+    if models.User.load(username) is not None:
         return "False"
     else:
         return "True"
@@ -189,9 +191,9 @@ def showDashboard():
     if 'username' not in session:
         return redirect('/login')
 
-    diets = loadUserDiets(session['username'])
-    user = loadUser(session['username'])
-    return template('dashboard.tpl', username=session['username'], diets=diets, firstname=user.firstname)
+    user = models.User.load(session['username'])
+    diets = user.diets
+    return template('dashboard.tpl', username=user.username, diets=diets, firstname=user.firstName)
 
 
 @app.route('/selectDietAJAX', methods=['POST'])
@@ -199,13 +201,13 @@ def selectDietAJAX():
     if 'username' not in session:
         return redirect('/login')
 
-    dietID = request.form['selectDiet']
-    recipes = loadDietRecipes(dietID)
-    for i in range(len(recipes)):
-        recipe = recipes[i]
-        recipes[i] = recipe.json
+    diet = models.Diet.load(request.form['selectDiet'])
 
-    array_recipes = {'array': recipes, 'dietID': dietID}
+    json_recipes = []
+    for recipe in diet.recipes:
+        json_recipes.append(recipe.json)
+
+    array_recipes = {'array': json_recipes, 'dietID': diet.id}
     return jsonify(array_recipes)
 
 
@@ -222,7 +224,8 @@ def showNewDiet():
 def addDietAJAX():
     if 'username' not in session:
         return redirect('/login')
-    diet = type('', (), {})()               # Magický trik, jak udělat prázdný objekt
+
+    diet = models.Diet()
     diet.name = request.form['name']
     diet.sugar = request.form['sugar']
     diet.fat = request.form['fat']
@@ -243,57 +246,61 @@ def addDietAJAX():
         flash("Vyplňte název")
         return redirect(request.url)
 
-    diet.username = session['username']
-    last_id = saveDiet(diet)
+    diet.author = models.User.load(session['username'])
+    diet.save()
     flash("Dieta byla vytvořena.")
-    return redirect('/diet={}'.format(last_id))
+    return redirect('/diet={}'.format(diet.id))
 
 
 # SHOW DIET PAGE
-@app.route('/diet=<dietID>')
-def showDiet(dietID):
+@app.route('/diet=<diet_id>')
+def showDiet(diet_id):
     if 'username' not in session:
         return redirect('/login')
 
-    diet = loadDiet(dietID)
-    if diet.author != session['username']:
+    diet = models.Diet.load(diet_id)
+
+    if diet is None:
+        abort(404)
+    if diet.author.username != session['username']:
         return redirect('/wrongpage')
 
-    recipes = loadDietRecipes(diet.id)
-    diet.used = not deleteDietCheck(dietID)
-    diets = loadUserDiets(session['username'])
+    diet.used = not diet.deleteCheck()
 
-    return template('showDiet.tpl', diet=diet, recipes=recipes, diets=diets)
+    return template('showDiet.tpl', diet=diet, recipes=diet.recipes, diets=diet.author.diets)
 
 
-@app.route('/diet=<dietID>/remove', methods=['POST'])
-def removeDiet(dietID):
-    diet = loadDiet(dietID)
-    if diet.author != session['username']:
+@app.route('/diet=<diet_id>/remove', methods=['POST'])
+def removeDiet(diet_id):
+    diet = models.Diet.load(diet_id)
+
+    if diet.author.username != session['username']:
         return redirect('/wrongpage')
 
-    if deleteDietCheck(dietID):  # wip
-        deleteDiet(dietID)
+    if diet.deleteCheck():  # wip
+        diet.remove()
         flash("Dieta byla smazána")
         return redirect("/")
     else:
         flash("Tato dieta má recepty, nelze smazat")
-        return redirect('/diet={}'.format(dietID))
+        return redirect('/diet={}'.format(diet_id))
 
 
-@app.route('/diet=<dietID>/archive', methods=['POST'])
-def archiveDiet(dietID):
-    diet = loadDiet(dietID)
-    if diet.author != session['username']:
+@app.route('/diet=<diet_id>/archive', methods=['POST'])
+def archiveDiet(diet_id):
+    diet = models.Diet.load(diet_id)
+
+    if diet.author.username != session['username']:
         return redirect('/wrongpage')
 
-    if loadDiet(dietID).active:
-        disableDiet(dietID)
+    diet.active = not diet.active
+    diet.edit()
+
+    if not diet.active:
         flash("Dieta byla archivována")
     else:
-        enableDiet(dietID)
         flash("Dieta byla aktivována")
-    return redirect('/diet={}'.format(dietID))
+    return redirect('/diet={}'.format(diet_id))
 
 
 # @app.route('/diet=<dietID>/export', methods=['POST'])
@@ -302,7 +309,7 @@ def archiveDiet(dietID):
 #     newDietID = int(request.form['diet'])
 #     newDiet = loadDiet(newDietID)
 #     for recipe in recipes:
-#         ingredients = loadRecipeIngredients(recipe.id)
+#         ingredients = recipe.ingredients
 #         solution = calc(ingredients, newDiet)
 #         if solution is None:
 #             continue
@@ -314,28 +321,26 @@ def archiveDiet(dietID):
 #     return redirect('/diet={}'.format(newDietID))
 
 
-@app.route('/diet=<dietID>/edit', methods=['POST'])
-def editDietAJAX(dietID):
-    temp_diet = loadDiet(dietID)
-    if temp_diet.author != session['username']:
+@app.route('/diet=<diet_id>/edit', methods=['POST'])
+def editDietAJAX(diet_id):
+    diet = models.Diet.load(diet_id)
+
+    if diet.author.username != session['username']:
         return redirect('/wrongpage')
 
-    diet = type('', (), {})()
     diet.name = request.form['name']
-    diet.id = dietID
+    diet.id = diet_id
     diet.small = request.form['small_size']
     diet.big = request.form['big_size']
-    if deleteDietCheck(dietID):  # wip
+
+    if diet.deleteCheck():
         diet.protein = request.form['protein']
         diet.fat = request.form['fat']
         diet.sugar = request.form['sugar']
-        editDiet(diet)
-        flash("Dieta byla upravena.")
-        return redirect('/diet={}'.format(dietID))
-    else:
-        editDiet(diet)
-        flash("Název byl upraven.")
-        return redirect('/diet={}'.format(dietID))
+
+    diet.edit()
+    flash("Dieta byla upravena.")
+    return redirect('/diet={}'.format(diet_id))
 
 
 @app.route('/alldiets')
@@ -343,7 +348,7 @@ def showAllDiets():
     if 'username' not in session:
         return redirect('/login')
 
-    diets = loadUserDiets(session['username'], 0)
+    diets = models.User.load(session['username']).diets
     return template('allDiets.tpl', diets=diets)
 
 
@@ -353,8 +358,9 @@ def showNewRecipe():
     if 'username' not in session:
         return redirect('/login')
 
-    diets = loadUserDiets(session['username'])
-    ingredients = loadAllIngredients(session['username'])
+    diets = models.User.load(session['username']).diets
+    ingredients = models.Ingredient.loadAllByUsername(session['username'])
+
     return template('newRecipe.tpl', ingredients=ingredients, diets=diets)
 
 
@@ -363,7 +369,7 @@ def addIngredienttoRecipeAJAX():
     if 'username' not in session:
         return redirect('/login')
 
-    ingredient = loadIngredient(request.form["prerecipe__add-ingredient__form__select"])
+    ingredient = models.Ingredient.load(request.form["prerecipe__add-ingredient__form__select"])
     return jsonify(ingredient.json)
 
 
@@ -373,18 +379,19 @@ def calcRecipeAJAX():
         return redirect('/login')
 
     json_ingredients = request.json['ingredients']
+    diet_id = request.json['dietID']
 
-    dietID = request.json['dietID']
-    if dietID is None:
+    if diet_id is None:
         return "False"
-    diet = loadDiet(dietID)
+
+    diet = models.Diet.load(diet_id)
 
     ingredients = []
-    for i in range(len(json_ingredients)):
-        ingredient = loadIngredient(json_ingredients[i]['id'])
-        ingredient.fixed = json_ingredients[i]['fixed']
-        ingredient.main = json_ingredients[i]['main']
-        ingredient.amount = float(json_ingredients[i]['amount']) / 100  # from grams per 100g
+    for json_i in json_ingredients:
+        ingredient = models.Ingredient.load(json_i['id'])
+        ingredient.fixed = json_i['fixed']
+        ingredient.main = json_i['main']
+        ingredient.amount = float(json_i['amount']) / 100  # from grams per 100g
         ingredients.append(ingredient)
 
     ingredients = calc(ingredients, diet)
@@ -425,7 +432,7 @@ def recalcRecipeAJAX():
 
     ingredients = []
     for json_ingredient in json_ingredients:
-        ingredient = loadIngredient(json_ingredient['id'])
+        ingredient = models.Ingredient.load(json_ingredient['id'])
         ingredient.fixed = json_ingredient['fixed']
         ingredient.main = json_ingredient['main']
         ingredient.amount = float(json_ingredient['amount']) / 100
@@ -457,8 +464,7 @@ def recalcRecipeAJAX():
     for ing in fixedIngredients:
         ingredients.remove(ing)
 
-    dietID = request.json['dietID']
-    diet = loadDiet(dietID)
+    diet = models.Diet.load(request.json['dietID'])
 
     slider = request.json['slider']
     slider = float(slider)
@@ -491,18 +497,14 @@ def recalcRecipeAJAX():
     results = [x, y, z]
     count = 0
     for ing in json_ingredients:
-        # temp_print(str(ing['id']) + ":" + str(ing['main']) + ":" + str(ing['fixed']))
-        if ing['main'] == True:
+        if ing['main'] is True:
             ing['amount'] = slider
-            # temp_print("main")
-        elif ing['fixed'] == True:
+        elif ing['fixed'] is True:
             pass
         else:
             ing['amount'] = results[count]['amount']
             count += 1
 
-    # slider = {'id': mainIngredient.id, 'amount': slider}
-    # solutionJSON = {'x': x, 'y': y, 'z': z, 'slider': slider, 'totals': totals}
     solutionJSON = {'ingredients': json_ingredients, 'totals': totals}
 
     # give ids with amounts
@@ -514,55 +516,47 @@ def addRecipeAJAX():
     if 'username' not in session:
         return redirect('/login')
 
-    # dietID = request.form['diet-ID']
-
     temp_ingredients = request.json['ingredients']
-    dietID = request.json['dietID']
-
-    # temp_ingredients = [word.strip() for word in temp_ingredients.split(',')]
-
-    # amounts = request.form['amounts']
-    # amounts = [word.strip() for word in amounts.split(',')]
+    diet_id = request.json['dietID']
 
     ingredients = []
-    for i in range(len(temp_ingredients)):
-        ingredients.append(loadIngredient(temp_ingredients[i]['id']))
-        ingredients[i].amount = temp_ingredients[i]['amount']
+    for temp_i in temp_ingredients:
+        rhi = models.RecipesHasIngredient()
+        rhi.ingredients_id = temp_i['id']
+        rhi.amount = temp_i['amount']
+        ingredients.append(rhi)
 
-    recipe = type('', (), {})()
+    recipe = models.Recipe()
     recipe.name = request.json['name']
-    recipe.size = request.json['size']
+    recipe.type = request.json['size']
+    recipe.diet = models.Diet.load(diet_id)
 
-    # temp_print('recipe: {}, ingredient[0].amount: {},  ingredient[0].id: {}, dietID: {}'.format(recipe, ingredients[0].amount, ingredients[0].id, dietID))
-
-    last_id = saveRecipe(recipe, ingredients, dietID)
+    last_id = recipe.save(ingredients)
     flash("Recept byl uložen")
-    # return redirect('/recipe=' + str(last_id))
     return ('/recipe=' + str(last_id))
 
 
-@app.route('/recipe=<recipeID>')
-def showRecipe(recipeID):
-    recipeData = loadRecipe(recipeID)
-    if recipeData is None:
+@app.route('/recipe=<recipe_id>')
+def showRecipe(recipe_id):
+    recipe = models.Recipe.load(recipe_id)
+
+    if recipe is None:
             abort(404)
-    recipe = recipeData[0]
-    author = recipeData[2]
-    if session['username'] != author:
+
+    if session['username'] != recipe.author:
         return redirect('/wrongpage')
-    diet = loadDiet(loadRecipeDietID(recipe.id))
-    diets = loadUserDiets(session['username'])
-    if recipe.size == "big":
+    diet = recipe.diet
+
+    diets = models.User.load(session['username']).diets
+
+    if recipe.type == "big":
         coef = diet.big_size / 100
     else:
         coef = diet.small_size / 100
 
-    ingredientIDs = recipeData[1]
-    ingredients = []
-    for ID in ingredientIDs:
-        ingredients.append(loadIngredient(ID))
+    ingredients = recipe.ingredients
     for i in ingredients:
-        i.amount = float(math.floor(loadAmount(i.id, recipeID)[0] * coef * 100000)) / 100000
+        i.amount = float(math.floor(i.loadAmount(recipe_id) * coef * 100000)) / 100000
 
     totals = type('', (), {})()
     totals.calorie = 0
@@ -586,24 +580,25 @@ def showRecipe(recipeID):
     return template('showRecipe.tpl', recipe=recipe, ingredients=ingredients, totals=totals, diet=diet, diets=diets)
 
 
-@app.route('/recipe=<recipeID>/print')
-def printRecipe(recipeID):
-    recipeData = loadRecipe(recipeID)
-    recipe = recipeData[0]
-    author = recipeData[2]
-    if recipeData is None:
+@app.route('/recipe=<recipe_id>/print')
+def printRecipe(recipe_id):
+    recipe = models.Recipe.load(recipe_id)
+
+    if recipe is None:
         abort(404)
-    if session['username'] != author:
+    if session['username'] != recipe.author:
         return redirect('/wrongpage')
-    diet = loadDiet(loadRecipeDietID(recipe.id))
-    if recipe.size == "big":
+
+    diet = recipe.diet
+    if recipe.type == "big":
         coef = diet.big_size / 100
     else:
         coef = diet.small_size / 100
 
-    ingredients = loadRecipeIngredients(recipeID)
+    ingredients = recipe.ingredients
+
     for i in ingredients:
-        i.amount = float(math.floor(loadAmount(i.id, recipeID)[0] * coef * 100000)) / 100000
+        i.amount = float(math.floor(i.loadAmount(recipe_id) * coef * 100000)) / 100000
 
     totals = type('', (), {})()
     totals.calorie = 0
@@ -627,37 +622,39 @@ def printRecipe(recipeID):
     return template('printRecipe.tpl', recipe=recipe, ingredients=ingredients, totals=totals, diet=diet)
 
 
-@app.route('/recipe=<recipeID>/remove', methods=['POST'])
-def removeRecipeAJAX(recipeID):
-    if session['username'] != loadRecipe(recipeID)[2]:
+@app.route('/recipe=<recipe_id>/remove', methods=['POST'])
+def removeRecipeAJAX(recipe_id):
+    if session['username'] != models.Recipe.load(recipe_id)[2]:
         return redirect('/wrongpage')
 
-    deleteRecipe(recipeID)
+    recipe = models.Recipe.load(recipe_id)[0]
+    recipe.remove()
     flash("Recept byl smazán.")
     return redirect('/')
 
 
-@app.route('/recipe=<recipeID>/edit', methods=['POST'])
-def editRecipeAJAX(recipeID):
-    if session['username'] != loadRecipe(recipeID)[2]:
+@app.route('/recipe=<recipe_id>/edit', methods=['POST'])
+def editRecipeAJAX(recipe_id):
+    if session['username'] != models.Recipe.load(recipe_id)[2]:
         return redirect('/wrongpage')
-    recipe = type('', (), {})()
+    recipe = models.Recipe.load(recipe_id)[0]
     recipe.name = request.form['name']
-    recipe.id = recipeID
-    recipe.size = request.form['size']
-    editRecipe(recipe)
+    recipe.type = request.form['size']
+    recipe.edit()
     flash("Recept byl upraven.")
-    return redirect('/recipe={}'.format(recipeID))
+    return redirect('/recipe={}'.format(recipe_id))
 
 
 @app.route('/allrecipes')
 def showAllRecipes():
     if 'username' not in session:
         return redirect('/login')
-    recipes = loadUserRecipes(session['username'])
+
+    user = models.User.load(session['username'])
+    recipes = user.recipes
     for recipe in recipes:
-        recipe.dietID = loadRecipeDietID(recipe.id)
-        recipe.dietName = loadDiet(recipe.dietID).name
+        recipe.dietID = recipe.diet.id
+        recipe.dietName = recipe.diet.name
 
     return template("allRecipes.tpl", recipes=recipes)
 
@@ -666,19 +663,19 @@ def showAllRecipes():
 def printAllRecipes():
     if 'username' not in session:
         return redirect('/login')
-    recipes = loadUserRecipes(session['username'])
+
+    recipes = models.User.load(session['username']).recipes
     for recipe in recipes:
-        recipe.dietID = loadRecipeDietID(recipe.id)
-        recipe.dietName = loadDiet(recipe.dietID).name
-        recipe.diet = loadDiet(recipe.dietID)
-        recipe.ingredients = loadRecipeIngredients(recipe.id)
-        if recipe.size == "big":
+        recipe.dietID = recipe.diet.id
+        recipe.dietName = recipe.diet.name
+        recipe.ingredients = recipe.ingredients
+        if recipe.type == "big":
             coef = recipe.diet.big_size / 100
         else:
             coef = recipe.diet.small_size / 100
 
         for i in recipe.ingredients:
-            i.amount = float(math.floor(loadAmount(i.id, recipe.id)[0] * coef * 100000)) / 100000
+            i.amount = float(math.floor(i.loadAmount(recipe.id) * coef * 100000)) / 100000
 
         recipe.totals = type('', (), {})()
         recipe.totals.calorie = 0
@@ -716,12 +713,13 @@ def addNewIngredientAJAX():
     if 'username' not in session:
         return redirect('/login')
 
-    ingredient = type('', (), {})()
+    ingredient = models.Ingredient()
     ingredient.name = request.form['name']
     ingredient.calorie = request.form['calorie']
     ingredient.sugar = request.form['sugar']
     ingredient.fat = request.form['fat']
     ingredient.protein = request.form['protein']
+    ingredient.author = session['username']
 
     if len(ingredient.protein) == 0:
         flash("Zadejte množství bílkoviny")
@@ -739,65 +737,66 @@ def addNewIngredientAJAX():
         flash("Zadejte název suroviny")
         return redirect(request.url)
 
-    saveIngredient(ingredient, session['username'])
+    ingredient.save()
     flash("Nová surovina byla vytvořena")
     return redirect('/newingredient')
 
 
-@app.route('/ingredient=<ingredientID>')
-def showIngredient(ingredientID):
-    ingredient = loadIngredient(ingredientID)
+@app.route('/ingredient=<ingredient_id>')
+def showIngredient(ingredient_id):
+    ingredient = models.Ingredient.load(ingredient_id)
     if ingredient is None:
         abort(404)
-    used = not deleteIngredientCheck(ingredientID)
+    used = not ingredient.deleteCheck()
     if session['username'] != ingredient.author:
         return redirect('/wrongpage')
     return template('showIngredient.tpl', ingredient=ingredient, used=used)
 
 
-@app.route('/ingredient=<ingredientID>/remove', methods=['POST'])
-def removeIngredientAJAX(ingredientID):
-    ingredient = loadIngredient(ingredientID)
+@app.route('/ingredient=<ingredient_id>/remove', methods=['POST'])
+def removeIngredientAJAX(ingredient_id):
+    ingredient = models.Ingredient.load(ingredient_id)
     if session['username'] != ingredient.author:
         return redirect('/wrongpage')
 
-    if deleteIngredientCheck(ingredientID):  # wip
-        deleteIngredient(ingredientID)
+    if ingredient.deleteCheck():  # wip
+        ingredient.remove()
         flash("Surovina byla smazána")
         return redirect("/")
     else:
         flash("Tato surovina je použita, nelze smazat")
-        return redirect('/ingredient={}'.format(ingredientID))
+        return redirect('/ingredient={}'.format(ingredient_id))
 
 
-@app.route('/ingredient=<ingredientID>/edit', methods=['POST'])
-def editIngredientAJAX(ingredientID):
-    ingredient = loadIngredient(ingredientID)
+@app.route('/ingredient=<ingredient_id>/edit', methods=['POST'])
+def editIngredientAJAX(ingredient_id):
+    ingredient = models.Ingredient.load(ingredient_id)
     if session['username'] != ingredient.author:
         return redirect('/wrongpage')
 
-    ingredient = type('', (), {})()
+    ingredient = models.Ingredient()
     ingredient.name = request.form['name']
-    ingredient.id = ingredientID
+    ingredient.id = ingredient_id
     ingredient.calorie = request.form['calorie']
-    if deleteIngredientCheck(ingredientID):  # wip
+    if ingredient.deleteCheck():  # wip
         ingredient.protein = request.form['protein']
         ingredient.fat = request.form['fat']
         ingredient.sugar = request.form['sugar']
-        editIngredient(ingredient)
+        ingredient.edit()
         flash("Surovina byla upravena.")
-        return redirect('/ingredient={}'.format(ingredientID))
+        return redirect('/ingredient={}'.format(ingredient_id))
     else:
-        editIngredient(ingredient)
+        ingredient.edit()
         flash("Název a kalorická hodnota byly upraveny.")
-        return redirect('/ingredient={}'.format(ingredientID))
+        return redirect('/ingredient={}'.format(ingredient_id))
 
 
 @app.route('/allingredients')
 def showAllIngredients():
     if 'username' not in session:
         return redirect('/login')
-    ingredients = loadAllIngredients(session['username'])
+    # ingredients = loadAllIngredients(session['username'])
+    ingredients = models.Ingredient.loadAllByUsername(session['username'])
     return template("allIngredients.tpl", ingredients=ingredients)
 
 
@@ -805,17 +804,17 @@ def showAllIngredients():
 def showUser():
     if 'username' not in session:
         return redirect('/login')
-    user = loadUser(session['username'])
+    user = models.User.load(session['username'])
     return template('showUser.tpl', user=user)
 
 
 @app.route('/user/edit', methods=['POST'])
 def editUserAJAX():
-    user = loadUser(session['username'])
+    user = models.User.load(session['username'])
     user.firstname = request.form['firstname']
     user.lastname = request.form['lastname']
-    success = editUser(user)
-    user = loadUserById(user.id)
+    success = user.edit()
+    user = models.User.load(user.id)
     if success:
         flash("Uživatel byl upraven")
     else:
@@ -825,39 +824,19 @@ def editUserAJAX():
 
 @app.route('/user/password_change', methods=['POST'])
 def changeUserAJAX():
-    user = loadUser(session['username'])
+    user = models.User.load(session['username'])
+
     if user is None or user.username != session['username']:
         return redirect('/wrongpage')
+
     password = request.form['password'].encode('utf-8')
     user.password = hashlib.sha256(password).hexdigest()
-    success = changeUserPassword(user)
+    success = user.edit()
     if success:
         flash("Heslo bylo změněno")
     else:
         flash("Nepovedlo se změnit heslo")
     return template('showUser.tpl', user=user)
-
-# @app.route('/ingredient=<ingredientID>/edit', methods=['POST'])
-# def editIngredientAJAX(ingredientID):
-#     ingredient = loadIngredient(ingredientID)
-#     if session['username'] != ingredient.author:
-#         return redirect('/wrongpage')
-
-#     ingredient = type('', (), {})()
-#     ingredient.name = request.form['name']
-#     ingredient.id = ingredientID
-#     ingredient.calorie = request.form['calorie']
-#     if deleteIngredientCheck(ingredientID):  # wip
-#         ingredient.protein = request.form['protein']
-#         ingredient.fat = request.form['fat']
-#         ingredient.sugar = request.form['sugar']
-#         editIngredient(ingredient)
-#         flash("Surovina byla upravena.")
-#         return redirect('/ingredient={}'.format(ingredientID))
-#     else:
-#         editIngredient(ingredient)
-#         flash("Název a kalorická hodnota byly upraveny.")
-#         return redirect('/ingredient={}'.format(ingredientID))
 
 
 # CALCULATE RECIPE
