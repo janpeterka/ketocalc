@@ -1,6 +1,6 @@
 {% extends "base.tpl" %}
 {% block title %}
-    Tady nemáte co pohledávat
+    Plánovaná odstávka
 {% endblock %}
 
 {% block style %}
@@ -10,7 +10,7 @@
         margin-right: auto;
         margin-top: 20px;
     }
-    </style>    
+    </style>
 {% endblock %}
 
 {% block script %}
@@ -20,19 +20,19 @@
 {% block content %}
     {% include('navbar_empty.tpl') %}
     <div class="container">
-        <div class="main">
+        <div class="col-12 main">
             <table>
             <td class="col-2"></td>
 
             <td class="col-8">
-                <h1>Na této stránce byste neměli být</h1>
-                Radši se vraťte na <a href="/">hlavní stránku</a>
+            	<h1>Web je v dočasně mimo provoz</h1>
+                Můžete zatím použít <a href="ketocalc.herokuapp.com">starou verzi aplikace</a> - své recepty tam najdete.
+                Odstávka by neměla trvat déle než 24 hodin.
             </td>
 
             <td class="col-2"></td>
             </table>
-        	
-        </div>
+        </div>  
     </div>
 {% endblock %}
 

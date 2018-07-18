@@ -16,8 +16,19 @@ Session = sessionmaker(bind=engine)
 Base = declarative_base()
 metadata = Base.metadata
 
-s = Session()
+global s
 
+
+def startSession():
+    global s
+    s = Session()
+
+
+def endSession():
+    s.close()
+
+
+startSession()
 
 t_diets_has_recipes = Table(
     'diets_has_recipes', metadata,
@@ -176,6 +187,14 @@ class User(Base):
             recipes.extend(diet.recipes)
         return recipes
 
+    @property
+    def activeDiets(self):
+        active_diets = []
+        for diet in self.diets:
+            if diet.active == 1:
+                active_diets.append(diet)
+        return active_diets
+
 
 class Recipe(Base):
     __tablename__ = 'recipes'
@@ -232,4 +251,4 @@ class Recipe(Base):
 
     @property
     def author(self):
-        return self.diet.author.username
+        return self.diet.author

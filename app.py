@@ -192,7 +192,7 @@ def showDashboard():
         return redirect('/login')
 
     user = models.User.load(session['username'])
-    diets = user.diets
+    diets = user.activeDiets
     return template('dashboard.tpl', username=user.username, diets=diets, firstname=user.firstName)
 
 
@@ -349,6 +349,8 @@ def showAllDiets():
         return redirect('/login')
 
     diets = models.User.load(session['username']).diets
+    diets.sort(key=lambda x: x.active, reverse=True)  # sort active first
+
     return template('allDiets.tpl', diets=diets)
 
 
@@ -358,7 +360,8 @@ def showNewRecipe():
     if 'username' not in session:
         return redirect('/login')
 
-    diets = models.User.load(session['username']).diets
+    diets = models.User.load(session['username']).activeDiets
+
     ingredients = models.Ingredient.loadAllByUsername(session['username'])
 
     return template('newRecipe.tpl', ingredients=ingredients, diets=diets)
@@ -543,7 +546,7 @@ def showRecipe(recipe_id):
     if recipe is None:
             abort(404)
 
-    if session['username'] != recipe.author:
+    if session['username'] != recipe.author.username:
         return redirect('/wrongpage')
     diet = recipe.diet
 
@@ -586,7 +589,7 @@ def printRecipe(recipe_id):
 
     if recipe is None:
         abort(404)
-    if session['username'] != recipe.author:
+    if session['username'] != recipe.author.username:
         return redirect('/wrongpage')
 
     diet = recipe.diet
@@ -624,10 +627,10 @@ def printRecipe(recipe_id):
 
 @app.route('/recipe=<recipe_id>/remove', methods=['POST'])
 def removeRecipeAJAX(recipe_id):
-    if session['username'] != models.Recipe.load(recipe_id)[2]:
+    if session['username'] != models.Recipe.load(recipe_id).author.username:
         return redirect('/wrongpage')
 
-    recipe = models.Recipe.load(recipe_id)[0]
+    recipe = models.Recipe.load(recipe_id)
     recipe.remove()
     flash("Recept byl smazán.")
     return redirect('/')
@@ -635,9 +638,9 @@ def removeRecipeAJAX(recipe_id):
 
 @app.route('/recipe=<recipe_id>/edit', methods=['POST'])
 def editRecipeAJAX(recipe_id):
-    if session['username'] != models.Recipe.load(recipe_id)[2]:
+    if session['username'] != models.Recipe.load(recipe_id).author.username:
         return redirect('/wrongpage')
-    recipe = models.Recipe.load(recipe_id)[0]
+    recipe = models.Recipe.load(recipe_id).author.username
     recipe.name = request.form['name']
     recipe.type = request.form['size']
     recipe.edit()
@@ -1110,6 +1113,10 @@ def showHelp():
 @app.route('/wrongpage')
 def wrongPage():
     return template('wrongPage.tpl')
+
+@app.route('/shutdown')
+def shutdown():
+    return template('shutdown.tpl')
 
 
 @app.route('/google3748bc0390347e56.html')

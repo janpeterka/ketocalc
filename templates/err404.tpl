@@ -18,7 +18,7 @@
 {% endblock %}
 
 {% block content %}
-    {# {% include('navbar_login.tpl') %} #}
+    {% include('navbar_empty.tpl') %}
     <div class="container">
         <div class="col-12 main">
             <table>

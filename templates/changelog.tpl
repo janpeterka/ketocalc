@@ -9,14 +9,11 @@
 			<h3>Beta</h3>
 			<h6>v2</h6>
 			<ul>
-				<i>
-					<li>v2.3.1 (ve vývoji)
-						<ul>
-							<li><strong>přepočítávání receptu do jiné diety</strong></li>
-							<li>nápověda</li>
-						</ul>
-					</li>
-				</i>
+				<li>v2.4 <i>17.7.2018</i>
+					<ul>
+						<li>přechod na SQLAlchemy ORM</li>
+					</ul>
+				</li>
 
 				<li>v2.3 <i>8.6.2018</i>
 					<ul>

@@ -5,11 +5,11 @@
 
 {% block style %}
     <style type="text/css" media="screen">
-    .False {
+    .inactive {
         background-color: lightgrey;
         color: grey;
     }
-    .False a{
+    .inactive a{
         color: grey;
         
     }
@@ -38,7 +38,7 @@
                     <th>Aktivní</th>
                 </tr>
                 {% for diet in diets: %}
-                    <tr class= {{ diet.active }}>                         
+                    <tr class= {% if diet.active%} active {% else %} inactive {% endif %}>                        
                         <td><a href="/diet={{diet.id}}">{{ diet.name }}</a></td>
                         <td>{{ diet.protein }}</td>
                         <td>{{ diet.fat }}</td>
