@@ -12,11 +12,6 @@ from flask import abort
 from flask_mail import Mail, Message
 from werkzeug import secure_filename
 
-
-# Session manager
-# from flask.sessions import SessionInterface
-# from beaker.middleware import SessionMiddleware
-
 import models as models
 
 import mail_data as mail_data
@@ -67,27 +62,28 @@ def inject_globals():
 
 # MAIN
 
-@app.before_request
-def session_management():
+@app.before_first_request
+def session_setup():
     # make the session last indefinitely until it is cleared
     session.permanent = True
 
 
+@app.before_request
+def session_management():
+    if request.path not in ['/register', '/registerValidate', '/login', '/static/style.css']:
+        if 'username' not in session:
+            return redirect('/login')
+
+
 @app.route('/', methods=['GET'])
 def main():
-    if 'username' in session:
         return redirect('/dashboard')
-    else:
-        return redirect('/login')
 
 
 # LOGIN
 @app.route('/login', methods=['GET'])
 def showLogin():
-    if 'username' in session:
-        return redirect('/')
-    else:
-        return template('login.tpl')
+    return template('login.tpl')
 
 
 @app.route('/login', methods=['POST'])
@@ -188,9 +184,6 @@ def validateRegister():
 # USER PAGE
 @app.route('/dashboard')
 def showDashboard():
-    if 'username' not in session:
-        return redirect('/login')
-
     user = models.User.load(session['username'])
     diets = user.activeDiets
     return template('dashboard.tpl', username=user.username, diets=diets, firstname=user.firstName)
@@ -198,9 +191,6 @@ def showDashboard():
 
 @app.route('/selectDietAJAX', methods=['POST'])
 def selectDietAJAX():
-    if 'username' not in session:
-        return redirect('/login')
-
     diet = models.Diet.load(request.form['selectDiet'])
 
     json_recipes = []
@@ -214,17 +204,11 @@ def selectDietAJAX():
 # NEW DIET
 @app.route('/newdiet', methods=['GET'])
 def showNewDiet():
-    if 'username' not in session:
-        return redirect('/login')
-
     return template('newDiet.tpl')
 
 
 @app.route('/newdiet', methods=['POST'])
 def addDietAJAX():
-    if 'username' not in session:
-        return redirect('/login')
-
     diet = models.Diet()
     diet.name = request.form['name']
     diet.sugar = request.form['sugar']
@@ -232,6 +216,7 @@ def addDietAJAX():
     diet.protein = request.form['protein']
     diet.small_size = request.form['small_size']
     diet.big_size = request.form['big_size']
+    diet.active = 1
 
     if len(diet.protein) == 0:
         flash("Vyplňte množství bílkoviny")
@@ -255,9 +240,6 @@ def addDietAJAX():
 # SHOW DIET PAGE
 @app.route('/diet=<diet_id>')
 def showDiet(diet_id):
-    if 'username' not in session:
-        return redirect('/login')
-
     diet = models.Diet.load(diet_id)
 
     if diet is None:
@@ -280,7 +262,7 @@ def removeDiet(diet_id):
     if diet.deleteCheck():  # wip
         diet.remove()
         flash("Dieta byla smazána")
-        return redirect("/")
+        return redirect("/alldiets")
     else:
         flash("Tato dieta má recepty, nelze smazat")
         return redirect('/diet={}'.format(diet_id))
@@ -345,9 +327,6 @@ def editDietAJAX(diet_id):
 
 @app.route('/alldiets')
 def showAllDiets():
-    if 'username' not in session:
-        return redirect('/login')
-
     diets = models.User.load(session['username']).diets
     diets.sort(key=lambda x: x.active, reverse=True)  # sort active first
 
@@ -357,9 +336,6 @@ def showAllDiets():
 # NEW RECIPE PAGE
 @app.route('/newrecipe')
 def showNewRecipe():
-    if 'username' not in session:
-        return redirect('/login')
-
     diets = models.User.load(session['username']).activeDiets
 
     ingredients = models.Ingredient.loadAllByUsername(session['username'])
@@ -369,18 +345,12 @@ def showNewRecipe():
 
 @app.route('/addIngredientAJAX', methods=['POST'])
 def addIngredienttoRecipeAJAX():
-    if 'username' not in session:
-        return redirect('/login')
-
     ingredient = models.Ingredient.load(request.form["prerecipe__add-ingredient__form__select"])
     return jsonify(ingredient.json)
 
 
 @app.route('/calcRecipeAJAX', methods=['POST'])
 def calcRecipeAJAX():
-    if 'username' not in session:
-        return redirect('/login')
-
     json_ingredients = request.json['ingredients']
     diet_id = request.json['dietID']
 
@@ -516,9 +486,6 @@ def recalcRecipeAJAX():
 
 @app.route('/saveRecipeAJAX', methods=['POST'])
 def addRecipeAJAX():
-    if 'username' not in session:
-        return redirect('/login')
-
     temp_ingredients = request.json['ingredients']
     diet_id = request.json['dietID']
 
@@ -650,9 +617,6 @@ def editRecipeAJAX(recipe_id):
 
 @app.route('/allrecipes')
 def showAllRecipes():
-    if 'username' not in session:
-        return redirect('/login')
-
     user = models.User.load(session['username'])
     recipes = user.recipes
     for recipe in recipes:
@@ -664,9 +628,6 @@ def showAllRecipes():
 
 @app.route('/printallrecipes')
 def printAllRecipes():
-    if 'username' not in session:
-        return redirect('/login')
-
     recipes = models.User.load(session['username']).recipes
     for recipe in recipes:
         recipe.dietID = recipe.diet.id
@@ -706,16 +667,12 @@ def printAllRecipes():
 # NEW INGREDIENT PAGE
 @app.route('/newingredient', methods=['GET'])
 def showNewIngredient():
-    if 'username' not in session:
-        return redirect('/login')
+
     return template('newIngredient.tpl', name="", sugar="", fat="", protein="")
 
 
 @app.route('/newingredient', methods=['POST'])
 def addNewIngredientAJAX():
-    if 'username' not in session:
-        return redirect('/login')
-
     ingredient = models.Ingredient()
     ingredient.name = request.form['name']
     ingredient.calorie = request.form['calorie']
@@ -796,8 +753,7 @@ def editIngredientAJAX(ingredient_id):
 
 @app.route('/allingredients')
 def showAllIngredients():
-    if 'username' not in session:
-        return redirect('/login')
+
     # ingredients = loadAllIngredients(session['username'])
     ingredients = models.Ingredient.loadAllByUsername(session['username'])
     return template("allIngredients.tpl", ingredients=ingredients)
@@ -805,8 +761,7 @@ def showAllIngredients():
 
 @app.route('/user')
 def showUser():
-    if 'username' not in session:
-        return redirect('/login')
+
     user = models.User.load(session['username'])
     return template('showUser.tpl', user=user)
 
@@ -1113,6 +1068,7 @@ def showHelp():
 @app.route('/wrongpage')
 def wrongPage():
     return template('wrongPage.tpl')
+
 
 @app.route('/shutdown')
 def shutdown():

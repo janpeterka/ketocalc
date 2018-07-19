@@ -65,7 +65,7 @@ class Diet(Base):
     protein = Column(Float, nullable=False)
     small_size = Column(Float, nullable=False)
     big_size = Column(Float, nullable=False)
-    active = Column(TINYINT(1))
+    active = Column(TINYINT(1), nullable=False, server_default=text("'1'"))
 
     recipes = relationship('Recipe', secondary='diets_has_recipes')
     author = relationship('User', secondary='users_has_diets', uselist=False)

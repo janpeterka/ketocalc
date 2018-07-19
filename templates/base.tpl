@@ -54,7 +54,6 @@
     {% endblock head %}
 </head>
 <body>
-    <!-- <div class="header"> Upozornění: Optimalizováno pro prohlížeč Chrome, v jiných prohlížečích se může konat nepředvídatelně.</div> -->
     <div id="content">{% block content %}{% endblock %}</div>
     <div class="footer">
         {% block footer %}
