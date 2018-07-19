@@ -9,7 +9,7 @@ def temp_print(input):
 class Diet(object):
     """  For loading from database """
 
-    def __init__(self, dbID, name, sugar, fat, protein, small_size, big_size, active):
+    def __init__(self, dbID, name, sugar, fat, protein, small_size, big_size, active, author):
         super(Diet, self).__init__()
         self.id = dbID
         self.name = name
@@ -18,10 +18,13 @@ class Diet(object):
         self.protein = protein
         self.small_size = small_size
         self.big_size = big_size
+        self.author = author
         if active == 1:
             self.active = True
         else:
             self.active = False
+        self.json = {'id': self.id, 'name': self.name, 'sugar': self.sugar, 'fat': self.fat,
+                     'protein': self.protein, 'small_size': self.small_size, 'big_size': self.big_size}
 
 
 class Recipe(object):
@@ -38,7 +41,7 @@ class Recipe(object):
 class Ingredient(object):
     """  For loading from database """
 
-    def __init__(self, dbID, name, calorie, sugar, fat, protein):
+    def __init__(self, dbID, name, calorie, sugar, fat, protein, author):
         super(Ingredient, self).__init__()
         self.id = dbID
         self.name = name
@@ -47,6 +50,7 @@ class Ingredient(object):
         self.fat = fat
         self.protein = protein
         self.amount = 0
+        self.author = author
         self.json = {'id': self.id, 'name': self.name, 'calorie': self.calorie, 'sugar': self.sugar, 'fat': self.fat, 'protein': self.protein}
 
 
@@ -90,16 +94,23 @@ def loadRecipe(recipeID):
     query = ("""
 
         SELECT
-            *
+            R.id, R.name, R.type, U.username
         FROM
-            recipes
+            recipes AS R
+            JOIN diets_has_recipes AS DR ON DR.recipes_id = R.id
+            JOIN users_has_diets AS UR ON UR.diets_id = DR.diets_id
+            JOIN users AS U ON U.id = UR.users_id
         WHERE
-            id='{}';
+            R.id=%s;
 
-        """.format(recipeID))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (recipeID,))
     response = cursor.fetchone()
+    if response is None:
+        return None
+
     recipe = Recipe(response[0], response[1], response[2])
+    author = response[3]
 
     query = ("""
 
@@ -108,17 +119,17 @@ def loadRecipe(recipeID):
         FROM
             recipes_has_ingredients
         WHERE
-            recipes_has_ingredients.recipes_id='{}';
+            recipes_has_ingredients.recipes_id=%s;
 
-        """.format(recipeID))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (recipeID,))
     response = cursor.fetchall()
 
     ingredientIDs = []
     for i in range(len(response)):
         ingredientIDs.append(response[i][0])
 
-    return [recipe, ingredientIDs]
+    return [recipe, ingredientIDs, author]
 
 
 def saveRecipe(recipe, ingredients, dietID):
@@ -143,10 +154,10 @@ def saveRecipe(recipe, ingredients, dietID):
         INSERT INTO
             recipes(name, type)
         VALUES
-            ('{}', '{}');
+            (%s, %s);
 
-        """.format(recipe.name, recipe.size))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (recipe.name, recipe.size))
     last_id = db.insert_id()
 
     for ingredient in ingredients:
@@ -155,20 +166,20 @@ def saveRecipe(recipe, ingredients, dietID):
             INSERT INTO
                 recipes_has_ingredients(recipes_id, ingredients_id, amount)
             VALUES
-                ({}, {}, {});
+                (%s, %s, %s);
 
-            """.format(last_id, ingredient.id, ingredient.amount))
-        cursor.execute(query)
+            """)
+        cursor.execute(query, (last_id, ingredient.id, ingredient.amount))
 
     query = ("""
 
         INSERT INTO
             diets_has_recipes(diets_id, recipes_id)
         VALUES
-            ({}, {});
+            (%s, %s);
 
-        """.format(dietID, last_id))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (dietID, last_id))
 
     db.commit()
 
@@ -189,31 +200,30 @@ def deleteRecipe(recipeID):
         DELETE FROM
             diets_has_recipes
         WHERE
-            diets_has_recipes.recipes_id = {};
+            diets_has_recipes.recipes_id = %s;
 
-
-        """.format(recipeID))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (recipeID,))
 
     query = ("""
 
         DELETE FROM
             recipes_has_ingredients
         WHERE
-            recipes_has_ingredients.recipes_id = {};
+            recipes_has_ingredients.recipes_id = %s;
 
-        """.format(recipeID))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (recipeID,))
 
     query = ("""
 
         DELETE FROM
             recipes
         WHERE
-            recipes.id = {};
+            recipes.id = %s;
 
-        """.format(recipeID))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (recipeID,))
 
     db.commit()
 
@@ -227,12 +237,12 @@ def editRecipe(recipe):
         UPDATE
             recipes
         SET
-            recipes.name = '{}', recipes.type = '{}'
+            recipes.name = %s, recipes.type = %s
         WHERE
-            recipes.id = {};
+            recipes.id = %s;
 
-        """.format(recipe.name, recipe.size, recipe.id))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (recipe.name, recipe.size, recipe.id))
     db.commit()
 
 
@@ -271,14 +281,14 @@ def loadRecipeDietID(recipeID):
     query = ("""
 
         SELECT
-            diets_has_recipes.diets_id
+            DR.diets_id
         FROM
-            diets_has_recipes
+            diets_has_recipes AS DR
         WHERE
-            recipes_id='{}';
+            DR.recipes_id = %s;
 
-        """.format(recipeID))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (recipeID,))
     response = cursor.fetchall()
 
     return response[0][0]
@@ -300,14 +310,14 @@ def loadDietRecipes(dietID):
     query = ("""
 
         SELECT
-            diets_has_recipes.recipes_id
+            DR.recipes_id
         FROM
-            diets_has_recipes
+            diets_has_recipes AS DR
         WHERE
-            diets_id='{}';
+            DR.diets_id = %s;
 
-        """.format(dietID))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (dietID,))
     response = cursor.fetchall()
 
     recipes = []
@@ -338,19 +348,29 @@ def loadDiet(dietID):
     query = ("""
 
         SELECT
-            *
+            D.id,
+            D.name,
+            D.sugar,
+            D.fat,
+            D.protein,
+            D.small_size,
+            D.big_size,
+            D.active,
+            U.username
         FROM
-            diets
+            diets AS D
+            JOIN users_has_diets AS UD ON UD.diets_id = D.id
+            JOIN users AS U ON U.id = UD.users_id
         WHERE
-            diets.id='{}';
+            D.id=%s;
 
-        """.format(dietID))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (dietID,))
     response = cursor.fetchone()
     if response is None:
         return None
     else:
-        diet = Diet(response[0], response[1], response[2], response[3], response[4], response[5], response[6], response[7])
+        diet = Diet(response[0], response[1], response[2], response[3], response[4], response[5], response[6], response[7], response[8])
         return diet
 
 
@@ -373,10 +393,10 @@ def saveDiet(diet):
         INSERT INTO
             diets(name, sugar, fat, protein, small_size, big_size, active)
         VALUES
-            ('{}', '{}', '{}', '{}', '{}', '{}', 1);
+            (%s, %s, %s, %s, %s, %s, 1);
 
-        """.format(diet.name, diet.sugar, diet.fat, diet.protein, diet.small_size, diet.big_size))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (diet.name, diet.sugar, diet.fat, diet.protein, diet.small_size, diet.big_size))
 
     last_id = db.insert_id()
     query = ("""
@@ -384,10 +404,10 @@ def saveDiet(diet):
         INSERT INTO
             users_has_diets(users_id, diets_id)
         VALUES
-            ('{}', '{}');
+            (%s, %s);
 
-        """.format(loadUser(diet.username).id, last_id))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (loadUser(diet.username).id, last_id))
 
     db.commit()
 
@@ -411,14 +431,14 @@ def deleteDietCheck(dietID):
     query = ("""
 
         SELECT
-            diets_has_recipes.recipes_id
+            DR.recipes_id
         FROM
-            diets_has_recipes
+            diets_has_recipes AS DR
         WHERE
-            diets_has_recipes.diets_id = {};
+            DR.diets_id = %s;
 
-        """.format(dietID))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (dietID,))
     response = cursor.fetchall()
     if len(response) == 0:
         return True
@@ -440,33 +460,39 @@ def deleteDiet(dietID):
     # recipes in diet are not accessible, but not deleted
     query = ("""
 
-        DELETE FROM
-            diets_has_recipes
+        DELETE 
+            DR
+        FROM
+            diets_has_recipes AS DR
         WHERE
-            diets_has_recipes.diets_id = {};
+            DR.diets_id = %s;
 
-        """.format(dietID))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (dietID,))
 
     query = ("""
 
-        DELETE FROM
-            users_has_diets
+        DELETE
+            DR
+        FROM
+            users_has_diets AS UD
         WHERE
-            users_has_diets.diets_id = {};
+            UD.diets_id = %s;
 
-        """.format(dietID))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (dietID,))
 
     query = ("""
 
-        DELETE FROM
-            diets
+        DELETE 
+            D
+        FROM
+            diets AS D
         WHERE
-            diets.id = {};
+            D.id = %s;
 
-        """.format(dietID))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (dietID,))
 
     db.commit()
 
@@ -477,13 +503,13 @@ def disableDiet(dietID):  # wip
 
     query = ("""
         UPDATE
-            diets
+            diets AS D
         SET
-            active = 0
+            D.active = 0
         WHERE
-            diets.id = {};
-        """.format(dietID))
-    cursor.execute(query)
+            D.id = %s;
+        """)
+    cursor.execute(query, (dietID,))
 
     db.commit()
 
@@ -494,13 +520,13 @@ def enableDiet(dietID):
 
     query = ("""
         UPDATE
-            diets
+            diets AS D
         SET
-            active = 1
+            D.active = 1
         WHERE
-            diets.id = {};
-        """.format(dietID))
-    cursor.execute(query)
+            D.id = %s;
+        """)
+    cursor.execute(query, (dietID,))
 
     db.commit()
 
@@ -520,31 +546,31 @@ def editDiet(diet):                         # wip - proč je tam if:else?
         query = ("""
 
             UPDATE
-                diets
+                diets AS D
             SET
-                diets.name = '{}', diets.protein = '{}', diets.fat = '{}', diets.sugar = '{}', diets.small_size = '{}', diets.big_size = '{}'
+                D.name = %s, D.protein = %s, D.fat = %s, D.sugar = %s, D.small_size = %s, D.big_size = %s
             WHERE
-                diets.id = {};
+                D.id = %s;
 
-            """.format(diet.name, diet.protein, diet.fat, diet.sugar, diet.small, diet.big, diet.id))
-        cursor.execute(query)
+            """)
+        cursor.execute(query, (diet.name, diet.protein, diet.fat, diet.sugar, diet.small, diet.big, diet.id))
     else:
         query = ("""
 
             UPDATE
-                diets
+                diets AS D
             SET
-                diets.name = '{}', diets.small_size = '{}', diets.big_size = '{}'
+                D.name = %s, D.small_size = %s, D.big_size = %s
             WHERE
-                diets.id = {};
+                D.id = %s;
 
-        """.format(diet.name, diet.small, diet.big, diet.id))
-        cursor.execute(query)
+        """)
+        cursor.execute(query, (diet.name, diet.small, diet.big, diet.id))
     db.commit()
 
 
 def loadUserDiets(username, active=1):
-    """Load diets for user
+    """Load diets for user ordered by name
 
     [description]
 
@@ -558,33 +584,33 @@ def loadUserDiets(username, active=1):
     cursor = db.cursor()
     query = ("""
         SELECT
-            diets.id,
-            diets.name,
-            diets.sugar,
-            diets.fat,
-            diets.protein,
-            diets.small_size,
-            diets.big_size,
-            diets.active
+            D.id,
+            D.name,
+            D.sugar,
+            D.fat,
+            D.protein,
+            D.small_size,
+            D.big_size,
+            D.active
         FROM
-            users
-            JOIN users_has_diets ON users_has_diets.users_id = users.id
-            JOIN diets ON diets.id = users_has_diets.diets_id AND IF({}=1, diets.active = 1, 1=1)
+            users AS U
+            JOIN users_has_diets AS UD ON UD.users_id = U.id
+            JOIN diets AS D ON D.id = UD.diets_id AND IF(%s=1, D.active = 1, 1=1)
         WHERE
-            users.username = '{}'
+            U.username = %s
         ORDER BY
-            diets.active DESC,
-            diets.name ASC
+            D.active DESC,
+            D.name ASC
             ;
-        """.format(active, username))
+        """)
 
-    cursor.execute(query)
+    cursor.execute(query, (active, username))
     response = cursor.fetchall()
 
     # convert to array of objects
     diets = []
     for i in range(len(response)):
-        temp_diet = Diet(response[i][0], response[i][1], response[i][2], response[i][3], response[i][4], response[i][5], response[i][6], response[i][7])
+        temp_diet = Diet(response[i][0], response[i][1], response[i][2], response[i][3], response[i][4], response[i][5], response[i][6], response[i][7], username)
         diets.append(temp_diet)
 
     return diets
@@ -608,19 +634,25 @@ def loadAllIngredients(username):
     query = ("""
 
         SELECT
-            *
+            I.id,
+            I.name,
+            I.calorie,
+            I.sugar,
+            I.fat,
+            I.protein,
+            I.author
         FROM
-            ingredients
+            ingredients AS I
         WHERE
-            author='{}';
+            I.author = %s;
 
-        """.format(username))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (username,))
     response = cursor.fetchall()
 
     temp_ingredients = []
     for ingredient in response:
-        temp_ingredient = Ingredient(ingredient[0], ingredient[1], ingredient[2], ingredient[3], ingredient[4], ingredient[5])
+        temp_ingredient = Ingredient(ingredient[0], ingredient[1], ingredient[2], ingredient[3], ingredient[4], ingredient[5], ingredient[6])
         temp_ingredients.append(temp_ingredient)
 
     temp_ingredients.sort(key=lambda x: x.name)
@@ -646,17 +678,25 @@ def loadIngredient(ingredientID):
     query = ("""
 
         SELECT
-            id, name, calorie, sugar, fat, protein
+            I.id,
+            I.name,
+            I.calorie,
+            I.sugar,
+            I.fat,
+            I.protein,
+            I.author
         FROM
-            ingredients
+            ingredients AS I
         WHERE
-            id='{}';
+            I.id = %s;
 
-        """.format(int(ingredientID)))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (int(ingredientID),))
     response = cursor.fetchone()
+    if response is None:
+        return None
 
-    ingredient = Ingredient(response[0], response[1], response[2], response[3], response[4], response[5])
+    ingredient = Ingredient(response[0], response[1], response[2], response[3], response[4], response[5], response[6])
 
     return ingredient
 
@@ -678,14 +718,14 @@ def loadRecipeIngredients(recipeID):
     query = ("""
 
         SELECT
-            recipes_has_ingredients.ingredients_id
+            RI.ingredients_id
         FROM
-            recipes_has_ingredients
+            recipes_has_ingredients AS RI
         WHERE
-            recipes_has_ingredients.recipes_id='{}';
+            RI.recipes_id = %s;
 
-        """.format(int(recipeID)))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (int(recipeID),))
     response = cursor.fetchall()
 
     ingredients = []
@@ -716,14 +756,14 @@ def loadAmount(ingredientID, recipeID):
         SELECT
             amount
         FROM
-            recipes_has_ingredients
+            recipes_has_ingredients AS RI
         WHERE
-            recipes_has_ingredients.ingredients_id = '{}'
+            RI.ingredients_id = %s
             AND
-            recipes_has_ingredients.recipes_id = '{}'
+            RI.recipes_id = %s
 
-        """.format(ingredientID, recipeID))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (ingredientID, recipeID))
     amount = cursor.fetchone()
 
     return amount
@@ -749,10 +789,10 @@ def saveIngredient(ingredient, username):
         INSERT INTO
             ingredients(name, calorie, sugar, fat, protein, author)
         VALUES
-            ('{}', '{}', '{}', '{}', '{}', '{}');
+            (%s, %s, %s, %s, %s, %s);
 
-        """.format(ingredient.name, ingredient.calorie, ingredient.sugar, ingredient.fat, ingredient.protein, username))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (ingredient.name, ingredient.calorie, ingredient.sugar, ingredient.fat, ingredient.protein, username))
     last_id = db.insert_id()
 
     db.commit()
@@ -777,14 +817,14 @@ def deleteIngredientCheck(ingredientID):
     query = ("""
 
         SELECT
-            recipes_has_ingredients.recipes_id
+            RI.recipes_id
         FROM
-            recipes_has_ingredients
+            recipes_has_ingredients AS RI
         WHERE
-            recipes_has_ingredients.ingredients_id = {};
+            RI.ingredients_id = %s;
 
-        """.format(ingredientID))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (ingredientID,))
     response = cursor.fetchall()
     if len(response) == 0:
         return True
@@ -805,22 +845,26 @@ def deleteIngredient(ingredientID):
 
     query = ("""
 
-        DELETE FROM
-            recipes_has_ingredients
+        DELETE
+            RI
+        FROM
+            recipes_has_ingredients AS RI
         WHERE
-            recipes_has_ingredients.ingredients_id= {ingredientID}
+            RI.ingredients_id = %s
 
-        """.format(ingredientID=ingredientID))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (ingredientID,))
 
     query = ("""
-        DELETE FROM
-            ingredients
+        DELETE
+            I
+        FROM
+            ingredients AS I
         WHERE
-            ingredients.id = {ingredientID};
+            I.id = %s;
 
-        """.format(ingredientID=ingredientID))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (ingredientID,))
 
     db.commit()
 
@@ -840,26 +884,26 @@ def editIngredient(ingredient):         # wip - why?
         query = ("""
 
             UPDATE
-                ingredients
+                ingredients AS I
             SET
-                ingredients.name = '{}', ingredients.calorie = '{}', ingredients.protein = '{}', ingredients.fat = '{}', ingredients.sugar = '{}'
+                I.name = %s, I.calorie = %s, I.protein = %s, I.fat = %s, I.sugar = %s
             WHERE
-                ingredients.id = {};
+                I.id = %s;
 
-            """.format(ingredient.name, ingredient.calorie, ingredient.protein, ingredient.fat, ingredient.sugar, ingredient.id))
-        cursor.execute(query)
+            """)
+        cursor.execute(query, (ingredient.name, ingredient.calorie, ingredient.protein, ingredient.fat, ingredient.sugar, ingredient.id))
     else:
         query = ("""
 
             UPDATE
-                ingredients
+                ingredients AS I
             SET
-                ingredients.name = '{}', ingredients.calorie = '{}'
+                I.name = %s, I.calorie = %s
             WHERE
-                ingredients.id = {};
+                I.id = %s;
 
-            """.format(ingredient.name, ingredient.calorie, ingredient.id))
-        cursor.execute(query)
+            """)
+        cursor.execute(query, (ingredient.name, ingredient.calorie, ingredient.id))
     db.commit()
 
 # Users
@@ -887,10 +931,10 @@ def saveUser(username, password_hash, firstname, lastname):
         INSERT INTO
             users(username, pwdhash, firstName, lastName)
         VALUES
-            ('{}', '{}', '{}', '{}');
+            (%s, %s, %s, %s);
 
-        """.format(username, password_hash, firstname, lastname))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (username, password_hash, firstname, lastname))
 
     db.commit()
 
@@ -917,14 +961,14 @@ def loadUser(username):
     query = ("""
 
         SELECT
-            *
+            id, username, pwdhash, firstname, lastname
         FROM
             users
         WHERE
-            username='{}';
+            username = %s;
 
-        """.format(username))
-    cursor.execute(query)
+        """)
+    cursor.execute(query, (username,))
 
     response = cursor.fetchone()
 
@@ -932,4 +976,89 @@ def loadUser(username):
         return None
     else:
         return User(response[0], response[1], response[2], response[3], response[4])
-#
+
+
+def loadUserById(userID):
+    """[summary]
+
+    [description]
+
+    Arguments:
+        username {str} -- [description]
+
+    Returns:
+        User or None -- [description]
+    """
+    db = dbConnect()
+    cursor = db.cursor()
+
+    query = ("""
+
+        SELECT
+            id, username, pwdhash, firstname, lastname
+        FROM
+            users
+        WHERE
+            id = %s;
+
+        """)
+    cursor.execute(query, (userID,))
+
+    response = cursor.fetchone()
+
+    if response is None:
+        return None
+    else:
+        return User(response[0], response[1], response[2], response[3], response[4])
+
+
+def editUser(user):
+    """[summary]
+    """
+    db = dbConnect()
+    cursor = db.cursor()
+    
+    query = ("""
+
+        UPDATE
+            users
+        SET
+            firstName = %s, lastName = %s
+        WHERE
+            id = %s;
+
+        """)
+    cursor.execute(query, (user.firstname, user.lastname, user.id))
+
+    db.commit()
+
+    if cursor.rowcount == 1:
+        return True
+    else:
+        return False
+
+
+def changeUserPassword(user):
+    """[summary]
+    """
+    db = dbConnect()
+    cursor = db.cursor()
+
+    query = ("""
+
+        UPDATE
+            users
+        SET
+            pwdhash = %s
+        WHERE
+            id = %s;
+
+        """)
+    cursor.execute(query, (user.password, user.id))
+
+    db.commit()
+
+    if cursor.rowcount == 1:
+        return True
+    else:
+        return False

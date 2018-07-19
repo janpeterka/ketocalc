@@ -33,7 +33,7 @@
 {% block content %}
     {% include('navbar.tpl') %}
     <div class="container">
-        <div class="col-8">
+        <div class="col-12">
             <form action="/ingredient={{ingredient.id}}/edit" class="edit__form form-group" method="post" accept-charset="utf-8">
                 <table class="table">
                     <tr>
@@ -96,13 +96,14 @@
                 </tr>
              </table>
 
-            <form action="/ingredient={{ingredient.id}}/remove" method="post" accept-charset="utf-8">
-                <input type="button" class="editShowButton btn btn-warning" value="Upravit surovinu" />
-                <input type="button" class="editHideButton btn btn-warning" value="Zrušit úpravy" />
+            <form action="/ingredient={{ingredient.id}}/remove" onsubmit="return confirm('Opravdu chcete smazat recept?');" method="post" accept-charset="utf-8">
+                <button type="button" class="editShowButton btn btn-warning">Upravit <i class="fas fa-pencil-alt"></i></button>
+                <button type="button" class="editHideButton btn btn-warning">Zrušit úpravy <i class="fas fa-pencil-alt"></i></button>
                 {% if used == False %}
-                    <input type="submit" class="btn btn-danger" value="Smazat surovinu" />
+                    <button type="submit" class="btn btn-danger">Smazat surovinu <i class="fas fa-trash"></i></button>
                 {% else %}
-                    <input type="submit" class="btn btn-danger" disabled value="Nelze smazat" />
+                    <button type="submit" class="btn btn-danger" disabled>Nelze smazat <i class="fas fa-trash"></i></button>
+                    {# <input type="submit" class="btn btn-danger" disabled value="Nelze smazat" /> #}
                 {% endif %}
             </form>
         </div>

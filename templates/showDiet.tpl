@@ -5,6 +5,9 @@
 
 {% block style %}
     <style type="text/css" media="screen">
+            .btn{
+                margin-top: 5px;
+            }
             .edit__form{
                 display: none;
             }
@@ -48,10 +51,10 @@
                 $('.editHideButton').hide();
             });
 
-            $(document).on("click", ".export__button", function() {
-                $('.row').hide();
-                $('.loader').show();
-            });
+            // $(document).on("click", ".export__button", function() {
+            //     $('.row').hide();
+            //     $('.loader').show();
+            // });
     
         </script>
 {% endblock %}
@@ -61,7 +64,7 @@
     <div class="container">
         <div class="row">
             <div class="col">
-                <label for="recipes"><h2>Recepty</h2></label>
+                <label for="recipes"><h2>Diety</h2></label>
                 <ul name="recipes">
                 {% for recipe in recipes: %}
                         <li><a href="/recipe={{recipe.id}}">{{ recipe.name }}</a></li>
@@ -70,7 +73,7 @@
 
                 <form action="/diet={{ diet.id }}/export" class="form-inline" method="post">
                     {% if recipes|length > 0 %}
-                        <input type="submit" class="btn btn-default export__button" value="Exportovat recepty do diety">
+                        <!-- <input type="submit" class="btn btn-default export__button" value="Exportovat recepty do diety"> -->
                         <select name="diet" class="form-control">
                         {% for diet in diets %}
                             <option value="{{ diet.id }}">{{ diet.name }}</option>
@@ -169,17 +172,17 @@
                 </form>
 
                 <form action="/diet={{ diet.id }}/remove" method="post" accept-charset="utf-8">
-                    <input type="button" class="editShowButton btn btn-warning" value="Upravit dietu" />
-                    <input type="button" class="editHideButton btn" value="Zrušit úpravy" />
+                    <button type="button" class="editShowButton btn btn-warning">Upravit <i class="fas fa-pencil-alt"></i></button>
+                    <button type="button" class="editHideButton btn btn-warning">Zrušit úpravy <i class="fas fa-pencil-alt"></i></button>
                     {% if diet.used == False %}
-                    <input type="submit" class="btn btn-danger" value="Smazat dietu" />
+                    <button type="submit" class="btn btn-danger">Smazat dietu <i class="fas fa-trash"></i></button>
                     {% endif %}
                 </form>
                 <form action="/diet={{ diet.id }}/archive" method="post" accept-charset="utf-8">
                     {% if diet.active == True %}
-                        <input type="submit" class="btn " value="Archivovat dietu" />
+                        <button type="submit" class="btn">Archivovat <i class="fas fa-archive"></i></button>
                     {% else %}
-                        <input type="submit" class="btn " value="Aktivovat dietu" />
+                        <button type="submit" class="btn">Aktivovat <i class="fas fa-archive"></i></button>
                     {% endif %}
                 </form>
             </div>  

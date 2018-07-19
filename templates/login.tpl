@@ -8,30 +8,7 @@
 {% endblock %}
 
 {% block script %}
-	<script type="text/javascript">
-        $(document).on("submit", "#loginForm", function(e) {
-        // $("#loginForm").on("submit", function(e) {
-            $.ajax({
-                type: 'POST',
-                url: '/login',
-                data: $(this).serialize(),
-                success: function(response) {
-                    if (!response){
-                    	// console.log("");
-                    	$("#wrongLogin").empty();
-						$("#wrongLogin").append("<small class='form-text'>Chybné přihlašovací údaje</small>");
-                    } else {
-                    	window.location.replace("/user");
-                	}
-                },
-                error: function(error) {
-                    console.log(error);
-                }
 
-            });
-            e.preventDefault();
-        });
-    </script>
 {% endblock %}
 
 {% block content %}

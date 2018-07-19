@@ -4,11 +4,35 @@
 {% endblock %}
 
 {% block style %}
+    <style type="text/css" media="screen">
+    .warning{
+        color : #CC0000;
+    }
+    </style>
     
 {% endblock %}
 
 {% block script %}
 	<script type="text/javascript">
+        function validateRegister(){
+            if (!($('#wrongUsername').is(':empty'))){
+                bootbox.alert("Jméno/email nemůžete použít!");
+                return false
+            }
+            else if (!($('#wrongPassword').is(':empty'))){
+                bootbox.alert("Heslo je příliš krátké!");
+                return false
+            }
+            else if (!($('#diffPassword').is(':empty'))){
+                bootbox.alert("Hesla jsou rozdílná!");
+                return false
+            }
+            else {
+              return true  
+            }
+            
+        }
+
         $(document).on("change","#username", function(e) {
             $.ajax({
                 type: 'POST',
@@ -16,13 +40,12 @@
                 data: $(this).serialize(),
                 success: function(response) {
                     if (response=="True") {
+                        console.log("Name ok")
                         $("#wrongUsername").empty();
                     } else if (response=="False") {
                         $("#wrongUsername").empty();
-                        $("#wrongUsername").append("<small class='form-text'>Jméno nemůžete použít!</small>");
+                        $("#wrongUsername").append("<small class='form-text'>Jméno/email nemůžete použít!</small>");
                         // alert(response);
-                    } else {
-                    	continue;
                     }
                 },
                 error: function(error) {
@@ -54,19 +77,19 @@
 {% block content %}
     {% include('navbar_login.tpl') %}
     <div class="container">
-    	<form id="registerForm" action="/register" method="post" class="col-sm-6">
+    	<form id="registerForm" action="/register" onsubmit="return validateRegister()" method="post" class="col-sm-6">
 
                 <label for="username">Přihlašovací email</label>
                 <input id="username" name="username" type="email" class="form-control" required value={{username}} >
-                <span id=wrongUsername></span>
+                <span id=wrongUsername class="warning"></span>
 
                 <label for="password">Heslo (alespoň 8 znaků)</label>
                 <input id="password" name="password" type="password" class="form-control" required />
-                <span id=wrongPassword></span>
+                <span id=wrongPassword class="warning"></span>
 
                 <label for="password">Heslo znovu</label>
                 <input id="againPassword" name="againPassword" type="password" class="form-control" required />
-                <span id=diffPassword></span>
+                <span id=diffPassword class="warning"> </span>
 
                 <div class="form-row">
 

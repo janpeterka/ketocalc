@@ -37,6 +37,7 @@
             <table id="ingredients" class="table">
                 <tr>
                     <th><strong>Název</strong></th>
+                    <th><strong>Kalorie</strong></th>
                     <th><strong>Bílkovina</strong></th>
                     <th><strong>Tuk</strong></th>
                     <th><strong>Sacharidy</strong></th>
@@ -47,20 +48,22 @@
                 {% for ingredient in ingredients: %}
                     <tr>
                         <td><strong>{{ ingredient.name }}</strong></td>
-                        <td>{{ ingredient.protein }} g</td>
-                        <td>{{ ingredient.fat }} g</td>
-                        <td>{{ ingredient.sugar }} g</td>
-                        <td>{{ ingredient.amount}} g</td>
+                        <td>{{ (ingredient.calorie / 100 * ingredient.amount)|round(2,'common') }} kcal</td>
+                        <td>{{ (ingredient.protein / 100 * ingredient.amount)|round(2,'common') }} g</td>
+                        <td>{{ (ingredient.fat / 100 * ingredient.amount)|round(2,'common') }} g</td>
+                        <td>{{ (ingredient.sugar / 100 * ingredient.amount)|round(2,'common') }} g</td>
+                        <td>{{ ingredient.amount|round(2,'common') }} g</td>
                         <td></td>
                     </tr>
                 {% endfor %}
 
                 <tr class="totals">
                     <td><strong>Celkem</strong></td>
-                    <td>{{ totals.protein }}</td>
-                    <td>{{ totals.fat }}</td>
-                    <td>{{ totals.sugar }}</td>
-                    <td>{{ totals.amount }} g</td>
+                    <td>{{ totals.calorie }} kcal</td>
+                    <td>{{ totals.protein }} g</td>
+                    <td>{{ totals.fat }} g</td>
+                    <td>{{ totals.sugar }} g</td>
+                    <td>{{ totals.amount|round(2,'common') }} g</td>
                     <td>{{ totals.eq }} : 1</td>
                 </tr>
             </table>
