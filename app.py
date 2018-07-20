@@ -393,6 +393,8 @@ def calcRecipeAJAX():
         totals['protein'] += json_ingredient['protein']
         totals['amount'] += json_ingredient['amount']
 
+    totals['eq'] = math.floor((totals['fat'] / (totals['protein'] + totals['sugar'])) * 100) / 100
+
     result = {'ingredients': json_ingredients, 'diet': diet.json, 'totals': totals}
 
     return jsonify(result)
@@ -465,7 +467,9 @@ def recalcRecipeAJAX():
     totalSugar = fixedSugar + ingredients[0].sugar * results[0] + ingredients[1].sugar * results[1] + ingredients[2].sugar * results[2] + mainIngredient.sugar * slider
     totalFat = fixedFat + ingredients[0].fat * results[0] + ingredients[1].fat * results[1] + ingredients[2].fat * results[2] + mainIngredient.fat * slider
     totalAmount = fixedAmount + results[0] + results[1] + results[2] + slider
-    totals = {'calorie': math.ceil(totalCalorie) / 100, 'protein': math.ceil(totalProtein) / 100, 'sugar': math.ceil(totalSugar) / 100, 'fat': math.ceil(totalFat) / 100, 'amount': math.ceil(totalAmount)}
+    totalRatio = math.floor((totalFat / (totalProtein + totalSugar)) * 100) / 100
+
+    totals = {'calorie': math.ceil(totalCalorie) / 100, 'protein': math.ceil(totalProtein) / 100, 'sugar': math.ceil(totalSugar) / 100, 'fat': math.ceil(totalFat) / 100, 'amount': math.ceil(totalAmount), 'ratio': math.ceil(totalRatio)}
 
     results = [x, y, z]
     count = 0

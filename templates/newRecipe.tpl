@@ -313,11 +313,11 @@
                                 return;
                             }
 
-                            var totalCalorie = 0;
-                            var totalProtein = 0;
-                            var totalFat = 0;
-                            var totalSugar = 0;
-                            var totalWeight = 0;
+                            // var totalCalorie = 0;
+                            // var totalProtein = 0;
+                            // var totalFat = 0;
+                            // var totalSugar = 0;
+                            // var totalWeight = 0;
                             var ingredients = response.ingredients;
                             var totals = response.totals;
                             console.log(totals)
@@ -359,7 +359,7 @@
                                                     'data-slider-tooltip="show"' +
                                             '</td>' +
 
-                                            '<td colspan="2">' +
+                                            '<td colspan="12">' +
                                                 '<span class="col">' +
                                                     ingredients[i].name +
                                                 '</span>' +
@@ -371,22 +371,31 @@
                                 $('.recipe__right__form__ingredient-table').append(ingredient_tr);
                                 var mySlider = $("#slider").slider();
 
-                                totalCalorie += ingredients[i].calorie * ingredients[i].amount;
-                                totalProtein += ingredients[i].protein * ingredients[i].amount;
-                                totalFat     += ingredients[i].fat     * ingredients[i].amount;
-                                totalSugar   += ingredients[i].sugar   * ingredients[i].amount;
-                                totalWeight  += ingredients[i].amount;
+                                // totalCalorie += ingredients[i].calorie * ingredients[i].amount;
+                                // totalProtein += ingredients[i].protein * ingredients[i].amount;
+                                // totalFat     += ingredients[i].fat     * ingredients[i].amount;
+                                // totalSugar   += ingredients[i].sugar   * ingredients[i].amount;
+                                // totalWeight  += ingredients[i].amount;
                             }
 
                             $('.recipe__right__form__ingredient-table').append(
                                 "<tr>" +
                                     '<td><strong>Součet</strong></td>'+
-                                    '<td><span id="totalCalorie">' +Math.round(totals.calorie)+'</span></td>' +
-                                    '<td><span id="totalProtein">' +Math.round(totals.protein)+'</span></td>' +
-                                    '<td><span id="totalFat">'     +Math.round(totals.fat)+'</span></td>' +
-                                    '<td><span id="totalSugar">'   +Math.round(totals.sugar)+'</span>'+'</td>' +
-                                    '<td><span id="totalWeight">'  +Math.round(totals.amount)+'</span> g</td>' +
-                                '</tr>');
+                                    '<td><span id="totalCalorie">' +totals.calorie+'</span></td>' +
+                                    '<td><span id="totalProtein">' +totals.protein+'</span></td>' +
+                                    '<td><span id="totalFat">'     +totals.fat+'</span></td>' +
+                                    '<td><span id="totalSugar">'   +totals.sugar+'</span>'+'</td>' +
+                                    '<td><span id="totalWeight">'  +totals.amount+'</span> g</td>' +
+                                '</tr>' +
+                                '<tr>' +
+                                    '<td></td>'+
+                                    '<td></td>'+
+                                    '<td></td>'+
+                                    '<td></td>'+
+                                    '<td></td>'+
+                                    '<td><span id="totalEq">'+totals.eq+'</span> : 1</td>' +
+                                '</tr>'
+                                );
 
                             // ingredients to inputs
                             for (let i = 0; i < ingredients.length; i++ ){
@@ -503,6 +512,7 @@
                             $('#totalProtein').text(response.totals.protein);
                             $('#totalCalorie').text(response.totals.calorie);
                             $('#totalWeight').text(response.totals.amount);
+                            $('#totalRatio').text(response.totals.ratio);
                             recipe__right__show();
 
                         },
