@@ -296,7 +296,7 @@ def archiveDiet(diet_id):
 #             continue
 #         else:
 #             for i in range(len(ingredients)):
-#                 ingredients[i].amount = math.ceil(solution.vars[i] * 10000) / 100
+#                 ingredients[i].amount = math.floor(solution.vars[i] * 10000) / 100
 #             recipe.name = "{} {}".format(recipe.name, newDiet.name)
 #             saveRecipe(recipe, ingredients, newDietID)
 #     return redirect('/diet={}'.format(newDietID))
@@ -380,9 +380,9 @@ def calcRecipeAJAX():
             return "False"
 
         if hasattr(ing, 'min'):
-            json_ingredient = json_ingredient = {'id': ing.id, 'calorie': math.ceil(ing.calorie * ing.amount * 100) / 100, 'name': ing.name, 'sugar': math.ceil(ing.sugar * ing.amount * 100) / 100, 'fat': math.ceil(ing.fat * ing.amount * 100) / 100, 'protein': math.ceil(ing.protein * ing.amount * 100) / 100, 'amount': math.ceil(ing.amount * 10000) / 100, 'main': ing.main, 'fixed': ing.fixed, 'min': ing.min, 'max': ing.max}  # wip
+            json_ingredient = json_ingredient = {'id': ing.id, 'calorie': math.floor(ing.calorie * ing.amount * 100) / 100, 'name': ing.name, 'sugar': math.floor(ing.sugar * ing.amount * 100) / 100, 'fat': math.floor(ing.fat * ing.amount * 100) / 100, 'protein': math.floor(ing.protein * ing.amount * 100) / 100, 'amount': math.floor(ing.amount * 10000) / 100, 'main': ing.main, 'fixed': ing.fixed, 'min': ing.min, 'max': ing.max}  # wip
         else:
-            json_ingredient = json_ingredient = {'id': ing.id, 'calorie': math.ceil(ing.calorie * ing.amount * 100) / 100, 'name': ing.name, 'sugar': math.ceil(ing.sugar * ing.amount * 100) / 100, 'fat': math.ceil(ing.fat * ing.amount * 100) / 100, 'protein': math.ceil(ing.protein * ing.amount * 100) / 100, 'amount': math.ceil(ing.amount * 10000) / 100, 'main': ing.main, 'fixed': ing.fixed}  # wip
+            json_ingredient = json_ingredient = {'id': ing.id, 'calorie': math.floor(ing.calorie * ing.amount * 100) / 100, 'name': ing.name, 'sugar': math.floor(ing.sugar * ing.amount * 100) / 100, 'fat': math.floor(ing.fat * ing.amount * 100) / 100, 'protein': math.floor(ing.protein * ing.amount * 100) / 100, 'amount': math.floor(ing.amount * 10000) / 100, 'main': ing.main, 'fixed': ing.fixed}  # wip
 
         json_ingredients.append(json_ingredient)
 
@@ -391,6 +391,12 @@ def calcRecipeAJAX():
         totals['fat'] += json_ingredient['fat']
         totals['protein'] += json_ingredient['protein']
         totals['amount'] += json_ingredient['amount']
+
+    totals['calorie'] += math.floor(totals['calorie'] * 100) / 100 
+    totals['sugar'] += math.floor(totals['sugar'] * 100) / 100 
+    totals['fat'] += math.floor(totals['fat'] * 100) / 100 
+    totals['protein'] += math.floor(totals['protein'] * 100) / 100 
+    totals['amount'] += math.floor(totals['amount'] * 100) / 100 
 
     totals['eq'] = math.floor((totals['fat'] / (totals['protein'] + totals['sugar'])) * 100) / 100
 
@@ -450,13 +456,13 @@ def recalcRecipeAJAX():
         [ingredients[0].sugar, ingredients[1].sugar, ingredients[2].sugar],
     ])
     b = numpy.array([
-        (diet.protein * 10000 - mainIngredient.protein * math.ceil(slider * 100) - fixedProtein) / 10000,
-        (diet.fat * 10000 - mainIngredient.fat * math.ceil(slider * 100) - fixedFat) / 10000,
-        (diet.sugar * 10000 - mainIngredient.sugar * math.ceil(slider * 100) - fixedSugar) / 10000,
+        (diet.protein * 10000 - mainIngredient.protein * math.floor(slider * 100) - fixedProtein) / 10000,
+        (diet.fat * 10000 - mainIngredient.fat * math.floor(slider * 100) - fixedFat) / 10000,
+        (diet.sugar * 10000 - mainIngredient.sugar * math.floor(slider * 100) - fixedSugar) / 10000,
     ])
     results = numpy.linalg.solve(a, b)
     for i in range(len(results)):
-        results[i] = math.ceil(results[i] * 10000) / 100
+        results[i] = math.floor(results[i] * 10000) / 100
     x = {'id': ingredients[0].id, 'amount': results[0]}
     y = {'id': ingredients[1].id, 'amount': results[1]}
     z = {'id': ingredients[2].id, 'amount': results[2]}
@@ -468,7 +474,7 @@ def recalcRecipeAJAX():
     totalAmount = fixedAmount + results[0] + results[1] + results[2] + slider
     totalRatio = math.floor((totalFat / (totalProtein + totalSugar)) * 100) / 100
 
-    totals = {'calorie': math.ceil(totalCalorie) / 100, 'protein': math.ceil(totalProtein) / 100, 'sugar': math.ceil(totalSugar) / 100, 'fat': math.ceil(totalFat) / 100, 'amount': math.ceil(totalAmount), 'ratio': math.ceil(totalRatio)}
+    totals = {'calorie': math.floor(totalCalorie) / 100, 'protein': math.floor(totalProtein) / 100, 'sugar': math.floor(totalSugar) / 100, 'fat': math.floor(totalFat) / 100, 'amount': math.floor(totalAmount), 'ratio': math.floor(totalRatio)}
 
     results = [x, y, z]
     count = 0
