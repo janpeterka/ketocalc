@@ -7,8 +7,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy import create_engine
 
-import db_data as dbd
-
+from data import db_data as dbd
 
 engine = create_engine(dbd.sqlalchemy_db_string, echo=False)  # change to False
 Session = sessionmaker(bind=engine)

@@ -14,8 +14,7 @@ from werkzeug import secure_filename
 
 import models as models
 
-import mail_data as mail_data
-import data as data
+from data import mail_data, data
 
 from utils import *
 
