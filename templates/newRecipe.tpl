@@ -230,8 +230,6 @@
                         contentType: 'application/json;charset=UTF-8',
                         success: function(response){
                             var pathname = window.location.pathname.split("/")[0];
-
-                            console.log(pathname)
                             window.location.replace(pathname + response);
                         },
                         error: function(error) {
@@ -313,15 +311,8 @@
                                 return;
                             }
 
-                            // var totalCalorie = 0;
-                            // var totalProtein = 0;
-                            // var totalFat = 0;
-                            // var totalSugar = 0;
-                            // var totalWeight = 0;
                             var ingredients = response.ingredients;
                             var totals = response.totals;
-                            console.log(totals)
-                            console.log(totals.sugar)
 
                             // ingredients to table
                             for ( let i = 0; i < ingredients.length; i++ ){
@@ -336,11 +327,11 @@
                                 }
 
                                 ingredient_tr +=    "<td>" + ingredients[i].name + "</td>" +
-                                                    "<td>" + ingredients[i].calorie + "</td>" +
-                                                    "<td>" + ingredients[i].protein + "</td>" +
-                                                    "<td>" + ingredients[i].fat + "</td>" +
-                                                    "<td>" + ingredients[i].sugar + "</td>" +
-                                                    '<td><span id="amount_' + ingredients[i].id + '">' + Math.round(ingredients[i].amount * 100) / 100 + " g</span></td>" +
+                                                    '<td><span id="calorie_' + ingredients[i].id + '">' + ingredients[i].calorie + "</span></td>" +
+                                                    '<td><span id="protein_' + ingredients[i].id + '">' + ingredients[i].protein + "</span></td>" +
+                                                    '<td><span id="fat_' + ingredients[i].id + '">' + ingredients[i].fat + "</span></td>" +
+                                                    '<td><span id="sugar_' + ingredients[i].id + '">' + ingredients[i].sugar + "</span></td>" +
+                                                    '<td><span id="amount_' + ingredients[i].id + '">' + ingredients[i].amount + " g</span></td>" +
                                                     '</tr>'
 
                                 if (ingredients[i].main){
@@ -371,11 +362,6 @@
                                 $('.recipe__right__form__ingredient-table').append(ingredient_tr);
                                 var mySlider = $("#slider").slider();
 
-                                // totalCalorie += ingredients[i].calorie * ingredients[i].amount;
-                                // totalProtein += ingredients[i].protein * ingredients[i].amount;
-                                // totalFat     += ingredients[i].fat     * ingredients[i].amount;
-                                // totalSugar   += ingredients[i].sugar   * ingredients[i].amount;
-                                // totalWeight  += ingredients[i].amount;
                             }
 
                             $('.recipe__right__form__ingredient-table').append(
@@ -500,9 +486,18 @@
 
                         success: function(response) {
 
+                            if (response == "False"){
+                                recipe__wrong__show();
+                                return;
+                            }
+
                             // ingredients
                             for (var i = 0; i < response.ingredients.length; i++) {
                                 $('#amount_'+response.ingredients[i].id).text(response.ingredients[i].amount+" g");
+                                $('#calorie_'+response.ingredients[i].id).text(response.ingredients[i].calorie);
+                                $('#fat_'+response.ingredients[i].id).text(response.ingredients[i].fat);
+                                $('#protein_'+response.ingredients[i].id).text(response.ingredients[i].protein);
+                                $('#sugar_'+response.ingredients[i].id).text(response.ingredients[i].sugar);
                             }
                             recipe__ingredient_array = response.ingredients
 

@@ -96,7 +96,7 @@
                 </tr>
              </table>
 
-            <form action="/ingredient={{ingredient.id}}/remove" onsubmit="return confirm('Opravdu chcete smazat recept?');" method="post" accept-charset="utf-8">
+            <form action="/ingredient={{ingredient.id}}/remove" onsubmit="return confirm('Opravdu chcete smazat surovinu?');" method="post" accept-charset="utf-8">
                 <button type="button" class="editShowButton btn btn-warning">Upravit {{ icons.edit }}</button>
                 <button type="button" class="editHideButton btn btn-warning">Zrušit úpravy {{ icons.edit }}</button>
                 {% if used == False %}

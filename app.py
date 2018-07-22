@@ -311,8 +311,8 @@ def editDietAJAX(diet_id):
 
     diet.name = request.form['name']
     diet.id = diet_id
-    diet.small = request.form['small_size']
-    diet.big = request.form['big_size']
+    diet.small_size = request.form['small_size']
+    diet.big_size = request.form['big_size']
 
     if diet.deleteCheck():
         diet.protein = request.form['protein']
@@ -380,9 +380,9 @@ def calcRecipeAJAX():
             return "False"
 
         if hasattr(ing, 'min'):
-            json_ingredient = json_ingredient = {'id': ing.id, 'calorie': math.floor(ing.calorie * ing.amount * 100) / 100, 'name': ing.name, 'sugar': math.floor(ing.sugar * ing.amount * 100) / 100, 'fat': math.floor(ing.fat * ing.amount * 100) / 100, 'protein': math.floor(ing.protein * ing.amount * 100) / 100, 'amount': math.floor(ing.amount * 10000) / 100, 'main': ing.main, 'fixed': ing.fixed, 'min': ing.min, 'max': ing.max}  # wip
+            json_ingredient = {'id': ing.id, 'calorie': math.floor(ing.calorie * ing.amount * 100) / 100, 'name': ing.name, 'sugar': math.floor(ing.sugar * ing.amount * 100) / 100, 'fat': math.floor(ing.fat * ing.amount * 100) / 100, 'protein': math.floor(ing.protein * ing.amount * 100) / 100, 'amount': math.floor(ing.amount * 10000) / 100, 'main': ing.main, 'fixed': ing.fixed, 'min': ing.min, 'max': ing.max}  # wip
         else:
-            json_ingredient = json_ingredient = {'id': ing.id, 'calorie': math.floor(ing.calorie * ing.amount * 100) / 100, 'name': ing.name, 'sugar': math.floor(ing.sugar * ing.amount * 100) / 100, 'fat': math.floor(ing.fat * ing.amount * 100) / 100, 'protein': math.floor(ing.protein * ing.amount * 100) / 100, 'amount': math.floor(ing.amount * 10000) / 100, 'main': ing.main, 'fixed': ing.fixed}  # wip
+            json_ingredient = {'id': ing.id, 'calorie': math.floor(ing.calorie * ing.amount * 100) / 100, 'name': ing.name, 'sugar': math.floor(ing.sugar * ing.amount * 100) / 100, 'fat': math.floor(ing.fat * ing.amount * 100) / 100, 'protein': math.floor(ing.protein * ing.amount * 100) / 100, 'amount': math.floor(ing.amount * 10000) / 100, 'main': ing.main, 'fixed': ing.fixed}  # wip
 
         json_ingredients.append(json_ingredient)
 
@@ -392,11 +392,11 @@ def calcRecipeAJAX():
         totals['protein'] += json_ingredient['protein']
         totals['amount'] += json_ingredient['amount']
 
-    totals['calorie'] += math.floor(totals['calorie'] * 100) / 100 
-    totals['sugar'] += math.floor(totals['sugar'] * 100) / 100 
-    totals['fat'] += math.floor(totals['fat'] * 100) / 100 
-    totals['protein'] += math.floor(totals['protein'] * 100) / 100 
-    totals['amount'] += math.floor(totals['amount'] * 100) / 100 
+    totals['calorie'] = math.floor(totals['calorie'] * 100) / 100 
+    totals['sugar'] = math.floor(totals['sugar'] * 100) / 100 
+    totals['fat'] = math.floor(totals['fat'] * 100) / 100 
+    totals['protein'] = math.floor(totals['protein'] * 100) / 100 
+    totals['amount'] = math.floor(totals['amount'] * 100) / 100 
 
     totals['eq'] = math.floor((totals['fat'] / (totals['protein'] + totals['sugar'])) * 100) / 100
 
@@ -407,6 +407,9 @@ def calcRecipeAJAX():
 
 @app.route('/recalcRecipeAJAX', methods=['POST'])
 def recalcRecipeAJAX():
+    # need to rewrite
+
+
     # get data
     json_ingredients = request.json['ingredients']
 
@@ -467,16 +470,18 @@ def recalcRecipeAJAX():
     y = {'id': ingredients[1].id, 'amount': results[1]}
     z = {'id': ingredients[2].id, 'amount': results[2]}
 
-    totalCalorie = fixedCalorie + ingredients[0].calorie * results[0] + ingredients[1].calorie * results[1] + ingredients[2].calorie * results[2] + mainIngredient.calorie * slider
-    totalProtein = fixedProtein + ingredients[0].protein * results[0] + ingredients[1].protein * results[1] + ingredients[2].protein * results[2] + mainIngredient.protein * slider
-    totalSugar = fixedSugar + ingredients[0].sugar * results[0] + ingredients[1].sugar * results[1] + ingredients[2].sugar * results[2] + mainIngredient.sugar * slider
-    totalFat = fixedFat + ingredients[0].fat * results[0] + ingredients[1].fat * results[1] + ingredients[2].fat * results[2] + mainIngredient.fat * slider
-    totalAmount = fixedAmount + results[0] + results[1] + results[2] + slider
-    totalRatio = math.floor((totalFat / (totalProtein + totalSugar)) * 100) / 100
 
-    totals = {'calorie': math.floor(totalCalorie) / 100, 'protein': math.floor(totalProtein) / 100, 'sugar': math.floor(totalSugar) / 100, 'fat': math.floor(totalFat) / 100, 'amount': math.floor(totalAmount), 'ratio': math.floor(totalRatio)}
+    # calc totals
+    # totalCalorie = fixedCalorie + ingredients[0].calorie * results[0] + ingredients[1].calorie * results[1] + ingredients[2].calorie * results[2] + mainIngredient.calorie * slider
+    # totalProtein = fixedProtein + ingredients[0].protein * results[0] + ingredients[1].protein * results[1] + ingredients[2].protein * results[2] + mainIngredient.protein * slider
+    # totalSugar = fixedSugar + ingredients[0].sugar * results[0] + ingredients[1].sugar * results[1] + ingredients[2].sugar * results[2] + mainIngredient.sugar * slider
+    # totalFat = fixedFat + ingredients[0].fat * results[0] + ingredients[1].fat * results[1] + ingredients[2].fat * results[2] + mainIngredient.fat * slider
+    # totalAmount = fixedAmount + results[0] + results[1] + results[2] + slider
+
 
     results = [x, y, z]
+
+    # what?
     count = 0
     for ing in json_ingredients:
         if ing['main'] is True:
@@ -484,12 +489,40 @@ def recalcRecipeAJAX():
         elif ing['fixed'] is True:
             pass
         else:
-            ing['amount'] = results[count]['amount']
+            ing['amount'] = math.floor(results[count]['amount'] * 100 )/ 100
             count += 1
+
+
+    totals = {'calorie': 0, 'protein': 0, 'sugar': 0, 'fat': 0, 'amount': 0, 'ratio': 0}
+
+    #calc ingredient nutritients
+    for ing in json_ingredients:
+        base_ing = models.Ingredient.load(int(ing['id']))
+
+        ing['calorie'] = math.floor(base_ing.calorie * ing['amount']) / 100
+        ing['sugar'] = math.floor(base_ing.sugar * ing['amount']) / 100
+        ing['fat'] = math.floor(base_ing.fat * ing['amount']) / 100
+        ing['protein'] = math.floor(base_ing.protein * ing['amount']) / 100
+
+        totals['calorie'] += ing['calorie']
+        totals['sugar'] += ing['sugar']
+        totals['fat'] += ing['fat']
+        totals['protein'] += ing['protein']
+        totals['amount'] += ing['amount']
+
+    totals['ratio'] = math.floor((totals['fat'] / (totals['protein'] + totals['sugar'])) * 100) / 100
+
+
+    totals['calorie'] = math.floor(totals['calorie'] * 100) / 100
+    totals['sugar'] = math.floor(totals['sugar'] * 100) / 100
+    totals['fat'] = math.floor(totals['fat'] * 100) / 100
+    totals['protein'] = math.floor(totals['protein'] * 100) / 100
+    totals['amount'] = math.floor(totals['amount'] * 100) / 100
+    totals['ratio'] = math.floor(totals['ratio'] * 100) / 100
 
     solutionJSON = {'ingredients': json_ingredients, 'totals': totals}
 
-    # give ids with amounts
+    # return ingredients with amounts + totals
     return jsonify(solutionJSON)
 
 
@@ -524,18 +557,20 @@ def showRecipe(recipe_id):
 
     if session['username'] != recipe.author.username:
         return redirect('/wrongpage')
+
     diet = recipe.diet
 
     diets = models.User.load(session['username']).diets
 
     if recipe.type == "big":
-        coef = diet.big_size / 100
+        coef = float(diet.big_size / 100)
     else:
-        coef = diet.small_size / 100
+        coef = float(diet.small_size / 100)
+
 
     ingredients = recipe.ingredients
     for i in ingredients:
-        i.amount = float(math.floor(i.loadAmount(recipe_id) * coef * 100000)) / 100000
+        i.amount = float(i.loadAmount(recipe_id) * coef)
 
     totals = type('', (), {})()
     totals.calorie = 0
@@ -819,10 +854,9 @@ def calc(ingredients, diet):
 
     Returns:
         [type] -- solution object
-        3 - ingredients {array} -- array of Ingredients (w/ amounts)
+        3 - ingredients {array} -- array of Ingredients (w/ amounts - 2 decimals)
         4 - ingredients {array} (last-main ing has min, max)
     """
-
     # remove fixed
     fixedSugar = 0
     fixedProtein = 0
@@ -839,6 +873,10 @@ def calc(ingredients, diet):
     for ing in fixedIngredients:
         ingredients.remove(ing)
 
+    diet.fat -= fixedFat
+    diet.sugar -= fixedSugar
+    diet.protein -= fixedProtein
+
     # sort for main ingredient # reaarange, so last ingredient is the main ingredient (better handling)
     mainIngredient = ingredients[0]
     for i in range(len(ingredients)):
@@ -848,26 +886,18 @@ def calc(ingredients, diet):
             ingredients.append(mainIngredient)
             break
 
+    # calculate
     if len(ingredients) == 0:
         return None
     elif len(ingredients) == 1:
         return None
     elif len(ingredients) == 2:
-        # a = numpy.array([[ingredients[0].sugar, ingredients[1].sugar], [ingredients[0].fat, ingredients[1].fat]])
-        # b = numpy.array([diet.sugar, diet.fat])
-        # x = numpy.linalg.solve(a, b)
-
-        # if x[0] * ingredients[0].protein + x[1] * ingredients[1].protein == diet.protein:
-        #     solution = type('', (), {})()
-        #     solution.vars = [x[0], x[1]]
-        #     return solution
-        # else:
         return None
     elif len(ingredients) == 3:
         a = numpy.array([[ingredients[0].sugar, ingredients[1].sugar, ingredients[2].sugar],
                          [ingredients[0].fat, ingredients[1].fat, ingredients[2].fat],
                          [ingredients[0].protein, ingredients[1].protein, ingredients[2].protein]])
-        b = numpy.array([diet.sugar - fixedSugar, diet.fat - fixedFat, diet.protein - fixedProtein])
+        b = numpy.array([diet.sugar, diet.fat, diet.protein])
         x = numpy.linalg.solve(a, b)
 
         ingredients[0].amount = x[0]
@@ -877,9 +907,6 @@ def calc(ingredients, diet):
         for ing in fixedIngredients:
             ingredients.append(ing)
 
-        # solution = type('', (), {})()
-        # solution.vars = [x[0], x[1], x[2]]
-        # return solution
         return ingredients
 
     elif len(ingredients) == 4:
@@ -887,9 +914,9 @@ def calc(ingredients, diet):
         e = sp.symbols('e')
 
         # set of linear equations
-        f1 = ingredients[0].sugar * x + ingredients[1].sugar * y + ingredients[2].sugar * z + ingredients[3].sugar * e - (diet.sugar - fixedSugar)
-        f2 = ingredients[0].fat * x + ingredients[1].fat * y + ingredients[2].fat * z + ingredients[3].fat * e - (diet.fat - fixedFat)
-        f3 = ingredients[0].protein * x + ingredients[1].protein * y + ingredients[2].protein * z + ingredients[3].protein * e - (diet.protein - fixedProtein)
+        f1 = ingredients[0].sugar * x + ingredients[1].sugar * y + ingredients[2].sugar * z + ingredients[3].sugar * e - (diet.sugar)
+        f2 = ingredients[0].fat * x + ingredients[1].fat * y + ingredients[2].fat * z + ingredients[3].fat * e - (diet.fat)
+        f3 = ingredients[0].protein * x + ingredients[1].protein * y + ingredients[2].protein * z + ingredients[3].protein * e - (diet.protein)
 
         # solve equations with args
         in1 = sp.solvers.solve((f1, f2, f3), (x, y, z))[x]
@@ -903,6 +930,9 @@ def calc(ingredients, diet):
         result3 = solvei(poly(in3), ">=")
 
         interval = (result1[0].intersect(result2[0])).intersect(result3[0])
+        if interval.is_EmptySet:
+            return None 
+
         if interval.right > 100:
             max_sol = 100
         else:
@@ -941,16 +971,16 @@ def calc(ingredients, diet):
         for ing in fixedIngredients:
             ingredients.append(ing)
 
+        # return diet to normal for commit
+        diet.fat += fixedFat
+        diet.sugar += fixedSugar
+        diet.protein += fixedProtein
+
         if max_sol >= 0:
-            # solution = type('', (), {})()
-            # solution.vars = [x, y, z, sol]
-            # solution.sol = sol
-            # solution.min_sol = min_sol
-            # solution.max_sol = max_sol
-            # return solution
             return ingredients
         else:
             return None
+
     # 5 ingredients WIP
     elif len(ingredients) == 5:
         # x, y, z = sp.symbols('x, y, z')
