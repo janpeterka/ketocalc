@@ -96,7 +96,7 @@
                     <td>{{ totals.fat }} g</td>
                     <td>{{ totals.sugar }} g</td>
                     <td>{{ totals.amount|round(2,'common')  }} g</td>
-                    <td>Poměr: {{ totals.eq }} : 1</td>
+                    <td>Poměr: {{ totals.ratio }} : 1</td>
                 </tr>
             </table>
             <div class="row">

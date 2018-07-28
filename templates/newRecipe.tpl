@@ -379,7 +379,7 @@
                                     '<td></td>'+
                                     '<td></td>'+
                                     '<td></td>'+
-                                    '<td><span id="totalEq">'+totals.eq+'</span> : 1</td>' +
+                                    '<td><span id="totalRatio">'+totals.ratio+'</span> : 1</td>' +
                                 '</tr>'
                                 );
 

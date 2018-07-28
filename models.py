@@ -17,7 +17,7 @@ metadata = Base.metadata
 
 global s
 
-
+# not cool (#wip)
 def startSession():
     global s
     s = Session()
@@ -96,6 +96,10 @@ class Diet(Base):
         return {'id': self.id, 'name': self.name, 'sugar': self.sugar, 'fat': self.fat,
                 'protein': self.protein, 'small_size': self.small_size, 'big_size': self.big_size}
 
+    @property
+    def used(self):
+        return not self.deleteCheck()
+
 
 class Ingredient(Base):
     __tablename__ = 'ingredients'
@@ -146,6 +150,9 @@ class Ingredient(Base):
     def json(self):
         return {'id': self.id, 'name': self.name, 'calorie': self.calorie, 'sugar': self.sugar, 'fat': self.fat, 'protein': self.protein}
 
+    @property
+    def used(self):
+        return not self.deleteCheck()
 
 class User(Base):
     __tablename__ = 'users'
@@ -167,7 +174,6 @@ class User(Base):
 
     def save(self):
         s.add(self)
-        s.flush()
         s.commit()
         return self.id
 
@@ -227,7 +233,6 @@ class Recipe(Base):
         for i in ingredients:
             i.recipes_id = self.id
             s.add(i)
-            s.flush()
 
         s.commit()
         return self.id

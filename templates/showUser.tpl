@@ -119,8 +119,8 @@
                 </tr>
                 <tr>
                     <td>{{ user.username }}</td>
-                    <td>{{ user.firstname }}</td>
-                    <td>{{ user.lastname }}</td>
+                    <td>{{ user.firstName }}</td>
+                    <td>{{ user.lastName }}</td>
                 </tr>
              </table>
         </div>

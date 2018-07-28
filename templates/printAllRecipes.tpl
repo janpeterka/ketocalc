@@ -60,7 +60,7 @@
                         <td>{{ recipe.totals.fat }}</td>
                         <td>{{ recipe.totals.sugar }}</td>
                         <td>{{ recipe.totals.amount }} g</td>
-                        <td>{{ recipe.totals.eq }} : 1</td>
+                        <td>{{ recipe.totals.ratio }} : 1</td>
                     </tr>
 
                 </table>

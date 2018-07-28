@@ -91,6 +91,7 @@ def doLogin():
     password = request.form['password']
     if checkLogin(username, password):
         session['username'] = username
+        # models.startSession()
         flash("Byl jste úspěšně přihlášen.")
         return redirect('/')
     else:
@@ -99,24 +100,24 @@ def doLogin():
 
 
 def checkLogin(username, password):
-    """[summary]
+    """Validates credentials against db
 
     [description]
 
     Arguments:
-        username {[type]} -- [description]
-        password {[type]} -- [description]
+        username {str}
+        password {str}
 
     Returns:
         bool -- [description]
     """
     user = models.User.load(username)
+
     if user is None:
         return False
-    pwdhash = user.pwdhash
-    temp_password = password.encode('utf-8')
-    password_hash = hashlib.sha256(temp_password).hexdigest()
-    if password_hash == pwdhash:
+    db_password_hash = user.pwdhash
+    password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
+    if password_hash == db_password_hash:
         return True
     else:
         return False
@@ -126,6 +127,7 @@ def checkLogin(username, password):
 def doLogout():
     session.pop('username', None)
     flash("Byl jste úspěšně odhlášen.")
+    # models.endSession()
     return redirect('/login')
 
 
@@ -141,9 +143,9 @@ def doRegister():
 
     user = models.User()
     user.username = request.form['username']
-    user.password_hash = hashlib.sha256(temp_password.encode('utf-8')).hexdigest()
     user.firstName = request.form['firstname']
     user.lastName = request.form['lastname']
+    user.pwdhash = hashlib.sha256(temp_password.encode('utf-8')).hexdigest()
 
     if len(user.lastName) == 0:
         flash("Není vyplněné jméno")
@@ -158,12 +160,13 @@ def doRegister():
         flash("Hesla jsou rozdílná!")
         return redirect(request.url)
     if models.User.load(user.username) is not None:
+        # Username used
         flash("Něco je špatně")
         return redirect(request.url)
 
-    response = user.save()
+    success = user.save()
 
-    if response:
+    if success is not None:
         flash("Byl jste úspěšně zaregistrován.")
         return redirect('/login')
     else:
@@ -173,6 +176,13 @@ def doRegister():
 
 @app.route('/registerValidate', methods=['POST'])
 def validateRegister():
+    """validates if username is taken
+    
+    [description]
+    
+    Decorators:
+        app.route
+    """
     username = request.form['username']
     if models.User.load(username) is not None:
         return "False"
@@ -184,12 +194,21 @@ def validateRegister():
 @app.route('/dashboard')
 def showDashboard():
     user = models.User.load(session['username'])
-    diets = user.activeDiets
-    return template('dashboard.tpl', username=user.username, diets=diets, firstname=user.firstName)
+    return template('dashboard.tpl', username=user.username, diets=user.activeDiets, firstname=user.firstName)
 
 
 @app.route('/selectDietAJAX', methods=['POST'])
 def selectDietAJAX():
+    """returns recipes of diet
+    
+    Used on dashboard
+    
+    Decorators:
+        app.route
+    
+    Returns:
+        [type] -- [description]
+    """
     diet = models.Diet.load(request.form['selectDiet'])
 
     json_recipes = []
@@ -246,8 +265,6 @@ def showDiet(diet_id):
     if diet.author.username != session['username']:
         return redirect('/wrongpage')
 
-    diet.used = not diet.deleteCheck()
-
     return template('showDiet.tpl', diet=diet, recipes=diet.recipes, diets=diet.author.diets)
 
 
@@ -258,7 +275,7 @@ def removeDiet(diet_id):
     if diet.author.username != session['username']:
         return redirect('/wrongpage')
 
-    if diet.deleteCheck():  # wip
+    if not diet.used:  # wip
         diet.remove()
         flash("Dieta byla smazána")
         return redirect("/alldiets")
@@ -274,13 +291,14 @@ def archiveDiet(diet_id):
     if diet.author.username != session['username']:
         return redirect('/wrongpage')
 
-    diet.active = not diet.active
-    diet.edit()
-
-    if not diet.active:
+    if diet.active:
         flash("Dieta byla archivována")
     else:
         flash("Dieta byla aktivována")
+
+    diet.active = not diet.active
+    diet.edit()
+
     return redirect('/diet={}'.format(diet_id))
 
 
@@ -314,7 +332,7 @@ def editDietAJAX(diet_id):
     diet.small_size = request.form['small_size']
     diet.big_size = request.form['big_size']
 
-    if diet.deleteCheck():
+    if not diet.used:
         diet.protein = request.form['protein']
         diet.fat = request.form['fat']
         diet.sugar = request.form['sugar']
@@ -326,6 +344,16 @@ def editDietAJAX(diet_id):
 
 @app.route('/alldiets')
 def showAllDiets():
+    """show all diets sorted
+    
+    active on top
+    
+    Decorators:
+        app.route
+    
+    Returns:
+        template -- [description]
+    """
     diets = models.User.load(session['username']).diets
     diets.sort(key=lambda x: x.active, reverse=True)  # sort active first
 
@@ -335,11 +363,10 @@ def showAllDiets():
 # NEW RECIPE PAGE
 @app.route('/newrecipe')
 def showNewRecipe():
-    diets = models.User.load(session['username']).activeDiets
-
+    active_diets = models.User.load(session['username']).activeDiets
     ingredients = models.Ingredient.loadAllByUsername(session['username'])
 
-    return template('newRecipe.tpl', ingredients=ingredients, diets=diets)
+    return template('newRecipe.tpl', ingredients=ingredients, diets=active_diets)
 
 
 @app.route('/addIngredientAJAX', methods=['POST'])
@@ -398,7 +425,7 @@ def calcRecipeAJAX():
     totals['protein'] = math.floor(totals['protein'] * 100) / 100 
     totals['amount'] = math.floor(totals['amount'] * 100) / 100 
 
-    totals['eq'] = math.floor((totals['fat'] / (totals['protein'] + totals['sugar'])) * 100) / 100
+    totals['ratio'] = math.floor((totals['fat'] / (totals['protein'] + totals['sugar'])) * 100) / 100
 
     result = {'ingredients': json_ingredients, 'diet': diet.json, 'totals': totals}
 
@@ -469,19 +496,7 @@ def recalcRecipeAJAX():
     x = {'id': ingredients[0].id, 'amount': results[0]}
     y = {'id': ingredients[1].id, 'amount': results[1]}
     z = {'id': ingredients[2].id, 'amount': results[2]}
-
-
-    # calc totals
-    # totalCalorie = fixedCalorie + ingredients[0].calorie * results[0] + ingredients[1].calorie * results[1] + ingredients[2].calorie * results[2] + mainIngredient.calorie * slider
-    # totalProtein = fixedProtein + ingredients[0].protein * results[0] + ingredients[1].protein * results[1] + ingredients[2].protein * results[2] + mainIngredient.protein * slider
-    # totalSugar = fixedSugar + ingredients[0].sugar * results[0] + ingredients[1].sugar * results[1] + ingredients[2].sugar * results[2] + mainIngredient.sugar * slider
-    # totalFat = fixedFat + ingredients[0].fat * results[0] + ingredients[1].fat * results[1] + ingredients[2].fat * results[2] + mainIngredient.fat * slider
-    # totalAmount = fixedAmount + results[0] + results[1] + results[2] + slider
-
-
     results = [x, y, z]
-
-    # what?
     count = 0
     for ing in json_ingredients:
         if ing['main'] is True:
@@ -554,19 +569,16 @@ def showRecipe(recipe_id):
 
     if recipe is None:
             abort(404)
-
     if session['username'] != recipe.author.username:
         return redirect('/wrongpage')
 
     diet = recipe.diet
-
     diets = models.User.load(session['username']).diets
 
     if recipe.type == "big":
         coef = float(diet.big_size / 100)
     else:
         coef = float(diet.small_size / 100)
-
 
     ingredients = recipe.ingredients
     for i in ingredients:
@@ -590,7 +602,7 @@ def showRecipe(recipe_id):
     totals.fat = math.floor(totals.fat) / 100
     totals.sugar = math.floor(totals.sugar) / 100
     totals.amount = math.floor(totals.amount)
-    totals.eq = math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
+    totals.ratio = math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
     return template('showRecipe.tpl', recipe=recipe, ingredients=ingredients, totals=totals, diet=diet, diets=diets)
 
 
@@ -632,7 +644,7 @@ def printRecipe(recipe_id):
     totals.fat = math.floor(totals.fat) / 100
     totals.sugar = math.floor(totals.sugar) / 100
     totals.amount = math.floor(totals.amount)
-    totals.eq = math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
+    totals.ratio = math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
     return template('printRecipe.tpl', recipe=recipe, ingredients=ingredients, totals=totals, diet=diet)
 
 
@@ -651,6 +663,7 @@ def removeRecipeAJAX(recipe_id):
 def editRecipeAJAX(recipe_id):
     if session['username'] != models.Recipe.load(recipe_id).author.username:
         return redirect('/wrongpage')
+
     recipe = models.Recipe.load(recipe_id).author.username
     recipe.name = request.form['name']
     recipe.type = request.form['size']
@@ -673,9 +686,8 @@ def showAllRecipes():
 @app.route('/printallrecipes')
 def printAllRecipes():
     recipes = models.User.load(session['username']).recipes
+
     for recipe in recipes:
-        recipe.dietID = recipe.diet.id
-        recipe.dietName = recipe.diet.name
         recipe.ingredients = recipe.ingredients
         if recipe.type == "big":
             coef = recipe.diet.big_size / 100
@@ -683,7 +695,7 @@ def printAllRecipes():
             coef = recipe.diet.small_size / 100
 
         for i in recipe.ingredients:
-            i.amount = float(math.floor(i.loadAmount(recipe.id) * coef * 100000)) / 100000
+            i.amount = float(math.floor(i.loadAmount(recipe.id) * coef * 100)) / 100
 
         recipe.totals = type('', (), {})()
         recipe.totals.calorie = 0
@@ -703,7 +715,7 @@ def printAllRecipes():
         recipe.totals.fat = math.floor(recipe.totals.fat) / 100
         recipe.totals.sugar = math.floor(recipe.totals.sugar) / 100
         recipe.totals.amount = math.floor(recipe.totals.amount)
-        recipe.totals.eq = math.floor((recipe.totals.fat / (recipe.totals.protein + recipe.totals.sugar)) * 10) / 10
+        recipe.totals.ratio = math.floor((recipe.totals.fat / (recipe.totals.protein + recipe.totals.sugar)) * 10) / 10
 
     return template("printAllRecipes.tpl", recipes=recipes)
 
@@ -711,7 +723,6 @@ def printAllRecipes():
 # NEW INGREDIENT PAGE
 @app.route('/newingredient', methods=['GET'])
 def showNewIngredient():
-
     return template('newIngredient.tpl', name="", sugar="", fat="", protein="")
 
 
@@ -749,21 +760,23 @@ def addNewIngredientAJAX():
 @app.route('/ingredient=<ingredient_id>')
 def showIngredient(ingredient_id):
     ingredient = models.Ingredient.load(ingredient_id)
+
     if ingredient is None:
         abort(404)
-    used = not ingredient.deleteCheck()
     if session['username'] != ingredient.author:
         return redirect('/wrongpage')
-    return template('showIngredient.tpl', ingredient=ingredient, used=used)
+
+    return template('showIngredient.tpl', ingredient=ingredient)
 
 
 @app.route('/ingredient=<ingredient_id>/remove', methods=['POST'])
 def removeIngredientAJAX(ingredient_id):
     ingredient = models.Ingredient.load(ingredient_id)
+
     if session['username'] != ingredient.author:
         return redirect('/wrongpage')
 
-    if ingredient.deleteCheck():  # wip
+    if not ingredient.used:
         ingredient.remove()
         flash("Surovina byla smazána")
         return redirect("/")
@@ -775,14 +788,14 @@ def removeIngredientAJAX(ingredient_id):
 @app.route('/ingredient=<ingredient_id>/edit', methods=['POST'])
 def editIngredientAJAX(ingredient_id):
     ingredient = models.Ingredient.load(ingredient_id)
+
     if session['username'] != ingredient.author:
         return redirect('/wrongpage')
 
-    ingredient = models.Ingredient()
     ingredient.name = request.form['name']
     ingredient.id = ingredient_id
     ingredient.calorie = request.form['calorie']
-    if ingredient.deleteCheck():  # wip
+    if not ingredient.used:
         ingredient.protein = request.form['protein']
         ingredient.fat = request.form['fat']
         ingredient.sugar = request.form['sugar']
@@ -797,15 +810,12 @@ def editIngredientAJAX(ingredient_id):
 
 @app.route('/allingredients')
 def showAllIngredients():
-
-    # ingredients = loadAllIngredients(session['username'])
     ingredients = models.Ingredient.loadAllByUsername(session['username'])
     return template("allIngredients.tpl", ingredients=ingredients)
 
 
 @app.route('/user')
 def showUser():
-
     user = models.User.load(session['username'])
     return template('showUser.tpl', user=user)
 
@@ -813,11 +823,10 @@ def showUser():
 @app.route('/user/edit', methods=['POST'])
 def editUserAJAX():
     user = models.User.load(session['username'])
-    user.firstname = request.form['firstname']
-    user.lastname = request.form['lastname']
+    user.firstName = request.form['firstname']
+    user.lastName = request.form['lastname']
     success = user.edit()
-    user = models.User.load(user.id)
-    if success:
+    if success is not None:
         flash("Uživatel byl upraven")
     else:
         flash("Nepovedlo se změnit uživatele")
@@ -828,13 +837,14 @@ def editUserAJAX():
 def changeUserAJAX():
     user = models.User.load(session['username'])
 
-    if user is None or user.username != session['username']:
+    if user is None:
         return redirect('/wrongpage')
 
     password = request.form['password'].encode('utf-8')
-    user.password = hashlib.sha256(password).hexdigest()
+    user.pwdhash = hashlib.sha256(password).hexdigest()
+
     success = user.edit()
-    if success:
+    if success is not None:
         flash("Heslo bylo změněno")
     else:
         flash("Nepovedlo se změnit heslo")
@@ -873,11 +883,13 @@ def calc(ingredients, diet):
     for ing in fixedIngredients:
         ingredients.remove(ing)
 
+
+    # changes diets accordingly
     diet.fat -= fixedFat
     diet.sugar -= fixedSugar
     diet.protein -= fixedProtein
 
-    # sort for main ingredient # reaarange, so last ingredient is the main ingredient (better handling)
+    # sort for main ingredient + reaarange, so last ingredient is the main ingredient (better handling)
     mainIngredient = ingredients[0]
     for i in range(len(ingredients)):
         if ingredients[i].main is True:
@@ -906,6 +918,10 @@ def calc(ingredients, diet):
 
         for ing in fixedIngredients:
             ingredients.append(ing)
+
+        diet.fat += fixedFat
+        diet.sugar += fixedSugar
+        diet.protein += fixedProtein
 
         return ingredients
 
@@ -943,7 +959,7 @@ def calc(ingredients, diet):
         else:
             min_sol = float(math.floor(interval.left * 10000) / 10000)
 
-        if max_sol < min_sol:
+        if max_sol < min_sol or max_sol < 0:
             return None
         # max_sol = max for e (variable )
         sol = (min_sol + max_sol) / 2
@@ -968,18 +984,16 @@ def calc(ingredients, diet):
         ingredients[3].min = min_sol
         ingredients[3].max = max_sol
 
+        #return fixed ingredietns # wip - for other branches
         for ing in fixedIngredients:
             ingredients.append(ing)
 
-        # return diet to normal for commit
+        # return diet to normal for commit # wip - for other branches
         diet.fat += fixedFat
         diet.sugar += fixedSugar
         diet.protein += fixedProtein
 
-        if max_sol >= 0:
-            return ingredients
-        else:
-            return None
+        return ingredients
 
     # 5 ingredients WIP
     elif len(ingredients) == 5:
@@ -1065,6 +1079,7 @@ def sendFeedback():
     msg = Message('[ketocalc] [{}]'.format(request.form['type']), sender='ketocalc', recipients=['ketocalc.jmp@gmail.com'])
     msg.body = "Message: {}\n".format(request.form['message'])
     msg.body += "Send by: {} [user: {}]".format(request.form['sender'], session['username'])
+
     if 'file' not in request.files:
         mail.send(msg)
         flash("Vaše připomínka byla zaslána na vyšší místa.")
@@ -1076,7 +1091,7 @@ def sendFeedback():
         mail.send(msg)
         flash("Vaše připomínka byla zaslána na vyšší místa.")
         return redirect('/')
-    if file and allowed_file(file.filename):
+    elif file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         with app.open_resource(os.path.join(app.config['UPLOAD_FOLDER'], filename)) as fp:
@@ -1133,7 +1148,7 @@ def error405(error):
 
 @app.errorhandler(500)
 def error500(error):
-    # internal error
+    # Internal error
     return template('err500.tpl')
 
 
@@ -1141,5 +1156,4 @@ app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
 
 if __name__ == "__main__":
-    # app.wsgi_app = SessionMiddleware(app.wsgi_app, session_opts)
     app.run(debug=True)

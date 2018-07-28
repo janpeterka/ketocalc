@@ -16,7 +16,7 @@
 	<script type="text/javascript">
         function validateRegister(){
             if (!($('#wrongUsername').is(':empty'))){
-                bootbox.alert("Jméno/email nemůžete použít!");
+                bootbox.alert("Email nemůžete použít!");
                 return false
             }
             else if (!($('#wrongPassword').is(':empty'))){
@@ -44,7 +44,7 @@
                         $("#wrongUsername").empty();
                     } else if (response=="False") {
                         $("#wrongUsername").empty();
-                        $("#wrongUsername").append("<small class='form-text'>Jméno/email nemůžete použít!</small>");
+                        $("#wrongUsername").append("<small class='form-text'>Email nemůžete použít!</small>");
                         // alert(response);
                     }
                 },

@@ -52,21 +52,21 @@
                             <input type="text" class="form-control" name="calorie" value="{{ ingredient.calorie }}" />
                         </td>
                         <td>
-                            {% if used == False %}
+                            {% if ingredient.used == False %}
                                 <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="protein" value="{{ ingredient.protein }}"/>
                             {% else %}
                                 {{ ingredient.protein }}
                             {% endif %}
                         </td>
                         <td>
-                            {% if used == False %}
+                            {% if ingredient.used == False %}
                                 <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="fat" value="{{ ingredient.fat }}"/>
                             {% else %}
                                 {{ ingredient.fat }}
                             {% endif %}
                         </td>
                         <td>
-                            {% if used == False %}
+                            {% if ingredient.used == False %}
                                 <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="sugar" value="{{ ingredient.sugar }}"/>
                             {% else %}
                                 {{ ingredient.sugar }}
@@ -99,7 +99,7 @@
             <form action="/ingredient={{ingredient.id}}/remove" onsubmit="return confirm('Opravdu chcete smazat surovinu?');" method="post" accept-charset="utf-8">
                 <button type="button" class="editShowButton btn btn-warning">Upravit {{ icons.edit }}</button>
                 <button type="button" class="editHideButton btn btn-warning">Zrušit úpravy {{ icons.edit }}</button>
-                {% if used == False %}
+                {% if ingredient.used == False %}
                     <button type="submit" class="btn btn-danger">Smazat surovinu {{ icons.delete }}</button>
                 {% else %}
                     <button type="submit" class="btn btn-danger" disabled>Nelze smazat {{ icons.delete }}</button>
