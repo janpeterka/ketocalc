@@ -4,7 +4,13 @@
 {% endblock %}
 
 {% block style %}
-    
+    <style type="text/css" media="screen">
+        .diet{
+            background-color: #a4f442;
+            margin-right: 0px;
+            padding-right: 0px;
+        }
+    </style>
 {% endblock %}
 
 {% block script %}
@@ -19,18 +25,21 @@
 {% block content %}
     {% include('navbar.tpl') %}
     <div class="container">
-        <div class="col-6">
+        <div class="col-10">
             <table id="diets" class="table">
-                <tr>
-                    <th>Název</th>
-                    <th>Dieta</th>
-                </tr>
-                {% for recipe in recipes: %}
+
+                {% for diet in diets: %}
                     <tr>
-                        <td><a href="/recipe={{recipe.id}}">{{ recipe.name }}</a></td>
-                        <td><a href="/diet={{recipe.dietID}}">{{ recipe.dietName }}</a></td>
+                        <th class='diet'><a href="/diet={{diet.id}}">{{ diet.name }}</a></th>
                     </tr>
-                {% endfor %}
+
+                    {% for recipe in diet.recipes: %}
+                        <tr>
+                            <td><a href="/recipe={{recipe.id}}">{{ recipe.name }}</a></td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}       
+
             </table>
             <div class="row">
                 <form action="" class="form-inline">

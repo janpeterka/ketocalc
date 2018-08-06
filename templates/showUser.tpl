@@ -81,10 +81,10 @@
                             {# <input type="text" class="form-control" value="{{ user.username }}" /> #}
                         </td>
                         <td>
-                            <input name="firstname" type="text" class="form-control" value="{{ user.firstname }}"/>
+                            <input name="firstname" type="text" class="form-control" value="{{ user.firstName }}"/>
                         </td>
                         <td>
-                            <input name="lastname" type="text" class="form-control" value="{{ user.lastname }}"/>
+                            <input name="lastname" type="text" class="form-control" value="{{ user.lastName }}"/>
                         </td>
                         <td>
                             <input type="submit" class="btn btn-warning" value="Uložit změnu" />

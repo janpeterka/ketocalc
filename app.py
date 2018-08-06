@@ -76,7 +76,7 @@ def session_management():
 
 @app.route('/', methods=['GET'])
 def main():
-        return redirect('/dashboard')
+    return redirect('/dashboard')
 
 
 # LOGIN
@@ -365,7 +365,6 @@ def showAllDiets():
 def showNewRecipe():
     active_diets = models.User.load(session['username']).activeDiets
     ingredients = models.Ingredient.loadAllByUsername(session['username'])
-
     return template('newRecipe.tpl', ingredients=ingredients, diets=active_diets)
 
 
@@ -504,13 +503,12 @@ def recalcRecipeAJAX():
         elif ing['fixed'] is True:
             pass
         else:
-            ing['amount'] = math.floor(results[count]['amount'] * 100 )/ 100
+            ing['amount'] = math.floor(results[count]['amount'] * 100) / 100
             count += 1
-
 
     totals = {'calorie': 0, 'protein': 0, 'sugar': 0, 'fat': 0, 'amount': 0, 'ratio': 0}
 
-    #calc ingredient nutritients
+    # calc ingredient nutritients
     for ing in json_ingredients:
         base_ing = models.Ingredient.load(int(ing['id']))
 
@@ -565,87 +563,14 @@ def addRecipeAJAX():
 
 @app.route('/recipe=<recipe_id>')
 def showRecipe(recipe_id):
-    recipe = models.Recipe.load(recipe_id)
-
-    if recipe is None:
-            abort(404)
-    if session['username'] != recipe.author.username:
-        return redirect('/wrongpage')
-
-    diet = recipe.diet
-    diets = models.User.load(session['username']).diets
-
-    if recipe.type == "big":
-        coef = float(diet.big_size / 100)
-    else:
-        coef = float(diet.small_size / 100)
-
-    ingredients = recipe.ingredients
-    for i in ingredients:
-        i.amount = float(i.loadAmount(recipe_id) * coef)
-
-    totals = type('', (), {})()
-    totals.calorie = 0
-    totals.protein = 0
-    totals.fat = 0
-    totals.sugar = 0
-    totals.amount = 0
-    for i in ingredients:
-        totals.calorie += i.amount * i.calorie
-        totals.protein += i.amount * i.protein
-        totals.fat += i.amount * i.fat
-        totals.sugar += i.amount * i.sugar
-        totals.amount += i.amount
-
-    totals.calorie = math.floor(totals.calorie) / 100
-    totals.protein = math.floor(totals.protein) / 100
-    totals.fat = math.floor(totals.fat) / 100
-    totals.sugar = math.floor(totals.sugar) / 100
-    totals.amount = math.floor(totals.amount)
-    totals.ratio = math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
-    return template('showRecipe.tpl', recipe=recipe, ingredients=ingredients, totals=totals, diet=diet, diets=diets)
+    recipe_data = models.Recipe.load(recipe_id).loadRecipeForShow()
+    return template('showRecipe.tpl', recipe=recipe_data['recipe'], totals=recipe_data['totals'])
 
 
 @app.route('/recipe=<recipe_id>/print')
 def printRecipe(recipe_id):
-    recipe = models.Recipe.load(recipe_id)
-
-    if recipe is None:
-        abort(404)
-    if session['username'] != recipe.author.username:
-        return redirect('/wrongpage')
-
-    diet = recipe.diet
-    if recipe.type == "big":
-        coef = diet.big_size / 100
-    else:
-        coef = diet.small_size / 100
-
-    ingredients = recipe.ingredients
-
-    for i in ingredients:
-        i.amount = float(math.floor(i.loadAmount(recipe_id) * coef * 100000)) / 100000
-
-    totals = type('', (), {})()
-    totals.calorie = 0
-    totals.protein = 0
-    totals.fat = 0
-    totals.sugar = 0
-    totals.amount = 0
-    for i in ingredients:
-        totals.calorie += i.amount * i.calorie
-        totals.protein += i.amount * i.protein
-        totals.fat += i.amount * i.fat
-        totals.sugar += i.amount * i.sugar
-        totals.amount += i.amount
-
-    totals.calorie = math.floor(totals.calorie) / 100
-    totals.protein = math.floor(totals.protein) / 100
-    totals.fat = math.floor(totals.fat) / 100
-    totals.sugar = math.floor(totals.sugar) / 100
-    totals.amount = math.floor(totals.amount)
-    totals.ratio = math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
-    return template('printRecipe.tpl', recipe=recipe, ingredients=ingredients, totals=totals, diet=diet)
+    recipe_data = models.Recipe.load(recipe_id).loadRecipeForShow()
+    return template('printRecipe.tpl', recipe=recipe_data['recipe'], totals=recipe_data['totals'])
 
 
 @app.route('/recipe=<recipe_id>/remove', methods=['POST'])
@@ -664,7 +589,7 @@ def editRecipeAJAX(recipe_id):
     if session['username'] != models.Recipe.load(recipe_id).author.username:
         return redirect('/wrongpage')
 
-    recipe = models.Recipe.load(recipe_id).author.username
+    recipe = models.Recipe.load(recipe_id)
     recipe.name = request.form['name']
     recipe.type = request.form['size']
     recipe.edit()
@@ -675,12 +600,19 @@ def editRecipeAJAX(recipe_id):
 @app.route('/allrecipes')
 def showAllRecipes():
     user = models.User.load(session['username'])
-    recipes = user.recipes
-    for recipe in recipes:
-        recipe.dietID = recipe.diet.id
-        recipe.dietName = recipe.diet.name
+    return template("allRecipes.tpl", diets=user.diets)
 
-    return template("allRecipes.tpl", recipes=recipes)
+
+@app.route('/diet=<diet_id>/print')
+def printDietRecipes(diet_id):
+    diet = models.Diet.load(diet_id)
+
+    for recipe in diet.recipes:
+        recipe_data = recipe.loadRecipeForShow()
+        recipe = recipe_data['recipe']
+        recipe.totals = recipe_data['totals']
+        temp_print(recipe.id)
+    return template("printAllRecipes.tpl", recipes=diet.recipes)
 
 
 @app.route('/printallrecipes')
@@ -688,34 +620,8 @@ def printAllRecipes():
     recipes = models.User.load(session['username']).recipes
 
     for recipe in recipes:
-        recipe.ingredients = recipe.ingredients
-        if recipe.type == "big":
-            coef = recipe.diet.big_size / 100
-        else:
-            coef = recipe.diet.small_size / 100
-
-        for i in recipe.ingredients:
-            i.amount = float(math.floor(i.loadAmount(recipe.id) * coef * 100)) / 100
-
-        recipe.totals = type('', (), {})()
-        recipe.totals.calorie = 0
-        recipe.totals.protein = 0
-        recipe.totals.fat = 0
-        recipe.totals.sugar = 0
-        recipe.totals.amount = 0
-        for i in recipe.ingredients:
-            recipe.totals.calorie += i.amount * i.calorie
-            recipe.totals.protein += i.amount * i.protein
-            recipe.totals.fat += i.amount * i.fat
-            recipe.totals.sugar += i.amount * i.sugar
-            recipe.totals.amount += i.amount
-
-        recipe.totals.calorie = math.floor(recipe.totals.calorie) / 100
-        recipe.totals.protein = math.floor(recipe.totals.protein) / 100
-        recipe.totals.fat = math.floor(recipe.totals.fat) / 100
-        recipe.totals.sugar = math.floor(recipe.totals.sugar) / 100
-        recipe.totals.amount = math.floor(recipe.totals.amount)
-        recipe.totals.ratio = math.floor((recipe.totals.fat / (recipe.totals.protein + recipe.totals.sugar)) * 10) / 10
+        recipe = recipe.loadRecipeForShow['recipe']
+        recipe.totals = recipe.loadRecipeForShow['totals']
 
     return template("printAllRecipes.tpl", recipes=recipes)
 

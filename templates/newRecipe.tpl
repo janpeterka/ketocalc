@@ -336,7 +336,7 @@
 
                                 if (ingredients[i].main){
                                     ingredient_tr += '<tr>' +
-                                            '<td id="slider_tr" name="'+ ingredients[i].id +'" class="row">' +
+                                            '<td id="slider_tr" name="'+ ingredients[i].id +'">' +
                                                 '<input type="text"' +
                                                     'class="col"' +
                                                     'id="slider"' +
@@ -350,10 +350,8 @@
                                                     'data-slider-tooltip="show"' +
                                             '</td>' +
 
-                                            '<td colspan="12">' +
-                                                '<span class="col">' +
+                                            '<td colspan=5>' +
                                                     ingredients[i].name +
-                                                '</span>' +
                                             '</td>' +
 
                                         '</tr>'

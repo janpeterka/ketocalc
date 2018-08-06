@@ -47,8 +47,8 @@
             <form action="/recipe={{recipe.id}}/edit" class="form-inline edit__form" method="post" accept-charset="utf-8">
                 <input type="text" name="name" class="form-control col-4" value="{{ recipe.name }}"><br>
                 <select name="size" class="form-control">
-                    <option value="small">Malé jídlo ({{ diet.small_size }})</option>
-                    <option value="big">Velké jídlo ({{ diet.big_size }})</option>
+                    <option value="small">Malé jídlo ({{ recipe.diet.small_size }})</option>
+                    <option value="big">Velké jídlo ({{ recipe.diet.big_size }})</option>
                 </select>
                 <input type="submit" value="Změnit recept" class="btn btn-warning">
             </form>
@@ -57,10 +57,10 @@
 
                 <h2>{{ recipe.name }}</h2>
 
-            {% if recipe.size == "small" %}
-                <h5>Malé jídlo ({{ diet.small_size }}%)</h5>
-            {% elif recipe.size == "big" %}
-                <h5>Velké jídlo ({{ diet.big_size }}%)</h5> 
+            {% if recipe.type == "small" %}
+                <h5>Malé jídlo ({{ recipe.diet.small_size }}%)</h5>
+            {% elif recipe.type == "big" %}
+                <h5>Velké jídlo ({{ recipe.diet.big_size }}%)</h5> 
             {% endif %}
 
         </span>
@@ -75,7 +75,7 @@
                     <th></th>
                 </tr>
 
-                {% for ingredient in ingredients: %}
+                {% for ingredient in recipe.ingredients: %}
                     <tr>
                         <td>
                             <a href="/ingredient={{ingredient.id}}">{{ ingredient.name }}</a>

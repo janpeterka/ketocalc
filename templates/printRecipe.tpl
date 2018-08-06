@@ -28,10 +28,10 @@
 
             <span class="data__table d-print-table"><h2>{{ recipe.name }}</h2></span>
             <span>
-                {% if recipe.size == "small" %}
-                    <h5>Malé jídlo ({{ diet.small_size }}%)</h5>
-                {% elif recipe.size == "big" %}
-                    <h5>Velké jídlo ({{ diet.big_size }}%)</h5> 
+                {% if recipe.type == "small" %}
+                    <h5>Malé jídlo ({{ recipe.diet.small_size }}%)</h5>
+                {% elif recipe.type == "big" %}
+                    <h5>Velké jídlo ({{ recipe.diet.big_size }}%)</h5> 
                 {% endif %}
             </span>            
             <table id="ingredients" class="table">
@@ -45,7 +45,7 @@
                     <th></th>
                 </tr>
 
-                {% for ingredient in ingredients: %}
+                {% for ingredient in recipe.ingredients: %}
                     <tr>
                         <td><strong>{{ ingredient.name }}</strong></td>
                         <td>{{ (ingredient.calorie / 100 * ingredient.amount)|round(2,'common') }} kcal</td>

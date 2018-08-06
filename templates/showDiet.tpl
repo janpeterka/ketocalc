@@ -55,6 +55,11 @@
             //     $('.row').hide();
             //     $('.loader').show();
             // });
+
+            $(document).on("click", ".printButton", function() {
+                var win = window.open(window.location.href + '/print');
+                win.focus();
+            });
     
         </script>
 {% endblock %}
@@ -177,6 +182,7 @@
                     {% if diet.used == False %}
                         <button type="submit" class="btn btn-danger">Smazat dietu {{ icons.delete }}</button>
                     {% endif %}
+                    <button type="button" class="printButton btn">Tisk {{ icons.print }}</button>
                 </form>
                 <form action="/diet={{ diet.id }}/archive" method="post" accept-charset="utf-8">
                     {% if diet.active == True %}

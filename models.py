@@ -1,5 +1,6 @@
 # coding: utf-8
 from sqlalchemy import CHAR, Column, Enum, Float, ForeignKey, INTEGER, String, Table, text
+from sqlalchemy import desc
 # from sqlalchemy import and_
 from sqlalchemy.dialects.mysql.types import TINYINT
 from sqlalchemy.orm import relationship, sessionmaker
@@ -8,6 +9,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 
 from data import db_data as dbd
+
+import math
 
 engine = create_engine(dbd.sqlalchemy_db_string, echo=False)  # change to False
 Session = sessionmaker(bind=engine)
@@ -66,7 +69,7 @@ class Diet(Base):
     big_size = Column(Float, nullable=False)
     active = Column(TINYINT(1), nullable=False, server_default=text("'1'"))
 
-    recipes = relationship('Recipe', secondary='diets_has_recipes')
+    recipes = relationship('Recipe', secondary='diets_has_recipes', order_by='Recipe.name')
     author = relationship('User', secondary='users_has_diets', uselist=False)
 
     def load(diet_id):
@@ -81,12 +84,6 @@ class Diet(Base):
     def edit(self):
         s.commit()
 
-    def deleteCheck(self):
-        if len(self.recipes) == 0:
-            return True
-        else:
-            return False
-
     def remove(self):
         s.delete(self)
         s.commit()
@@ -98,7 +95,10 @@ class Diet(Base):
 
     @property
     def used(self):
-        return not self.deleteCheck()
+        if len(self.recipes) == 0:
+            return False
+        else:
+            return True
 
 
 class Ingredient(Base):
@@ -114,14 +114,16 @@ class Ingredient(Base):
 
     recipes = relationship('Recipe',
                            primaryjoin="and_(Ingredient.id == remote(RecipesHasIngredient.ingredients_id), foreign(Recipe.id) == RecipesHasIngredient.recipes_id)",
-                           viewonly=True)
+                           viewonly=True, order_by='Recipe.name')
 
     def load(ingredient_id):
         ingredient = s.query(Ingredient).filter(Ingredient.id == ingredient_id).first()
         return ingredient
 
-    def loadAllByUsername(username):
+    def loadAllByUsername(username, ordered=True):
         ingredients = s.query(Ingredient).filter(Ingredient.author == username).all()
+        if ordered:
+            ingredients.sort(key=lambda x: x.name, reverse=False)
         return ingredients
 
     def loadAmount(self, recipe_id):
@@ -136,12 +138,6 @@ class Ingredient(Base):
     def edit(self):
         s.commit()
 
-    def deleteCheck(self):
-        if len(self.recipes) == 0:
-            return True
-        else:
-            return False
-
     def remove(self):
         s.delete(self)
         s.commit()
@@ -152,7 +148,11 @@ class Ingredient(Base):
 
     @property
     def used(self):
-        return not self.deleteCheck()
+        if len(self.recipes) == 0:
+            return False
+        else:
+            return True
+
 
 class User(Base):
     __tablename__ = 'users'
@@ -163,7 +163,7 @@ class User(Base):
     firstName = Column(String(255), nullable=False)
     lastName = Column(String(255), nullable=False)
 
-    diets = relationship('Diet', secondary='users_has_diets')
+    diets = relationship('Diet', secondary='users_has_diets', order_by='desc(Diet.active)')
 
     def load(user_id):
         if type(user_id) is int:
@@ -186,10 +186,12 @@ class User(Base):
         s.commit()
 
     @property
-    def recipes(self):
+    def recipes(self, ordered=True):
         recipes = []
         for diet in self.diets:
             recipes.extend(diet.recipes)
+        if ordered:
+            recipes.sort(key=lambda x: x.name, reverse=False)
         return recipes
 
     @property
@@ -211,20 +213,41 @@ class Recipe(Base):
     diet = relationship('Diet', secondary='diets_has_recipes', uselist=False)
     ingredients = relationship("Ingredient",
                                primaryjoin="and_(Recipe.id == remote(RecipesHasIngredient.recipes_id), foreign(Ingredient.id) == RecipesHasIngredient.ingredients_id)",
-                               viewonly=True)
+                               viewonly=True, order_by='Recipe.name')
 
     def load(recipe_id):
         recipe = s.query(Recipe).filter(Recipe.id == recipe_id).first()
-        if recipe is None:
-            return None
-
-        temp_ingredients = s.query(RecipesHasIngredient).filter(RecipesHasIngredient.recipes_id == recipe_id)
-
-        ingredientIDs = []
-        for i in temp_ingredients.all():
-            ingredientIDs.append(i.ingredients_id)
-
         return recipe
+
+    def loadRecipeForShow(self):
+        if self.type == "big":
+            coef = float(self.diet.big_size / 100)
+        else:
+            coef = float(self.diet.small_size / 100)
+
+        for ingredient in self.ingredients:
+            ingredient.amount = float(math.floor(ingredient.loadAmount(self.id) * coef * 100000)) / 100000
+
+        totals = type('', (), {})()
+        totals.calorie = 0
+        totals.protein = 0
+        totals.fat = 0
+        totals.sugar = 0
+        totals.amount = 0
+        for i in self.ingredients:
+            totals.calorie += i.amount * i.calorie
+            totals.protein += i.amount * i.protein
+            totals.fat += i.amount * i.fat
+            totals.sugar += i.amount * i.sugar
+            totals.amount += i.amount
+
+        totals.calorie = math.floor(totals.calorie) / 100
+        totals.protein = math.floor(totals.protein) / 100
+        totals.fat = math.floor(totals.fat) / 100
+        totals.sugar = math.floor(totals.sugar) / 100
+        totals.amount = math.floor(totals.amount)
+        totals.ratio = math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
+        return {'recipe': self, 'totals': totals}
 
     def save(self, ingredients):
         s.add(self)
