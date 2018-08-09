@@ -69,7 +69,7 @@
     <div class="container">
         <div class="row">
             <div class="col">
-                <label for="recipes"><h2>Diety</h2></label>
+                <label for="recipes"><h2>Recepty</h2></label>
                 <ul name="recipes">
                 {% for recipe in recipes: %}
                         <li><a href="/recipe={{recipe.id}}">{{ recipe.name }}</a></li>

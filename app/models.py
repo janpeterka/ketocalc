@@ -1,6 +1,6 @@
 # coding: utf-8
 from sqlalchemy import CHAR, Column, Enum, Float, ForeignKey, INTEGER, String, Table, text
-from sqlalchemy import desc
+# from sqlalchemy import desc
 # from sqlalchemy import and_
 from sqlalchemy.dialects.mysql.types import TINYINT
 from sqlalchemy.orm import relationship, sessionmaker
@@ -8,7 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy import create_engine
 
-from data import db_data as dbd
+from .data import db_data as dbd
 
 import math
 
@@ -19,6 +19,7 @@ Base = declarative_base()
 metadata = Base.metadata
 
 global s
+
 
 # not cool (#wip)
 def startSession():
@@ -213,7 +214,7 @@ class Recipe(Base):
     diet = relationship('Diet', secondary='diets_has_recipes', uselist=False)
     ingredients = relationship("Ingredient",
                                primaryjoin="and_(Recipe.id == remote(RecipesHasIngredient.recipes_id), foreign(Ingredient.id) == RecipesHasIngredient.ingredients_id)",
-                               viewonly=True, order_by='Recipe.name')
+                               viewonly=True, order_by='Ingredient.name')
 
     def load(recipe_id):
         recipe = s.query(Recipe).filter(Recipe.id == recipe_id).first()

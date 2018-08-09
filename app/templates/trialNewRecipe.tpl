@@ -1,6 +1,6 @@
 {% extends "base.tpl" %}
 {% block title %}
-    Nový recept
+    Ukázka - Nový recept
 {% endblock %}
 
 {% block style %}
@@ -217,27 +217,6 @@
                 $(".recipe__right").hide();
             }
 
-            $(document).on("submit", ".recipe__right__form", function(e){
-                $.ajax({
-                        type: 'POST',
-                        url: '/saveRecipeAJAX',
-                        data: JSON.stringify({
-                            'ingredients' : recipe__ingredient_array,
-                            'dietID' : recipe__ingredient_dietID,
-                            'name' : $('[name="recipe__right__form__name-input"]').val(),
-                            'size' : $('[name="recipe__right__form__size-select"]').val()
-                        }),
-                        contentType: 'application/json;charset=UTF-8',
-                        success: function(response){
-                            var pathname = window.location.pathname.split("/")[0];
-                            window.location.replace(pathname + response);
-                        },
-                        error: function(error) {
-                            // console.log(error);
-                        }
-                });
-                e.preventDefault();
-            });
 
             $(document).on("submit", ".prerecipe__calc__form", function(e) {
 
@@ -547,6 +526,16 @@
                     }
                 }
             }
+
+            function saveRecipeConfirm(){
+                r = confirm("Pokud si chcete recept uložit, musíte se zaregistrovat")
+                if (r == true){
+                    var win = window.open('/register');
+                    return;
+                } else {
+                    return;
+                }
+            }
         </script>
 {% endblock %}
 
@@ -578,10 +567,12 @@
                         <form class="prerecipe__calc__form form-inline">
                             <label for="select-diet">Název diety</label>
                             <select name="select-diet" class="select-diet form-control">
-                            {% for diet in diets: %}
                                 <option value="{{diet.id}}">{{ diet.name }}</option>
-                            {% endfor %}
                             </select>
+                            <span>Cukry: {{ diet.sugar }}</span>
+                            <span>Tuky: {{ diet.fat }}</span>
+                            <span>Bílkoviny: {{ diet.protein }}</span>
+
                             <input type="submit" class=" prerecipe__calc__form__submit btn btn-primary" value="Spočítat množství!" />
                         </form>
                     </div>
@@ -597,9 +588,9 @@
                     </div>
 
                     <div class="recipe__right">
-                        <form method="post" class="recipe__right__form form-group"  action="/saveRecipeAJAX" >
+                        <form class="recipe__right__form form-group">
                             <label for="recipe__right__form__name-input">Název receptu</label>
-                            <input type="text" name="recipe__right__form__name-input" required class="form-control"/>
+                            <input type="text" name="recipe__right__form__name-input" placeholder="Ukázkový recept" class="form-control"/>
 
                             <table class="recipe__right__form__ingredient-table table">
                                 <tr>
@@ -609,7 +600,6 @@
                                     <th>Tuk</th>
                                     <th>Sacharidy</th>
                                     <th>Množství</th>
-                                    <th></th>
                                 </tr>
                             </table>
 
@@ -620,7 +610,7 @@
                                 </select>
 
                                 <span class="col-4">Dieta: <span class="recipe__right__form__diet-name"></span></span>
-                                <input type="submit" class="btn btn-primary col-4 " value="Uložit mezi recepty" />
+                                <input type="button" onclick='saveRecipeConfirm()' class="btn btn-primary col-4 " value="Uložit mezi recepty" />
                             </div>
                         </form>
                     </div>

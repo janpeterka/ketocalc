@@ -11,6 +11,10 @@
         <li class="nav-item">
           <a class="nav-link" href="/register">Zaregistrovat se</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/trialnewrecipe">Ukázka</a>
+        </li>
+
     </ul>
   </div>
 </nav>

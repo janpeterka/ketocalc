@@ -9,16 +9,23 @@
 			<h3>Beta</h3>
 			<h6>v2</h6>
 			<ul>
+				<li> v2.4.1 <i>9.8.2018</i>
+					<ul>
+						<li>ukázkový recept</li>
+						<i><li>změna struktury</li></i>
+					</ul>
+				</li>
+
 				<li>v2.4 <i>17.7.2018</i>
 					<ul>
-						<li>přechod na SQLAlchemy ORM</li>
+						<i><li>přechod na SQLAlchemy ORM</li></i>
 					</ul>
 				</li>
 
 				<li>v2.3 <i>8.6.2018</i>
 					<ul>
 						<li>Fixní suroviny - počítání s více surovinami</li>
-						<li>Úprava uživatele - jméno, heslo <i>(23.6.2018)</i></li>
+						<li>Úprava uživatele - jméno, heslo</li>
 					</ul>
 				</li>
 
