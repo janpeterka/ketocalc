@@ -1042,6 +1042,13 @@ def shutdown():
     return template('shutdown.tpl')
 
 
+@app.route('/testing')
+def testingPage():
+    if session['username'] != 'admin':
+        redirect('/wrongpage')
+    return template('testing.tpl', data=app.config['TEST_VAR'])
+
+
 @app.route('/google3748bc0390347e56.html')
 def googleVerification():
     return template('google3748bc0390347e56.html')

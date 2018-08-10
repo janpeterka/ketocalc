@@ -8,11 +8,13 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy import create_engine
 
-from .data import db_data as dbd
+# from .data import db_data as dbd
 
 import math
+import os
 
-engine = create_engine(dbd.sqlalchemy_db_string, echo=False)  # change to False
+
+engine = create_engine(os.environ.get('DB_STRING'), echo=False)  # change to False
 Session = sessionmaker(bind=engine)
 
 Base = declarative_base()

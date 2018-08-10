@@ -1,9 +1,9 @@
-# import os
+import os
 
 UPLOAD_FOLDER = '/tmp',
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif']),
 
-SECRET_KEY = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT',
+SECRET_KEY = os.environ.get('SECRET_KEY'),
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False,
 
@@ -12,5 +12,7 @@ MAIL_PORT = 465,
 MAIL_USE_TLS = False,
 MAIL_USE_SSL = True,
 
-MAIL_USERNAME = 'ketocalc.jmp@gmail.com',
-MAIL_PASSWORD = '60i#8%n*$vsW#F76D1hR3*&@fBgeEO34LMf^GMoU8hm6#JQmGr'
+MAIL_USERNAME = os.environ.get('MAIL_USERNAME'),
+MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD'),
+
+TEST_VAR = os.environ.get('TEST_VAR')
