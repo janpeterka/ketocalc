@@ -12,6 +12,9 @@ from flask import abort
 from flask_mail import Message
 from werkzeug import secure_filename
 
+import requests
+import json
+
 from app import models
 from app import app
 from .data import template_data
@@ -70,49 +73,29 @@ def showLogin():
 
 
 @app.route('/login', methods=['POST'])
-def doLogin():
-    username = request.form['username']
-    password = request.form['password']
-    if checkLogin(username, password):
-        session['username'] = username
-        user = models.User.load(username)
-        session['user_id'] = user.id
-        # models.startSession()
-        flash("Byl jste úspěšně přihlášen.")
-        return redirect('/')
-    else:
-        flash("Přihlášení se nezdařilo.")
-        return redirect('/login')
-
-
-def checkLogin(username, password):
-    """Validates credentials against db
-
-    [description]
-
-    Arguments:
-        username {str}
-        password {str}
-
-    Returns:
-        bool -- [description]
-    """
+def doLogin(from_register=False, username=None, password=None):
+    if username is None:
+        username = request.form['username']
+    if password is None:
+        password = request.form['password'].encode('utf-8')
     user = models.User.load(username)
 
-    if user is None:
-        return False
-    db_password_hash = user.pwdhash
-    password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
-    if password_hash == db_password_hash:
-        return True
+    if user is not None and user.checkLogin(password):
+        session['username'] = username
+        session['user_id'] = user.id
+        # models.startSession()
+        if not from_register:
+            flash("Byl jste úspěšně přihlášen.", 'success')
+        return redirect('/dashboard')
     else:
-        return False
+        flash("Přihlášení se nezdařilo.", 'error')
+        return redirect('/login')
 
 
 @app.route('/logout')
 def doLogout():
     session.pop('username', None)
-    flash("Byl jste úspěšně odhlášen.")
+    flash('Byl jste úspěšně odhlášen.', 'info')
     # models.endSession()
     return redirect('/login')
 
@@ -124,6 +107,10 @@ def showRegister():
 
 @app.route('/register', methods=['POST'])
 def doRegister():
+    if not is_human(request.form['g-recaptcha-response']):
+        flash("Registrace se nezdařila", 'error')
+        return redirect(request.url)
+
     temp_password = str(request.form['password'])
     temp_password_2 = str(request.form['againPassword'])
 
@@ -131,41 +118,57 @@ def doRegister():
     user.username = request.form['username']
     user.firstName = request.form['firstname']
     user.lastName = request.form['lastname']
-    user.pwdhash = hashlib.sha256(temp_password.encode('utf-8')).hexdigest()
+    user.pwdhash = user.getPassword(temp_password.encode('utf-8'))
+    user.password_version = 'bcrypt'
+
+    # hashlib.sha256(temp_password.encode('utf-8')).hexdigest()
 
     if len(user.lastName) == 0:
-        flash("Není vyplněné jméno")
+        flash("Není vyplněné jméno", 'warning')
         return redirect(request.url)
     if len(user.firstName) == 0:
-        flash("Není vyplněné příjmení")
+        flash("Není vyplněné příjmení", 'warning')
         return redirect(request.url)
     if len(temp_password) < 8:
-        flash("Heslo je příliš krátké")
+        flash("Heslo je příliš krátké", 'warning')
         return redirect(request.url)
     if temp_password_2 != temp_password:
-        flash("Hesla jsou rozdílná!")
+        flash("Hesla jsou rozdílná!", 'warning')
         return redirect(request.url)
     if models.User.load(user.username) is not None:
         # Username used
-        flash("Něco je špatně")
+        flash("Email nemůžete použít", 'warning')
         return redirect(request.url)
 
     success = user.save()
 
     if success is not None:
-        flash("Byl jste úspěšně zaregistrován.")
-        return redirect('/login')
+        doLogin(True, user.username, temp_password.encode('utf-8'))
+        flash("Byl jste úspěšně zaregistrován.", 'success')
+        return redirect('/dashboard')
+
     else:
-        flash("Registrace neproběhla v pořádku")
+        flash("Registrace neproběhla v pořádku", 'error')
         return redirect('/register')
+
+
+def is_human(captcha_response):
+    """ Validating recaptcha response from google server
+        Returns True captcha test passed for submitted form else returns False.
+    """
+    secret = app.config['RECAPTCHA_SECRET']
+    payload = {'response': captcha_response, 'secret': secret}
+    response = requests.post("https://www.google.com/recaptcha/api/siteverify", payload)
+    response_text = json.loads(response.text)
+    return response_text['success']
 
 
 @app.route('/registerValidate', methods=['POST'])
 def validateRegister():
     """validates if username is taken
-    
+
     [description]
-    
+
     Decorators:
         app.route
     """
@@ -223,21 +226,21 @@ def addDietAJAX():
     diet.active = 1
 
     if len(diet.protein) == 0:
-        flash("Vyplňte množství bílkoviny")
+        flash("Vyplňte množství bílkoviny", 'warning')
         return redirect(request.url)
     if len(diet.fat) == 0:
-        flash("Vyplňte množství tuku")
+        flash("Vyplňte množství tuku", 'warning')
         return redirect(request.url)
     if len(diet.sugar) == 0:
-        flash("Vyplňte množství sacharidů")
+        flash("Vyplňte množství sacharidů", 'warning')
         return redirect(request.url)
     if len(diet.name) == 0:
-        flash("Vyplňte název")
+        flash("Vyplňte název", 'warning')
         return redirect(request.url)
 
     diet.author = models.User.load(session['username'])
     diet.save()
-    flash("Dieta byla vytvořena.")
+    flash("Dieta byla vytvořena.", 'success')
     return redirect('/diet={}'.format(diet.id))
 
 
@@ -263,10 +266,10 @@ def removeDiet(diet_id):
 
     if not diet.used:  # wip
         diet.remove()
-        flash("Dieta byla smazána")
+        flash("Dieta byla smazána", 'success')
         return redirect("/alldiets")
     else:
-        flash("Tato dieta má recepty, nelze smazat")
+        flash("Tato dieta má recepty, nelze smazat", 'error')
         return redirect('/diet={}'.format(diet_id))
 
 
@@ -278,9 +281,9 @@ def archiveDiet(diet_id):
         return redirect('/wrongpage')
 
     if diet.active:
-        flash("Dieta byla archivována")
+        flash("Dieta byla archivována", 'info')
     else:
-        flash("Dieta byla aktivována")
+        flash("Dieta byla aktivována", 'info')
 
     diet.active = not diet.active
     diet.edit()
@@ -324,7 +327,7 @@ def editDietAJAX(diet_id):
         diet.sugar = request.form['sugar']
 
     diet.edit()
-    flash("Dieta byla upravena.")
+    flash("Dieta byla upravena.", 'success')
     return redirect('/diet={}'.format(diet_id))
 
 
@@ -567,7 +570,7 @@ def addRecipeAJAX():
     recipe.diet = models.Diet.load(diet_id)
 
     last_id = recipe.save(ingredients)
-    flash("Recept byl uložen")
+    flash("Recept byl uložen", 'success')
     return ('/recipe=' + str(last_id))
 
 
@@ -590,7 +593,7 @@ def removeRecipeAJAX(recipe_id):
 
     recipe = models.Recipe.load(recipe_id)
     recipe.remove()
-    flash("Recept byl smazán.")
+    flash("Recept byl smazán.", 'success')
     return redirect('/')
 
 
@@ -603,7 +606,7 @@ def editRecipeAJAX(recipe_id):
     recipe.name = request.form['name']
     recipe.type = request.form['size']
     recipe.edit()
-    flash("Recept byl upraven.")
+    flash("Recept byl upraven.", 'success')
     return redirect('/recipe={}'.format(recipe_id))
 
 
@@ -619,7 +622,6 @@ def printDietRecipes(diet_id):
 
     for recipe in diet.recipes:
         recipe_data = recipe.loadRecipeForShow()
-        recipe = recipe_data['recipe']
         recipe.totals = recipe_data['totals']
     return template("printAllRecipes.tpl", recipes=diet.recipes)
 
@@ -629,9 +631,8 @@ def printAllRecipes():
     recipes = models.User.load(session['username']).recipes
 
     for recipe in recipes:
-        recipe = recipe.loadRecipeForShow['recipe']
-        recipe.totals = recipe.loadRecipeForShow['totals']
-
+        recipe_data = recipe.loadRecipeForShow()
+        recipe.totals = recipe_data['totals']
     return template("printAllRecipes.tpl", recipes=recipes)
 
 
@@ -652,23 +653,23 @@ def addNewIngredientAJAX():
     ingredient.author = session['username']
 
     if len(ingredient.protein) == 0:
-        flash("Zadejte množství bílkoviny")
+        flash("Zadejte množství bílkoviny", 'warning')
         return redirect(request.url)
     if len(ingredient.calorie) == 0:
-        flash("Zadejte kalorie")
+        flash("Zadejte kalorie", 'warning')
         return redirect(request.url)
     if len(ingredient.fat) == 0:
-        flash("Zadejte množství tuku")
+        flash("Zadejte množství tuku", 'warning')
         return redirect(request.url)
     if len(ingredient.sugar) == 0:
-        flash("Zadejte množství sacharidů")
+        flash("Zadejte množství sacharidů", 'warning')
         return redirect(request.url)
     if len(ingredient.name) == 0:
-        flash("Zadejte název suroviny")
+        flash("Zadejte název suroviny", 'warning')
         return redirect(request.url)
 
     ingredient.save()
-    flash("Nová surovina byla vytvořena")
+    flash("Nová surovina byla vytvořena", 'success')
     return redirect('/newingredient')
 
 
@@ -693,10 +694,10 @@ def removeIngredientAJAX(ingredient_id):
 
     if not ingredient.used:
         ingredient.remove()
-        flash("Surovina byla smazána")
+        flash("Surovina byla smazána", 'success')
         return redirect("/")
     else:
-        flash("Tato surovina je použita, nelze smazat")
+        flash("Tato surovina je použita, nelze smazat", 'error')
         return redirect('/ingredient={}'.format(ingredient_id))
 
 
@@ -715,11 +716,11 @@ def editIngredientAJAX(ingredient_id):
         ingredient.fat = request.form['fat']
         ingredient.sugar = request.form['sugar']
         ingredient.edit()
-        flash("Surovina byla upravena.")
+        flash("Surovina byla upravena.", 'success')
         return redirect('/ingredient={}'.format(ingredient_id))
     else:
         ingredient.edit()
-        flash("Název a kalorická hodnota byly upraveny.")
+        flash("Název a kalorická hodnota byly upraveny.", 'success')
         return redirect('/ingredient={}'.format(ingredient_id))
 
 
@@ -743,9 +744,9 @@ def editUserAJAX():
     user.lastName = request.form['lastname']
     success = user.edit()
     if success is not None:
-        flash("Uživatel byl upraven")
+        flash("Uživatel byl upraven", 'success')
     else:
-        flash("Nepovedlo se změnit uživatele")
+        flash("Nepovedlo se změnit uživatele", 'error')
     return template('showUser.tpl', user=user)
 
 
@@ -761,9 +762,9 @@ def changeUserAJAX():
 
     success = user.edit()
     if success is not None:
-        flash("Heslo bylo změněno")
+        flash("Heslo bylo změněno", 'success')
     else:
-        flash("Nepovedlo se změnit heslo")
+        flash("Nepovedlo se změnit heslo", 'error')
     return template('showUser.tpl', user=user)
 
 
@@ -995,14 +996,14 @@ def sendFeedback():
 
     if 'file' not in request.files:
         mail.send(msg)
-        flash("Vaše připomínka byla zaslána na vyšší místa.")
+        flash("Vaše připomínka byla zaslána na vyšší místa.", 'success')
         return redirect('/')
     else:
         file = request.files['file']
 
     if file.filename == '':
         mail.send(msg)
-        flash("Vaše připomínka byla zaslána na vyšší místa.")
+        flash("Vaše připomínka byla zaslána na vyšší místa.", 'success')
         return redirect('/')
     elif file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
@@ -1011,7 +1012,7 @@ def sendFeedback():
             msg.attach("screenshot", "image/{}".format(filename.split(".")[1]), fp.read())
 
         mail.send(msg)
-        flash("Vaše připomínka byla zaslána na vyšší místa.")
+        flash("Vaše připomínka byla zaslána na vyšší místa.", 'success')
         return redirect('/')
 
 
@@ -1070,9 +1071,6 @@ def error405(error):
 def error500(error):
     # Internal error
     return template('err500.tpl')
-
-
-
 
 
 if __name__ == "__main__":

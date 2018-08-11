@@ -6,6 +6,8 @@ Flask-SQLAlchemy
 Flask-Bcrypt
 Flask-Dance
 
+requests
+
 mysqlclient
 
 PyMySQL

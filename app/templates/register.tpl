@@ -45,7 +45,6 @@
                     } else if (response=="False") {
                         $("#wrongUsername").empty();
                         $("#wrongUsername").append("<small class='form-text'>Email nemůžete použít!</small>");
-                        // alert(response);
                     }
                 },
                 error: function(error) {
@@ -104,6 +103,7 @@
                     </div>
 
                 </div>
+                <div class="g-recaptcha" data-sitekey="6LfFdWkUAAAAALQkac4_BJhv7W9Q3v11kDH62aO2"></div>
 
                 <input value="Registrovat" type="submit" class="btn btn-primary" />
                 <a class="col-sm-2" href="/login">Přihlásit se</a><br>

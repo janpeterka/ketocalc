@@ -13,6 +13,9 @@ from sqlalchemy import create_engine
 import math
 import os
 
+import bcrypt
+import hashlib
+
 
 engine = create_engine(os.environ.get('DB_STRING'), echo=False)  # change to False
 Session = sessionmaker(bind=engine)
@@ -165,6 +168,7 @@ class User(Base):
     pwdhash = Column(CHAR(64), nullable=False)
     firstName = Column(String(255), nullable=False)
     lastName = Column(String(255), nullable=False)
+    password_version = Column(String(45), nullable=True)
 
     diets = relationship('Diet', secondary='users_has_diets', order_by='desc(Diet.active)')
 
@@ -187,6 +191,27 @@ class User(Base):
     def remove(self):
         s.delete()
         s.commit()
+
+    def getPassword(self, password):
+        return bcrypt.hashpw(password, bcrypt.gensalt())
+
+    def checkLogin(self, password):
+        db_password_hash = self.pwdhash.encode('utf-8')
+        if self.password_version == 'SHA256':
+
+            if hashlib.sha256(password).hexdigest() == self.pwdhash:
+                # changing from sha256 to bcrypt
+                self.pwdhash = self.getPassword(password)
+                self.password_version = 'bcrypt'
+                s.commit()
+                return True
+            else:
+                return False
+        else:
+            if bcrypt.checkpw(password, db_password_hash):
+                return True
+            else:
+                return False
 
     @property
     def recipes(self, ordered=True):

@@ -16,3 +16,5 @@ MAIL_USERNAME = os.environ.get('MAIL_USERNAME'),
 MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD'),
 
 TEST_VAR = os.environ.get('TEST_VAR')
+
+RECAPTCHA_SECRET = os.environ.get('RECAPTCHA_SECRET')
