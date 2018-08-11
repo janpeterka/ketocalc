@@ -1,3 +1,24 @@
+:root{
+    --color_error: #CC0000; /* Red */
+    --color_success: #007E33; /* Green */
+    --color_warning: #FF8800; /* Orange */
+    --color_info: grey; /* Grey */
+
+    --color_loader_outer: #f3f3f3; /* Light grey */
+    --color_loader_inner: #4285F4; /* Blue */
+
+    --bgcolor_mainIngredient: #00C851; /* Light green */
+    --bgcolor_fixedIngredient: grey; /* Grey */
+
+    --color_icon_remove: #8b0000; /* Dark red */
+
+    --color_inactive: grey;
+    --bgcolor_inactive: lightgrey;
+
+    --bgcolor_totals: lightgrey;
+}
+
+
 input{
 	margin-top: 5px;
 	margin-bottom: 5px;
@@ -7,23 +28,35 @@ input{
    margin: 5px 3px;
 }
 
-.navbar{
-	margin-bottom: 15px;
-}
-
-.problem{
-	color: red;
-}
+/*.navbar{
+	margin-bottom: 0px;
+}*/
 
 .changelog{
-	margin: 10px;
+    margin: 10px;
 }
 
-.remove {
+/* New recipe */
+
+i.remove {
     cursor: pointer;
 }
 
-.flashes {
+i.set_fixed {
+    cursor: pointer;
+}
+
+i.set_main {
+    cursor: pointer;
+}
+
+div.recipe__wrong{
+	color: red;
+}
+
+/*Flashes*/
+
+div.flashes {
     -moz-animation: cssAnimation 0s ease-in 5s forwards;
     /* Firefox */
     -webkit-animation: cssAnimation 0s ease-in 5s forwards;
@@ -33,17 +66,47 @@ input{
     animation: cssAnimation 0s ease-in 5s forwards;
     -webkit-animation-fill-mode: forwards;
     animation-fill-mode: forwards;
+    position: relative;
+    height: 0px;
+    background-color: rgba(0, 0, 0, 0);
 }
+
+div.flashes ul li{
+    list-style-type: none;
+    text-align: center; 
+    color: #101010;
+}
+
+div.flashes ul li.error{
+    color: var(--color_error);
+}
+
+div.flashes ul li.success{
+    color: var(--color_success);
+}
+
+div.flashes ul li.info{
+    color: var(--color_info);
+}
+
+div.flashes ul li.warning{
+    color: var(--color_warning);
+}
+
+/* Footer */
 
 .footer {
     position: fixed;
     left: 0;
     bottom: 0;
     width: 100%;
-    color: grey;
+    color: var(--color_info);
     font-size: 10px;
     text-align: center;
+    opacity: 0.7;
 }
+
+/* Loader */
 
 @keyframes cssAnimation {
     to {

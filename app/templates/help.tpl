@@ -6,11 +6,11 @@
 {% block style %}
 	<style type="text/css" media="screen">
         .tr-mainIngredient {
-            background-color: #82b74b;
+            background-color: var(--bgcolor_mainIngredient);
         }
 
         .tr-fixedIngredient {
-            background-color: grey;
+            background-color: var(--bgcolor_fixedIngredient);
         }
     </style>
 {% endblock %}
@@ -19,8 +19,13 @@
     {% include('navbar.tpl') %}
     <div>
     	<h1>FAQ</h1>
-    	<p class="faq-question">Nefunguje mi ketokalkulačka</p>
-    	<p class="faq-answer">Nahlašte problém na <a href="/feedback">této záložce</a>. Než se problém vyřeší, používejte <a href="https://ketocalc.herokuapp.com/">stabilní verzi</a></p>
+    	<ul>
+    		<li>
+    			<p class="faq-question">Nefunguje mi ketokalkulačka</p>
+    			<p class="faq-answer">Nahlašte problém na <a href="/feedback">této záložce</a>. Než se problém vyřeší, používejte <a href="https://ketocalc.herokuapp.com/">stabilní verzi</a></p>
+    		</li>
+    	</ul>
+    	
     </div>
 	<div name="newrecipe">
 		<h1> Nový recept </h1>

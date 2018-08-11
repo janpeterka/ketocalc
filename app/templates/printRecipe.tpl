@@ -6,13 +6,13 @@
 {% block style %}
     <style type="text/css" media="screen">
 		.totals {
-			background-color: lightgrey;
+			background-color: var(--bgcolor-totals);
 		}      
 
 		@media print {
 			body {-webkit-print-color-adjust: exact;}
 			.totals {
-				background-color: lightgrey;
+				background-color: var(--bgcolor-totals);
 			}
 		}
     </style>

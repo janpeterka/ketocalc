@@ -6,13 +6,13 @@
 {% block style %}
     <style type="text/css" media="screen">
 		.totals {
-			background-color: lightgrey;
+			background-color: var(--bgcolor-totals);
 		}      
 
 		@media print {
 			body {-webkit-print-color-adjust: exact;}
 			.totals {
-				background-color: lightgrey;
+				background-color: var(--bgcolor-totals);
 			}
 		}
     </style>
@@ -46,20 +46,20 @@
                     {% for ingredient in recipe.ingredients: %}
                         <tr>
                             <td><strong>{{ ingredient.name }}</strong></td>
-                            <td>{{ ingredient.protein }} g</td>
-                            <td>{{ ingredient.fat }} g</td>
-                            <td>{{ ingredient.sugar }} g</td>
-                            <td>{{ ingredient.amount}} g</td>
+                            <td>{{ ingredient.protein|round(2,'common') }} g</td>
+                            <td>{{ ingredient.fat|round(2,'common') }} g</td>
+                            <td>{{ ingredient.sugar|round(2,'common') }} g</td>
+                            <td>{{ ingredient.amount|round(2,'common') }} g</td>
                             <td></td>
                         </tr>
                     {% endfor %}
 
                     <tr class="totals">
                         <td><strong>Celkem</strong></td>
-                        <td>{{ recipe.totals.protein }}</td>
-                        <td>{{ recipe.totals.fat }}</td>
-                        <td>{{ recipe.totals.sugar }}</td>
-                        <td>{{ recipe.totals.amount }} g</td>
+                        <td>{{ recipe.totals.protein|round(2,'common') }}</td>
+                        <td>{{ recipe.totals.fat|round(2,'common') }}</td>
+                        <td>{{ recipe.totals.sugar|round(2,'common') }}</td>
+                        <td>{{ recipe.totals.amount|round(2,'common') }} g</td>
                         <td>{{ recipe.totals.ratio }} : 1</td>
                     </tr>
 
