@@ -18,8 +18,8 @@
 
             .loader {
                 display: none;
-                border: 16px solid #f3f3f3; /* Light grey */
-                border-top: 16px solid #337ab7; /* Blue */
+                border: 16px solid var(--color_loader_outer); /* Light grey */
+                border-top: 16px solid var(--color_loader_inner); /* Blue */
                 border-radius: 50%;
                 width: 300px;
                 height: 300px;

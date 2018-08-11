@@ -86,7 +86,7 @@ def doLogin(from_register=False, username=None, password=None):
         # models.startSession()
         if not from_register:
             flash("Byl jste úspěšně přihlášen.", 'success')
-        return redirect('/dashboard')
+            return redirect('/dashboard')
     else:
         flash("Přihlášení se nezdařilo.", 'error')
         return redirect('/login')

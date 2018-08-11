@@ -5,9 +5,15 @@
 
 {% block style %}
     <style type="text/css" media="screen">
-        .edit__form{display: none;}
-        .editHideButton{display: none;}     
-        .warning{color: red;}       
+        .edit__form{
+            display: none;
+        }
+        .editHideButton{
+            display: none;
+        }     
+        .warning{
+            color: var(--color_warning);
+        }       
     </style>
 {% endblock %}
 

@@ -20,8 +20,8 @@
 
         .recipe__loader {
             display: none;
-            border: 16px solid #f3f3f3; /* Light grey */
-            border-top: 16px solid #337ab7; /* Blue */
+            border: 16px solid var(--color_loader_outer); /* Light grey */
+            border-top: 16px solid var(--color_loader_inner); /* Blue */
             border-radius: 50%;
             width: 200px;
             height: 200px;
@@ -35,11 +35,11 @@
         }
 
         .tr-mainIngredient {
-            background-color: #a4f442;
+            background-color: var(--bgcolor_mainIngredient);
         }
 
         .tr-fixedIngredient {
-            background-color: grey;
+            background-color: var(--bgcolor_fixedIngredient);
         }
 
         .prerecipe__selected-ingredients__table tr td i {
@@ -47,7 +47,7 @@
         }
 
         .fa-times {
-            color: #8b0000;
+            color: var(--color_icon_remove);
             font-size: 12pt;
         }
 

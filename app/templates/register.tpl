@@ -6,7 +6,7 @@
 {% block style %}
     <style type="text/css" media="screen">
     .warning{
-        color : #CC0000;
+        color : var(--color_warning);
     }
     </style>
     

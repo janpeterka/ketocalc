@@ -6,7 +6,7 @@
 {% block style %}
     <style type="text/css" media="screen">
         .diet{
-            background-color: #a4f442;
+            background-color: var(--bgcolor-mainIngredient);
             margin-right: 0px;
             padding-right: 0px;
         }

@@ -6,11 +6,11 @@
 {% block style %}
     <style type="text/css" media="screen">
     .inactive {
-        background-color: lightgrey;
-        color: grey;
+        background-color: var(--bgcolor_inactive);
+        color: var(--color_inactive);
     }
     .inactive a{
-        color: grey;
+        color: var(--color_inactive);
         
     }
     </style>
