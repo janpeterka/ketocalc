@@ -5,6 +5,10 @@ Flask-Login
 Flask-SQLAlchemy
 Flask-Bcrypt
 Flask-Dance
+Flask-Security
+
+Flask-WTF
+WTForms
 
 requests
 
@@ -18,8 +22,8 @@ numpy
 
 sympy
 
-pytest
+unidecode
 
-WTForms
+pytest
 
 gunicorn

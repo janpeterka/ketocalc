@@ -14,25 +14,6 @@
 
 {% block script %}
 	<script type="text/javascript">
-        function validateRegister(){
-            if (!($('#wrongUsername').is(':empty'))){
-                bootbox.alert("Email nemůžete použít!");
-                return false
-            }
-            else if (!($('#wrongPassword').is(':empty'))){
-                bootbox.alert("Heslo je příliš krátké!");
-                return false
-            }
-            else if (!($('#diffPassword').is(':empty'))){
-                bootbox.alert("Hesla jsou rozdílná!");
-                return false
-            }
-            else {
-              return true  
-            }
-            
-        }
-
         $(document).on("change","#username", function(e) {
             $.ajax({
                 type: 'POST',
@@ -53,59 +34,34 @@
             });
             e.preventDefault();
         });
-        $(document).on('blur','#password',function(){
-            if ($(this).val().length > 8){
-                $("#wrongPassword").empty();
-            } else {
-                $("#wrongPassword").empty();
-                $("#wrongPassword").append("<small class='form-text'>Heslo je příliš krátké!</small>");
-            }
-
-        });
-        $(document).on('blur','#againPassword',function(){
-            if ($(this).val() === $("#password").val()){
-                $("#diffPassword").empty();
-            } else {
-                $("#diffPassword").empty();
-                $("#diffPassword").append("<small class='form-text'>Hesla jsou rozdílná!</small>");
-            }
-        });
     </script>
 {% endblock %}
 
 {% block content %}
     {% include('navbar_login.tpl') %}
     <div class="container">
-    	<form action="/register" onsubmit="return validateRegister()" method="post" class="col-sm-6" accept-charset="UTF-8">
+    	<form action="/register" method="post" class="form-group form-control col-sm-6" accept-charset="UTF-8">
+                {{ form.csrf_token }}
+                {% from "_formelement.tpl" import render_field %}
 
-                <label for="username">Přihlašovací email</label>
-                <input id="username" name="username" type="email" class="form-control" required value={{username}} >
-                <span id=wrongUsername class="warning"></span>
-
-                <label for="password">Heslo (alespoň 8 znaků)</label>
-                <input id="password" name="password" type="password" class="form-control" required />
-                <span id=wrongPassword class="warning"></span>
-
-                <label for="password">Heslo znovu</label>
-                <input id="againPassword" name="againPassword" type="password" class="form-control" required />
-                <span id=diffPassword class="warning"> </span>
+                {{ render_field(form.username, "form-control") }}
+                {{ render_field(form.password, "form-control") }}
+                {{ render_field(form.password_again, "form-control") }}
 
                 <div class="form-row">
 
                     <div class="col">
-                        <label for="firstname">Jméno</label>
-                        <input name="firstname" type="text" class="form-control" required value={{firstname}} >
+                        {{ render_field(form.first_name, "form-control") }}
                     </div>
                     
                     <div class="col">
-                        <label for="lastname">Příjmení</label>
-                        <input name="lastname" type="text" class="form-control" required value={{lastname}} > <br>
+                        {{ render_field(form.last_name, "form-control") }}
                     </div>
 
                 </div>
-                <div class="g-recaptcha" data-sitekey="6LfFdWkUAAAAALQkac4_BJhv7W9Q3v11kDH62aO2"></div>
+                {{ render_field(form.recaptcha) }}
+                {{ render_field(form.submit, "btn btn-primary", False) }}
 
-                <input value="Registrovat" type="submit" class="btn btn-primary" />
                 <a class="col-sm-2" href="/login">Přihlásit se</a><br>
             </form>
     </div>

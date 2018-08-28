@@ -26,7 +26,7 @@
 
             <td class="col-8">
             	<h1>Web je v dočasně mimo provoz</h1>
-                Můžete zatím použít <a href="ketocalc.herokuapp.com">starou verzi aplikace</a> - své recepty tam najdete.
+                Můžete zatím použít <a href="ketocalc.herokuapp.com">starou verzi aplikace</a> - své recepty tam najdete. <br>
                 Odstávka by neměla trvat déle než 24 hodin.
             </td>
 

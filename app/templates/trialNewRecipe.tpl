@@ -31,15 +31,14 @@
 
         .prerecipe__selected-ingredients__table tr {
             transition: background-color 0.5s ease;
-
         }
 
         .tr-mainIngredient {
-            background-color: var(--bgcolor-mainIngredient);
+            background-color: var(--bgcolor_mainIngredient);
         }
 
         .tr-fixedIngredient {
-            background-color: var(--bgcolor-fixedIngredient);
+            background-color: var(--bgcolor_fixedIngredient);
         }
 
         .prerecipe__selected-ingredients__table tr td i {

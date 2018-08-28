@@ -12,6 +12,13 @@
 
 {% block script %}
     <script type="text/javascript">
+
+        $(document).ready(function() {
+            $('.edit__form').hide();
+            $('.data__table').show();
+            $('.editShowButton').show();
+            $('.editHideButton').hide();
+        });
             
         $(document).on("click", ".editShowButton", function() {
             $('.edit__form').show();

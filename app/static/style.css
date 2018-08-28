@@ -93,6 +93,15 @@ div.flashes ul li.warning{
     color: var(--color_warning);
 }
 
+/* Form */
+form ul.errors{
+    /*padding-left: 0px; */
+}
+
+form ul.errors li.warning{
+    color: var(--color_warning);
+}
+
 /* Footer */
 
 .footer {

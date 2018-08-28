@@ -15,15 +15,12 @@
     {% include('navbar_login.tpl') %}
     <div class="container">
     	<div class="col-12">
-    		<form id="loginForm" action="/login" method="post" class="form-group form-control" >
-    	        <label for="username">Přihlašovací email</label>
-    	        <input name="username" type="text" required class="form-control" />
-
-    	        <label for="password">Heslo</label>
-    	        <input name="password" type="password" required class="form-control" />
-    	        <span id=wrongLogin></span>
-
-    	        <input name="loginButton" value="Přihlásit" type="submit" class="btn btn-primary col-sm-3" />
+    		<form action="/login" method="post" class="form-group form-control" >
+                {{ form.csrf_token }}
+                {% from "_formelement.tpl" import render_field %}
+                {{ render_field(form.username, "form-control") }}
+                {{ render_field(form.password, "form-control") }}
+                {{ render_field(form.submit, "btn btn-primary col-sm-3", False) }}
             	<a class="col-sm-2" href="/register">Registrovat</a>
     	    </form>
     	</div>

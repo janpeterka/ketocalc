@@ -1,12 +1,14 @@
 from flask import Flask
 from flask_mail import Mail
+# from flask_bootstrap import Bootstrap
 
-app = Flask(__name__, instance_relative_config=True)
+application = Flask(__name__, instance_relative_config=True)
 
 # a simple page that says hello
-app.config.from_object('config')
-app.secret_key = app.config['SECRET_KEY'][0]
+application.config.from_object('config')
+application.secret_key = application.config['SECRET_KEY'][0]
 
 mail = Mail()
+# Bootstrap(application)
 
 from app import models, routes

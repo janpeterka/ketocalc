@@ -1,4 +1,4 @@
-from app import app
+from app import application
 
 # This will run the app's run() method, in debugging mode.
-app.run()
+# application.run()

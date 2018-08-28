@@ -11,12 +11,13 @@ from flask import abort
 
 from flask_mail import Message
 from werkzeug import secure_filename
+# import flask_security
 
 import requests
 import json
 
-from app import models
-from app import app
+from app import models, forms
+from app import application
 from .data import template_data
 from utils import *
 
@@ -38,162 +39,132 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 
 # global data
-@app.context_processor
+@application.context_processor
 def inject_globals():
     return dict(icons=template_data.icons)
 
 
 # MAIN
 
-@app.before_first_request
+@application.before_first_request
 def session_setup():
     # make the session last indefinitely until it is cleared
     session.permanent = True
 
 
-@app.before_request
+@application.before_request
 def session_management():
-    # if request.path == '/trialnewrecipe' and 'username' in session:
-    #     return redirect('/newrecipe')
+    if application.config['APP_STATE'] == 'shutdown' and request.path not in ['/shutdown', '/static/style.css']:
+        return redirect('/shutdown')
+    else:
+        if request.path == '/shutdown' and application.config['APP_STATE'] != 'shutdown':
+            return redirect('/')
+        if request.path not in ['/register', '/registerValidate', '/login', '/static/style.css', '/trialnewrecipe', '/addIngredientAJAX', '/calcRecipeAJAX', '/shutdown', '/wrongpage']:
+            if 'username' not in session:
+                return redirect('/login')
 
-    if request.path not in ['/register', '/registerValidate', '/login', '/static/style.css', '/trialnewrecipe', '/addIngredientAJAX', '/calcRecipeAJAX']:
-        if 'username' not in session:
-            return redirect('/login')
 
-
-@app.route('/', methods=['GET'])
+@application.route('/', methods=['GET'])
 def main():
     return redirect('/dashboard')
 
 
 # LOGIN
-@app.route('/login', methods=['GET'])
+@application.route('/login', methods=['GET', 'POST'])
 def showLogin():
-    return template('login.tpl')
+    form = forms.LoginForm(request.form)
+    if request.method == 'GET':
+        return template('login.tpl', form=form)
+    elif request.method == 'POST':
+        print(form.username.errors)
+        if not form.validate_on_submit():
+            return template('login.tpl', form=form)
+        if doLogin(form.username.data, form.password.data.encode('utf-8')):
+            return redirect('/dashboard')
+        else:
+            return redirect('/login')
 
 
-@app.route('/login', methods=['POST'])
-def doLogin(from_register=False, username=None, password=None):
-    if username is None:
-        username = request.form['username']
-    if password is None:
-        password = request.form['password'].encode('utf-8')
+def doLogin(username, password, from_register=False):
     user = models.User.load(username)
-
     if user is not None and user.checkLogin(password):
         session['username'] = username
         session['user_id'] = user.id
-        # models.startSession()
         if not from_register:
-            flash("Byl jste úspěšně přihlášen.", 'success')
-            return redirect('/dashboard')
+            flash('Byl jste úspěšně přihlášen.', 'success')
+            return True
     else:
-        flash("Přihlášení se nezdařilo.", 'error')
-        return redirect('/login')
+        flash('Přihlášení se nezdařilo.', 'error')
+        return False
 
 
-@app.route('/logout')
+@application.route('/logout')
 def doLogout():
     session.pop('username', None)
     flash('Byl jste úspěšně odhlášen.', 'info')
-    # models.endSession()
     return redirect('/login')
 
 
-@app.route('/register', methods=['GET'])
+@application.route('/register', methods=['GET', 'POST'])
 def showRegister():
-    return template('register.tpl', username="", firstname="", lastname="")
+    form = forms.RegisterForm(request.form)
+    if request.method == 'GET':
+        return template('register.tpl', form=form)
+    elif request.method == 'POST':
+
+        if not validateRegister(form.username.data):
+            form.username.errors.append('Toto jméno nemůžete použít')
+        if not form.validate_on_submit():
+            return template('register.tpl', form=form)
+
+        user = models.User()
+
+        user.username = form.username.data
+        user.firstName = form.first_name.data
+        user.lastName = form.last_name.data
+        user.password = form.password.data
+        user.pwdhash = user.getPassword(form.password.data.encode('utf-8'))
+        user.password_version = 'bcrypt'
+
+        if doRegister(user):
+            return redirect('/dashboard')
+        else:
+            return template('register.tpl', form=form)
 
 
-@app.route('/register', methods=['POST'])
-def doRegister():
-    if not is_human(request.form['g-recaptcha-response']):
-        flash("Registrace se nezdařila", 'error')
-        return redirect(request.url)
-
-    temp_password = str(request.form['password'])
-    temp_password_2 = str(request.form['againPassword'])
-
-    user = models.User()
-    user.username = request.form['username']
-    user.firstName = request.form['firstname']
-    user.lastName = request.form['lastname']
-    user.pwdhash = user.getPassword(temp_password.encode('utf-8'))
-    user.password_version = 'bcrypt'
-
-    # hashlib.sha256(temp_password.encode('utf-8')).hexdigest()
-
-    if len(user.lastName) == 0:
-        flash("Není vyplněné jméno", 'warning')
-        return redirect(request.url)
-    if len(user.firstName) == 0:
-        flash("Není vyplněné příjmení", 'warning')
-        return redirect(request.url)
-    if len(temp_password) < 8:
-        flash("Heslo je příliš krátké", 'warning')
-        return redirect(request.url)
-    if temp_password_2 != temp_password:
-        flash("Hesla jsou rozdílná!", 'warning')
-        return redirect(request.url)
-    if models.User.load(user.username) is not None:
-        # Username used
-        flash("Email nemůžete použít", 'warning')
-        return redirect(request.url)
-
-    success = user.save()
-
-    if success is not None:
-        doLogin(True, user.username, temp_password.encode('utf-8'))
-        flash("Byl jste úspěšně zaregistrován.", 'success')
-        return redirect('/dashboard')
-
+def doRegister(user):
+    if user.save() is not None:
+        doLogin(user.username, user.password.encode('utf-8'), True)
+        flash('Byl jste úspěšně zaregistrován.', 'success')
+        return True
     else:
-        flash("Registrace neproběhla v pořádku", 'error')
-        return redirect('/register')
+        flash('Registrace neproběhla v pořádku', 'error')
+        return False
 
 
-def is_human(captcha_response):
-    """ Validating recaptcha response from google server
-        Returns True captcha test passed for submitted form else returns False.
-    """
-    secret = app.config['RECAPTCHA_SECRET']
-    payload = {'response': captcha_response, 'secret': secret}
-    response = requests.post("https://www.google.com/recaptcha/api/siteverify", payload)
-    response_text = json.loads(response.text)
-    return response_text['success']
-
-
-@app.route('/registerValidate', methods=['POST'])
-def validateRegister():
-    """validates if username is taken
-
-    [description]
-
-    Decorators:
-        app.route
-    """
-    username = request.form['username']
+# @application.route('/registerValidate', methods=['POST'])
+def validateRegister(username):
     if models.User.load(username) is not None:
-        return "False"
+        return False
     else:
-        return "True"
+        return True
 
 
 # USER PAGE
-@app.route('/dashboard')
+@application.route('/dashboard')
 def showDashboard():
     user = models.User.load(session['username'])
     return template('dashboard.tpl', username=user.username, diets=user.activeDiets, firstname=user.firstName)
 
 
-@app.route('/selectDietAJAX', methods=['POST'])
+@application.route('/selectDietAJAX', methods=['POST'])
 def selectDietAJAX():
     """returns recipes of diet
 
     Used on dashboard
 
     Decorators:
-        app.route
+        application.route
 
     Returns:
         [type] -- [description]
@@ -209,12 +180,12 @@ def selectDietAJAX():
 
 
 # NEW DIET
-@app.route('/newdiet', methods=['GET'])
+@application.route('/newdiet', methods=['GET'])
 def showNewDiet():
     return template('newDiet.tpl')
 
 
-@app.route('/newdiet', methods=['POST'])
+@application.route('/newdiet', methods=['POST'])
 def addDietAJAX():
     diet = models.Diet()
     diet.name = request.form['name']
@@ -226,26 +197,26 @@ def addDietAJAX():
     diet.active = 1
 
     if len(diet.protein) == 0:
-        flash("Vyplňte množství bílkoviny", 'warning')
+        flash('Vyplňte množství bílkoviny', 'warning')
         return redirect(request.url)
     if len(diet.fat) == 0:
-        flash("Vyplňte množství tuku", 'warning')
+        flash('Vyplňte množství tuku', 'warning')
         return redirect(request.url)
     if len(diet.sugar) == 0:
-        flash("Vyplňte množství sacharidů", 'warning')
+        flash('Vyplňte množství sacharidů', 'warning')
         return redirect(request.url)
     if len(diet.name) == 0:
-        flash("Vyplňte název", 'warning')
+        flash('Vyplňte název', 'warning')
         return redirect(request.url)
 
     diet.author = models.User.load(session['username'])
     diet.save()
-    flash("Dieta byla vytvořena.", 'success')
+    flash('Dieta byla vytvořena.', 'success')
     return redirect('/diet={}'.format(diet.id))
 
 
 # SHOW DIET PAGE
-@app.route('/diet=<diet_id>')
+@application.route('/diet=<diet_id>')
 def showDiet(diet_id):
     diet = models.Diet.load(diet_id)
 
@@ -257,7 +228,7 @@ def showDiet(diet_id):
     return template('showDiet.tpl', diet=diet, recipes=diet.recipes, diets=diet.author.diets)
 
 
-@app.route('/diet=<diet_id>/remove', methods=['POST'])
+@application.route('/diet=<diet_id>/remove', methods=['POST'])
 def removeDiet(diet_id):
     diet = models.Diet.load(diet_id)
 
@@ -266,14 +237,14 @@ def removeDiet(diet_id):
 
     if not diet.used:  # wip
         diet.remove()
-        flash("Dieta byla smazána", 'success')
-        return redirect("/alldiets")
+        flash('Dieta byla smazána', 'success')
+        return redirect('/alldiets')
     else:
-        flash("Tato dieta má recepty, nelze smazat", 'error')
+        flash('Tato dieta má recepty, nelze smazat', 'error')
         return redirect('/diet={}'.format(diet_id))
 
 
-@app.route('/diet=<diet_id>/archive', methods=['POST'])
+@application.route('/diet=<diet_id>/archive', methods=['POST'])
 def archiveDiet(diet_id):
     diet = models.Diet.load(diet_id)
 
@@ -281,9 +252,9 @@ def archiveDiet(diet_id):
         return redirect('/wrongpage')
 
     if diet.active:
-        flash("Dieta byla archivována", 'info')
+        flash('Dieta byla archivována', 'info')
     else:
-        flash("Dieta byla aktivována", 'info')
+        flash('Dieta byla aktivována', 'info')
 
     diet.active = not diet.active
     diet.edit()
@@ -291,7 +262,7 @@ def archiveDiet(diet_id):
     return redirect('/diet={}'.format(diet_id))
 
 
-# @app.route('/diet=<dietID>/export', methods=['POST'])
+# @application.route('/diet=<dietID>/export', methods=['POST'])
 # def exportDiet(dietID):
 #     recipes = loadDietRecipes(dietID)
 #     newDietID = int(request.form['diet'])
@@ -309,7 +280,7 @@ def archiveDiet(diet_id):
 #     return redirect('/diet={}'.format(newDietID))
 
 
-@app.route('/diet=<diet_id>/edit', methods=['POST'])
+@application.route('/diet=<diet_id>/edit', methods=['POST'])
 def editDietAJAX(diet_id):
     diet = models.Diet.load(diet_id)
 
@@ -327,18 +298,18 @@ def editDietAJAX(diet_id):
         diet.sugar = request.form['sugar']
 
     diet.edit()
-    flash("Dieta byla upravena.", 'success')
+    flash('Dieta byla upravena.', 'success')
     return redirect('/diet={}'.format(diet_id))
 
 
-@app.route('/alldiets')
+@application.route('/alldiets')
 def showAllDiets():
     """show all diets sorted
 
     active on top
 
     Decorators:
-        app.route
+        application.route
 
     Returns:
         template -- [description]
@@ -350,34 +321,34 @@ def showAllDiets():
 
 
 # NEW RECIPE PAGE
-@app.route('/trialnewrecipe')
+@application.route('/trialnewrecipe')
 def showTrialNewRecipe():
     ingredients = models.Ingredient.loadAllByUsername('basic')
     trial_diet = models.Diet.load(2)  # wip
     return template('trialNewRecipe.tpl', ingredients=ingredients, diet=trial_diet)
 
 
-@app.route('/newrecipe')
+@application.route('/newrecipe')
 def showNewRecipe():
     active_diets = models.User.load(session['username']).activeDiets
     ingredients = models.Ingredient.loadAllByUsername(session['username'])
     return template('newRecipe.tpl', ingredients=ingredients, diets=active_diets)
 
 
-@app.route('/addIngredientAJAX', methods=['POST'])
+@application.route('/addIngredientAJAX', methods=['POST'])
 def addIngredienttoRecipeAJAX():
-    ingredient = models.Ingredient.load(request.form["prerecipe__add-ingredient__form__select"])
+    ingredient = models.Ingredient.load(request.form['prerecipe__add-ingredient__form__select'])
     return jsonify(ingredient.json)
 
 
-@app.route('/calcRecipeAJAX', methods=['POST'])
+@application.route('/calcRecipeAJAX', methods=['POST'])
 def calcRecipeAJAX(test_dataset=None):
     """[summary]
 
     [description]
 
     Decorators:
-        app.route
+        application.route
 
     Keyword Arguments:
         test_ingredients {array} -- array of json ingredients (default: {None})
@@ -394,7 +365,7 @@ def calcRecipeAJAX(test_dataset=None):
         diet = models.Diet.load(test_dataset['diet_id'])
 
     if diet is None:
-        return "False"
+        return 'False'
 
     ingredients = []
     for json_i in json_ingredients:
@@ -407,7 +378,7 @@ def calcRecipeAJAX(test_dataset=None):
     ingredients = calc(ingredients, diet)
 
     if ingredients is None:
-        return "False"
+        return 'False'
 
     totals = {'calorie': 0, 'sugar': 0, 'fat': 0, 'protein': 0, 'amount': 0}
 
@@ -415,7 +386,7 @@ def calcRecipeAJAX(test_dataset=None):
     for ing in ingredients:
 
         if ing.amount < 0:
-            return "False"
+            return 'False'
 
         if hasattr(ing, 'min'):
             json_ingredient = {'id': ing.id, 'calorie': math.floor(ing.calorie * ing.amount * 100) / 100, 'name': ing.name, 'sugar': math.floor(ing.sugar * ing.amount * 100) / 100, 'fat': math.floor(ing.fat * ing.amount * 100) / 100, 'protein': math.floor(ing.protein * ing.amount * 100) / 100, 'amount': math.floor(ing.amount * 10000) / 100, 'main': ing.main, 'fixed': ing.fixed, 'min': ing.min, 'max': ing.max}  # wip
@@ -443,7 +414,7 @@ def calcRecipeAJAX(test_dataset=None):
     return jsonify(result)
 
 
-@app.route('/recalcRecipeAJAX', methods=['POST'])
+@application.route('/recalcRecipeAJAX', methods=['POST'])
 def recalcRecipeAJAX(test_dataset=None):
     # need to rewrite #wip
 
@@ -552,7 +523,7 @@ def recalcRecipeAJAX(test_dataset=None):
     return jsonify(solutionJSON)
 
 
-@app.route('/saveRecipeAJAX', methods=['POST'])
+@application.route('/saveRecipeAJAX', methods=['POST'])
 def addRecipeAJAX():
     temp_ingredients = request.json['ingredients']
     diet_id = request.json['dietID']
@@ -570,34 +541,34 @@ def addRecipeAJAX():
     recipe.diet = models.Diet.load(diet_id)
 
     last_id = recipe.save(ingredients)
-    flash("Recept byl uložen", 'success')
+    flash('Recept byl uložen', 'success')
     return ('/recipe=' + str(last_id))
 
 
-@app.route('/recipe=<recipe_id>')
+@application.route('/recipe=<recipe_id>')
 def showRecipe(recipe_id):
     recipe_data = models.Recipe.load(recipe_id).loadRecipeForShow()
     return template('showRecipe.tpl', recipe=recipe_data['recipe'], totals=recipe_data['totals'])
 
 
-@app.route('/recipe=<recipe_id>/print')
+@application.route('/recipe=<recipe_id>/print')
 def printRecipe(recipe_id):
     recipe_data = models.Recipe.load(recipe_id).loadRecipeForShow()
     return template('printRecipe.tpl', recipe=recipe_data['recipe'], totals=recipe_data['totals'])
 
 
-@app.route('/recipe=<recipe_id>/remove', methods=['POST'])
+@application.route('/recipe=<recipe_id>/remove', methods=['POST'])
 def removeRecipeAJAX(recipe_id):
     if session['username'] != models.Recipe.load(recipe_id).author.username:
         return redirect('/wrongpage')
 
     recipe = models.Recipe.load(recipe_id)
     recipe.remove()
-    flash("Recept byl smazán.", 'success')
+    flash('Recept byl smazán.', 'success')
     return redirect('/')
 
 
-@app.route('/recipe=<recipe_id>/edit', methods=['POST'])
+@application.route('/recipe=<recipe_id>/edit', methods=['POST'])
 def editRecipeAJAX(recipe_id):
     if session['username'] != models.Recipe.load(recipe_id).author.username:
         return redirect('/wrongpage')
@@ -606,74 +577,69 @@ def editRecipeAJAX(recipe_id):
     recipe.name = request.form['name']
     recipe.type = request.form['size']
     recipe.edit()
-    flash("Recept byl upraven.", 'success')
+    flash('Recept byl upraven.', 'success')
     return redirect('/recipe={}'.format(recipe_id))
 
 
-@app.route('/allrecipes')
+@application.route('/allrecipes')
 def showAllRecipes():
     user = models.User.load(session['username'])
-    return template("allRecipes.tpl", diets=user.diets)
+    return template('allRecipes.tpl', diets=user.diets)
 
 
-@app.route('/diet=<diet_id>/print')
+@application.route('/diet=<diet_id>/print')
 def printDietRecipes(diet_id):
     diet = models.Diet.load(diet_id)
 
     for recipe in diet.recipes:
         recipe_data = recipe.loadRecipeForShow()
         recipe.totals = recipe_data['totals']
-    return template("printAllRecipes.tpl", recipes=diet.recipes)
+    return template('printAllRecipes.tpl', recipes=diet.recipes)
 
 
-@app.route('/printallrecipes')
+@application.route('/printallrecipes')
 def printAllRecipes():
     recipes = models.User.load(session['username']).recipes
 
     for recipe in recipes:
         recipe_data = recipe.loadRecipeForShow()
         recipe.totals = recipe_data['totals']
-    return template("printAllRecipes.tpl", recipes=recipes)
+    return template('printAllRecipes.tpl', recipes=recipes)
 
 
 # NEW INGREDIENT PAGE
-@app.route('/newingredient', methods=['GET'])
+@application.route('/newingredient', methods=['GET', 'POST'])
 def showNewIngredient():
-    return template('newIngredient.tpl')
+    form = forms.NewIngredientForm()
+    if request.method == 'GET':
+        return template('newIngredient.tpl', form=form)
+    elif request.method == 'POST':
+        ingredient = models.Ingredient()
+        ingredient.name = form.name.data
+        ingredient.calorie = form.calorie.data
+        ingredient.sugar = form.sugar.data
+        ingredient.fat = form.fat.data
+        ingredient.protein = form.protein.data
+        ingredient.author = session['username']
+        if not form.validate_on_submit():
+            return template('newIngredient.tpl', form=form)
+
+        if doNewIngredient(ingredient):
+            flash('Nová surovina byla vytvořena', 'success')
+            return redirect('/ingredient={}'.format(ingredient.id))
+        else:
+            flash('Nepodařilo se vytvořit surovinu', 'error')
+            return template('newIngredient.tpl', form=form)
 
 
-@app.route('/newingredient', methods=['POST'])
-def addNewIngredientAJAX():
-    ingredient = models.Ingredient()
-    ingredient.name = request.form['name']
-    ingredient.calorie = request.form['calorie']
-    ingredient.sugar = request.form['sugar']
-    ingredient.fat = request.form['fat']
-    ingredient.protein = request.form['protein']
-    ingredient.author = session['username']
-
-    if len(ingredient.protein) == 0:
-        flash("Zadejte množství bílkoviny", 'warning')
-        return redirect(request.url)
-    if len(ingredient.calorie) == 0:
-        flash("Zadejte kalorie", 'warning')
-        return redirect(request.url)
-    if len(ingredient.fat) == 0:
-        flash("Zadejte množství tuku", 'warning')
-        return redirect(request.url)
-    if len(ingredient.sugar) == 0:
-        flash("Zadejte množství sacharidů", 'warning')
-        return redirect(request.url)
-    if len(ingredient.name) == 0:
-        flash("Zadejte název suroviny", 'warning')
-        return redirect(request.url)
-
-    ingredient.save()
-    flash("Nová surovina byla vytvořena", 'success')
-    return redirect('/newingredient')
+def doNewIngredient(ingredient):
+    if ingredient.save() is not None:
+        return True
+    else:
+        return False
 
 
-@app.route('/ingredient=<ingredient_id>')
+@application.route('/ingredient=<ingredient_id>')
 def showIngredient(ingredient_id):
     ingredient = models.Ingredient.load(ingredient_id)
 
@@ -685,7 +651,7 @@ def showIngredient(ingredient_id):
     return template('showIngredient.tpl', ingredient=ingredient)
 
 
-@app.route('/ingredient=<ingredient_id>/remove', methods=['POST'])
+@application.route('/ingredient=<ingredient_id>/remove', methods=['POST'])
 def removeIngredientAJAX(ingredient_id):
     ingredient = models.Ingredient.load(ingredient_id)
 
@@ -694,14 +660,14 @@ def removeIngredientAJAX(ingredient_id):
 
     if not ingredient.used:
         ingredient.remove()
-        flash("Surovina byla smazána", 'success')
-        return redirect("/")
+        flash('Surovina byla smazána', 'success')
+        return redirect('/')
     else:
-        flash("Tato surovina je použita, nelze smazat", 'error')
+        flash('Tato surovina je použita, nelze smazat', 'error')
         return redirect('/ingredient={}'.format(ingredient_id))
 
 
-@app.route('/ingredient=<ingredient_id>/edit', methods=['POST'])
+@application.route('/ingredient=<ingredient_id>/edit', methods=['POST'])
 def editIngredientAJAX(ingredient_id):
     ingredient = models.Ingredient.load(ingredient_id)
 
@@ -716,41 +682,41 @@ def editIngredientAJAX(ingredient_id):
         ingredient.fat = request.form['fat']
         ingredient.sugar = request.form['sugar']
         ingredient.edit()
-        flash("Surovina byla upravena.", 'success')
+        flash('Surovina byla upravena.', 'success')
         return redirect('/ingredient={}'.format(ingredient_id))
     else:
         ingredient.edit()
-        flash("Název a kalorická hodnota byly upraveny.", 'success')
+        flash('Název a kalorická hodnota byly upraveny.', 'success')
         return redirect('/ingredient={}'.format(ingredient_id))
 
 
-@app.route('/allingredients')
+@application.route('/allingredients')
 def showAllIngredients():
     # basic_ingredients = models.Ingredient.loadAllByUsername('default')
     ingredients = models.Ingredient.loadAllByUsername(session['username'])
-    return template("allIngredients.tpl", ingredients=ingredients)
+    return template('allIngredients.tpl', ingredients=ingredients)
 
 
-@app.route('/user')
+@application.route('/user')
 def showUser():
     user = models.User.load(session['username'])
     return template('showUser.tpl', user=user)
 
 
-@app.route('/user/edit', methods=['POST'])
+@application.route('/user/edit', methods=['POST'])
 def editUserAJAX():
     user = models.User.load(session['username'])
     user.firstName = request.form['firstname']
     user.lastName = request.form['lastname']
     success = user.edit()
     if success is not None:
-        flash("Uživatel byl upraven", 'success')
+        flash('Uživatel byl upraven', 'success')
     else:
-        flash("Nepovedlo se změnit uživatele", 'error')
+        flash('Nepovedlo se změnit uživatele', 'error')
     return template('showUser.tpl', user=user)
 
 
-@app.route('/user/password_change', methods=['POST'])
+@application.route('/user/password_change', methods=['POST'])
 def changeUserAJAX():
     user = models.User.load(session['username'])
 
@@ -762,9 +728,9 @@ def changeUserAJAX():
 
     success = user.edit()
     if success is not None:
-        flash("Heslo bylo změněno", 'success')
+        flash('Heslo bylo změněno', 'success')
     else:
-        flash("Nepovedlo se změnit heslo", 'error')
+        flash('Nepovedlo se změnit heslo', 'error')
     return template('showUser.tpl', user=user)
 
 
@@ -857,9 +823,9 @@ def calc(ingredients, diet):
 
         # Faster way?? wip
         # solve for positive numbers
-        result1 = solvei(poly(in1), ">=")
-        result2 = solvei(poly(in2), ">=")
-        result3 = solvei(poly(in3), ">=")
+        result1 = solvei(poly(in1), '>=')
+        result2 = solvei(poly(in2), '>=')
+        result3 = solvei(poly(in3), '>=')
 
         interval = (result1[0].intersect(result2[0])).intersect(result3[0])
         if interval.is_EmptySet:
@@ -874,7 +840,6 @@ def calc(ingredients, diet):
             min_sol = 0
         else:
             min_sol = float(math.floor(interval.left * 10000) / 10000)
-
 
         if max_sol < min_sol:
             return None
@@ -978,7 +943,7 @@ def calc(ingredients, diet):
         return None
 
 
-@app.route('/feedback', methods=['GET'])
+@application.route('/feedback', methods=['GET'])
 def showFeedback():
     return template('feedback.tpl')
 
@@ -988,90 +953,90 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-@app.route('/feedback', methods=['POST'])
+@application.route('/feedback', methods=['POST'])
 def sendFeedback():
     msg = Message('[ketocalc] [{}]'.format(request.form['type']), sender='ketocalc', recipients=['ketocalc.jmp@gmail.com'])
-    msg.body = "Message: {}\n".format(request.form['message'])
-    msg.body += "Send by: {} [user: {}]".format(request.form['sender'], session['username'])
+    msg.body = 'Message: {}\n'.format(request.form['message'])
+    msg.body += 'Send by: {} [user: {}]'.format(request.form['sender'], session['username'])
 
     if 'file' not in request.files:
         mail.send(msg)
-        flash("Vaše připomínka byla zaslána na vyšší místa.", 'success')
+        flash('Vaše připomínka byla zaslána na vyšší místa.', 'success')
         return redirect('/')
     else:
         file = request.files['file']
 
     if file.filename == '':
         mail.send(msg)
-        flash("Vaše připomínka byla zaslána na vyšší místa.", 'success')
+        flash('Vaše připomínka byla zaslána na vyšší místa.', 'success')
         return redirect('/')
     elif file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        with app.open_resource(os.path.join(app.config['UPLOAD_FOLDER'], filename)) as fp:
-            msg.attach("screenshot", "image/{}".format(filename.split(".")[1]), fp.read())
+        file.save(os.path.join(application.config['UPLOAD_FOLDER'], filename))
+        with application.open_resource(os.path.join(application.config['UPLOAD_FOLDER'], filename)) as fp:
+            msg.attach('screenshot', 'image/{}'.format(filename.split('.')[1]), fp.read())
 
         mail.send(msg)
-        flash("Vaše připomínka byla zaslána na vyšší místa.", 'success')
+        flash('Vaše připomínka byla zaslána na vyšší místa.', 'success')
         return redirect('/')
 
 
 # S'MORE
-@app.route('/index.html')
+@application.route('/index.html')
 def indexhtml():
     return redirect('/')
 
 
-@app.route('/changelog')
+@application.route('/changelog')
 def showChangelog():
     return template('changelog.tpl')
 
 
-@app.route('/help')
+@application.route('/help')
 def showHelp():
     return template('help.tpl')
 
 
 # ERROR
-@app.route('/wrongpage')
+@application.route('/wrongpage')
 def wrongPage():
     return template('wrongPage.tpl')
 
 
-@app.route('/shutdown')
+@application.route('/shutdown')
 def shutdown():
     return template('shutdown.tpl')
 
 
-@app.route('/testing')
+@application.route('/testing')
 def testingPage():
     if session['username'] != 'admin':
         redirect('/wrongpage')
-    return template('testing.tpl', data=app.config['TEST_VAR'])
+    return template('testing.tpl', data=application.config['TEST_VAR'])
 
 
-@app.route('/google3748bc0390347e56.html')
+@application.route('/google3748bc0390347e56.html')
 def googleVerification():
     return template('google3748bc0390347e56.html')
 
 
-@app.errorhandler(404)
+@application.errorhandler(404)
 def error404(error):
     # Missing page
     return template('err404.tpl')
 
 
-@app.errorhandler(405)
+@application.errorhandler(405)
 def error405(error):
     # Action not allowed (AJAX)
     return template('wrongPage.tpl')
 
 
-@app.errorhandler(500)
+@application.errorhandler(500)
 def error500(error):
     # Internal error
     return template('err500.tpl')
 
 
-if __name__ == "__main__":
-    app.run(debug=True)
+if __name__ == '__main__':
+    aplication.run(debug=True)

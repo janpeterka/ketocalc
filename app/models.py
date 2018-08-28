@@ -16,6 +16,8 @@ import os
 import bcrypt
 import hashlib
 
+import unidecode
+
 
 engine = create_engine(os.environ.get('DB_STRING'), echo=False)  # change to False
 Session = sessionmaker(bind=engine)
@@ -129,7 +131,7 @@ class Ingredient(Base):
     def loadAllByUsername(username, ordered=True):
         ingredients = s.query(Ingredient).filter(Ingredient.author == username).all()
         if ordered:
-            ingredients.sort(key=lambda x: x.name, reverse=False)
+            ingredients.sort(key=lambda x: unidecode.unidecode(x.name.lower()), reverse=False)
         return ingredients
 
     def loadAmount(self, recipe_id):
@@ -219,7 +221,7 @@ class User(Base):
         for diet in self.diets:
             recipes.extend(diet.recipes)
         if ordered:
-            recipes.sort(key=lambda x: x.name, reverse=False)
+            recipes.sort(key=lambda x: unidecode.unidecode(x.name.lower()), reverse=False)
         return recipes
 
     @property
