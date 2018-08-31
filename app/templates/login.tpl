@@ -3,13 +3,8 @@
     Přihlašování
 {% endblock %}
 
-{% block style %}
-    
-{% endblock %}
-
-{% block script %}
-
-{% endblock %}
+{% block style %}{% endblock %}
+{% block script %}{% endblock %}
 
 {% block content %}
     {% include('navbar_login.tpl') %}

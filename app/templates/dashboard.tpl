@@ -46,13 +46,13 @@
             </div>
 
             <div class="form-inline col" style="display: block;">
-                <form id="selectDietForm" method="POST" action="/selectDietAJAX">
-                    <select id="selectDiet" name="selectDiet" class="form-control">
+                <form id="selectDietForm" method="POST">
+                    <select name="selectDiet" class="form-control">
                         {% for diet in diets: %}
                             <option value="{{diet.id}}">{{ diet.name }}</option>
                         {% endfor %}
                     </select>
-                    <input id="ajaxButton" type="submit" class="btn btn-primary" value="Změnit dietu" />
+                    <input type="submit" class="btn btn-primary" value="Změnit dietu" />
                 </form>
             </div>
         </div>

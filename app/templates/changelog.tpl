@@ -9,6 +9,11 @@
 			<h3>Beta</h3>
 			<h6>v2</h6>
 			<ul>
+				<li> v2.4.2 <i>31.8.2018</i>
+					<ul>
+						<li>recepty u suroviny</li>
+					</ul>
+				</li>
 				<li> v2.4.1 <i>9.8.2018</i>
 					<ul>
 						<li>ukázkový recept</li>

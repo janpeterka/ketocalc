@@ -1,21 +1,42 @@
 {% extends "base.tpl" %}
 {% block title %}
-	Recept
+    {% if show %}
+        Recept
+    {% else %}
+        Vytisknout recept - {{ recipe.name }}
+    {% endif %}
 {% endblock %}
     
 {% block style %}
-    <style type="text/css" media="screen">
+
+    {% if show %}
+        <style type="text/css" media="screen">
             .edit__form{
                 display: none;
             }
 
             .editHideButton{
                 display: none;
-            }            
+            }
         </style>
+    {% else %}
+        <style type="text/css" media="screen">
+            .totals {
+            background-color: var(--bgcolor_totals);
+            }      
+
+            @media print {
+                body {-webkit-print-color-adjust: exact;}
+                .totals {
+                    background-color: var(--bgcolor_totals);
+                }
+            } 
+        </style>
+    {% endif %}
 {% endblock %}
 
 {% block script %}
+    {% if show %}
 	<script type="text/javascript">
 
             $(document).on("click", ".editShowButton", function() {
@@ -38,12 +59,16 @@
             });
     
         </script>
+        {% endif %}
 {% endblock %}
 
 {% block content %}
-    {% include('navbar.tpl') %}
+    {% if show %}
+        {% include('navbar.tpl') %}
+    {% endif %}
     <div class="container">
         <div class="col-12">
+            {% if show %}
             <form action="/recipe={{recipe.id}}/edit" class="form-inline edit__form" method="post" accept-charset="utf-8">
                 <input type="text" name="name" class="form-control col-4" value="{{ recipe.name }}"><br>
                 <select name="size" class="form-control">
@@ -52,8 +77,13 @@
                 </select>
                 <input type="submit" value="Změnit recept" class="btn btn-warning">
             </form>
+            {% endif %}
 
-            <span class="data__table">
+            {% if show %}
+                <span class="data__table">
+            {% else %}
+                <span class="data__table d-print-table">
+            {% endif %}
 
                 <h2>{{ recipe.name }}</h2>
 
@@ -89,7 +119,7 @@
                     </tr>
                 {% endfor %}
 
-                <tr>
+                <tr class="totals">
                     <td>Celkem</td>
                     <td>{{ totals.calorie }} kcal</td>
                     <td>{{ totals.protein }} g</td>
@@ -99,6 +129,8 @@
                     <td>Poměr: {{ totals.ratio }} : 1</td>
                 </tr>
             </table>
+
+            {% if show %}
             <div class="row">
                 <form action="/recipe={{recipe.id}}/remove" method="post" class="form col-5"  accept-charset="utf-8" onsubmit="return confirm('Opravdu chcete smazat recept?');">
                     <button type="button" class="editShowButton btn btn-warning">Upravit {{ icons.edit }}</button>
@@ -119,6 +151,7 @@
                     </select>
                 </form> -->
             </div>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

@@ -4,7 +4,6 @@ from flask_mail import Mail
 
 application = Flask(__name__, instance_relative_config=True)
 
-# a simple page that says hello
 application.config.from_object('config')
 application.secret_key = application.config['SECRET_KEY'][0]
 

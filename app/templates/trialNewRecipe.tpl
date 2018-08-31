@@ -539,7 +539,7 @@
 {% endblock %}
 
 {% block content %}
-	{% include('navbar.tpl') %}
+	{% include('navbar_login.tpl') %}
         <div class="container-fluid container__main">
             <div class="row">
                 <div class="prerecipe col-lg-6 col-md-12">

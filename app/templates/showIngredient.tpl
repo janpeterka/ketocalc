@@ -40,79 +40,92 @@
 {% block content %}
     {% include('navbar.tpl') %}
     <div class="container">
-        <div class="col-12">
-            <form action="/ingredient={{ingredient.id}}/edit" class="edit__form form-group" method="post" accept-charset="utf-8">
-                <table class="table">
+        <div class="row">
+  
+            <div class="col">
+                <h4>Seznam receptů:</h4>
+                <ul>
+                    {% for recipe in recipes %}
+                    <li><a href='/recipe={{ recipe.id }}'>{{ recipe.name }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="col">
+                <form action="/ingredient={{ingredient.id}}/edit" class="edit__form form-group" method="post" accept-charset="utf-8">
+                    <table class="table">
+                        <tr>
+                            <th>Název</th>
+                            <th>Kalorie</th>
+                            <th>Bílkovina</th>
+                            <th>Tuk</th>
+                            <th>Sacharidy</th>
+                            <th>Upravit</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="text" class="form-control" name="name" value="{{ ingredient.name }}" />
+                            </td>
+                            <td>
+                                <input type="text" class="form-control" name="calorie" value="{{ ingredient.calorie }}" />
+                            </td>
+                            <td>
+                                {% if ingredient.used == False %}
+                                    <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="protein" value="{{ ingredient.protein }}"/>
+                                {% else %}
+                                    {{ ingredient.protein }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if ingredient.used == False %}
+                                    <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="fat" value="{{ ingredient.fat }}"/>
+                                {% else %}
+                                    {{ ingredient.fat }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if ingredient.used == False %}
+                                    <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="sugar" value="{{ ingredient.sugar }}"/>
+                                {% else %}
+                                    {{ ingredient.sugar }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                <input type="submit" class="btn btn-warning" value="Uložit změnu" />
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+
+                <table class=" data__table table">
                     <tr>
                         <th>Název</th>
                         <th>Kalorie</th>
                         <th>Bílkovina</th>
                         <th>Tuk</th>
                         <th>Sacharidy</th>
-                        <th>Upravit</th>
                     </tr>
                     <tr>
-                        <td>
-                            <input type="text" class="form-control" name="name" value="{{ ingredient.name }}" />
-                        </td>
-                        <td>
-                            <input type="text" class="form-control" name="calorie" value="{{ ingredient.calorie }}" />
-                        </td>
-                        <td>
-                            {% if ingredient.used == False %}
-                                <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="protein" value="{{ ingredient.protein }}"/>
-                            {% else %}
-                                {{ ingredient.protein }}
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if ingredient.used == False %}
-                                <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="fat" value="{{ ingredient.fat }}"/>
-                            {% else %}
-                                {{ ingredient.fat }}
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if ingredient.used == False %}
-                                <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="sugar" value="{{ ingredient.sugar }}"/>
-                            {% else %}
-                                {{ ingredient.sugar }}
-                            {% endif %}
-                        </td>
-                        <td>
-                            <input type="submit" class="btn btn-warning" value="Uložit změnu" />
-                        </td>
+                        <td>{{ ingredient.name }}</td>
+                        <td>{{ ingredient.calorie }}</td>
+                        <td>{{ ingredient.protein }}</td>
+                        <td>{{ ingredient.fat }}</td>
+                        <td>{{ ingredient.sugar }}</td>
                     </tr>
-                </table>
-            </form>
+                 </table>
 
-            <table class=" data__table table">
-                <tr>
-                    <th>Název</th>
-                    <th>Kalorie</th>
-                    <th>Bílkovina</th>
-                    <th>Tuk</th>
-                    <th>Sacharidy</th>
-                </tr>
-                <tr>
-                    <td>{{ ingredient.name }}</td>
-                    <td>{{ ingredient.calorie }}</td>
-                    <td>{{ ingredient.protein }}</td>
-                    <td>{{ ingredient.fat }}</td>
-                    <td>{{ ingredient.sugar }}</td>
-                </tr>
-             </table>
+                <form action="/ingredient={{ingredient.id}}/remove" onsubmit="return confirm('Opravdu chcete smazat surovinu?');" method="post" accept-charset="utf-8">
+                    <button type="button" class="editShowButton btn btn-warning">Upravit {{ icons.edit }}</button>
+                    <button type="button" class="editHideButton btn btn-warning">Zrušit úpravy {{ icons.edit }}</button>
+                    {% if ingredient.used == False %}
+                        <button type="submit" class="btn btn-danger">Smazat surovinu {{ icons.delete }}</button>
+                    {% else %}
+                        <button type="submit" class="btn btn-danger" disabled>Nelze smazat {{ icons.delete }}</button>
+                        {# <input type="submit" class="btn btn-danger" disabled value="Nelze smazat" /> #}
+                    {% endif %}
+                </form>
+            </div>
 
-            <form action="/ingredient={{ingredient.id}}/remove" onsubmit="return confirm('Opravdu chcete smazat surovinu?');" method="post" accept-charset="utf-8">
-                <button type="button" class="editShowButton btn btn-warning">Upravit {{ icons.edit }}</button>
-                <button type="button" class="editHideButton btn btn-warning">Zrušit úpravy {{ icons.edit }}</button>
-                {% if ingredient.used == False %}
-                    <button type="submit" class="btn btn-danger">Smazat surovinu {{ icons.delete }}</button>
-                {% else %}
-                    <button type="submit" class="btn btn-danger" disabled>Nelze smazat {{ icons.delete }}</button>
-                    {# <input type="submit" class="btn btn-danger" disabled value="Nelze smazat" /> #}
-                {% endif %}
-            </form>
         </div>
     </div>
 {% endblock %}

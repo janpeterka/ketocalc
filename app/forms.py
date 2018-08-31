@@ -38,3 +38,13 @@ class NewIngredientForm(FlaskForm):
     fat = MyFloatField('Množství tuku / 100 g', [validators.InputRequired('Množství musí být vyplněno'), validators.NumberRange(0, 100, 'Musí být mezi 0 a 100')])
     calorie = MyFloatField('Množství kalorií (kcal) / 100 g', [validators.InputRequired('Množství musí být vyplněno'), validators.NumberRange(0, 100, 'Musí být mezi 0 a 100')])
     submit = SubmitField('Přidat surovinu')
+
+
+class NewDietForm(FlaskForm):
+    name = StringField('Název diety', [validators.InputRequired('Název musí být vyplněn')])
+    protein = MyFloatField('Množství bílkovin / den', [validators.InputRequired('Množství musí být vyplněno')])
+    sugar = MyFloatField('Množství sacharidů / den', [validators.InputRequired('Množství musí být vyplněno')])
+    fat = MyFloatField('Množství tuku / den', [validators.InputRequired('Množství musí být vyplněno')])
+    small_size = MyFloatField('Procentuální velikost malého jídla', [validators.InputRequired('Množství musí být vyplněno')])
+    big_size = MyFloatField('Procentuální velikost velkého jídla', [validators.InputRequired('Množství musí být vyplněno')])
+    submit = SubmitField('Přidat dietu')

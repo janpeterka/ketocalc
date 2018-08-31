@@ -13,8 +13,8 @@ from flask_mail import Message
 from werkzeug import secure_filename
 # import flask_security
 
-import requests
-import json
+# import requests
+# import json
 
 from app import models, forms
 from app import application
@@ -32,6 +32,7 @@ from sympy import poly
 import math
 import os
 
+from functools import wraps
 # Printing
 # import pdfkit
 
@@ -46,6 +47,24 @@ def inject_globals():
 
 # MAIN
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in session and 'user_id' not in session:
+            return redirect('/login')
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session['user_id'] != 'admin':
+            redirect('/wrongpage')
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 @application.before_first_request
 def session_setup():
     # make the session last indefinitely until it is cleared
@@ -56,12 +75,8 @@ def session_setup():
 def session_management():
     if application.config['APP_STATE'] == 'shutdown' and request.path not in ['/shutdown', '/static/style.css']:
         return redirect('/shutdown')
-    else:
-        if request.path == '/shutdown' and application.config['APP_STATE'] != 'shutdown':
+    elif request.path == '/shutdown' and application.config['APP_STATE'] != 'shutdown':
             return redirect('/')
-        if request.path not in ['/register', '/registerValidate', '/login', '/static/style.css', '/trialnewrecipe', '/addIngredientAJAX', '/calcRecipeAJAX', '/shutdown', '/wrongpage']:
-            if 'username' not in session:
-                return redirect('/login')
 
 
 @application.route('/', methods=['GET'])
@@ -76,7 +91,6 @@ def showLogin():
     if request.method == 'GET':
         return template('login.tpl', form=form)
     elif request.method == 'POST':
-        print(form.username.errors)
         if not form.validate_on_submit():
             return template('login.tpl', form=form)
         if doLogin(form.username.data, form.password.data.encode('utf-8')):
@@ -101,6 +115,7 @@ def doLogin(username, password, from_register=False):
 @application.route('/logout')
 def doLogout():
     session.pop('username', None)
+    session.pop('user_id', None)
     flash('Byl jste úspěšně odhlášen.', 'info')
     return redirect('/login')
 
@@ -142,7 +157,7 @@ def doRegister(user):
         return False
 
 
-# @application.route('/registerValidate', methods=['POST'])
+@application.route('/registerValidate', methods=['POST'])
 def validateRegister(username):
     if models.User.load(username) is not None:
         return False
@@ -152,12 +167,14 @@ def validateRegister(username):
 
 # USER PAGE
 @application.route('/dashboard')
+@login_required
 def showDashboard():
-    user = models.User.load(session['username'])
-    return template('dashboard.tpl', username=user.username, diets=user.activeDiets, firstname=user.firstName)
+    user = models.User.load(session['user_id'])
+    return template('dashboard.tpl', diets=user.activeDiets, firstname=user.firstName)
 
 
 @application.route('/selectDietAJAX', methods=['POST'])
+@login_required
 def selectDietAJAX():
     """returns recipes of diet
 
@@ -180,86 +197,77 @@ def selectDietAJAX():
 
 
 # NEW DIET
-@application.route('/newdiet', methods=['GET'])
+@application.route('/newdiet', methods=['GET', 'POST'])
+@login_required
 def showNewDiet():
+    form = forms.NewDietForm()
+    if request.method == 'GET':
+        return template('newDiet.tpl', form=form)
+    elif request.method == 'POST':
+        diet = models.Diet()
+        diet.name = form.name.data
+        diet.sugar = form.sugar.data
+        diet.fat = form.fat.data
+        diet.protein = form.protein.data
+        diet.small_size = form.small_size.data
+        diet.big_size = form.big_size.data
+        diet.active = 1
+        diet.author = models.User.load(session['user_id'])
+
+        if not form.validate_on_submit():
+            return template('newDiet.tpl', form=form)
+
+        if diet.save():
+            flash('Nová dieta byla vytvořena', 'success')
+            return redirect('/diet={}'.format(diet.id))
+        else:
+            flash('Nepodařilo se vytvořit dietu', 'error')
+            return template('newDiet.tpl', form=form)
+
     return template('newDiet.tpl')
 
 
-@application.route('/newdiet', methods=['POST'])
-def addDietAJAX():
-    diet = models.Diet()
-    diet.name = request.form['name']
-    diet.sugar = request.form['sugar']
-    diet.fat = request.form['fat']
-    diet.protein = request.form['protein']
-    diet.small_size = request.form['small_size']
-    diet.big_size = request.form['big_size']
-    diet.active = 1
-
-    if len(diet.protein) == 0:
-        flash('Vyplňte množství bílkoviny', 'warning')
-        return redirect(request.url)
-    if len(diet.fat) == 0:
-        flash('Vyplňte množství tuku', 'warning')
-        return redirect(request.url)
-    if len(diet.sugar) == 0:
-        flash('Vyplňte množství sacharidů', 'warning')
-        return redirect(request.url)
-    if len(diet.name) == 0:
-        flash('Vyplňte název', 'warning')
-        return redirect(request.url)
-
-    diet.author = models.User.load(session['username'])
-    diet.save()
-    flash('Dieta byla vytvořena.', 'success')
-    return redirect('/diet={}'.format(diet.id))
-
-
 # SHOW DIET PAGE
-@application.route('/diet=<diet_id>')
-def showDiet(diet_id):
+@application.route('/diet=<int:diet_id>')
+@application.route('/diet=<int:diet_id>/<page_type>', methods=['POST', 'GET'])
+@login_required
+def showDiet(diet_id, page_type=None):
     diet = models.Diet.load(diet_id)
-
     if diet is None:
         abort(404)
     if diet.author.username != session['username']:
         return redirect('/wrongpage')
 
-    return template('showDiet.tpl', diet=diet, recipes=diet.recipes, diets=diet.author.diets)
+    if page_type is None:
+        return template('showDiet.tpl', diet=diet, recipes=diet.recipes, diets=diet.author.diets)
+    elif page_type == 'remove' and request.method == 'POST':
+        if not diet.used:  # wip
+            diet.remove()
+            flash('Dieta byla smazána', 'success')
+            return redirect('/alldiets')
+        else:
+            flash('Tato dieta má recepty, nelze smazat', 'error')
+            return redirect('/diet={}'.format(diet_id))
+    elif page_type == 'archive' and request.method == 'POST':
+        flash('Dieta byla archivována', 'info') if diet.active else flash('Dieta byla aktivována', 'info')
+        diet.active = not diet.active
+        diet.edit()
 
-
-@application.route('/diet=<diet_id>/remove', methods=['POST'])
-def removeDiet(diet_id):
-    diet = models.Diet.load(diet_id)
-
-    if diet.author.username != session['username']:
-        return redirect('/wrongpage')
-
-    if not diet.used:  # wip
-        diet.remove()
-        flash('Dieta byla smazána', 'success')
-        return redirect('/alldiets')
-    else:
-        flash('Tato dieta má recepty, nelze smazat', 'error')
         return redirect('/diet={}'.format(diet_id))
+    elif page_type == 'edit' and request.method == 'POST':
+        diet.name = request.form['name']
+        diet.id = diet_id
+        diet.small_size = request.form['small_size']
+        diet.big_size = request.form['big_size']
 
+        if not diet.used:
+            diet.protein = request.form['protein']
+            diet.fat = request.form['fat']
+            diet.sugar = request.form['sugar']
 
-@application.route('/diet=<diet_id>/archive', methods=['POST'])
-def archiveDiet(diet_id):
-    diet = models.Diet.load(diet_id)
-
-    if diet.author.username != session['username']:
-        return redirect('/wrongpage')
-
-    if diet.active:
-        flash('Dieta byla archivována', 'info')
-    else:
-        flash('Dieta byla aktivována', 'info')
-
-    diet.active = not diet.active
-    diet.edit()
-
-    return redirect('/diet={}'.format(diet_id))
+        diet.edit()
+        flash('Dieta byla upravena.', 'success')
+        return redirect('/diet={}'.format(diet_id))
 
 
 # @application.route('/diet=<dietID>/export', methods=['POST'])
@@ -280,31 +288,10 @@ def archiveDiet(diet_id):
 #     return redirect('/diet={}'.format(newDietID))
 
 
-@application.route('/diet=<diet_id>/edit', methods=['POST'])
-def editDietAJAX(diet_id):
-    diet = models.Diet.load(diet_id)
-
-    if diet.author.username != session['username']:
-        return redirect('/wrongpage')
-
-    diet.name = request.form['name']
-    diet.id = diet_id
-    diet.small_size = request.form['small_size']
-    diet.big_size = request.form['big_size']
-
-    if not diet.used:
-        diet.protein = request.form['protein']
-        diet.fat = request.form['fat']
-        diet.sugar = request.form['sugar']
-
-    diet.edit()
-    flash('Dieta byla upravena.', 'success')
-    return redirect('/diet={}'.format(diet_id))
-
-
 @application.route('/alldiets')
+@login_required
 def showAllDiets():
-    """show all diets sorted
+    """show all diets sorted (active first)
 
     active on top
 
@@ -314,8 +301,8 @@ def showAllDiets():
     Returns:
         template -- [description]
     """
-    diets = models.User.load(session['username']).diets
-    diets.sort(key=lambda x: x.active, reverse=True)  # sort active first
+    diets = models.User.load(session['user_id']).diets
+    diets.sort(key=lambda x: x.active, reverse=True)
 
     return template('allDiets.tpl', diets=diets)
 
@@ -323,15 +310,16 @@ def showAllDiets():
 # NEW RECIPE PAGE
 @application.route('/trialnewrecipe')
 def showTrialNewRecipe():
-    ingredients = models.Ingredient.loadAllByUsername('basic')
+    ingredients = models.Ingredient.loadAllByAuthor('basic')
     trial_diet = models.Diet.load(2)  # wip
     return template('trialNewRecipe.tpl', ingredients=ingredients, diet=trial_diet)
 
 
 @application.route('/newrecipe')
+@login_required
 def showNewRecipe():
-    active_diets = models.User.load(session['username']).activeDiets
-    ingredients = models.Ingredient.loadAllByUsername(session['username'])
+    active_diets = models.User.load(session['user_id']).activeDiets
+    ingredients = models.Ingredient.loadAllByAuthor(session['username'])
     return template('newRecipe.tpl', ingredients=ingredients, diets=active_diets)
 
 
@@ -524,6 +512,7 @@ def recalcRecipeAJAX(test_dataset=None):
 
 
 @application.route('/saveRecipeAJAX', methods=['POST'])
+@login_required
 def addRecipeAJAX():
     temp_ingredients = request.json['ingredients']
     diet_id = request.json['dietID']
@@ -545,52 +534,49 @@ def addRecipeAJAX():
     return ('/recipe=' + str(last_id))
 
 
-@application.route('/recipe=<recipe_id>')
-def showRecipe(recipe_id):
-    recipe_data = models.Recipe.load(recipe_id).loadRecipeForShow()
-    return template('showRecipe.tpl', recipe=recipe_data['recipe'], totals=recipe_data['totals'])
+@application.route('/recipe=<int:recipe_id>', methods=['GET'])
+@application.route('/recipe=<int:recipe_id>/<page_type>', methods=['POST', 'GET'])
+@login_required
+def showRecipe(recipe_id, page_type=None):
+    try:
+        recipe_data = models.Recipe.load(recipe_id).loadRecipeForShow()
+    except AttributeError:
+        return abort(404)
 
-
-@application.route('/recipe=<recipe_id>/print')
-def printRecipe(recipe_id):
-    recipe_data = models.Recipe.load(recipe_id).loadRecipeForShow()
-    return template('printRecipe.tpl', recipe=recipe_data['recipe'], totals=recipe_data['totals'])
-
-
-@application.route('/recipe=<recipe_id>/remove', methods=['POST'])
-def removeRecipeAJAX(recipe_id):
     if session['username'] != models.Recipe.load(recipe_id).author.username:
         return redirect('/wrongpage')
 
-    recipe = models.Recipe.load(recipe_id)
-    recipe.remove()
-    flash('Recept byl smazán.', 'success')
-    return redirect('/')
-
-
-@application.route('/recipe=<recipe_id>/edit', methods=['POST'])
-def editRecipeAJAX(recipe_id):
-    if session['username'] != models.Recipe.load(recipe_id).author.username:
-        return redirect('/wrongpage')
-
-    recipe = models.Recipe.load(recipe_id)
-    recipe.name = request.form['name']
-    recipe.type = request.form['size']
-    recipe.edit()
-    flash('Recept byl upraven.', 'success')
-    return redirect('/recipe={}'.format(recipe_id))
+    if page_type is None:
+        return template('showRecipe.tpl', recipe=recipe_data['recipe'], totals=recipe_data['totals'], show=True)
+    elif page_type == 'print':
+        return template('showRecipe.tpl', recipe=recipe_data['recipe'], totals=recipe_data['totals'], show=False)
+    elif page_type == 'edit' and request.method == 'POST':
+        recipe = recipe_data['recipe']
+        recipe.name = request.form['name']
+        recipe.type = request.form['size']
+        recipe.edit()
+        flash('Recept byl upraven.', 'success')
+        return redirect('/recipe={}'.format(recipe_id))
+    elif page_type == 'remove' and request.method == 'POST':
+        recipe = recipe_data['recipe']
+        recipe.remove()
+        flash('Recept byl smazán.', 'success')
+        return redirect('/')
+    else:
+        redirect('/wrongpage')
 
 
 @application.route('/allrecipes')
+@login_required
 def showAllRecipes():
-    user = models.User.load(session['username'])
+    user = models.User.load(session['user_id'])
     return template('allRecipes.tpl', diets=user.diets)
 
 
-@application.route('/diet=<diet_id>/print')
+@application.route('/diet=<int:diet_id>/print')
+@login_required
 def printDietRecipes(diet_id):
     diet = models.Diet.load(diet_id)
-
     for recipe in diet.recipes:
         recipe_data = recipe.loadRecipeForShow()
         recipe.totals = recipe_data['totals']
@@ -598,9 +584,9 @@ def printDietRecipes(diet_id):
 
 
 @application.route('/printallrecipes')
+@login_required
 def printAllRecipes():
-    recipes = models.User.load(session['username']).recipes
-
+    recipes = models.User.load(session['user_id']).recipes
     for recipe in recipes:
         recipe_data = recipe.loadRecipeForShow()
         recipe.totals = recipe_data['totals']
@@ -609,6 +595,7 @@ def printAllRecipes():
 
 # NEW INGREDIENT PAGE
 @application.route('/newingredient', methods=['GET', 'POST'])
+@login_required
 def showNewIngredient():
     form = forms.NewIngredientForm()
     if request.method == 'GET':
@@ -624,7 +611,7 @@ def showNewIngredient():
         if not form.validate_on_submit():
             return template('newIngredient.tpl', form=form)
 
-        if doNewIngredient(ingredient):
+        if ingredient.save():
             flash('Nová surovina byla vytvořena', 'success')
             return redirect('/ingredient={}'.format(ingredient.id))
         else:
@@ -632,106 +619,83 @@ def showNewIngredient():
             return template('newIngredient.tpl', form=form)
 
 
-def doNewIngredient(ingredient):
-    if ingredient.save() is not None:
-        return True
-    else:
-        return False
-
-
-@application.route('/ingredient=<ingredient_id>')
-def showIngredient(ingredient_id):
+@application.route('/ingredient=<int:ingredient_id>')
+@application.route('/ingredient=<int:ingredient_id>/<page_type>', methods=['POST', 'GET'])
+@login_required
+def showIngredient(ingredient_id, page_type=None):
     ingredient = models.Ingredient.load(ingredient_id)
-
     if ingredient is None:
         abort(404)
     if session['username'] != ingredient.author:
         return redirect('/wrongpage')
 
-    return template('showIngredient.tpl', ingredient=ingredient)
+    if page_type is None:
+        recipes = models.Recipe.loadByIngredient(ingredient.id)
+        return template('showIngredient.tpl', ingredient=ingredient, recipes=recipes)
 
+    elif page_type == 'edit' and request.methods == 'POST':
+        ingredient.name = request.form['name']
+        ingredient.id = ingredient_id
+        ingredient.calorie = request.form['calorie']
+        if not ingredient.used:
+            ingredient.protein = request.form['protein']
+            ingredient.fat = request.form['fat']
+            ingredient.sugar = request.form['sugar']
+            ingredient.edit()
+            flash('Surovina byla upravena.', 'success')
+            return redirect('/ingredient={}'.format(ingredient_id))
+        else:
+            ingredient.edit()
+            flash('Název a kalorická hodnota byly upraveny.', 'success')
+            return redirect('/ingredient={}'.format(ingredient_id))
 
-@application.route('/ingredient=<ingredient_id>/remove', methods=['POST'])
-def removeIngredientAJAX(ingredient_id):
-    ingredient = models.Ingredient.load(ingredient_id)
-
-    if session['username'] != ingredient.author:
-        return redirect('/wrongpage')
-
-    if not ingredient.used:
-        ingredient.remove()
-        flash('Surovina byla smazána', 'success')
-        return redirect('/')
-    else:
-        flash('Tato surovina je použita, nelze smazat', 'error')
-        return redirect('/ingredient={}'.format(ingredient_id))
-
-
-@application.route('/ingredient=<ingredient_id>/edit', methods=['POST'])
-def editIngredientAJAX(ingredient_id):
-    ingredient = models.Ingredient.load(ingredient_id)
-
-    if session['username'] != ingredient.author:
-        return redirect('/wrongpage')
-
-    ingredient.name = request.form['name']
-    ingredient.id = ingredient_id
-    ingredient.calorie = request.form['calorie']
-    if not ingredient.used:
-        ingredient.protein = request.form['protein']
-        ingredient.fat = request.form['fat']
-        ingredient.sugar = request.form['sugar']
-        ingredient.edit()
-        flash('Surovina byla upravena.', 'success')
-        return redirect('/ingredient={}'.format(ingredient_id))
-    else:
-        ingredient.edit()
-        flash('Název a kalorická hodnota byly upraveny.', 'success')
-        return redirect('/ingredient={}'.format(ingredient_id))
+    elif page_type == 'remove' and request.methods == 'POST':
+        if not ingredient.used:
+            ingredient.remove()
+            flash('Surovina byla smazána', 'success')
+            return redirect('/')
+        else:
+            flash('Tato surovina je použita, nelze smazat', 'error')
+            return redirect('/ingredient={}'.format(ingredient_id))
 
 
 @application.route('/allingredients')
+@login_required
 def showAllIngredients():
-    # basic_ingredients = models.Ingredient.loadAllByUsername('default')
-    ingredients = models.Ingredient.loadAllByUsername(session['username'])
+    # basic_ingredients = models.Ingredient.loadAllByAuthor('default')
+    ingredients = models.Ingredient.loadAllByAuthor(session['username'])
     return template('allIngredients.tpl', ingredients=ingredients)
 
 
 @application.route('/user')
-def showUser():
-    user = models.User.load(session['username'])
-    return template('showUser.tpl', user=user)
-
-
-@application.route('/user/edit', methods=['POST'])
-def editUserAJAX():
-    user = models.User.load(session['username'])
-    user.firstName = request.form['firstname']
-    user.lastName = request.form['lastname']
-    success = user.edit()
-    if success is not None:
-        flash('Uživatel byl upraven', 'success')
-    else:
-        flash('Nepovedlo se změnit uživatele', 'error')
-    return template('showUser.tpl', user=user)
-
-
-@application.route('/user/password_change', methods=['POST'])
-def changeUserAJAX():
-    user = models.User.load(session['username'])
-
+@application.route('/user/<page_type>', methods=['POST', 'GET'])
+@login_required
+def showUser(page_type=None):
+    user = models.User.load(session['user_id'])
     if user is None:
         return redirect('/wrongpage')
+    if page_type is None:
+        return template('showUser.tpl', user=user)
+    elif page_type == 'edit' and request.method == 'POST':
+        user.firstName = request.form['firstname']
+        user.lastName = request.form['lastname']
+        success = user.edit()
+        if success is not None:
+            flash('Uživatel byl upraven', 'success')
+        else:
+            flash('Nepovedlo se změnit uživatele', 'error')
+        return template('showUser.tpl', user=user)
+    elif page_type == 'password_change' and request.method == 'POST':
 
-    password = request.form['password'].encode('utf-8')
-    user.pwdhash = hashlib.sha256(password).hexdigest()
+        password = request.form['password'].encode('utf-8')
+        user.pwdhash = hashlib.sha256(password).hexdigest()
 
-    success = user.edit()
-    if success is not None:
-        flash('Heslo bylo změněno', 'success')
-    else:
-        flash('Nepovedlo se změnit heslo', 'error')
-    return template('showUser.tpl', user=user)
+        success = user.edit()
+        if success is not None:
+            flash('Heslo bylo změněno', 'success')
+        else:
+            flash('Nepovedlo se změnit heslo', 'error')
+        return template('showUser.tpl', user=user)
 
 
 # CALCULATE RECIPE
@@ -943,9 +907,36 @@ def calc(ingredients, diet):
         return None
 
 
-@application.route('/feedback', methods=['GET'])
+@application.route('/feedback', methods=['GET', 'POST'])
+@login_required
 def showFeedback():
-    return template('feedback.tpl')
+    if request.method == 'GET':
+        return template('feedback.tpl')
+    elif request.method == 'POST':
+        msg = Message('[ketocalc] [{}]'.format(request.form['type']), sender='ketocalc', recipients=['ketocalc.jmp@gmail.com'])
+        msg.body = 'Message: {}\n'.format(request.form['message'])
+        msg.body += 'Send by: {} [user: {}]'.format(request.form['sender'], session['username'])
+
+        if 'file' not in request.files:
+            mail.send(msg)
+            flash('Vaše připomínka byla zaslána na vyšší místa.', 'success')
+            return redirect('/')
+        else:
+            file = request.files['file']
+
+        if file.filename == '':
+            mail.send(msg)
+            flash('Vaše připomínka byla zaslána na vyšší místa.', 'success')
+            return redirect('/')
+        elif file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(application.config['UPLOAD_FOLDER'], filename))
+            with application.open_resource(os.path.join(application.config['UPLOAD_FOLDER'], filename)) as fp:
+                msg.attach('screenshot', 'image/{}'.format(filename.split('.')[1]), fp.read())
+
+            mail.send(msg)
+            flash('Vaše připomínka byla zaslána na vyšší místa.', 'success')
+            return redirect('/')
 
 
 def allowed_file(filename):
@@ -953,41 +944,9 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-@application.route('/feedback', methods=['POST'])
-def sendFeedback():
-    msg = Message('[ketocalc] [{}]'.format(request.form['type']), sender='ketocalc', recipients=['ketocalc.jmp@gmail.com'])
-    msg.body = 'Message: {}\n'.format(request.form['message'])
-    msg.body += 'Send by: {} [user: {}]'.format(request.form['sender'], session['username'])
-
-    if 'file' not in request.files:
-        mail.send(msg)
-        flash('Vaše připomínka byla zaslána na vyšší místa.', 'success')
-        return redirect('/')
-    else:
-        file = request.files['file']
-
-    if file.filename == '':
-        mail.send(msg)
-        flash('Vaše připomínka byla zaslána na vyšší místa.', 'success')
-        return redirect('/')
-    elif file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(application.config['UPLOAD_FOLDER'], filename))
-        with application.open_resource(os.path.join(application.config['UPLOAD_FOLDER'], filename)) as fp:
-            msg.attach('screenshot', 'image/{}'.format(filename.split('.')[1]), fp.read())
-
-        mail.send(msg)
-        flash('Vaše připomínka byla zaslána na vyšší místa.', 'success')
-        return redirect('/')
-
-
 # S'MORE
-@application.route('/index.html')
-def indexhtml():
-    return redirect('/')
-
-
 @application.route('/changelog')
+@login_required
 def showChangelog():
     return template('changelog.tpl')
 
@@ -1009,10 +968,11 @@ def shutdown():
 
 
 @application.route('/testing')
+@admin_required
 def testingPage():
-    if session['username'] != 'admin':
-        redirect('/wrongpage')
-    return template('testing.tpl', data=application.config['TEST_VAR'])
+    tests = []
+    tests.append()
+    return template('testing.tpl', tests=tests)
 
 
 @application.route('/google3748bc0390347e56.html')

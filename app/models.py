@@ -128,7 +128,7 @@ class Ingredient(Base):
         ingredient = s.query(Ingredient).filter(Ingredient.id == ingredient_id).first()
         return ingredient
 
-    def loadAllByUsername(username, ordered=True):
+    def loadAllByAuthor(username, ordered=True):
         ingredients = s.query(Ingredient).filter(Ingredient.author == username).all()
         if ordered:
             ingredients.sort(key=lambda x: unidecode.unidecode(x.name.lower()), reverse=False)
@@ -278,6 +278,10 @@ class Recipe(Base):
         totals.amount = math.floor(totals.amount)
         totals.ratio = math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
         return {'recipe': self, 'totals': totals}
+
+    def loadByIngredient(ingredient_id):
+        recipes = s.query(Recipe).filter(Recipe.ingredients.any(Ingredient.id == ingredient_id)).all()
+        return recipes
 
     def save(self, ingredients):
         s.add(self)

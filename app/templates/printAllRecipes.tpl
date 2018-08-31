@@ -18,9 +18,7 @@
     </style>
 {% endblock %}
 
-{% block script %}
-	
-{% endblock %}
+{% block script %}{% endblock %}
 
 {% block content %}
     <div class="container">
