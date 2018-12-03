@@ -1,14 +1,10 @@
 # coding: utf-8
 from sqlalchemy import CHAR, Column, Enum, Float, ForeignKey, INTEGER, String, Table, text
-# from sqlalchemy import desc
-# from sqlalchemy import and_
 from sqlalchemy.dialects.mysql.types import TINYINT
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy import create_engine
-
-# from .data import db_data as dbd
 
 import math
 import os
@@ -19,13 +15,15 @@ import hashlib
 import unidecode
 
 
-engine = create_engine(os.environ.get('DB_STRING'), echo=False)  # change to False
+engine = create_engine(os.environ.get('DB_STRING'), echo=False)
 Session = sessionmaker(bind=engine)
 
 Base = declarative_base()
 metadata = Base.metadata
 
 global s
+
+s = None
 
 
 # not cool (#wip)
@@ -57,6 +55,19 @@ t_users_has_diets = Table(
 
 
 class RecipesHasIngredient(Base):
+    """Recipe-Ingredient connection class
+
+    Extends:
+        Base
+
+    Variables:
+        __tablename__ {str} -- [description]
+        recipes_id {int} -- [description]
+        ingredients_id {int} -- [description]
+        amount {int} -- [description]
+        ingredients {relationship} -- [description]
+        recipes {relationship} -- [description]
+    """
     __tablename__ = 'recipes_has_ingredients'
 
     recipes_id = Column(ForeignKey('recipes.id'), primary_key=True, nullable=False, index=True)
@@ -68,6 +79,24 @@ class RecipesHasIngredient(Base):
 
 
 class Diet(Base):
+    """Diet object
+
+    Extends:
+        Base
+
+    Variables:
+        __tablename__ {str} -- [description]
+        id {int} -- [description]
+        name {string} -- [description]
+        sugar {int} -- sugar amount
+        fat {int} -- fat amount
+        protein {int} -- protein amount
+        small_size {int} -- small size in %
+        big_size {int} -- big size in %
+        active {int} -- int 0 / 1 - works as boolean
+        recipes {relationship} -- [description]
+        author {relationship} -- [description]
+    """
     __tablename__ = 'diets'
 
     id = Column(INTEGER, primary_key=True)
@@ -82,29 +111,57 @@ class Diet(Base):
     recipes = relationship('Recipe', secondary='diets_has_recipes', order_by='Recipe.name')
     author = relationship('User', secondary='users_has_diets', uselist=False)
 
+    @staticmethod
     def load(diet_id):
+        """Load Diet object by ID
+
+        Arguments:
+            diet_id {int} -- object ID in database
+
+        Returns:
+            Diet -- SQLAlchemy Diet object
+        """
         diet = s.query(Diet).filter(Diet.id == diet_id).first()
         return diet
 
     def save(self):
+        """Save new Diet object
+
+        Returns:
+            int -- id of saved object
+        """
         s.add(self)
         s.commit()
         return self.id
 
     def edit(self):
+        """Saves Diet object changes
+        """
         s.commit()
 
     def remove(self):
+        """Deletes Diet object
+        """
         s.delete(self)
         s.commit()
 
     @property
     def json(self):
+        """returns Diet object as JSON
+
+        Returns:
+            json -- Diet data
+        """
         return {'id': self.id, 'name': self.name, 'sugar': self.sugar, 'fat': self.fat,
                 'protein': self.protein, 'small_size': self.small_size, 'big_size': self.big_size}
 
     @property
     def used(self):
+        """Is Diet used in Recipe?
+
+        Returns:
+            bool --
+        """
         if len(self.recipes) == 0:
             return False
         else:
@@ -112,6 +169,24 @@ class Diet(Base):
 
 
 class Ingredient(Base):
+    """Ingredient class
+
+    [description]
+
+    Extends:
+        Base
+
+    Variables:
+        __tablename__ {str} -- [description]
+        id {int} -- [description]
+        name {string} -- [description]
+        calorie {int} -- [description]
+        sugar {int} -- [description]
+        fat {int} -- [description]
+        protein {int} -- [description]
+        author {string} -- [description]
+        recipes {relationship} -- [description]
+    """
     __tablename__ = 'ingredients'
 
     id = Column(INTEGER, primary_key=True)
@@ -126,38 +201,92 @@ class Ingredient(Base):
                            primaryjoin="and_(Ingredient.id == remote(RecipesHasIngredient.ingredients_id), foreign(Recipe.id) == RecipesHasIngredient.recipes_id)",
                            viewonly=True, order_by='Recipe.name')
 
+    @staticmethod
     def load(ingredient_id):
+        """Load Ingredient object by ID
+
+        SQLAlchemy class
+
+        Arguments:
+            ingredient_id {int} -- object ID in database
+
+        Returns:
+            Ingredient -- SQLAlchemy Ingredient object
+        """
         ingredient = s.query(Ingredient).filter(Ingredient.id == ingredient_id).first()
         return ingredient
 
+    @staticmethod
     def loadAllByAuthor(username, ordered=True):
+        """Load Ingredient objects by author
+
+        used for loading all ingredients for user
+
+        Arguments:
+            username {string} -- [description]
+
+        Keyword Arguments:
+            ordered {bool} -- if ingredients ordered alphabetically (default: {True})
+
+        Returns:
+            list -- list of Ingredient objects
+        """
         ingredients = s.query(Ingredient).filter(Ingredient.author == username).all()
         if ordered:
             ingredients.sort(key=lambda x: unidecode.unidecode(x.name.lower()), reverse=False)
         return ingredients
 
     def loadAmount(self, recipe_id):
+        """Load amount of Ingredient in Recipe
+
+        Arguments:
+            recipe_id {int} -- Recipe database ID
+
+        Returns:
+            int -- amount
+        """
         rhi = s.query(RecipesHasIngredient).filter(RecipesHasIngredient.recipes_id == recipe_id).filter(RecipesHasIngredient.ingredients_id == self.id).first()
         return rhi.amount
 
     def save(self):
+        """Saves new Ingredient object
+
+        Returns:
+            int -- database ID of new object
+        """
+
         s.add(self)
         s.commit()
         return self.id
 
     def edit(self):
+        """Saves Ingredient object changes
+        """
         s.commit()
 
     def remove(self):
+        """Deletes Ingredient object
+
+        """
         s.delete(self)
         s.commit()
 
     @property
     def json(self):
+        """returns Diet object as JSON
+
+        Returns:
+            json -- Diet data
+        """
         return {'id': self.id, 'name': self.name, 'calorie': self.calorie, 'sugar': self.sugar, 'fat': self.fat, 'protein': self.protein}
 
     @property
     def used(self):
+        """Is Ingredient used in Recipe?
+
+        Returns:
+            bool -- 
+        """
         if len(self.recipes) == 0:
             return False
         else:
@@ -165,6 +294,22 @@ class Ingredient(Base):
 
 
 class User(Base):
+    """User class
+
+
+    Extends:
+        Base
+
+    Variables:
+        __tablename__ {str} -- [description]
+        id {int} -- [description]
+        username {string} -- [description]
+        pwdhash {string} -- password hash (sha256 / bcrypt)
+        firstName {string} -- [description]
+        lastName {string} -- [description]
+        password_version {string} -- password version (sha256 / bcrypt)
+        diets {relationship} -- [description]
+    """
     __tablename__ = 'users'
 
     id = Column(INTEGER, primary_key=True, unique=True)
@@ -176,7 +321,18 @@ class User(Base):
 
     diets = relationship('Diet', secondary='users_has_diets', order_by='desc(Diet.active)')
 
+    @staticmethod
     def load(user_id):
+        """Load User
+
+        Load User by ID or username
+
+        Arguments:
+            user_id {int / string} -- database ID or username
+
+        Returns:
+            User -- SQLAlchemy object
+        """
         if type(user_id) is int:
             user = s.query(User).filter(User.id == user_id).first()
         else:
@@ -184,22 +340,58 @@ class User(Base):
         return user
 
     def save(self):
+        """Saves user
+
+        Returns:
+            int -- new User db id
+        """
         s.add(self)
         s.commit()
         return self.id
 
     def edit(self):
+        """Edit user
+
+        Returns:
+            None --
+        """
         s.commit()
-        return True
+        return None
 
     def remove(self):
+        """Remove User
+
+        Returns:
+            None --
+        """
         s.delete()
         s.commit()
+        return None
 
     def getPassword(self, password):
+        """Creates hash from password
+
+        Uses bcrypt hash function
+
+        Arguments:
+            password {string} -- plaintext password
+
+        Returns:
+            string -- hashed password
+        """
         return bcrypt.hashpw(password, bcrypt.gensalt())
 
     def checkLogin(self, password):
+        """Verifies login data
+
+        Verifies login data and changes hash function if necessary
+
+        Arguments:
+            password {string} -- plaintext password
+
+        Returns:
+            bool -- verification
+        """
         db_password_hash = self.pwdhash.encode('utf-8')
         if self.password_version == 'SHA256':
 
@@ -219,6 +411,14 @@ class User(Base):
 
     @property
     def recipes(self, ordered=True):
+        """User's Recipes
+
+        Keyword Arguments:
+            ordered {bool} -- is ordered alphabetically? (default: {True})
+
+        Returns:
+            list -- list of Recipe objects
+        """
         recipes = []
         for diet in self.diets:
             recipes.extend(diet.recipes)
@@ -228,6 +428,11 @@ class User(Base):
 
     @property
     def activeDiets(self):
+        """User's active Diets
+
+        Returns:
+            list -- list of active diets
+        """
         active_diets = []
         for diet in self.diets:
             if diet.active == 1:
@@ -236,6 +441,21 @@ class User(Base):
 
 
 class Recipe(Base):
+    """[summary]
+
+    [description]
+
+    Extends:
+        Base
+
+    Variables:
+        __tablename__ {str} -- [description]
+        id {int} -- [description]
+        name {string} -- [description]
+        type {string} -- [description]
+        diet {relationship} -- [description]
+        ingredients {relationship} -- [description]
+    """
     __tablename__ = 'recipes'
 
     id = Column(INTEGER, primary_key=True)
@@ -247,11 +467,25 @@ class Recipe(Base):
                                primaryjoin="and_(Recipe.id == remote(RecipesHasIngredient.recipes_id), foreign(Ingredient.id) == RecipesHasIngredient.ingredients_id)",
                                viewonly=True, order_by='Ingredient.name')
 
+    @staticmethod
     def load(recipe_id):
+        """Load Recipe by id
+
+        Arguments:
+            recipe_id {int} -- recipe id
+
+        Returns:
+            Recipe -- Recipe object
+        """
         recipe = s.query(Recipe).filter(Recipe.id == recipe_id).first()
         return recipe
 
     def loadRecipeForShow(self):
+        """Load Recipe for print
+
+        Returns:
+            json -- recipe, totals
+        """
         if self.type == "big":
             coef = float(self.diet.big_size / 100)
         else:
@@ -281,11 +515,31 @@ class Recipe(Base):
         totals.ratio = math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
         return {'recipe': self, 'totals': totals}
 
+    @staticmethod
     def loadByIngredient(ingredient_id):
+        """Load all recipes by ingredient
+
+        Arguments:
+            ingredient_id {int} -- Ingredient id
+
+        Returns:
+            list -- of Recipes
+        """
+
         recipes = s.query(Recipe).filter(Recipe.ingredients.any(Ingredient.id == ingredient_id)).all()
         return recipes
 
     def save(self, ingredients):
+        """Save recipe
+
+        [description]
+
+        Arguments:
+            ingredients {list} -- list of Ingredients
+
+        Returns:
+            int -- Recipe id
+        """
         s.add(self)
         s.flush()
 
@@ -297,6 +551,11 @@ class Recipe(Base):
         return self.id
 
     def remove(self):
+        """Deletes Recipe
+
+        Returns:
+            None
+        """
         # wip - to improve w/ orphan cascade
         ingredients = s.query(RecipesHasIngredient).filter(RecipesHasIngredient.recipes_id == self.id)
         for i in ingredients:
@@ -304,14 +563,33 @@ class Recipe(Base):
 
         s.delete(self)
         s.commit()
+        return None
 
     def edit(self):
+        """Edit Recipe
+
+        Returns:
+            None
+        """
         s.commit()
+        return None
 
     @property
     def json(self):
+        """Returns JSON of Recipe
+
+        Returns:
+            json
+        """
         return {'id': self.id, 'name': self.name, 'size': self.type}
 
     @property
     def author(self):
+        """[summary]
+
+        Returns User who created diet, in which this recipe is
+
+        Returns:
+            User -- User object
+        """
         return self.diet.author

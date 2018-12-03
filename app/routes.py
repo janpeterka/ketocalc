@@ -182,6 +182,7 @@ def selectDietAJAX():
 
     Decorators:
         application.route
+        login_required
 
     Returns:
         [type] -- [description]
