@@ -1,20 +1,19 @@
 import os
 
-UPLOAD_FOLDER = '/tmp',
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif']),
+UPLOAD_FOLDER = '/tmp'
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
-SECRET_KEY = os.environ.get('SECRET_KEY'),
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
-SQLALCHEMY_TRACK_MODIFICATIONS = False,
-DB_STRING = os.environ.get('DB_STRING'),
+SQLALCHEMY_TRACK_MODIFICATIONS = False
+DB_STRING = os.environ.get('DB_STRING')
 
-MAIL_SERVER = 'smtp.googlemail.com',
-MAIL_PORT = 465,
-MAIL_USE_TLS = False,
-MAIL_USE_SSL = True,
-
-MAIL_USERNAME = os.environ.get('MAIL_USERNAME'),
-MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD'),
+MAIL_SERVER = 'smtp.googlemail.com'
+MAIL_PORT = 465
+MAIL_USE_TLS = False
+MAIL_USE_SSL = True
+MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
 
 TEST_VAR = os.environ.get('TEST_VAR')
 

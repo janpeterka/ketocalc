@@ -18,6 +18,7 @@ from werkzeug import secure_filename
 
 from app import models, forms
 from app import application
+from app import mail
 from .data import template_data
 from utils import *
 
@@ -919,9 +920,13 @@ def showFeedback():
         msg.body += 'Send by: {} [user: {}]'.format(request.form['sender'], session['username'])
 
         if 'file' not in request.files:
-            mail.send(msg)
-            flash('Vaše připomínka byla zaslána na vyšší místa.', 'success')
-            return redirect('/')
+            try:
+                mail.send(msg)
+                flash('Vaše připomínka byla zaslána na vyšší místa.', 'success')
+                return redirect('/')
+            except Exception as error:
+                print(error)
+                abort(500)
         else:
             file = request.files['file']
 
@@ -969,10 +974,11 @@ def shutdown():
 
 
 @application.route('/testing')
+@login_required
 @admin_required
 def testingPage():
     tests = []
-    tests.append()
+    # tests.append()
     return template('testing.tpl', tests=tests)
 
 
