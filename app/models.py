@@ -38,7 +38,9 @@ def endSession():
     s.close()
 
 
-startSession()
+if s is None:
+    startSession()
+
 
 t_diets_has_recipes = Table(
     'diets_has_recipes', metadata,

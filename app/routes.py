@@ -50,7 +50,7 @@ def inject_globals():
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'username' not in session and 'user_id' not in session:
+        if 'username' not in session or 'user_id' not in session:
             return redirect('/login')
         return f(*args, **kwargs)
     return decorated_function
@@ -59,8 +59,8 @@ def login_required(f):
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if session['user_id'] != 'admin':
-            redirect('/wrongpage')
+        if session['username'] != 'admin':
+            return redirect('/wrongpage')
         return f(*args, **kwargs)
     return decorated_function
 

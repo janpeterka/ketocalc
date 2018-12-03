@@ -16,14 +16,7 @@
     </style>
 {% endblock %}
 
-{% block script %}
-	<script>
-        $(document).on("click", ".newDiet", function() {
-            var win = window.open('/newdiet');
-            win.focus();
-        });
-    </script>
-{% endblock %}
+{% block script %}{% endblock %}
 
 {% block content %}
     {% include('navbar.tpl') %}
@@ -52,7 +45,8 @@
                     </tr>
                 {% endfor %}
             </table>
-            <button class="newDiet btn">Přidat dietu</button>
+            
+            <a href="/newdiet" target="_blank"><button class="btn">Přidat dietu</button></button>
         </div>    
     </div>
 {% endblock %}

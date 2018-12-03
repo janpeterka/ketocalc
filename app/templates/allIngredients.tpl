@@ -8,12 +8,6 @@
 {% endblock %}
 
 {% block script %}
-	<script>
-        $(document).on("click", ".newIngredient", function() {
-            var win = window.open('/newingredient');
-            win.focus();
-        });
-    </script>
 {% endblock %}
 
 {% block content %}
@@ -38,7 +32,7 @@
                     </tr>
                 {% endfor %}
             </table>
-            <button class="newIngredient btn">Přidat surovinu</button>
+            <a href="/newingredient" target="_blank"><button class="btn">Přidat surovinu</button></button>
         </div> 
     </div>
 {% endblock %}

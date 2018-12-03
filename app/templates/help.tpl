@@ -3,17 +3,7 @@
     Nápověda
 {% endblock %}
 
-{% block style %}
-	<style type="text/css" media="screen">
-        .tr-mainIngredient {
-            background-color: var(--bgcolor_mainIngredient);
-        }
-
-        .tr-fixedIngredient {
-            background-color: var(--bgcolor_fixedIngredient);
-        }
-    </style>
-{% endblock %}
+{% block style %}{% endblock %}
 
 {% block content %}
     {% include('navbar.tpl') %}

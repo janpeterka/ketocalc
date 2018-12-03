@@ -3,69 +3,7 @@
     Nový recept
 {% endblock %}
 
-{% block style %}
-    <style type="text/css" media="screen">
-
-        .recipe__wrong{
-            display: none;
-        }
-
-        .recipe__right{
-            display: none;
-        }
-
-       .container__main {
-            margin-top: 40px;
-        }
-
-        .recipe__loader {
-            display: none;
-            border: 16px solid var(--color_loader_outer); 
-            border-top: 16px solid var(--color_loader_inner); 
-            border-radius: 50%;
-            width: 200px;
-            height: 200px;
-            animation: spin 2s linear infinite;
-            margin: 40px auto;
-        }
-
-        .prerecipe__selected-ingredients__table tr {
-            transition: background-color 0.5s ease;
-
-        }
-
-        .tr-mainIngredient {
-            background-color: var(--bgcolor_mainIngredient);
-        }
-
-        .tr-fixedIngredient {
-            background-color: var(--bgcolor_fixedIngredient);
-        }
-
-        .prerecipe__selected-ingredients__table tr td i {
-            margin-right: 1em;
-        }
-
-        .fa-times {
-            color: var(--color_icon_remove);
-            font-size: 12pt;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        #sliderVal{
-            font-weight: bold;
-        }
-
-        .in{
-            opacity: .9;
-        }
-
-    </style>
-{% endblock %}
+{% block style %}{% endblock %}
 
 {% block script %}
 	<script type="text/javascript">

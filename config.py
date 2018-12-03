@@ -6,6 +6,7 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif']),
 SECRET_KEY = os.environ.get('SECRET_KEY'),
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False,
+DB_STRING = os.environ.get('DB_STRING'),
 
 MAIL_SERVER = 'smtp.googlemail.com',
 MAIL_PORT = 465,

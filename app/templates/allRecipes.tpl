@@ -3,24 +3,9 @@
     Všechny recepty
 {% endblock %}
 
-{% block style %}
-    <style type="text/css" media="screen">
-        .diet{
-            background-color: var(--bgcolor-mainIngredient);
-            margin-right: 0px;
-            padding-right: 0px;
-        }
-    </style>
-{% endblock %}
+{% block style %}{% endblock %}
 
-{% block script %}
-	<script>
-        $(document).on("click", ".newRecipe", function() {
-            var win = window.open('/newrecipe');
-            win.focus();
-        });
-    </script>
-{% endblock %}
+{% block script %}{% endblock %}
 
 {% block content %}
     {% include('navbar.tpl') %}
@@ -43,7 +28,7 @@
             </table>
             <div class="row">
                 <form action="" class="form-inline">
-                    <button class="newRecipe btn">Přidat recept</button>        
+                    <a href="/newrecipe" target="_blank"><button class="btn">Přidat recept</button></button>
                 </form>
                 <form action="/printallrecipes" class="form-inline">
                     <input type="submit" class="btn" value="Vytisknout všechny recepty" />
