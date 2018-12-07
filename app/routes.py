@@ -312,9 +312,10 @@ def showAllDiets():
 # NEW RECIPE PAGE
 @application.route('/trialnewrecipe')
 def showTrialNewRecipe():
+    # trial_diet = models.Diet.load(2)  # wip
+    active_diets = [models.Diet.load(2)]
     ingredients = models.Ingredient.loadAllByAuthor('basic')
-    trial_diet = models.Diet.load(2)  # wip
-    return template('trialNewRecipe.tpl', ingredients=ingredients, diet=trial_diet)
+    return template('newRecipe.tpl', ingredients=ingredients, diets=active_diets, trialrecipe=True)
 
 
 @application.route('/newrecipe')
@@ -327,7 +328,8 @@ def showNewRecipe():
 
 @application.route('/addIngredientAJAX', methods=['POST'])
 def addIngredienttoRecipeAJAX():
-    ingredient = models.Ingredient.load(request.form['prerecipe__add-ingredient__form__select'])
+    ingredient = models.Ingredient.load(request.json['ingredient_id'])
+    # ingredient = models.Ingredient.load(request.form['prerecipe__add-ingredient__form__select'])
     return jsonify(ingredient.json)
 
 
