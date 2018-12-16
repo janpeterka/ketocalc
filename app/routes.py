@@ -637,7 +637,7 @@ def showIngredient(ingredient_id, page_type=None):
         recipes = models.Recipe.loadByIngredient(ingredient.id)
         return template('showIngredient.tpl', ingredient=ingredient, recipes=recipes)
 
-    elif page_type == 'edit' and request.methods == 'POST':
+    elif page_type == 'edit' and request.method == 'POST':
         ingredient.name = request.form['name']
         ingredient.id = ingredient_id
         ingredient.calorie = request.form['calorie']
@@ -653,7 +653,7 @@ def showIngredient(ingredient_id, page_type=None):
             flash('Název a kalorická hodnota byly upraveny.', 'success')
             return redirect('/ingredient={}'.format(ingredient_id))
 
-    elif page_type == 'remove' and request.methods == 'POST':
+    elif page_type == 'remove' and request.method == 'POST':
         if not ingredient.used:
             ingredient.remove()
             flash('Surovina byla smazána', 'success')
@@ -691,11 +691,14 @@ def showUser(page_type=None):
         return template('showUser.tpl', user=user)
     elif page_type == 'password_change' and request.method == 'POST':
 
-        password = request.form['password'].encode('utf-8')
-        user.pwdhash = hashlib.sha256(password).hexdigest()
+        user.pwdhash = user.getPassword(request.form['password'].encode('utf-8'))
+        user.password_version = 'bcrypt'
+
+        # password = request.form['password'].encode('utf-8')
+        # user.pwdhash = hashlib.sha256(password).hexdigest()
 
         success = user.edit()
-        if success is not None:
+        if success is True:
             flash('Heslo bylo změněno', 'success')
         else:
             flash('Nepovedlo se změnit heslo', 'error')

@@ -182,7 +182,7 @@
                     {% if diet.used == False %}
                         <button type="submit" class="btn btn-danger">Smazat dietu {{ icons.delete }}</button>
                     {% endif %}
-                    <button type="button" class="printButton btn">Tisk {{ icons.print }}</button>
+                    <button type="button" class="printButton btn btn-secondary">Tisk {{ icons.print }}</button>
                 </form>
                 <form action="/diet={{ diet.id }}/archive" method="post" accept-charset="utf-8">
                     {% if diet.active == True %}

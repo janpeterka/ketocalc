@@ -138,12 +138,14 @@ class Diet(Base):
         """Saves Diet object changes
         """
         s.commit()
+        return True
 
     def remove(self):
         """Deletes Diet object
         """
         s.delete(self)
         s.commit()
+        return True
 
     @property
     def json(self):
@@ -263,6 +265,7 @@ class Ingredient(Base):
         """Saves Ingredient object changes
         """
         s.commit()
+        return True
 
     def remove(self):
         """Deletes Ingredient object
@@ -270,6 +273,7 @@ class Ingredient(Base):
         """
         s.delete(self)
         s.commit()
+        return True
 
     @property
     def json(self):
@@ -285,7 +289,7 @@ class Ingredient(Base):
         """Is Ingredient used in Recipe?
 
         Returns:
-            bool -- 
+            bool -- Ingredient used in Recipe
         """
         if len(self.recipes) == 0:
             return False
@@ -301,14 +305,14 @@ class User(Base):
         Base
 
     Variables:
-        __tablename__ {str} -- [description]
-        id {int} -- [description]
-        username {string} -- [description]
+        __tablename__ {str} -- DB table name
+        id {int} -- user id
+        username {string} -- username (email)
         pwdhash {string} -- password hash (sha256 / bcrypt)
-        firstName {string} -- [description]
-        lastName {string} -- [description]
+        firstName {string} -- first name
+        lastName {string} -- last name
         password_version {string} -- password version (sha256 / bcrypt)
-        diets {relationship} -- [description]
+        diets {relationship} -- diets of user
     """
     __tablename__ = 'users'
 
@@ -355,8 +359,11 @@ class User(Base):
         Returns:
             None --
         """
-        s.commit()
-        return None
+        try:
+            s.commit()
+            return True
+        except Exception:
+            return False
 
     def remove(self):
         """Remove User
@@ -366,7 +373,7 @@ class User(Base):
         """
         s.delete()
         s.commit()
-        return None
+        return True
 
     def getPassword(self, password):
         """Creates hash from password
@@ -399,7 +406,7 @@ class User(Base):
                 # changing from sha256 to bcrypt
                 self.pwdhash = self.getPassword(password)
                 self.password_version = 'bcrypt'
-                s.commit()
+                self.edit()
                 return True
             else:
                 return False
@@ -500,6 +507,7 @@ class Recipe(Base):
         totals.fat = 0
         totals.sugar = 0
         totals.amount = 0
+
         for i in self.ingredients:
             totals.calorie += i.amount * i.calorie
             totals.protein += i.amount * i.protein
@@ -512,6 +520,7 @@ class Recipe(Base):
         totals.fat = math.floor(totals.fat) / 100
         totals.sugar = math.floor(totals.sugar) / 100
         totals.amount = math.floor(totals.amount)
+
         totals.ratio = math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
         return {'recipe': self, 'totals': totals}
 
@@ -523,7 +532,7 @@ class Recipe(Base):
             ingredient_id {int} -- Ingredient id
 
         Returns:
-            list -- of Recipes
+            list -- list of Recipes
         """
 
         recipes = s.query(Recipe).filter(Recipe.ingredients.any(Ingredient.id == ingredient_id)).all()
@@ -563,7 +572,7 @@ class Recipe(Base):
 
         s.delete(self)
         s.commit()
-        return None
+        return True
 
     def edit(self):
         """Edit Recipe
@@ -572,7 +581,7 @@ class Recipe(Base):
             None
         """
         s.commit()
-        return None
+        return True
 
     @property
     def json(self):
