@@ -46,7 +46,7 @@
                 {% endfor %}
             </table>
             
-            <a href="/newdiet" target="_blank"><button class="btn">Přidat dietu</button></button>
+            <a href="/newdiet" target="_blank"><button class="btn btn-secondary">Přidat dietu</button></a>
         </div>    
     </div>
 {% endblock %}

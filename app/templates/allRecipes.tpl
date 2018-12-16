@@ -26,14 +26,18 @@
                 {% endfor %}       
 
             </table>
-            <div class="row">
-                <form action="" class="form-inline">
-                    <a href="/newrecipe" target="_blank"><button class="btn">Přidat recept</button></button>
-                </form>
-                <form action="/printallrecipes" class="form-inline">
-                    <input type="submit" class="btn" value="Vytisknout všechny recepty" />
-                </form>
+            <div style="margin-left: 10px">
+                <div class="row">
+                    <a href="/newrecipe" target="_blank" style="margin-left: 3px"><button class="btn btn-secondary">Přidat recept</button></a>
+                </div>
+
+                <div class="row">
+                    <form action="/printallrecipes" class="form-inline">
+                        <input type="submit" class="btn btn-secondary" value="Vytisknout všechny recepty" />
+                    </form>
+                </div>
             </div>
+            
         </div>    
     </div>
 {% endblock %}

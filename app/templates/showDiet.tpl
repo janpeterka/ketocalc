@@ -186,9 +186,9 @@
                 </form>
                 <form action="/diet={{ diet.id }}/archive" method="post" accept-charset="utf-8">
                     {% if diet.active == True %}
-                        <button type="submit" class="btn">Archivovat {{ icons.archive }}</button>
+                        <button type="submit" class="btn btn-secondary">Archivovat {{ icons.archive }}</button>
                     {% else %}
-                        <button type="submit" class="btn">Aktivovat {{ icons.unarchive }}</button>
+                        <button type="submit" class="btn btn-secondary">Aktivovat {{ icons.unarchive }}</button>
                     {% endif %}
                 </form>
             </div>  

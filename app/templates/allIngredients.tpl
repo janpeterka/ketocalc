@@ -4,7 +4,6 @@
 {% endblock %}
 
 {% block style %}
-    
 {% endblock %}
 
 {% block script %}
@@ -32,7 +31,7 @@
                     </tr>
                 {% endfor %}
             </table>
-            <a href="/newingredient" target="_blank"><button class="btn">Přidat surovinu</button></button>
+            <a href="/newingredient" target="_blank"><button class="btn btn-secondary" style="margin-left: 5px">Přidat surovinu</button></a>
         </div> 
     </div>
 {% endblock %}

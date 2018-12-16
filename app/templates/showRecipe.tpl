@@ -22,7 +22,7 @@
     {% else %}
         <style type="text/css" media="screen">
             .totals {
-            background-color: var(--bgcolor_totals);
+                background-color: var(--bgcolor_totals);
             }      
 
             @media print {
@@ -143,7 +143,7 @@
 
 					<!--
 					<form action="/recipe={{recipe.id}}/export" class="form-inline col-5" method="post" accept-charset="utf-8">
-                    <input type="submit" class="btn" value="Exportovat recept do diety" />
+                    <input type="submit" class="btn btn-secondary" value="Exportovat recept do diety" />
                     <select name="diet" class="form-control">
                             {% for diet in diets %}
                                 <option value="{{ diet.id }}">{{ diet.name }}</option>
