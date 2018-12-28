@@ -77,7 +77,7 @@ def session_management():
     if application.config['APP_STATE'] == 'shutdown' and request.path not in ['/shutdown', '/static/style.css']:
         return redirect('/shutdown')
     elif request.path == '/shutdown' and application.config['APP_STATE'] != 'shutdown':
-            return redirect('/')
+        return redirect('/')
 
 
 @application.route('/', methods=['GET'])
@@ -204,7 +204,7 @@ def selectDietAJAX():
 def showNewDiet():
     form = forms.NewDietForm()
     if request.method == 'GET':
-        return template('newDiet.tpl', form=form)
+        return template('diet/newDiet.tpl', form=form)
     elif request.method == 'POST':
         diet = models.Diet()
         diet.name = form.name.data
@@ -217,16 +217,16 @@ def showNewDiet():
         diet.author = models.User.load(session['user_id'])
 
         if not form.validate_on_submit():
-            return template('newDiet.tpl', form=form)
+            return template('diet/newDiet.tpl', form=form)
 
         if diet.save():
             flash('Nová dieta byla vytvořena', 'success')
             return redirect('/diet={}'.format(diet.id))
         else:
             flash('Nepodařilo se vytvořit dietu', 'error')
-            return template('newDiet.tpl', form=form)
+            return template('diet/newDiet.tpl', form=form)
 
-    return template('newDiet.tpl')
+    return template('diet/newDiet.tpl')
 
 
 # SHOW DIET PAGE
@@ -241,7 +241,7 @@ def showDiet(diet_id, page_type=None):
         return redirect('/wrongpage')
 
     if page_type is None:
-        return template('showDiet.tpl', diet=diet, recipes=diet.recipes, diets=diet.author.diets)
+        return template('diet/showDiet.tpl', diet=diet, recipes=diet.recipes, diets=diet.author.diets)
     elif page_type == 'remove' and request.method == 'POST':
         if not diet.used:  # wip
             diet.remove()
@@ -251,7 +251,7 @@ def showDiet(diet_id, page_type=None):
             flash('Tato dieta má recepty, nelze smazat', 'error')
             return redirect('/diet={}'.format(diet_id))
     elif page_type == 'archive' and request.method == 'POST':
-        flash('Dieta byla archivována', 'info') if diet.active else flash('Dieta byla aktivována', 'info')
+        flash('Dieta byla archivována', 'success') if diet.active else flash('Dieta byla aktivována', 'success')
         diet.active = not diet.active
         diet.edit()
 
@@ -304,9 +304,9 @@ def showAllDiets():
         template -- [description]
     """
     diets = models.User.load(session['user_id']).diets
-    diets.sort(key=lambda x: x.active, reverse=True)
+    diets.sort(key=lambda x: (-x.active, x.name))
 
-    return template('allDiets.tpl', diets=diets)
+    return template('diet/allDiets.tpl', diets=diets)
 
 
 # NEW RECIPE PAGE
@@ -315,7 +315,7 @@ def showTrialNewRecipe():
     # trial_diet = models.Diet.load(2)  # wip
     active_diets = [models.Diet.load(2)]
     ingredients = models.Ingredient.loadAllByAuthor('basic')
-    return template('newRecipe.tpl', ingredients=ingredients, diets=active_diets, trialrecipe=True)
+    return template('recipe/newRecipe.tpl', ingredients=ingredients, diets=active_diets, trialrecipe=True)
 
 
 @application.route('/newrecipe')
@@ -323,7 +323,7 @@ def showTrialNewRecipe():
 def showNewRecipe():
     active_diets = models.User.load(session['user_id']).activeDiets
     ingredients = models.Ingredient.loadAllByAuthor(session['username'])
-    return template('newRecipe.tpl', ingredients=ingredients, diets=active_diets)
+    return template('recipe/newRecipe.tpl', ingredients=ingredients, diets=active_diets)
 
 
 @application.route('/addIngredientAJAX', methods=['POST'])
@@ -372,7 +372,12 @@ def calcRecipeAJAX(test_dataset=None):
     if ingredients is None:
         return 'False'
 
-    totals = {'calorie': 0, 'sugar': 0, 'fat': 0, 'protein': 0, 'amount': 0}
+    totals = type('', (), {})()
+    totals.sugar = 0
+    totals.fat = 0
+    totals.protein = 0
+    totals.amount = 0
+    totals.calorie = 0
 
     json_ingredients = []
     for ing in ingredients:
@@ -382,26 +387,38 @@ def calcRecipeAJAX(test_dataset=None):
 
         if hasattr(ing, 'min'):
             json_ingredient = {'id': ing.id, 'calorie': math.floor(ing.calorie * ing.amount * 100) / 100, 'name': ing.name, 'sugar': math.floor(ing.sugar * ing.amount * 100) / 100, 'fat': math.floor(ing.fat * ing.amount * 100) / 100, 'protein': math.floor(ing.protein * ing.amount * 100) / 100, 'amount': math.floor(ing.amount * 10000) / 100, 'main': ing.main, 'fixed': ing.fixed, 'min': ing.min, 'max': ing.max}  # wip
+            # json_ingredient = {'id': ing.id, }
         else:
             json_ingredient = {'id': ing.id, 'calorie': math.floor(ing.calorie * ing.amount * 100) / 100, 'name': ing.name, 'sugar': math.floor(ing.sugar * ing.amount * 100) / 100, 'fat': math.floor(ing.fat * ing.amount * 100) / 100, 'protein': math.floor(ing.protein * ing.amount * 100) / 100, 'amount': math.floor(ing.amount * 10000) / 100, 'main': ing.main, 'fixed': ing.fixed}  # wip
+            # json_ingredient = {'id': ing.id, }
 
         json_ingredients.append(json_ingredient)
 
-        totals['calorie'] += json_ingredient['calorie']
-        totals['sugar'] += json_ingredient['sugar']
-        totals['fat'] += json_ingredient['fat']
-        totals['protein'] += json_ingredient['protein']
-        totals['amount'] += json_ingredient['amount']
+        ing.calorie = math.floor(ing.calorie * ing.amount * 100) / 100
+        ing.fat = math.floor(ing.fat * ing.amount * 100) / 100
+        ing.sugar = math.floor(ing.sugar * ing.amount * 100) / 100
+        ing.protein = math.floor(ing.protein * ing.amount * 100) / 100
+        ing.amount = math.floor(ing.amount * 10000) / 100
 
-    totals['calorie'] = math.floor(totals['calorie'] * 100) / 100
-    totals['sugar'] = math.floor(totals['sugar'] * 100) / 100
-    totals['fat'] = math.floor(totals['fat'] * 100) / 100
-    totals['protein'] = math.floor(totals['protein'] * 100) / 100
-    totals['amount'] = math.floor(totals['amount'] * 100) / 100
+        totals.sugar += ing.sugar
+        totals.fat += ing.fat
+        totals.protein += ing.protein
+        totals.amount += ing.amount
+        totals.calorie += ing.calorie
 
-    totals['ratio'] = math.floor((totals['fat'] / (totals['protein'] + totals['sugar'])) * 100) / 100
+        ing.expire()
 
-    result = {'ingredients': json_ingredients, 'diet': diet.json, 'totals': totals}
+    totals.calorie = math.floor(totals.calorie * 100) / 100
+    totals.sugar = math.floor(totals.sugar * 100) / 100
+    totals.fat = math.floor(totals.fat * 100) / 100
+    totals.protein = math.floor(totals.protein * 100) / 100
+    totals.amount = math.floor(totals.amount * 100) / 100
+
+    totals.ratio = math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
+
+    template_data = template('recipe/newreciperightform.tpl', ingredients=ingredients, totals=totals, diet=diet)
+
+    result = {'template_data': str(template_data), 'ingredients': json_ingredients, 'diet': diet.json}
 
     return jsonify(result)
 
@@ -551,9 +568,9 @@ def showRecipe(recipe_id, page_type=None):
         return redirect('/wrongpage')
 
     if page_type is None:
-        return template('showRecipe.tpl', recipe=recipe_data['recipe'], totals=recipe_data['totals'], show=True)
+        return template('recipe/showRecipe.tpl', recipe=recipe_data['recipe'], totals=recipe_data['totals'], show=True)
     elif page_type == 'print':
-        return template('showRecipe.tpl', recipe=recipe_data['recipe'], totals=recipe_data['totals'], show=False)
+        return template('recipe/showRecipe.tpl', recipe=recipe_data['recipe'], totals=recipe_data['totals'], show=False)
     elif page_type == 'edit' and request.method == 'POST':
         recipe = recipe_data['recipe']
         recipe.name = request.form['name']
@@ -574,7 +591,7 @@ def showRecipe(recipe_id, page_type=None):
 @login_required
 def showAllRecipes():
     user = models.User.load(session['user_id'])
-    return template('allRecipes.tpl', diets=user.diets)
+    return template('recipe/allRecipes.tpl', diets=user.diets)
 
 
 @application.route('/diet=<int:diet_id>/print')
@@ -584,7 +601,7 @@ def printDietRecipes(diet_id):
     for recipe in diet.recipes:
         recipe_data = recipe.loadRecipeForShow()
         recipe.totals = recipe_data['totals']
-    return template('printAllRecipes.tpl', recipes=diet.recipes)
+    return template('recipe/printAllRecipes.tpl', recipes=diet.recipes)
 
 
 @application.route('/printallrecipes')
@@ -594,7 +611,7 @@ def printAllRecipes():
     for recipe in recipes:
         recipe_data = recipe.loadRecipeForShow()
         recipe.totals = recipe_data['totals']
-    return template('printAllRecipes.tpl', recipes=recipes)
+    return template('recipe/printAllRecipes.tpl', recipes=recipes)
 
 
 # NEW INGREDIENT PAGE
@@ -603,7 +620,7 @@ def printAllRecipes():
 def showNewIngredient():
     form = forms.NewIngredientForm()
     if request.method == 'GET':
-        return template('newIngredient.tpl', form=form)
+        return template('ingredient/newIngredient.tpl', form=form)
     elif request.method == 'POST':
         ingredient = models.Ingredient()
         ingredient.name = form.name.data
@@ -613,14 +630,14 @@ def showNewIngredient():
         ingredient.protein = form.protein.data
         ingredient.author = session['username']
         if not form.validate_on_submit():
-            return template('newIngredient.tpl', form=form)
+            return template('ingredient/newIngredient.tpl', form=form)
 
         if ingredient.save():
             flash('Nová surovina byla vytvořena', 'success')
             return redirect('/ingredient={}'.format(ingredient.id))
         else:
             flash('Nepodařilo se vytvořit surovinu', 'error')
-            return template('newIngredient.tpl', form=form)
+            return template('ingredient/newIngredient.tpl', form=form)
 
 
 @application.route('/ingredient=<int:ingredient_id>')
@@ -635,7 +652,7 @@ def showIngredient(ingredient_id, page_type=None):
 
     if page_type is None:
         recipes = models.Recipe.loadByIngredient(ingredient.id)
-        return template('showIngredient.tpl', ingredient=ingredient, recipes=recipes)
+        return template('ingredient/showIngredient.tpl', ingredient=ingredient, recipes=recipes)
 
     elif page_type == 'edit' and request.method == 'POST':
         ingredient.name = request.form['name']
@@ -668,7 +685,7 @@ def showIngredient(ingredient_id, page_type=None):
 def showAllIngredients():
     # basic_ingredients = models.Ingredient.loadAllByAuthor('default')
     ingredients = models.Ingredient.loadAllByAuthor(session['username'])
-    return template('allIngredients.tpl', ingredients=ingredients)
+    return template('ingredient/allIngredients.tpl', ingredients=ingredients)
 
 
 @application.route('/user')
@@ -970,12 +987,12 @@ def showHelp():
 # ERROR
 @application.route('/wrongpage')
 def wrongPage():
-    return template('wrongPage.tpl')
+    return template('error/wrongPage.tpl')
 
 
 @application.route('/shutdown')
 def shutdown():
-    return template('shutdown.tpl')
+    return template('error/shutdown.tpl')
 
 
 @application.route('/testing')
@@ -984,30 +1001,30 @@ def shutdown():
 def testingPage():
     tests = []
     # tests.append()
-    return template('testing.tpl', tests=tests)
+    return template('other/testing.tpl', tests=tests)
 
 
 @application.route('/google3748bc0390347e56.html')
 def googleVerification():
-    return template('google3748bc0390347e56.html')
+    return template('other/google3748bc0390347e56.html')
 
 
 @application.errorhandler(404)
 def error404(error):
     # Missing page
-    return template('err404.tpl')
+    return template('error/err404.tpl')
 
 
 @application.errorhandler(405)
 def error405(error):
     # Action not allowed (AJAX)
-    return template('wrongPage.tpl')
+    return template('error/wrongPage.tpl')
 
 
 @application.errorhandler(500)
 def error500(error):
     # Internal error
-    return template('err500.tpl')
+    return template('error/err500.tpl')
 
 
 if __name__ == '__main__':

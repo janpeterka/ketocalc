@@ -147,6 +147,15 @@ class Diet(Base):
         s.commit()
         return True
 
+    def expire(self):
+        """Dumps database changes
+
+        [description]
+        """
+
+        s.expire(self)
+        return True
+
     @property
     def json(self):
         """returns Diet object as JSON
@@ -275,6 +284,19 @@ class Ingredient(Base):
         s.commit()
         return True
 
+    def expire(self):
+        """Dumps database changes
+
+        [description]
+        """
+
+        s.expire(self)
+        return True
+
+    # def refresh(self):
+    #     s.refresh(self)
+    #     return True
+
     @property
     def json(self):
         """returns Diet object as JSON
@@ -373,6 +395,15 @@ class User(Base):
         """
         s.delete()
         s.commit()
+        return True
+
+    def expire(self):
+        """Dumps database changes
+
+        [description]
+        """
+
+        s.expire(self)
         return True
 
     def getPassword(self, password):
@@ -581,6 +612,15 @@ class Recipe(Base):
             None
         """
         s.commit()
+        return True
+
+    def expire(self):
+        """Dumps database changes
+
+        [description]
+        """
+
+        s.expire(self)
         return True
 
     @property
