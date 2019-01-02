@@ -15,7 +15,7 @@
                 {% from "_formelement.tpl" import render_field %}
                 {{ render_field(form.username, "form-control") }}
                 {{ render_field(form.password, "form-control") }}
-                {{ render_field(form.submit, "btn btn-primary col-sm-3", False) }}
+                {{ form.submit(class_='btn btn-primary col-sm-3') }}
             	<a class="col-sm-2" href="/register">Registrovat</a>
     	    </form>
     	</div>

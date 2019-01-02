@@ -13,7 +13,8 @@
 {% endblock %}
 
 {% block script %}
-	<script type="text/javascript">
+
+	<!-- <script type="text/javascript">
         $(document).on("change","#username", function(e) {
             $.ajax({
                 type: 'POST',
@@ -34,7 +35,7 @@
             });
             e.preventDefault();
         });
-    </script>
+    </script> -->
 {% endblock %}
 
 {% block content %}
@@ -59,8 +60,9 @@
                     </div>
 
                 </div>
-                {{ render_field(form.recaptcha) }}
-                {{ render_field(form.submit, "btn btn-primary", False) }}
+                <!-- {{ render_field(form.recaptcha) }} -->
+                {{ form.recaptcha }}
+                {{ form.submit(class_='btn btn-primary')}}
 
                 <a class="col-sm-2" href="/login">Přihlásit se</a><br>
             </form>

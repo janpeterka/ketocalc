@@ -22,9 +22,6 @@ from app import mail
 from .data import template_data
 from utils import *
 
-# Hashing library
-import hashlib
-
 # Math library
 import numpy
 import sympy as sp
@@ -127,10 +124,10 @@ def showRegister():
     if request.method == 'GET':
         return template('register.tpl', form=form)
     elif request.method == 'POST':
-
-        if not validateRegister(form.username.data):
-            form.username.errors.append('Toto jméno nemůžete použít')
         if not form.validate_on_submit():
+            return template('register.tpl', form=form)
+        if not validateRegister(form.username.data):
+            form.username.errors += ('Toto jméno nemůžete použít')
             return template('register.tpl', form=form)
 
         user = models.User()
@@ -329,8 +326,9 @@ def showNewRecipe():
 @application.route('/addIngredientAJAX', methods=['POST'])
 def addIngredienttoRecipeAJAX():
     ingredient = models.Ingredient.load(request.json['ingredient_id'])
-    # ingredient = models.Ingredient.load(request.form['prerecipe__add-ingredient__form__select'])
-    return jsonify(ingredient.json)
+    template_data = template('recipe/addingredientAJAX.tpl', ingredient=ingredient)
+    result = {'ingredient': ingredient.json, 'template_data': template_data}
+    return jsonify(result)
 
 
 @application.route('/calcRecipeAJAX', methods=['POST'])
@@ -348,6 +346,7 @@ def calcRecipeAJAX(test_dataset=None):
     Returns:
         [type] -- [description]
     """
+
     # testing
     if test_dataset is None:
         json_ingredients = request.json['ingredients']
@@ -355,6 +354,7 @@ def calcRecipeAJAX(test_dataset=None):
     else:
         json_ingredients = test_dataset['ingredients']
         diet = models.Diet.load(test_dataset['diet_id'])
+    # end testing
 
     if diet is None:
         return 'False'
@@ -534,7 +534,7 @@ def recalcRecipeAJAX(test_dataset=None):
 
 @application.route('/saveRecipeAJAX', methods=['POST'])
 @login_required
-def addRecipeAJAX():
+def saveRecipeAJAX():
     temp_ingredients = request.json['ingredients']
     diet_id = request.json['dietID']
 
@@ -710,9 +710,6 @@ def showUser(page_type=None):
 
         user.pwdhash = user.getPassword(request.form['password'].encode('utf-8'))
         user.password_version = 'bcrypt'
-
-        # password = request.form['password'].encode('utf-8')
-        # user.pwdhash = hashlib.sha256(password).hexdigest()
 
         success = user.edit()
         if success is True:
@@ -987,7 +984,7 @@ def showHelp():
 # ERROR
 @application.route('/wrongpage')
 def wrongPage():
-    return template('error/wrongPage.tpl')
+    abourt(405)
 
 
 @application.route('/shutdown')
@@ -1017,7 +1014,7 @@ def error404(error):
 
 @application.errorhandler(405)
 def error405(error):
-    # Action not allowed (AJAX)
+    # Action not allowed
     return template('error/wrongPage.tpl')
 
 

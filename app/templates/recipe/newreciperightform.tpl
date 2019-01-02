@@ -17,7 +17,7 @@
             {% elif ingredient.fixed %}
                 <tr class="tr-fixedIngredient">
             {% else %}
-                <tr class="tr-variableIngredient">'
+                <tr class="tr-variableIngredient">
             {% endif %}
 
                     <td>{{ ingredient.name }} </td>
@@ -34,7 +34,9 @@
                         <input type="text" class="col" id="slider" data-slider-id="slider_data" name="slider" data-provide="slider" data-slider-min="{{ingredient.min * 100}}" data-slider-max="{{ingredient.max * 100}}" data-slider-step="0.1" data-slider-value="{{ingredient.amount}}" data-slider-tooltip="show">
                     </td>
 
-                    <td colspan=5>{{ingredient.name}}</td>
+                    <td colspan=5>
+                        {{ingredient.name}}
+                    </td>
 
                 </tr>
             {% endif %}

@@ -11,31 +11,9 @@
             var recipe__ingredient_array = [];
             var recipe__ingredient_dietID = "";
 
-            // var prerecipe__selected_ingredients__table__header = 
-            //     '<tr>'+
-            //         '<th>Název</th>'+
-            //         '<th>Kalorie</th>'+
-            //         '<th>Bílk.</th>'+
-            //         '<th>Tuk</th>'+
-            //         '<th>Sach.</th>'+
-            //         '<th></th>'+
-            //     '</tr>'
-
-            function prerecipe__selected_ingredients__table__add_ingredient (ingredient) {
-                return '<tr id_value="' + ingredient.id + '">' +
-                            '<td>' + ingredient.name + '</td>' +
-                            '<td>' + ingredient.calorie + '</td>' +
-                            '<td>' + ingredient.protein+ '</td>' +
-                            '<td>' + ingredient.fat + '</td>'+
-                            '<td>' + ingredient.sugar + '</td>'+
-                            '<td>' +
-                                '{{ icons.ingredient_fixed }}' +
-                                '{{ icons.ingredient_main }}' +
-                                '{{ icons.ingredient_remove }}' +
-                            '</td>'+
-                        '</tr>'
+            Array.prototype.empty = function(){
+                this.length = 0
             }
-
 
             /// On ready - change visibility to default
             $(document).ready(function() {
@@ -43,20 +21,10 @@
                 $(".recipe__right").hide();
                 $(".recipe__wrong").hide();
                 $(".recipe__loader").hide();
-                // prerecipe__selectedIngredients__table__empty();
-                prerecipe__calc__form__empty();
-                $('.js-example-basic-single').select2();
+                // prerecipe__calc__form__empty();
+                prerecipe__ingredient_array.empty();
+                $('#prerecipe__add-ingredient__form__select').select2();
             });
-
-            // ingredient select to actual
-            function prerecipe__addIngredient__form__select__refresh(){
-                $('.prerecipe__add-ingredient__form__select').empty();
-                $('.prerecipe__add-ingredient__form__select').append(allIngredients);
-
-                for (var i = 0; i < prerecipe__ingredient_array.length; i++) {
-                    $('.prerecipe__add-ingredient__form__select option[value="' + prerecipe__ingredient_array[i].id + '"]').remove(); // wip
-                }
-            }
 
             // ingredient select to default
             function prerecipe__addIngredient__form__select__renew(){
@@ -64,30 +32,24 @@
                 $('.prerecipe__add-ingredient__form__select').append(allIngredients);
             }
 
+            // ingredient select to actual
+            function prerecipe__addIngredient__form__select__refresh(){
+                prerecipe__addIngredient__form__select__renew()
 
-            // empty prerecipe ingredients table
-            // function prerecipe__selectedIngredients__table__empty(){
-            //     $('.prerecipe__selected-ingredients__table').empty();
-            //     $(".prerecipe__selected-ingredients__table").append(prerecipe__selected_ingredients__table__header);
-            // }
-
-            function prerecipe__selectedIngredients__table__add(ingredient){
-                $('.prerecipe__selected-ingredients__table').append(prerecipe__selected_ingredients__table__add_ingredient(ingredient));
+                for (var i = 0; i < prerecipe__ingredient_array.length; i++) {
+                    $('.prerecipe__add-ingredient__form__select option[value="' + prerecipe__ingredient_array[i].id + '"]').remove(); // wip
+                }
             }
+
+            // add ingredient html to table of ingredients (prerecipe)
+            function prerecipe__selectedIngredients__table__add(ingredient_data){
+                $('.prerecipe__selected-ingredients__table').append(ingredient_data);
+            }
+
 
             // add ingredient to recipe
             function recipe__right__form__addIngredient(ingredient){
                 recipe__ingredient_array.push(ingredient)
-            }
-
-            // empty prerecipe form values
-            function prerecipe__calc__form__empty(){
-                prerecipe__ingredient_array.length = 0;
-            }
-
-            // empty recipe form values
-            function recipe__right__form__empty(){
-                recipe__ingredient_array.length = 0;
             }
 
             // remove prerecipe__form ingredient
@@ -146,6 +108,7 @@
                 $(".recipe__right").hide();
             }
 
+            // Save recipe AJAX
             $(document).on("submit", ".recipe__right__form", function(e){
                 $.ajax({
                         type: 'POST',
@@ -234,19 +197,16 @@
                             var template_data = response.template_data;
                             console.log(template_data);
 
-                            
-
-                            // // empty recipe all
-                            recipe__right__form__empty();
-
-                            // fill with html
-                            $('#recipe__right').html(template_data);
-
-
                             if (response == "False"){
                                 recipe__wrong__show();
                                 return;
                             }
+                            
+                            // // empty recipe all
+                            recipe__ingredient_array.empty();
+
+                            // fill with html
+                            $('#recipe__right').html(template_data);
 
                             var mySlider = $("#slider").slider();
 
@@ -285,10 +245,13 @@
                             null, '\t'),
                         contentType: 'application/json;charset=UTF-8',
                         success: function(response) {
-                            var ingredient = response;
+                            var ingredient = response['ingredient'];
+                            var template_data = response['template_data'];
+
                             prerecipe__calc__form__ingredients__add(ingredient);
                             prerecipe__addIngredient__form__select__refresh();
-                            prerecipe__selectedIngredients__table__add(ingredient); // gets data from form__ings
+                            
+                            $('.prerecipe__selected-ingredients__table').append(template_data);
                             recipe__hideAll();
                         },
                         error: function(error) {
@@ -415,7 +378,7 @@
                         if (prerecipe__ingredient_array[i].fixed){
                             prerecipe__ingredient_array[i].fixed = false;
                             $('.prerecipe__selected-ingredients__table').find('tr[id_value = "' + id +'"] ').removeClass('tr-fixedIngredient');
-                        }else{
+                        } else {
                             prerecipe__ingredient_array[i].fixed = true;
                             prerecipe__ingredient_array[i].main = false;
                             $('.prerecipe__selected-ingredients__table').find('tr[id_value = "' + id +'"] ').addClass('tr-fixedIngredient');
@@ -448,8 +411,8 @@
 
                     <div class="prerecipe__add-ingredient col-12">
                         <form class="prerecipe__add-ingredient__form form-inline">
-                            <select class="prerecipe__add-ingredient__form__select form-control js-example-basic-single"
-                            name="prerecipe__add-ingredient__form__select">
+                            <select class="prerecipe__add-ingredient__form__select form-control"
+                            name="prerecipe__add-ingredient__form__select" id="prerecipe__add-ingredient__form__select">
                             {% for ingredient in ingredients: %}
                                 <option name='{{ingredient.name}}' value="{{ingredient.id}}">{{ingredient.name}}</option>
                             {% endfor %}

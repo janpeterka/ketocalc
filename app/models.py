@@ -1,13 +1,8 @@
 # coding: utf-8
-from sqlalchemy import CHAR, Column, Enum, Float, ForeignKey, INTEGER, String, Table, text
-from sqlalchemy.dialects.mysql.types import TINYINT
-from sqlalchemy.orm import relationship, sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
 
-from sqlalchemy import create_engine
+from . import db
 
 import math
-import os
 
 import bcrypt
 import hashlib
@@ -15,46 +10,98 @@ import hashlib
 import unidecode
 
 
-engine = create_engine(os.environ.get('DB_STRING'), echo=False)
-Session = sessionmaker(bind=engine)
-
-Base = declarative_base()
-metadata = Base.metadata
-
-global s
-
-s = None
-
-
-# not cool (#wip)
-def startSession():
-    global s
-    s = Session()
-
-
-def endSession():
-    s.close()
-
-
-if s is None:
-    startSession()
-
-
-t_diets_has_recipes = Table(
-    'diets_has_recipes', metadata,
-    Column('diet_id', ForeignKey('diets.id'), primary_key=True, nullable=False, index=True),
-    Column('recipes_id', ForeignKey('recipes.id'), primary_key=True, nullable=False, index=True)
+t_diets_has_recipes = db.Table(
+    'diets_has_recipes',
+    db.Column('diet_id', db.ForeignKey('diets.id'), primary_key=True, nullable=False, index=True),
+    db.Column('recipes_id', db.ForeignKey('recipes.id'), primary_key=True, nullable=False, index=True)
 )
 
 
-t_users_has_diets = Table(
-    'users_has_diets', metadata,
-    Column('user_id', ForeignKey('users.id'), primary_key=True, nullable=False, index=True),
-    Column('diet_id', ForeignKey('diets.id'), primary_key=True, nullable=False, index=True)
+t_users_has_diets = db.Table(
+    'users_has_diets',
+    db.Column('user_id', db.ForeignKey('users.id'), primary_key=True, nullable=False, index=True),
+    db.Column('diet_id', db.ForeignKey('diets.id'), primary_key=True, nullable=False, index=True)
 )
 
 
-class RecipesHasIngredient(Base):
+# Custom methods for all my classes
+class BaseMixin(object):
+
+    def edit(self, **kw):
+        """Edits object
+
+        Saves object changes
+        """
+        try:
+            db.session.commit()
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+    def save(self, **kw):
+        """Saves new object
+
+        Returns:
+            int -- database ID of new object
+        """
+        try:
+            db.session.add(self)
+            db.session.commit()
+            return self.id
+        except Exception as e:
+            print(e)
+            return False
+
+    def remove(self, **kw):
+        """Deletes object
+        """
+        try:
+            db.session.delete(self)
+            db.session.commit()
+            return True
+        except Exception as e:
+            print(self)
+            print(self.id)
+            print(e)
+            return False
+
+    def expire(self, **kw):
+        """Dumps database changes
+
+        [description]
+        """
+
+        try:
+            db.session.expire(self)
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+    @classmethod
+    def refresh(self, **kw):
+        """Refreshes object
+
+        Expires changes and loads object
+
+        Arguments:
+            **kw {[type]} -- [description]
+
+        Returns:
+            bool -- [description]
+        """
+        # obj = cls(**kw)
+
+        try:
+            db.session.refresh(self)
+            return True
+        except Exception:
+            print(Exception)
+            return False
+
+
+class RecipesHasIngredient(db.Model):
     """Recipe-Ingredient connection class
 
     Extends:
@@ -70,15 +117,15 @@ class RecipesHasIngredient(Base):
     """
     __tablename__ = 'recipes_has_ingredients'
 
-    recipes_id = Column(ForeignKey('recipes.id'), primary_key=True, nullable=False, index=True)
-    ingredients_id = Column(ForeignKey('ingredients.id'), primary_key=True, nullable=False, index=True)
-    amount = Column(Float, nullable=False)
+    recipes_id = db.Column(db.ForeignKey('recipes.id'), primary_key=True, nullable=False, index=True)
+    ingredients_id = db.Column(db.ForeignKey('ingredients.id'), primary_key=True, nullable=False, index=True)
+    amount = db.Column(db.Float, nullable=False)
 
-    ingredients = relationship('Ingredient')
-    recipes = relationship('Recipe')
+    ingredients = db.relationship('Ingredient')
+    recipes = db.relationship('Recipe')
 
 
-class Diet(Base):
+class Diet(db.Model, BaseMixin):
     """Diet object
 
     Extends:
@@ -99,17 +146,17 @@ class Diet(Base):
     """
     __tablename__ = 'diets'
 
-    id = Column(INTEGER, primary_key=True)
-    name = Column(String(255), nullable=False)
-    sugar = Column(Float, nullable=False)
-    fat = Column(Float, nullable=False)
-    protein = Column(Float, nullable=False)
-    small_size = Column(Float, nullable=False)
-    big_size = Column(Float, nullable=False)
-    active = Column(TINYINT(1), nullable=False, server_default=text("'1'"))
+    id = db.Column(db.INTEGER, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    sugar = db.Column(db.Float, nullable=False)
+    fat = db.Column(db.Float, nullable=False)
+    protein = db.Column(db.Float, nullable=False)
+    small_size = db.Column(db.Float, nullable=False)
+    big_size = db.Column(db.Float, nullable=False)
+    active = db.Column(db.Boolean, nullable=False)
 
-    recipes = relationship('Recipe', secondary='diets_has_recipes', order_by='Recipe.name')
-    author = relationship('User', secondary='users_has_diets', uselist=False)
+    recipes = db.relationship('Recipe', secondary='diets_has_recipes', order_by='Recipe.name')
+    author = db.relationship('User', secondary='users_has_diets', uselist=False)
 
     @staticmethod
     def load(diet_id):
@@ -121,40 +168,8 @@ class Diet(Base):
         Returns:
             Diet -- SQLAlchemy Diet object
         """
-        diet = s.query(Diet).filter(Diet.id == diet_id).first()
+        diet = db.session.query(Diet).filter(Diet.id == diet_id).first()
         return diet
-
-    def save(self):
-        """Save new Diet object
-
-        Returns:
-            int -- id of saved object
-        """
-        s.add(self)
-        s.commit()
-        return self.id
-
-    def edit(self):
-        """Saves Diet object changes
-        """
-        s.commit()
-        return True
-
-    def remove(self):
-        """Deletes Diet object
-        """
-        s.delete(self)
-        s.commit()
-        return True
-
-    def expire(self):
-        """Dumps database changes
-
-        [description]
-        """
-
-        s.expire(self)
-        return True
 
     @property
     def json(self):
@@ -179,7 +194,7 @@ class Diet(Base):
             return True
 
 
-class Ingredient(Base):
+class Ingredient(db.Model, BaseMixin):
     """Ingredient class
 
     [description]
@@ -200,17 +215,17 @@ class Ingredient(Base):
     """
     __tablename__ = 'ingredients'
 
-    id = Column(INTEGER, primary_key=True)
-    name = Column(String(255), nullable=False)
-    calorie = Column(Float, nullable=False, server_default=text("'0'"))
-    sugar = Column(Float, nullable=False, server_default=text("'0'"))
-    fat = Column(Float, nullable=False, server_default=text("'0'"))
-    protein = Column(Float, nullable=False, server_default=text("'0'"))
-    author = Column(String(255), nullable=False)
+    id = db.Column(db.INTEGER, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    calorie = db.Column(db.Float, nullable=False, server_default=db.text("'0'"))
+    sugar = db.Column(db.Float, nullable=False, server_default=db.text("'0'"))
+    fat = db.Column(db.Float, nullable=False, server_default=db.text("'0'"))
+    protein = db.Column(db.Float, nullable=False, server_default=db.text("'0'"))
+    author = db.Column(db.String(255), nullable=False)
 
-    recipes = relationship('Recipe',
-                           primaryjoin="and_(Ingredient.id == remote(RecipesHasIngredient.ingredients_id), foreign(Recipe.id) == RecipesHasIngredient.recipes_id)",
-                           viewonly=True, order_by='Recipe.name')
+    recipes = db.relationship('Recipe',
+                              primaryjoin="and_(Ingredient.id == remote(RecipesHasIngredient.ingredients_id), foreign(Recipe.id) == RecipesHasIngredient.recipes_id)",
+                              viewonly=True, order_by='Recipe.name')
 
     @staticmethod
     def load(ingredient_id):
@@ -224,7 +239,7 @@ class Ingredient(Base):
         Returns:
             Ingredient -- SQLAlchemy Ingredient object
         """
-        ingredient = s.query(Ingredient).filter(Ingredient.id == ingredient_id).first()
+        ingredient = db.session.query(Ingredient).filter(Ingredient.id == ingredient_id).first()
         return ingredient
 
     @staticmethod
@@ -242,7 +257,7 @@ class Ingredient(Base):
         Returns:
             list -- list of Ingredient objects
         """
-        ingredients = s.query(Ingredient).filter(Ingredient.author == username).all()
+        ingredients = db.session.query(Ingredient).filter(Ingredient.author == username).all()
         if ordered:
             ingredients.sort(key=lambda x: unidecode.unidecode(x.name.lower()), reverse=False)
         return ingredients
@@ -256,46 +271,8 @@ class Ingredient(Base):
         Returns:
             int -- amount
         """
-        rhi = s.query(RecipesHasIngredient).filter(RecipesHasIngredient.recipes_id == recipe_id).filter(RecipesHasIngredient.ingredients_id == self.id).first()
+        rhi = db.session.query(RecipesHasIngredient).filter(RecipesHasIngredient.recipes_id == recipe_id).filter(RecipesHasIngredient.ingredients_id == self.id).first()
         return rhi.amount
-
-    def save(self):
-        """Saves new Ingredient object
-
-        Returns:
-            int -- database ID of new object
-        """
-
-        s.add(self)
-        s.commit()
-        return self.id
-
-    def edit(self):
-        """Saves Ingredient object changes
-        """
-        s.commit()
-        return True
-
-    def remove(self):
-        """Deletes Ingredient object
-
-        """
-        s.delete(self)
-        s.commit()
-        return True
-
-    def expire(self):
-        """Dumps database changes
-
-        [description]
-        """
-
-        s.expire(self)
-        return True
-
-    # def refresh(self):
-    #     s.refresh(self)
-    #     return True
 
     @property
     def json(self):
@@ -319,7 +296,7 @@ class Ingredient(Base):
             return True
 
 
-class User(Base):
+class User(db.Model, BaseMixin):
     """User class
 
 
@@ -338,14 +315,14 @@ class User(Base):
     """
     __tablename__ = 'users'
 
-    id = Column(INTEGER, primary_key=True, unique=True)
-    username = Column(String(255), nullable=False, unique=True)
-    pwdhash = Column(CHAR(64), nullable=False)
-    firstName = Column(String(255), nullable=False)
-    lastName = Column(String(255), nullable=False)
-    password_version = Column(String(45), nullable=True)
+    id = db.Column(db.INTEGER, primary_key=True, unique=True)
+    username = db.Column(db.String(255), nullable=False, unique=True)
+    pwdhash = db.Column(db.CHAR(64), nullable=False)
+    firstName = db.Column(db.String(255), nullable=False)
+    lastName = db.Column(db.String(255), nullable=False)
+    password_version = db.Column(db.String(45), nullable=True)
 
-    diets = relationship('Diet', secondary='users_has_diets', order_by='desc(Diet.active)')
+    diets = db.relationship('Diet', secondary='users_has_diets', order_by='desc(Diet.active)')
 
     @staticmethod
     def load(user_id):
@@ -360,51 +337,13 @@ class User(Base):
             User -- SQLAlchemy object
         """
         if type(user_id) is int:
-            user = s.query(User).filter(User.id == user_id).first()
+            user = db.session.query(User).filter(User.id == user_id).first()
         else:
-            user = s.query(User).filter(User.username == user_id).first()
+            user = db.session.query(User).filter(User.username == user_id).first()
+
+        # endSession(session)
+
         return user
-
-    def save(self):
-        """Saves user
-
-        Returns:
-            int -- new User db id
-        """
-        s.add(self)
-        s.commit()
-        return self.id
-
-    def edit(self):
-        """Edit user
-
-        Returns:
-            None --
-        """
-        try:
-            s.commit()
-            return True
-        except Exception:
-            return False
-
-    def remove(self):
-        """Remove User
-
-        Returns:
-            None --
-        """
-        s.delete()
-        s.commit()
-        return True
-
-    def expire(self):
-        """Dumps database changes
-
-        [description]
-        """
-
-        s.expire(self)
-        return True
 
     def getPassword(self, password):
         """Creates hash from password
@@ -478,7 +417,7 @@ class User(Base):
         return active_diets
 
 
-class Recipe(Base):
+class Recipe(db.Model, BaseMixin):
     """[summary]
 
     [description]
@@ -496,14 +435,14 @@ class Recipe(Base):
     """
     __tablename__ = 'recipes'
 
-    id = Column(INTEGER, primary_key=True)
-    name = Column(String(255), nullable=False)
-    type = Column(Enum('small', 'big'), nullable=False)
+    id = db.Column(db.INTEGER, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    type = db.Column(db.Enum('small', 'big'), nullable=False)
 
-    diet = relationship('Diet', secondary='diets_has_recipes', uselist=False)
-    ingredients = relationship("Ingredient",
-                               primaryjoin="and_(Recipe.id == remote(RecipesHasIngredient.recipes_id), foreign(Ingredient.id) == RecipesHasIngredient.ingredients_id)",
-                               viewonly=True, order_by='Ingredient.name')
+    diet = db.relationship('Diet', secondary='diets_has_recipes', uselist=False)
+    ingredients = db.relationship("Ingredient",
+                                  primaryjoin="and_(Recipe.id == remote(RecipesHasIngredient.recipes_id), foreign(Ingredient.id) == RecipesHasIngredient.ingredients_id)",
+                                  viewonly=True, order_by='Ingredient.name')
 
     @staticmethod
     def load(recipe_id):
@@ -515,7 +454,7 @@ class Recipe(Base):
         Returns:
             Recipe -- Recipe object
         """
-        recipe = s.query(Recipe).filter(Recipe.id == recipe_id).first()
+        recipe = db.session.query(Recipe).filter(Recipe.id == recipe_id).first()
         return recipe
 
     def loadRecipeForShow(self):
@@ -566,7 +505,7 @@ class Recipe(Base):
             list -- list of Recipes
         """
 
-        recipes = s.query(Recipe).filter(Recipe.ingredients.any(Ingredient.id == ingredient_id)).all()
+        recipes = db.session.query(Recipe).filter(Recipe.ingredientdb.session.any(Ingredient.id == ingredient_id)).all()
         return recipes
 
     def save(self, ingredients):
@@ -580,14 +519,14 @@ class Recipe(Base):
         Returns:
             int -- Recipe id
         """
-        s.add(self)
-        s.flush()
+        db.session.add(self)
+        db.session.flush()
 
         for i in ingredients:
             i.recipes_id = self.id
-            s.add(i)
+            db.session.add(i)
 
-        s.commit()
+        db.session.commit()
         return self.id
 
     def remove(self):
@@ -597,30 +536,12 @@ class Recipe(Base):
             None
         """
         # wip - to improve w/ orphan cascade
-        ingredients = s.query(RecipesHasIngredient).filter(RecipesHasIngredient.recipes_id == self.id)
+        ingredients = db.session.query(RecipesHasIngredient).filter(RecipesHasIngredient.recipes_id == self.id)
         for i in ingredients:
-            s.delete(i)
+            db.session.delete(i)
 
-        s.delete(self)
-        s.commit()
-        return True
-
-    def edit(self):
-        """Edit Recipe
-
-        Returns:
-            None
-        """
-        s.commit()
-        return True
-
-    def expire(self):
-        """Dumps database changes
-
-        [description]
-        """
-
-        s.expire(self)
+        db.session.delete(self)
+        db.session.commit()
         return True
 
     @property
