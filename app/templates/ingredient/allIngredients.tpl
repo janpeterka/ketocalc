@@ -16,10 +16,10 @@
             <table id="ingredients" class="table">
                 <tr>
                     <th>Název</th>
-                    <th>Kalorie</th>
-                    <th>Bílkovina</th>
-                    <th>Tuk</th>
-                    <th>Sacharidy</th>
+                    <th>Energie (kJ)</th>
+                    <th>Bílkovina (g/100g)</th>
+                    <th>Tuk (g/100g)</th>       
+                    <th>Sacharidy (g/100g)</th>
                 </tr>
                 {% for ingredient in ingredients: %}
                     <tr>

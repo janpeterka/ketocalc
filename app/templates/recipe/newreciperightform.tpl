@@ -4,11 +4,11 @@
     <table class="recipe__right__form__ingredient-table table">
         <tr>
             <th>Název</th>
-            <th>Kalorie</th>
-            <th>Bílkovina</th>
-            <th>Tuk</th>
-            <th>Sacharidy</th>
-            <th>Množství</th>
+            <th>Energie (kJ)</th>
+            <th>Bílkovina (g/100g)</th>
+            <th>Tuk (g/100g)</th>
+            <th>Sacharidy (g/100g)</th>
+            <th>Množství (g)</th>
         </tr>
 
         {% for ingredient in ingredients %}

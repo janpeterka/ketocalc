@@ -505,7 +505,7 @@ class Recipe(db.Model, BaseMixin):
             list -- list of Recipes
         """
 
-        recipes = db.session.query(Recipe).filter(Recipe.ingredientdb.session.any(Ingredient.id == ingredient_id)).all()
+        recipes = db.session.query(Recipe).filter(Recipe.ingredients.any(Ingredient.id == ingredient_id)).all()
         return recipes
 
     def save(self, ingredients):

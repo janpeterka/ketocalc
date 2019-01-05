@@ -426,7 +426,7 @@
                             <table class="prerecipe__selected-ingredients__table table">
                                 <tr>
                                     <th>Název</th>
-                                    <th>Kalorie</th>
+                                    <th>Energie (kJ)</th>
                                     <th>Bílk.</th>
                                     <th>Tuk</th>
                                     <th>Sach.</th>

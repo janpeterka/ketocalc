@@ -68,7 +68,7 @@
     {% include('navbar.tpl') %}
     <div class="container">
         <div class="row">
-            <div class="col">
+            <div class="col-4">
                 <label for="recipes"><h2>Recepty</h2></label>
                 <ul name="recipes">
                 {% for recipe in recipes: %}
@@ -88,7 +88,7 @@
                 </form>
             </div>
 
-            <div class="col">
+            <div class="col-8">
                 <table id="ingredients" class="table data__table">
                     <tr>
                         <th>Název</th>

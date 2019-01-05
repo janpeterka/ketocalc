@@ -42,7 +42,7 @@
     <div class="container">
         <div class="row">
   
-            <div class="col">
+            <div class="col-4">
                 <h4>Seznam receptů:</h4>
                 <ul>
                     {% for recipe in recipes %}
@@ -51,15 +51,15 @@
                 </ul>
             </div>
 
-            <div class="col">
+            <div class="col-8">
                 <form action="/ingredient={{ingredient.id}}/edit" class="edit__form form-group" method="post" accept-charset="utf-8">
                     <table class="table">
                         <tr>
                             <th>Název</th>
-                            <th>Kalorie</th>
-                            <th>Bílkovina</th>
-                            <th>Tuk</th>
-                            <th>Sacharidy</th>
+                            <th>Energie (kJ/100g)</th>
+                            <th>Bílkovina (g/100g)</th>
+                            <th>Tuk (g/100g)</th>
+                            <th>Sacharidy (g/100g)</th>
                             <th>Upravit</th>
                         </tr>
                         <tr>
@@ -100,10 +100,10 @@
                 <table class=" data__table table">
                     <tr>
                         <th>Název</th>
-                        <th>Kalorie</th>
-                        <th>Bílkovina</th>
-                        <th>Tuk</th>
-                        <th>Sacharidy</th>
+                        <th>Energie (kJ)</th>
+                        <th>Bílkovina (g/100g)</th>
+                        <th>Tuk (g/100g)</th>
+                        <th>Sacharidy (g/100g)</th>
                     </tr>
                     <tr>
                         <td>{{ ingredient.name }}</td>
