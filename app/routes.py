@@ -287,6 +287,7 @@ def calcRecipeAJAX(test_dataset=None):
         ingredients.append(ingredient)
 
     ingredients = calculations.calculateRecipe(ingredients, diet)
+    print(ingredients)
 
     if ingredients is None:
         return 'False'
@@ -335,7 +336,7 @@ def calcRecipeAJAX(test_dataset=None):
 
     totals.ratio = math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
 
-    template_data = template('recipe/newreciperightform.tpl', ingredients=ingredients, totals=totals, diet=diet)
+    template_data = template('recipe/newreciperightform.tpl', ingredients=ingredients, totals=totals, diet=diet, trialrecipe=True)
 
     result = {'template_data': str(template_data), 'ingredients': json_ingredients, 'diet': diet.json}
 
