@@ -1,6 +1,6 @@
 {% extends "base.tpl" %}
 {% block title %}
-    Nový recept
+    {{ texts.recipe_new }}
 {% endblock %}
 
 {% block style %}{% endblock %}
@@ -425,11 +425,11 @@
                         <form class="form-group">
                             <table class="prerecipe__selected-ingredients__table table">
                                 <tr>
-                                    <th>Název</th>
-                                    <th>Energie (kJ)</th>
-                                    <th>Bílk.</th>
-                                    <th>Tuk</th>
-                                    <th>Sach.</th>
+                                    <th>{{ texts.title }}</th>
+                                    <th>{{ texts.energy_simple }}</th>
+                                    <th>{{ texts.protein_simple }}</th>
+                                    <th>{{ texts.fat_simple }}</th>
+                                    <th>{{ texts.sugar_simple}}</th>
                                     <th></th>
                                 </tr>
                             </table>
@@ -438,13 +438,13 @@
 
                     <div class="prerecipe__calc col-12">
                         <form class="prerecipe__calc__form form-inline">
-                            <label for="select-diet">Název diety</label>
+                            <label for="select-diet">{{ texts.diet_name}}</label>
                             <select name="select-diet" class="select-diet form-control">
                             {% for diet in diets: %}
                                 <option value="{{diet.id}}">{{ diet.name }}</option>
                             {% endfor %}
                             </select>
-                            <input type="submit" class=" prerecipe__calc__form__submit btn btn-primary" value="Spočítat množství!" />
+                            <input type="submit" class=" prerecipe__calc__form__submit btn btn-primary" value="{{ texts.calc_amount }}" />
                         </form>
                     </div>
 
@@ -455,7 +455,7 @@
                     <div class="recipe__loader"></div>
 
                     <div class="recipe__wrong">
-                        <span>Recept nelze vytvořit</span>
+                        <span>{{ texts.recipe_impossible}}</span>
                     </div>
 
                     <div class="recipe__right" id="recipe__right">

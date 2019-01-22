@@ -1,6 +1,6 @@
 {% extends "base.tpl" %}
 {% block title %}
-    Všechny suroviny	
+    {{ texts.ingredient_all }}	
 {% endblock %}
 
 {% block style %}
@@ -15,11 +15,11 @@
         <div class="col-10">
             <table id="ingredients" class="table">
                 <tr>
-                    <th>Název</th>
-                    <th>Energie (kJ)</th>
-                    <th>Bílkovina (g/100g)</th>
-                    <th>Tuk (g/100g)</th>       
-                    <th>Sacharidy (g/100g)</th>
+                    <th>{{ texts.title }}</th>
+                    <th>{{ texts.energy_100 }}</th>
+                    <th>{{ texts.protein_100 }}</th>
+                    <th>{{ texts.fat_100 }}</th>       
+                    <th>{{ texts.sugar_100 }}</th>
                 </tr>
                 {% for ingredient in ingredients: %}
                     <tr>
@@ -31,7 +31,7 @@
                     </tr>
                 {% endfor %}
             </table>
-            <a href="/newingredient" target="_blank"><button class="btn btn-secondary" style="margin-left: 5px">Přidat surovinu</button></a>
+            <a href="/newingredient" target="_blank"><button class="btn btn-secondary" style="margin-left: 5px">{{ texts.ingredient_add }}</button></a>
         </div> 
     </div>
 {% endblock %}

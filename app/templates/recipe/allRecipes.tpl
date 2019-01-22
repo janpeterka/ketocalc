@@ -1,14 +1,9 @@
 {% extends "base.tpl" %}
 {% block title %}
-    Všechny recepty
+    {{ texts.recipe_all }}
 {% endblock %}
 
 {% block style %}{% endblock %}
-<!-- <style type="text/css">  
-    .btn{
-        margin-top: 5px;
-    }
-</style> -->
 
 {% block script %}{% endblock %}
 
@@ -33,14 +28,11 @@
             </table>
             <div style="margin-left: 15px">
                 <div class="row">
-                    <a href="/newrecipe" target="_blank" class="btn btn-secondary">Přidat recept</a>
+                    <a href="/newrecipe" target="_blank" class="btn btn-secondary">{{ texts.recipe_add }}</a>
                 </div>
 
                 <div class="row" style="margin-top: 5px">
-                    <a href="/printallrecipes" target="_black" class="btn btn-secondary"> Vytisknout všechny recepty {{ icons.print }}</a>
-<!--                     <form action="/printallrecipes" class="form-inline">
-                        <input type="submit" class="btn btn-secondary" value="Vytisknout všechny recepty" />
-                    </form> -->
+                    <a href="/printallrecipes" target="_black" class="btn btn-secondary"> {{ texts.recipe_print_all }} {{ icons.print }}</a>
                 </div>
             </div>
             

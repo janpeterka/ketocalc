@@ -1,6 +1,6 @@
 {% extends "base.tpl" %}
 {% block title %}
-    Dieta: {{diet.name}}
+    {{ texts.diet }}: {{ diet.name }}
 {% endblock %}
 
 {% block style %}
@@ -69,7 +69,7 @@
     <div class="container">
         <div class="row">
             <div class="col-4">
-                <label for="recipes"><h2>Recepty</h2></label>
+                <label for="recipes"><h3>{{ texts.recipe_list }}</h3></label>
                 <ul name="recipes">
                 {% for recipe in recipes: %}
                         <li><a href="/recipe={{recipe.id}}">{{ recipe.name }}</a></li>
@@ -91,30 +91,30 @@
             <div class="col-8">
                 <table id="ingredients" class="table data__table">
                     <tr>
-                        <th>Název</th>
-                        <th>Bílkovina</th>
-                        <th>Tuk</th>
-                        <th>Sacharidy</th>
+                        <th>{{ texts.title }}</th>
+                        <th>{{ texts.protein_simple }}</th>
+                        <th>{{ texts.fat_simple }}</th>
+                        <th>{{ texts.sugar_simple }}</th>
                     </tr>
                     <tr>
-                        <td>{{diet.name}}</td>
-                        <td>{{diet.protein}}</td>
-                        <td>{{diet.fat}}</td>
-                        <td>{{diet.sugar}}</td>
+                        <td>{{ diet.name }}</td>
+                        <td>{{ diet.protein }}</td>
+                        <td>{{ diet.fat }}</td>
+                        <td>{{ diet.sugar }}</td>
                     </tr>
                 </table>
 
                 <table class="table data__table">
                     <tr>
-                        <th>Velikost jídla</th>
-                        <th>Podíl</th>
+                        <th>{{ texts.meal_size }}</th>
+                        <th>{{ texts.meal_portion }}</th>
                     </tr>
                     <tr>
-                        <td>Velké jídlo</td>
+                        <td>{{ texts.meal_size_big }}</td>
                         <td>{{ diet.big_size }} %</td>
                     </tr>
                     <tr>
-                        <td>Malé jídlo</td>
+                        <td>{{ texts.meal_size_small }}</td>
                         <td>{{ diet.small_size }} %</td>
                     </tr>
                 </table>
@@ -122,10 +122,10 @@
                 <form action="/diet={{diet.id}}/edit" class="edit__form form-group" method="post" accept-charset="utf-8">
                     <table class="table">
                         <tr>
-                            <th>Název</th>
-                            <th>Bílkovina</th>
-                            <th>Tuk</th>
-                            <th>Sacharidy</th>
+                            <th>{{ texts.title }}</th>
+                            <th>{{ texts.protein_simple }}</th>
+                            <th>{{ texts.fat_simple }}</th>
+                            <th>{{ texts.sugar_simple }}</th>
                         </tr>
                         <tr>
                             <td>
@@ -157,38 +157,38 @@
 
                     <table class="table edit__form">
                         <tr>
-                            <th>Velikost jídla</th>
-                            <th>Podíl</th>
+                            <th>{{ texts.meal_size }}</th>
+                            <th>{{ texts.meal_portion }}</th>
                         </tr>
                         <tr>
-                            <td>Velké jídlo</td>
+                            <td>{{ texts.meal_size_big }}</td>
                             <td>
                                 <input type="text" class="form-control" name="big_size" value="{{ diet.big_size }}" />
                             </td>
                         </tr>
                         <tr>
-                            <td>Malé jídlo</td>
+                            <td>{{ texts.meal_size_small }}</td>
                             <td>
                                 <input type="text" class="form-control" name="small_size"  value="{{ diet.small_size }}" /> 
                             </td>
                         </tr>
                     </table>
-                    <input type="submit" class="btn btn-warning" value="Uložit změnu" />
+                    <input type="submit" class="btn btn-warning" value="{{ texts.edit_confirm }}" />
                 </form>
 
                 <form action="/diet={{ diet.id }}/remove" method="post" accept-charset="utf-8">
-                    <button type="button" class="editShowButton btn btn-warning">Upravit {{ icons.edit }}</button>
-                    <button type="button" class="editHideButton btn btn-warning">Zrušit úpravy {{ icons.edit }}</button>
+                    <button type="button" class="editShowButton btn btn-warning">{{ texts.edit }} {{ icons.edit }}</button>
+                    <button type="button" class="editHideButton btn btn-warning">{{ texts.edit_cancel }} {{ icons.edit }}</button>
                     {% if diet.used == False %}
-                        <button type="submit" class="btn btn-danger">Smazat dietu {{ icons.delete }}</button>
+                        <button type="submit" class="btn btn-danger">{{ texts.diet_delete }} {{ icons.delete }}</button>
                     {% endif %}
-                    <button type="button" class="printButton btn btn-secondary">Tisk {{ icons.print }}</button>
+                    <button type="button" class="printButton btn btn-secondary">{{ texts.print }} {{ icons.print }}</button>
                 </form>
                 <form action="/diet={{ diet.id }}/archive" method="post" accept-charset="utf-8">
                     {% if diet.active == True %}
-                        <button type="submit" class="btn btn-secondary">Archivovat {{ icons.archive }}</button>
+                        <button type="submit" class="btn btn-secondary">{{ texts.archive }} {{ icons.archive }}</button>
                     {% else %}
-                        <button type="submit" class="btn btn-secondary">Aktivovat {{ icons.unarchive }}</button>
+                        <button type="submit" class="btn btn-secondary">{{ texts.unarchive }} {{ icons.unarchive }}</button>
                     {% endif %}
                 </form>
             </div>  

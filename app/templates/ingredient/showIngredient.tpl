@@ -1,6 +1,6 @@
 {% extends "base.tpl" %}
 {% block title %}
-    Surovina
+     {{ texts.ingredient }}
 {% endblock %}
 
 {% block style %}
@@ -43,10 +43,10 @@
         <div class="row">
   
             <div class="col-4">
-                <h4>Seznam receptů:</h4>
-                <ul>
+                <label for="recipes"><h3>{{ texts.recipe_list }}</h3></label>
+                <ul name="recipes">
                     {% for recipe in recipes %}
-                    <li><a href='/recipe={{ recipe.id }}'>{{ recipe.name }}</a></li>
+                        <li><a href='/recipe={{ recipe.id }}'>{{ recipe.name }}</a></li>
                     {% endfor %}
                 </ul>
             </div>
@@ -55,12 +55,12 @@
                 <form action="/ingredient={{ingredient.id}}/edit" class="edit__form form-group" method="post" accept-charset="utf-8">
                     <table class="table">
                         <tr>
-                            <th>Název</th>
-                            <th>Energie (kJ/100g)</th>
-                            <th>Bílkovina (g/100g)</th>
-                            <th>Tuk (g/100g)</th>
-                            <th>Sacharidy (g/100g)</th>
-                            <th>Upravit</th>
+                            <th>{{ texts.title }}</th>
+                            <th>{{ texts.energy_100 }}</th>
+                            <th>{{ texts.protein_100 }}</th>
+                            <th>{{ texts.fat_100 }}</th>
+                            <th>{{ texts.sugar_100 }}</th>
+                            <th>{{ texts.edit }}</th>
                         </tr>
                         <tr>
                             <td>
@@ -91,7 +91,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <input type="submit" class="btn btn-warning" value="Uložit změnu" />
+                                <input type="submit" class="btn btn-warning" value="{{ texts.edit_confirm}}" />
                             </td>
                         </tr>
                     </table>
@@ -99,11 +99,11 @@
 
                 <table class=" data__table table">
                     <tr>
-                        <th>Název</th>
-                        <th>Energie (kJ)</th>
-                        <th>Bílkovina (g/100g)</th>
-                        <th>Tuk (g/100g)</th>
-                        <th>Sacharidy (g/100g)</th>
+                        <th>{{ texts.title }}</th>
+                        <th>{{ texts.energy_100 }}</th>
+                        <th>{{ texts.protein_100 }}</th>
+                        <th>{{ texts.fat_100 }}</th>
+                        <th>{{ texts.sugar_100 }}</th>
                     </tr>
                     <tr>
                         <td>{{ ingredient.name }}</td>
@@ -114,14 +114,13 @@
                     </tr>
                  </table>
 
-                <form action="/ingredient={{ingredient.id}}/remove" onsubmit="return confirm('Opravdu chcete smazat surovinu?');" method="post" accept-charset="utf-8">
-                    <button type="button" class="editShowButton btn btn-warning">Upravit {{ icons.edit }}</button>
-                    <button type="button" class="editHideButton btn btn-warning">Zrušit úpravy {{ icons.edit }}</button>
+                <form action="/ingredient={{ingredient.id}}/remove" onsubmit="return confirm('{{ texts.ingredient_delete_confirm }}');" method="post" accept-charset="utf-8">
+                    <button type="button" class="editShowButton btn btn-warning">{{ texts.edit }} {{ icons.edit }}</button>
+                    <button type="button" class="editHideButton btn btn-warning">{{ texts.edit_cancel }} {{ icons.edit }}</button>
                     {% if ingredient.used == False %}
-                        <button type="submit" class="btn btn-danger">Smazat surovinu {{ icons.delete }}</button>
+                        <button type="submit" class="btn btn-danger">{{ texts.ingredient_delete }} {{ icons.delete }}</button>
                     {% else %}
-                        <button type="submit" class="btn btn-danger" disabled>Nelze smazat {{ icons.delete }}</button>
-                        {# <input type="submit" class="btn btn-danger" disabled value="Nelze smazat" /> #}
+                        <button type="submit" class="btn btn-danger" disabled>{{ texts.delete_error }} {{ icons.delete }}</button>
                     {% endif %}
                 </form>
             </div>

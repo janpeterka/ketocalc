@@ -1,6 +1,6 @@
 {% extends "base.tpl" %}
 {% block title %}
-    Nová dieta
+    {{ texts.diet_new }}
 {% endblock %}
 
 {% block style %}{% endblock %}

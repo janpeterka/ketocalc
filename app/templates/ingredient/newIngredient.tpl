@@ -1,14 +1,12 @@
 {% extends "base.tpl" %}
 {% block title %}
-    Nová surovina
+    {{ texts.ingredient_new }}
 {% endblock %}
 
 {% block style %}
-    
 {% endblock %}
 
 {% block script %}
-	
 {% endblock %}
 
 {% block content %}

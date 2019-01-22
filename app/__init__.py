@@ -12,4 +12,14 @@ mail = Mail(application)
 # Bootstrap(application)
 db = SQLAlchemy(application)
 
+from app.auth import bp as auth_bp
+application.register_blueprint(auth_bp)
+
+from app.calc import bp as calc_bp
+application.register_blueprint(calc_bp)
+
+from app.errors import bp as errors_bp
+application.register_blueprint(errors_bp)
+
+
 from app import models, routes

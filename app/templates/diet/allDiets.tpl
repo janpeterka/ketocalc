@@ -1,6 +1,6 @@
 {% extends "base.tpl" %}
 {% block title %}
-    Všechny diety
+    {{ texts.diet_all }}
 {% endblock %}
 
 {% block style %}
@@ -24,11 +24,11 @@
         <div class="col-6">
             <table id="diets" class="table">
                 <tr>
-                    <th>Název</th>
-                    <th>Bílkovina</th>
-                    <th>Tuk</th>
-                    <th>Sacharidy</th>
-                    <th>Aktivní</th>
+                    <th>{{ texts.title }}</th>
+                    <th>{{ texts.protein_100 }}</th>
+                    <th>{{ texts.fat_100 }}</th>
+                    <th>{{ texts.sugar_100 }}</th>
+                    <th>{{ texts.diet_active }}</th>
                 </tr>
                 {% for diet in diets: %}
                     <tr class= {% if diet.active%} active {% else %} inactive {% endif %}>                        
@@ -38,15 +38,15 @@
                         <td>{{ diet.sugar }}</td>
                         <td>
                             {% if diet.active %}
-                                Ano
+                                {{ texts.yes }}
                             {% else %}
-                                Ne
+                                {{ texts.no }}
                             {% endif %}
                     </tr>
                 {% endfor %}
             </table>
             
-            <a href="/newdiet" target="_blank"><button class="btn btn-secondary">Přidat dietu</button></a>
+            <a href="/newdiet" target="_blank"><button class="btn btn-secondary">{{ texts.diet_add }}</button></a>
         </div>    
     </div>
 {% endblock %}

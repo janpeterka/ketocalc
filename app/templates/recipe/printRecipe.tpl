@@ -1,6 +1,6 @@
 {% extends "base.tpl" %}
 {% block title %}
-    Vytisknout recept - {{ recipe.name }}
+    {{ texts.recipe_print }} - {{ recipe.name }}
 {% endblock %}
 
 {% block style %}
@@ -27,20 +27,20 @@
             <span class="data__table d-print-table"><h2>{{ recipe.name }}</h2></span>
             <span>
                 {% if recipe.type == "small" %}
-                    <h5>Malé jídlo ({{ recipe.diet.small_size }}%)</h5>
+                    <h5>{{ texts.meal_size_small }} ({{ recipe.diet.small_size }}%)</h5>
                 {% elif recipe.type == "big" %}
-                    <h5>Velké jídlo ({{ recipe.diet.big_size }}%)</h5> 
+                    <h5>{{ texts.meal_size_big }} ({{ recipe.diet.big_size }}%)</h5> 
                 {% endif %}
             </span>            
             <table id="ingredients" class="table">
                 <tr>
-                    <th><strong>Název</strong></th>
-                    <th><strong>Kalorie</strong></th>
-                    <th><strong>Bílkovina</strong></th>
-                    <th><strong>Tuk</strong></th>
-                    <th><strong>Sacharidy</strong></th>
-                    <th><strong>Množství</strong></th>
-                    <th></th>
+                    <th><strong>{{ texts.title }}</strong></th>
+                        <th><strong>{{ texts.calorie_simple }</strong></th>
+                        <th><strong>{{ texts.protein_simple }</strong></th>
+                        <th><strong>{{ texts.fat_simple }}</strong></th>
+                        <th><strong>{{ texts.sugar_simple }}</strong></th>
+                        <th><strong>{{ texts.amount_simple }}</strong></th>
+                        <th></th>
                 </tr>
 
                 {% for ingredient in recipe.ingredients: %}

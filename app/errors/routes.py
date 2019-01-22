@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# run by pyserver
+
+from flask import render_template as template
+from flask import abort
+
+from app import application
+from app.routes import login_required, admin_required
+
+
+# ERROR
+@application.route('/wrongpage')
+def wrongPage():
+    abort(405)
+
+
+@application.route('/shutdown')
+def shutdown():
+    return template('errors/shutdown.tpl')
+
+
+@application.route('/testing')
+@login_required
+@admin_required
+def testingPage():
+    tests = []
+    # tests.append()
+    return template('other/testing.tpl', tests=tests)
+
+
+@application.route('/google3748bc0390347e56.html')
+def googleVerification():
+    return template('other/google3748bc0390347e56.html')
+
+
+@application.errorhandler(404)
+def error404(error):
+    # Missing page
+    return template('errors/err404.tpl')
+
+
+@application.errorhandler(405)
+def error405(error):
+    # Action not allowed
+    return template('errors/wrongPage.tpl')
+
+
+@application.errorhandler(500)
+def error500(error):
+    # Internal error
+    return template('errors/err500.tpl')

@@ -1,6 +1,6 @@
 {% extends "base.tpl" %}
 {% block title %}
-    Vytisknout všechny recepty
+    {{ texts.recipe_print_all }}
 {% endblock %}
 
 {% block style %}
@@ -26,17 +26,17 @@
             {% for recipe in recipes:%}
                 <h2>{{ recipe.name }}</h2>
                 {% if recipe.size == "small" %}
-                    <h5>Malé jídlo ({{ recipe.diet.small_size }}%)</h5>
+                    <h5>{{ texts.meal_size_small }} ({{ recipe.diet.small_size }}%)</h5>
                 {% elif recipe.size == "big" %}
-                    <h5>Velké jídlo ({{ recipe.diet.big_size }}%)</h5> 
+                    <h5>{{ texts.meal_size_small }} ({{ recipe.diet.big_size }}%)</h5> 
                 {% endif %}
                 <table id="ingredients" class="table">
                     <tr>
-                        <th><strong>Název</strong></th>
-                        <th><strong>Bílkovina</strong></th>
-                        <th><strong>Tuk</strong></th>
-                        <th><strong>Sacharidy</strong></th>
-                        <th><strong>Množství</strong></th>
+                        <th><strong>{{ texts.title }}</strong></th>
+                        <th><strong>{{ texts.protein_simple }</strong></th>
+                        <th><strong>{{ texts.fat_simple }}</strong></th>
+                        <th><strong>{{ texts.sugar_simple }}</strong></th>
+                        <th><strong>{{ texts.amount_simple }}</strong></th>
                         <th></th>
                     </tr>
 
@@ -53,7 +53,7 @@
                     {% endfor %}
 
                     <tr class="totals">
-                        <td><strong>Celkem</strong></td>
+                        <td><strong>{{ texts.total }}</strong></td>
                         <td>{{ recipe.totals.protein|round(2,'common') }}</td>
                         <td>{{ recipe.totals.fat|round(2,'common') }}</td>
                         <td>{{ recipe.totals.sugar|round(2,'common') }}</td>

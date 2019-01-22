@@ -19,14 +19,14 @@ from werkzeug import secure_filename
 from app import models, forms
 from app import application
 from app import mail
+
+from app.calc import calculations
+
 from .data import template_data
 from utils import *
 
 # Math library
 import numpy
-import sympy as sp
-from sympy import solve_poly_inequality as solvei
-from sympy import poly
 import math
 import os
 
@@ -40,11 +40,10 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 # global data
 @application.context_processor
 def inject_globals():
-    return dict(icons=template_data.icons)
+    return dict(icons=template_data.icons, texts=template_data.texts)
 
 
 # MAIN
-
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -80,87 +79,6 @@ def session_management():
 @application.route('/', methods=['GET'])
 def main():
     return redirect('/dashboard')
-
-
-# LOGIN
-@application.route('/login', methods=['GET', 'POST'])
-def showLogin():
-    form = forms.LoginForm(request.form)
-    if request.method == 'GET':
-        return template('login.tpl', form=form)
-    elif request.method == 'POST':
-        if not form.validate_on_submit():
-            return template('login.tpl', form=form)
-        if doLogin(form.username.data, form.password.data.encode('utf-8')):
-            return redirect('/dashboard')
-        else:
-            return redirect('/login')
-
-
-def doLogin(username, password, from_register=False):
-    user = models.User.load(username)
-    if user is not None and user.checkLogin(password):
-        session['username'] = username
-        session['user_id'] = user.id
-        if not from_register:
-            flash('Byl jste úspěšně přihlášen.', 'success')
-            return True
-    else:
-        flash('Přihlášení se nezdařilo.', 'error')
-        return False
-
-
-@application.route('/logout')
-def doLogout():
-    session.pop('username', None)
-    session.pop('user_id', None)
-    flash('Byl jste úspěšně odhlášen.', 'info')
-    return redirect('/login')
-
-
-@application.route('/register', methods=['GET', 'POST'])
-def showRegister():
-    form = forms.RegisterForm(request.form)
-    if request.method == 'GET':
-        return template('register.tpl', form=form)
-    elif request.method == 'POST':
-        if not form.validate_on_submit():
-            return template('register.tpl', form=form)
-        if not validateRegister(form.username.data):
-            form.username.errors += ('Toto jméno nemůžete použít')
-            return template('register.tpl', form=form)
-
-        user = models.User()
-
-        user.username = form.username.data
-        user.firstName = form.first_name.data
-        user.lastName = form.last_name.data
-        user.password = form.password.data
-        user.pwdhash = user.getPassword(form.password.data.encode('utf-8'))
-        user.password_version = 'bcrypt'
-
-        if doRegister(user):
-            return redirect('/dashboard')
-        else:
-            return template('register.tpl', form=form)
-
-
-def doRegister(user):
-    if user.save() is not None:
-        doLogin(user.username, user.password.encode('utf-8'), True)
-        flash('Byl jste úspěšně zaregistrován.', 'success')
-        return True
-    else:
-        flash('Registrace neproběhla v pořádku', 'error')
-        return False
-
-
-@application.route('/registerValidate', methods=['POST'])
-def validateRegister(username):
-    if models.User.load(username) is not None:
-        return False
-    else:
-        return True
 
 
 # USER PAGE
@@ -205,6 +123,7 @@ def showNewDiet():
     elif request.method == 'POST':
         diet = models.Diet()
         diet.name = form.name.data
+        # diet.calorie = form.calorie.data
         diet.sugar = form.sugar.data
         diet.fat = form.fat.data
         diet.protein = form.protein.data
@@ -367,7 +286,7 @@ def calcRecipeAJAX(test_dataset=None):
         ingredient.amount = float(json_i['amount']) / 100  # from grams per 100g
         ingredients.append(ingredient)
 
-    ingredients = calc(ingredients, diet)
+    ingredients = calculations.calculateRecipe(ingredients, diet)
 
     if ingredients is None:
         return 'False'
@@ -572,10 +491,12 @@ def showRecipe(recipe_id, page_type=None):
     elif page_type == 'print':
         return template('recipe/showRecipe.tpl', recipe=recipe_data['recipe'], totals=recipe_data['totals'], show=False)
     elif page_type == 'edit' and request.method == 'POST':
+        # print(recipe_data)
         recipe = recipe_data['recipe']
         recipe.name = request.form['name']
         recipe.type = request.form['size']
         recipe.edit()
+        recipe.refresh()
         flash('Recept byl upraven.', 'success')
         return redirect('/recipe={}'.format(recipe_id))
     elif page_type == 'remove' and request.method == 'POST':
@@ -719,213 +640,7 @@ def showUser(page_type=None):
         return template('showUser.tpl', user=user)
 
 
-# CALCULATE RECIPE
-def calc(ingredients, diet):
-    """
-    [summary]
 
-    [description]
-
-    Arguments:
-        ingredients {array} -- array of Ingredients
-        diet {Diet} -- Diet
-
-    Returns:
-        [type] -- solution object
-        3 - ingredients {array} -- array of Ingredients (w/ amounts - 2 decimals)
-        4 - ingredients {array} (last-main ing has min, max)
-    """
-    # remove fixed
-    fixedSugar = 0
-    fixedProtein = 0
-    fixedFat = 0
-
-    fixedIngredients = []
-    for i in range(len(ingredients)):
-        if ingredients[i].fixed is True:
-            fixedSugar += ingredients[i].amount * ingredients[i].sugar
-            fixedProtein += ingredients[i].amount * ingredients[i].protein
-            fixedFat += ingredients[i].amount * ingredients[i].fat
-            fixedIngredients.append(ingredients[i])
-
-    for ing in fixedIngredients:
-        ingredients.remove(ing)
-
-    # changes diets accordingly
-    diet.fat -= fixedFat
-    diet.sugar -= fixedSugar
-    diet.protein -= fixedProtein
-
-    # sort for main ingredient + reaarange, so last ingredient is the main ingredient (better handling)
-    mainIngredient = ingredients[0]
-    for i in range(len(ingredients)):
-        if ingredients[i].main is True:
-            mainIngredient = ingredients[i]
-            ingredients.pop(i)
-            ingredients.append(mainIngredient)
-            break
-
-    # calculate
-    if len(ingredients) == 0:
-        return None
-    elif len(ingredients) == 1:
-        return None
-    elif len(ingredients) == 2:
-        return None
-    elif len(ingredients) == 3:
-        a = numpy.array([[ingredients[0].sugar, ingredients[1].sugar, ingredients[2].sugar],
-                         [ingredients[0].fat, ingredients[1].fat, ingredients[2].fat],
-                         [ingredients[0].protein, ingredients[1].protein, ingredients[2].protein]])
-        b = numpy.array([diet.sugar, diet.fat, diet.protein])
-        x = numpy.linalg.solve(a, b)
-
-        ingredients[0].amount = x[0]
-        ingredients[1].amount = x[1]
-        ingredients[2].amount = x[2]
-
-        for ing in fixedIngredients:
-            ingredients.append(ing)
-
-        diet.fat += fixedFat
-        diet.sugar += fixedSugar
-        diet.protein += fixedProtein
-
-        return ingredients
-
-    elif len(ingredients) == 4:
-        x, y, z = sp.symbols('x, y, z')
-        e = sp.symbols('e')
-
-        # set of linear equations
-        f1 = ingredients[0].sugar * x + ingredients[1].sugar * y + ingredients[2].sugar * z + ingredients[3].sugar * e - (diet.sugar)
-        f2 = ingredients[0].fat * x + ingredients[1].fat * y + ingredients[2].fat * z + ingredients[3].fat * e - (diet.fat)
-        f3 = ingredients[0].protein * x + ingredients[1].protein * y + ingredients[2].protein * z + ingredients[3].protein * e - (diet.protein)
-
-        # solve equations with args
-        in1 = sp.solvers.solve((f1, f2, f3), (x, y, z))[x]
-        in2 = sp.solvers.solve((f1, f2, f3), (x, y, z))[y]
-        in3 = sp.solvers.solve((f1, f2, f3), (x, y, z))[z]
-
-        # Faster way?? wip
-        # solve for positive numbers
-        result1 = solvei(poly(in1), '>=')
-        result2 = solvei(poly(in2), '>=')
-        result3 = solvei(poly(in3), '>=')
-
-        interval = (result1[0].intersect(result2[0])).intersect(result3[0])
-        if interval.is_EmptySet:
-            return None
-
-        if interval.right > 100:
-            max_sol = 100
-        else:
-            max_sol = float(math.floor(interval.right * 10000) / 10000)
-
-        if interval.left < 0:
-            min_sol = 0
-        else:
-            min_sol = float(math.floor(interval.left * 10000) / 10000)
-
-        if max_sol < min_sol:
-            return None
-        # max_sol = max for e (variable)
-        sol = (min_sol + max_sol) / 2
-
-        in1_dict = in1.as_coefficients_dict()
-        x = in1_dict[e] * sol + in1_dict[1]
-
-        in2_dict = in2.as_coefficients_dict()
-        y = in2_dict[e] * sol + in2_dict[1]
-
-        in3_dict = in3.as_coefficients_dict()
-        z = in3_dict[e] * sol + in3_dict[1]
-
-        x = float(math.floor(x * 100000) / 100000)
-        y = float(math.floor(y * 100000) / 100000)
-        z = float(math.floor(z * 100000) / 100000)
-
-        if x < 0 or y < 0 or z < 0:
-            return None
-
-        ingredients[0].amount = x
-        ingredients[1].amount = y
-        ingredients[2].amount = z
-        ingredients[3].amount = sol
-        ingredients[3].min = min_sol
-        ingredients[3].max = max_sol
-
-        # return fixed ingredients #wip - for other branches
-        for ing in fixedIngredients:
-            ingredients.append(ing)
-
-        # return diet to normal for commit #wip - for other branches
-        diet.fat += fixedFat
-        diet.sugar += fixedSugar
-        diet.protein += fixedProtein
-
-        return ingredients
-
-    # 5 ingredients #wip
-    elif len(ingredients) == 5:
-        # x, y, z = sp.symbols('x, y, z')
-        # e, f = sp.symbols('e, f')
-        #
-        # # set of linear equations
-        # f1 = ingredients[0].sugar * x + ingredients[1].sugar * y + ingredients[2].sugar * z + ingredients[3].sugar * e + ingredients[4].sugar * f - diet.sugar
-        # f2 = ingredients[0].fat * x + ingredients[1].fat * y + ingredients[2].fat * z + ingredients[3].fat * e + ingredients[4].fat * f - diet.fat
-        # f3 = ingredients[0].protein * x + ingredients[1].protein * y + ingredients[2].protein * z + ingredients[3].protein * e + ingredients[4].protein * f - diet.protein
-        #
-        # # solve equations with args
-        # in1 = sp.solvers.solve((f1, f2, f3), (x, y, z))[x]
-        # in2 = sp.solvers.solve((f1, f2, f3), (x, y, z))[y]
-        # in3 = sp.solvers.solve((f1, f2, f3), (x, y, z))[z]
-
-        # Faster way?? wip
-        # solve for positive numbers
-        # result1 = solvei(poly(in1), ">=")
-        # result2 = solvei(poly(in2), ">=")
-        # result3 = solvei(poly(in3), ">=")
-
-        # interval = (result1[0].intersect(result2[0])).intersect(result3[0])
-        # if interval.right > 100:
-        #     max_sol = 100
-        # else:
-        #     max_sol = float(math.floor(interval.right * 10000) / 10000)
-
-        # if interval.left < 0:
-        #     min_sol = 0
-        # else:
-        #     min_sol = float(math.floor(interval.left * 10000) / 10000)
-
-        # if max_sol < min_sol:
-        #     return None
-        # # max_sol = max for e (variable )
-        # sol = (min_sol + max_sol) / 2
-
-        # in1_dict = in1.as_coefficients_dict()
-        # x = in1_dict[e] * sol + in1_dict[1]
-
-        # in2_dict = in2.as_coefficients_dict()
-        # y = in2_dict[e] * sol + in2_dict[1]
-
-        # in3_dict = in3.as_coefficients_dict()
-        # z = in3_dict[e] * sol + in3_dict[1]
-
-        # x = float(math.floor(x * 100000) / 100000)
-        # y = float(math.floor(y * 100000) / 100000)
-        # z = float(math.floor(z * 100000) / 100000)
-
-        # if max_sol >= 0:
-        #     solution = type('', (), {})()
-        #     solution.vars = [x, y, z, sol]
-        #     solution.sol = sol
-        #     solution.min_sol = min_sol
-        #     solution.max_sol = max_sol
-        #     return solution
-        # else:
-        return None
-    else:
-        return None
 
 
 @application.route('/feedback', methods=['GET', 'POST'])
@@ -980,48 +695,10 @@ def showChangelog():
 def showHelp():
     return template('help.tpl')
 
-
-# ERROR
-@application.route('/wrongpage')
-def wrongPage():
-    abourt(405)
-
-
-@application.route('/shutdown')
-def shutdown():
-    return template('error/shutdown.tpl')
-
-
-@application.route('/testing')
-@login_required
-@admin_required
-def testingPage():
-    tests = []
-    # tests.append()
-    return template('other/testing.tpl', tests=tests)
-
-
-@application.route('/google3748bc0390347e56.html')
-def googleVerification():
-    return template('other/google3748bc0390347e56.html')
-
-
-@application.errorhandler(404)
-def error404(error):
-    # Missing page
-    return template('error/err404.tpl')
-
-
-@application.errorhandler(405)
-def error405(error):
-    # Action not allowed
-    return template('error/wrongPage.tpl')
-
-
-@application.errorhandler(500)
-def error500(error):
-    # Internal error
-    return template('error/err500.tpl')
+# @application.errorhandler(DatabaseError)
+# def databaseError(error):
+#     print('Database connection failed')
+#     abort(500)
 
 
 if __name__ == '__main__':

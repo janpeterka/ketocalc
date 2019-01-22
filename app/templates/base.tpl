@@ -60,7 +60,7 @@
     <div id="content">{% block content %}{% endblock %}</div>
     <div class="footer">
         {% block footer %}
-        &copy; Copyright since 2017 by Jan Peterka</a>.
+            {{ texts.copyright }}
         {% endblock %}
     </div>
 </body>

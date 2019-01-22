@@ -3,12 +3,12 @@
     <input type="text" name="recipe__right__form__name-input" required class="form-control"/>
     <table class="recipe__right__form__ingredient-table table">
         <tr>
-            <th>Název</th>
-            <th>Energie (kJ)</th>
-            <th>Bílkovina (g/100g)</th>
-            <th>Tuk (g/100g)</th>
-            <th>Sacharidy (g/100g)</th>
-            <th>Množství (g)</th>
+            <th>{{ texts.title }}</th>
+            <th>{{ texts.energy_100 }}</th>
+            <th>{{ texts.protein_100 }}</th>
+            <th>{{ texts.fat_100 }}</th>
+            <th>{{ texts.sugar_100 }}</th>
+            <th>{{ texts.amount_simple }}</th>
         </tr>
 
         {% for ingredient in ingredients %}
@@ -62,15 +62,15 @@
 
     <div class="form-inline">
         <select name="recipe__right__form__size-select" class="form-control col-3">
-            <option value="big">Velké jídlo</option>
-            <option value="small">Malé jídlo</option>
+            <option value="big">{{ texts.meal_size_big }}</option>
+            <option value="small">{{ texts.meal_size_small }}</option>
         </select>
 
         <span class="col-4">Dieta: {{ diet.name }}</span>
         {% if not trialrecipe %}
-            <input type="submit" class="btn btn-primary col-4 " value="Uložit mezi recepty" />
+            <input type="submit" class="btn btn-primary col-4 " value="{{ texts.recipe_save }}" />
         {% else %}
-            <input type="button" onclick='trialSaveConfirm()' class="btn btn-primary col-4 " value="Uložit mezi recepty" />
+            <input type="button" onclick='trialSaveConfirm()' class="btn btn-primary col-4 " value="{{ texts.recipe_save }}" />
         {% endif %}
     </div>
 </form>

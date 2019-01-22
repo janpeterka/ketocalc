@@ -61,8 +61,6 @@ class BaseMixin(object):
             db.session.commit()
             return True
         except Exception as e:
-            print(self)
-            print(self.id)
             print(e)
             return False
 
@@ -76,6 +74,7 @@ class BaseMixin(object):
             db.session.expire(self)
             return True
         except Exception as e:
+            print("expire error")
             print(e)
             return False
 
@@ -96,8 +95,9 @@ class BaseMixin(object):
         try:
             db.session.refresh(self)
             return True
-        except Exception:
-            print(Exception)
+        except Exception as e:
+            print("refresh error")
+            print(e)
             return False
 
 
@@ -148,6 +148,7 @@ class Diet(db.Model, BaseMixin):
 
     id = db.Column(db.INTEGER, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
+    # calorie = db.Column(db.Float, nullable=False)
     sugar = db.Column(db.Float, nullable=False)
     fat = db.Column(db.Float, nullable=False)
     protein = db.Column(db.Float, nullable=False)
