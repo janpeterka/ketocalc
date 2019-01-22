@@ -2,33 +2,32 @@
 # -*- coding: utf-8 -*-
 
 # run by pyserver
+from functools import wraps
 
 from flask import render_template as template, request, redirect
-# from flask import jsonify
-from flask import session
 from flask import flash
-# from flask import abort
 
-# from flask_mail import Message
-# from werkzeug import secure_filename
-# import flask_security
-
-# import requests
-# import json
+from flask_login import login_user, logout_user, current_user
 
 from app import models
-from app import application
+from app import application, login
 
-from app.auth import forms
-# from .data import template_data
-# from utils import *
+from app.auth.forms import LoginForm, RegisterForm
 
-# from functools import wraps
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if current_user.username != 'admin':
+            return redirect('/wrongpage')
+        return f(*args, **kwargs)
+    return decorated_function
 
 
 @application.route('/login', methods=['GET', 'POST'])
+@login.unauthorized_handler
 def showLogin():
-    form = forms.LoginForm(request.form)
+    form = LoginForm(request.form)
     if request.method == 'GET':
         return template('auth/login.tpl', form=form)
     elif request.method == 'POST':
@@ -37,14 +36,13 @@ def showLogin():
         if doLogin(form.username.data, form.password.data.encode('utf-8')):
             return redirect('/dashboard')
         else:
-            return redirect('/login')
+            return template('auth/login.tpl', form=form)
 
 
 def doLogin(username, password, from_register=False):
     user = models.User.load(username)
     if user is not None and user.checkLogin(password):
-        session['username'] = username
-        session['user_id'] = user.id
+        login_user(user, remember=True)
         if not from_register:
             flash('Byl jste úspěšně přihlášen.', 'success')
             return True
@@ -55,15 +53,14 @@ def doLogin(username, password, from_register=False):
 
 @application.route('/logout')
 def doLogout():
-    session.pop('username', None)
-    session.pop('user_id', None)
+    logout_user()
     flash('Byl jste úspěšně odhlášen.', 'info')
     return redirect('/login')
 
 
 @application.route('/register', methods=['GET', 'POST'])
 def showRegister():
-    form = forms.RegisterForm(request.form)
+    form = RegisterForm(request.form)
     if request.method == 'GET':
         return template('auth/register.tpl', form=form)
     elif request.method == 'POST':

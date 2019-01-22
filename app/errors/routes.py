@@ -6,8 +6,11 @@
 from flask import render_template as template
 from flask import abort
 
+from flask_login import login_required
+
 from app import application
-from app.routes import login_required, admin_required
+from app.auth.routes import admin_required
+# from app import login
 
 
 # ERROR
@@ -42,7 +45,7 @@ def error404(error):
 
 
 @application.errorhandler(405)
-def error405(error):
+def error405(error=None):
     # Action not allowed
     return template('errors/wrongPage.tpl')
 

@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from . import db
+from app import db, login
 
 import math
 
@@ -9,6 +9,7 @@ import hashlib
 
 import unidecode
 
+from flask_login import UserMixin
 
 t_diets_has_recipes = db.Table(
     'diets_has_recipes',
@@ -297,7 +298,7 @@ class Ingredient(db.Model, BaseMixin):
             return True
 
 
-class User(db.Model, BaseMixin):
+class User(db.Model, UserMixin, BaseMixin):
     """User class
 
 
@@ -345,6 +346,10 @@ class User(db.Model, BaseMixin):
         # endSession(session)
 
         return user
+
+    @login.user_loader
+    def load_user(user_id):
+        return db.session.query(User).filter(User.id == user_id).first()
 
     def getPassword(self, password):
         """Creates hash from password

@@ -30,7 +30,7 @@ import numpy
 import math
 import os
 
-from functools import wraps
+from flask_login import login_required, current_user
 # Printing
 # import pdfkit
 
@@ -44,23 +44,6 @@ def inject_globals():
 
 
 # MAIN
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'username' not in session or 'user_id' not in session:
-            return redirect('/login')
-        return f(*args, **kwargs)
-    return decorated_function
-
-
-def admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if session['username'] != 'admin':
-            return redirect('/wrongpage')
-        return f(*args, **kwargs)
-    return decorated_function
-
 
 @application.before_first_request
 def session_setup():
@@ -85,7 +68,7 @@ def main():
 @application.route('/dashboard')
 @login_required
 def showDashboard():
-    user = models.User.load(session['user_id'])
+    user = models.User.load(current_user.id)
     return template('dashboard.tpl', diets=user.activeDiets, firstname=user.firstName)
 
 
@@ -119,7 +102,7 @@ def selectDietAJAX():
 def showNewDiet():
     form = forms.NewDietForm()
     if request.method == 'GET':
-        return template('diet/newDiet.tpl', form=form)
+        return template('diet/new.tpl', form=form)
     elif request.method == 'POST':
         diet = models.Diet()
         diet.name = form.name.data
@@ -130,19 +113,19 @@ def showNewDiet():
         diet.small_size = form.small_size.data
         diet.big_size = form.big_size.data
         diet.active = 1
-        diet.author = models.User.load(session['user_id'])
+        diet.author = models.User.load(current_user.id)
 
         if not form.validate_on_submit():
-            return template('diet/newDiet.tpl', form=form)
+            return template('diet/new.tpl', form=form)
 
         if diet.save():
             flash('Nová dieta byla vytvořena', 'success')
             return redirect('/diet={}'.format(diet.id))
         else:
             flash('Nepodařilo se vytvořit dietu', 'error')
-            return template('diet/newDiet.tpl', form=form)
+            return template('diet/new.tpl', form=form)
 
-    return template('diet/newDiet.tpl')
+    return template('diet/new.tpl')
 
 
 # SHOW DIET PAGE
@@ -153,11 +136,11 @@ def showDiet(diet_id, page_type=None):
     diet = models.Diet.load(diet_id)
     if diet is None:
         abort(404)
-    if diet.author.username != session['username']:
+    if diet.author.username != current_user.username:
         return redirect('/wrongpage')
 
     if page_type is None:
-        return template('diet/showDiet.tpl', diet=diet, recipes=diet.recipes, diets=diet.author.diets)
+        return template('diet/show.tpl', diet=diet, recipes=diet.recipes, diets=diet.author.diets)
     elif page_type == 'remove' and request.method == 'POST':
         if not diet.used:  # wip
             diet.remove()
@@ -219,10 +202,10 @@ def showAllDiets():
     Returns:
         template -- [description]
     """
-    diets = models.User.load(session['user_id']).diets
+    diets = models.User.load(current_user.id).diets
     diets.sort(key=lambda x: (-x.active, x.name))
 
-    return template('diet/allDiets.tpl', diets=diets)
+    return template('diet/all.tpl', diets=diets)
 
 
 # NEW RECIPE PAGE
@@ -231,15 +214,15 @@ def showTrialNewRecipe():
     # trial_diet = models.Diet.load(2)  # wip
     active_diets = [models.Diet.load(2)]
     ingredients = models.Ingredient.loadAllByAuthor('basic')
-    return template('recipe/newRecipe.tpl', ingredients=ingredients, diets=active_diets, trialrecipe=True)
+    return template('recipe/new.tpl', ingredients=ingredients, diets=active_diets, trialrecipe=True)
 
 
 @application.route('/newrecipe')
 @login_required
 def showNewRecipe():
-    active_diets = models.User.load(session['user_id']).activeDiets
-    ingredients = models.Ingredient.loadAllByAuthor(session['username'])
-    return template('recipe/newRecipe.tpl', ingredients=ingredients, diets=active_diets)
+    active_diets = models.User.load(current_user.id).activeDiets
+    ingredients = models.Ingredient.loadAllByAuthor(current_user.username)
+    return template('recipe/new.tpl', ingredients=ingredients, diets=active_diets, trialrecipe=False)
 
 
 @application.route('/addIngredientAJAX', methods=['POST'])
@@ -287,7 +270,6 @@ def calcRecipeAJAX(test_dataset=None):
         ingredients.append(ingredient)
 
     ingredients = calculations.calculateRecipe(ingredients, diet)
-    print(ingredients)
 
     if ingredients is None:
         return 'False'
@@ -336,7 +318,10 @@ def calcRecipeAJAX(test_dataset=None):
 
     totals.ratio = math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
 
-    template_data = template('recipe/newreciperightform.tpl', ingredients=ingredients, totals=totals, diet=diet, trialrecipe=True)
+    if request.json['trial'] == 'True':
+        template_data = template('recipe/newreciperightform.tpl', ingredients=ingredients, totals=totals, diet=diet, trialrecipe=True)
+    else:
+        template_data = template('recipe/newreciperightform.tpl', ingredients=ingredients, totals=totals, diet=diet, trialrecipe=False)
 
     result = {'template_data': str(template_data), 'ingredients': json_ingredients, 'diet': diet.json}
 
@@ -484,13 +469,13 @@ def showRecipe(recipe_id, page_type=None):
     except AttributeError:
         return abort(404)
 
-    if session['username'] != models.Recipe.load(recipe_id).author.username:
+    if current_user.username != models.Recipe.load(recipe_id).author.username:
         return redirect('/wrongpage')
 
     if page_type is None:
-        return template('recipe/showRecipe.tpl', recipe=recipe_data['recipe'], totals=recipe_data['totals'], show=True)
+        return template('recipe/show.tpl', recipe=recipe_data['recipe'], totals=recipe_data['totals'], show=True)
     elif page_type == 'print':
-        return template('recipe/showRecipe.tpl', recipe=recipe_data['recipe'], totals=recipe_data['totals'], show=False)
+        return template('recipe/show.tpl', recipe=recipe_data['recipe'], totals=recipe_data['totals'], show=False)
     elif page_type == 'edit' and request.method == 'POST':
         # print(recipe_data)
         recipe = recipe_data['recipe']
@@ -512,8 +497,8 @@ def showRecipe(recipe_id, page_type=None):
 @application.route('/allrecipes')
 @login_required
 def showAllRecipes():
-    user = models.User.load(session['user_id'])
-    return template('recipe/allRecipes.tpl', diets=user.diets)
+    user = models.User.load(current_user.id)
+    return template('recipe/all.tpl', diets=user.diets)
 
 
 @application.route('/diet=<int:diet_id>/print')
@@ -523,17 +508,17 @@ def printDietRecipes(diet_id):
     for recipe in diet.recipes:
         recipe_data = recipe.loadRecipeForShow()
         recipe.totals = recipe_data['totals']
-    return template('recipe/printAllRecipes.tpl', recipes=diet.recipes)
+    return template('recipe/printAll.tpl', recipes=diet.recipes)
 
 
 @application.route('/printallrecipes')
 @login_required
 def printAllRecipes():
-    recipes = models.User.load(session['user_id']).recipes
+    recipes = models.User.load(current_user.id).recipes
     for recipe in recipes:
         recipe_data = recipe.loadRecipeForShow()
         recipe.totals = recipe_data['totals']
-    return template('recipe/printAllRecipes.tpl', recipes=recipes)
+    return template('recipe/printAll.tpl', recipes=recipes)
 
 
 # NEW INGREDIENT PAGE
@@ -542,7 +527,7 @@ def printAllRecipes():
 def showNewIngredient():
     form = forms.NewIngredientForm()
     if request.method == 'GET':
-        return template('ingredient/newIngredient.tpl', form=form)
+        return template('ingredient/new.tpl', form=form)
     elif request.method == 'POST':
         ingredient = models.Ingredient()
         ingredient.name = form.name.data
@@ -550,16 +535,16 @@ def showNewIngredient():
         ingredient.sugar = form.sugar.data
         ingredient.fat = form.fat.data
         ingredient.protein = form.protein.data
-        ingredient.author = session['username']
+        ingredient.author = current_user.username
         if not form.validate_on_submit():
-            return template('ingredient/newIngredient.tpl', form=form)
+            return template('ingredient/new.tpl', form=form)
 
         if ingredient.save():
             flash('Nová surovina byla vytvořena', 'success')
             return redirect('/ingredient={}'.format(ingredient.id))
         else:
             flash('Nepodařilo se vytvořit surovinu', 'error')
-            return template('ingredient/newIngredient.tpl', form=form)
+            return template('ingredient/new.tpl', form=form)
 
 
 @application.route('/ingredient=<int:ingredient_id>')
@@ -569,12 +554,12 @@ def showIngredient(ingredient_id, page_type=None):
     ingredient = models.Ingredient.load(ingredient_id)
     if ingredient is None:
         abort(404)
-    if session['username'] != ingredient.author:
+    if current_user.username != ingredient.author:
         return redirect('/wrongpage')
 
     if page_type is None:
         recipes = models.Recipe.loadByIngredient(ingredient.id)
-        return template('ingredient/showIngredient.tpl', ingredient=ingredient, recipes=recipes)
+        return template('ingredient/show.tpl', ingredient=ingredient, recipes=recipes)
 
     elif page_type == 'edit' and request.method == 'POST':
         ingredient.name = request.form['name']
@@ -606,15 +591,15 @@ def showIngredient(ingredient_id, page_type=None):
 @login_required
 def showAllIngredients():
     # basic_ingredients = models.Ingredient.loadAllByAuthor('default')
-    ingredients = models.Ingredient.loadAllByAuthor(session['username'])
-    return template('ingredient/allIngredients.tpl', ingredients=ingredients)
+    ingredients = models.Ingredient.loadAllByAuthor(current_user.username)
+    return template('ingredient/all.tpl', ingredients=ingredients)
 
 
 @application.route('/user')
 @application.route('/user/<page_type>', methods=['POST', 'GET'])
 @login_required
 def showUser(page_type=None):
-    user = models.User.load(session['user_id'])
+    user = models.User.load(current_user.id)
     if user is None:
         return redirect('/wrongpage')
     if page_type is None:
@@ -652,7 +637,7 @@ def showFeedback():
     elif request.method == 'POST':
         msg = Message('[ketocalc] [{}]'.format(request.form['type']), sender='ketocalc', recipients=['ketocalc.jmp@gmail.com'])
         msg.body = 'Message: {}\n'.format(request.form['message'])
-        msg.body += 'Send by: {} [user: {}]'.format(request.form['sender'], session['username'])
+        msg.body += 'Send by: {} [user: {}]'.format(request.form['sender'], current_user.username)
 
         if 'file' not in request.files:
             try:
@@ -695,11 +680,6 @@ def showChangelog():
 @application.route('/help')
 def showHelp():
     return template('help.tpl')
-
-# @application.errorhandler(DatabaseError)
-# def databaseError(error):
-#     print('Database connection failed')
-#     abort(500)
 
 
 if __name__ == '__main__':

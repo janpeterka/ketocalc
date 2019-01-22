@@ -24,6 +24,7 @@
                 // prerecipe__calc__form__empty();
                 prerecipe__ingredient_array.empty();
                 $('#prerecipe__add-ingredient__form__select').select2();
+                // prompt("{{ trialrecipe|safe }}");
             });
 
             // ingredient select to default
@@ -189,7 +190,8 @@
                         url: '/calcRecipeAJAX',
                         data: JSON.stringify({
                             'ingredients' : prerecipe__ingredient_array,
-                            'dietID' : $('.select-diet').val()
+                            'dietID' : $('.select-diet').val(),
+                            'trial' : '{{ trialrecipe|safe }}'
                         }),
                         contentType: 'application/json;charset=UTF-8',
                         success: function(response){
@@ -394,7 +396,7 @@
                 if (r == true){
                     var win = window.open('/register');
                 }
-                return;
+                return true;
             }
         </script>
 {% endblock %}
