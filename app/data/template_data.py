@@ -85,6 +85,17 @@ texts = {
     # Calc
     "calc_amount": 'Spočítat množství!',
 
+    # User
+    "user_username": 'Přihlašovací jméno',
+    "user_firstname": 'Jméno',
+    "user_lastname": 'Příjmení',
+
+    "password": 'Heslo',
+    "password_change": 'Změnit heslo',
+    "password_new": 'Nové heslo',
+    "password_new_again": 'Nové heslo znovu',
+
+
 
     "copyright": '&copy; Copyright since 2017 by Jan Peterka'
 

@@ -76,9 +76,9 @@
             <form action="/user/edit" class="form-group" method="post" accept-charset="utf-8">
                 <table class="table">
                     <tr>
-                        <th>Přihlašovací jméno</th>
-                        <th>Jméno</th>
-                        <th>Příjmení</th>
+                        <th>{{ texts.user_username}}</th>
+                        <th>{{ texts.user_firstname}}</th>
+                        <th>{{ texts.user_lastname}}</th>
                         <th></th>
                     </tr>
                     <tr>
@@ -93,7 +93,7 @@
                             <input name="lastname" type="text" class="form-control" value="{{ user.lastName }}"/>
                         </td>
                         <td>
-                            <input type="submit" class="btn btn-warning" value="Uložit změnu" />
+                            <input type="submit" class="btn btn-warning" value="{{ texts.edit_confirm }}" />
                         </td>
                     </tr>
                 </table>
@@ -102,15 +102,15 @@
             <form action="/user/password_change" method="post" onsubmit="return validateRegister()" >
                 <table class="table">
                     <td>
-                        <input name="password" type="password" class="form-control password" placeholder="Nové heslo" />
+                        <input name="password" type="password" class="form-control password" placeholder="{{ texts.password_new }}" />
                         <span class="warning wrongPassword"></span>
                     </td>
                     <td>
-                        <input type="password" class="form-control againPassword" placeholder="Nové heslo znovu" />
+                        <input type="password" class="form-control againPassword" placeholder="{{ texts.password_new_again }}" />
                         <span class="warning diffPassword"></span>
                     </td>
                     <td>
-                        <input type="submit" class="btn btn-warning" value="Změnit heslo">
+                        <input type="submit" class="btn btn-warning" value="{{ texts.password_change }}">
                     </td>
                 </table>
             </form>
@@ -119,9 +119,9 @@
         <div class="data__table col-12">
             <table class="table">
                 <tr>
-                    <th>Přihlašovací jméno</th>
-                    <th>Jméno</th>
-                    <th>Příjmení</th>
+                    <th>{{ texts.user_username}}</th>
+                    <th>{{ texts.user_firstname}}</th>
+                    <th>{{ texts.user_lastname}}</th>
                 </tr>
                 <tr>
                     <td>{{ user.username }}</td>
@@ -133,8 +133,8 @@
 
         <div>
             <form>
-                <button type="button" class="editShowButton btn btn-warning">Upravit {{ icons.edit }}</button>
-                <button type="button" class="editHideButton btn btn-warning">Zrušit úpravy {{ icons.edit }}</button>
+                <button type="button" class="editShowButton btn btn-warning">{{ texts.edit }} {{ icons.edit }}</button>
+                <button type="button" class="editHideButton btn btn-warning">{{ texts.edit_cancel}} {{ icons.edit }}</button>
             </form>
         </div>
     </div>

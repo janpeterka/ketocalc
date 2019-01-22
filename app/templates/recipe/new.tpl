@@ -24,7 +24,6 @@
                 // prerecipe__calc__form__empty();
                 prerecipe__ingredient_array.empty();
                 $('#prerecipe__add-ingredient__form__select').select2();
-                // prompt("{{ trialrecipe|safe }}");
             });
 
             // ingredient select to default

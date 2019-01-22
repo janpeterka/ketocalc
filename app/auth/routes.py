@@ -45,7 +45,7 @@ def doLogin(username, password, from_register=False):
         login_user(user, remember=True)
         if not from_register:
             flash('Byl jste úspěšně přihlášen.', 'success')
-            return True
+        return True
     else:
         flash('Přihlášení se nezdařilo.', 'error')
         return False
@@ -65,6 +65,7 @@ def showRegister():
         return template('auth/register.tpl', form=form)
     elif request.method == 'POST':
         if not form.validate_on_submit():
+            print("Not validated")
             return template('auth/register.tpl', form=form)
         if not validateRegister(form.username.data):
             form.username.errors += ('Toto jméno nemůžete použít')
