@@ -36,8 +36,9 @@
                     </div>
                 </div>
                 {{ form.submit(class_='btn btn-primary col-sm-3') }}
+               <a href="{{ url_for('google.login')}}""><button type="button" class="loginBtn loginBtn--google">Přihlásit pomocí Google</button></a>
                 <a class="col-sm-2" href="/register">Registrovat</a>
-                <a class="col-sm-2" href="{{ url_for('google.login')}}">Přihlásit přes Google</a>
+                <!-- <a class="col-sm-2" href="{{ url_for('google.login')}}">{{ icons.google }} Přihlásit přes Google</a> -->
     	    </form>
     	</div>
     </div>
