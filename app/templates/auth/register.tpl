@@ -13,44 +13,39 @@
 {% endblock %}
 
 {% block script %}
-
-	<!-- <script type="text/javascript">
-        $(document).on("change","#username", function(e) {
-            $.ajax({
-                type: 'POST',
-                url: '/registerValidate',
-                data: $(this).serialize(),
-                success: function(response) {
-                    if (response=="True") {
-                        console.log("Name ok")
-                        $("#wrongUsername").empty();
-                    } else if (response=="False") {
-                        $("#wrongUsername").empty();
-                        $("#wrongUsername").append("<small class='form-text'>Email nemůžete použít!</small>");
-                    }
-                },
-                error: function(error) {
-                    console.log(error);
-                }
-            });
-            e.preventDefault();
-        });
-    </script> -->
+    <script>
+        function toggleVisibility() {
+            var x = $('#password')
+            // console.log(x.attr("type"));
+            if (x.attr("type") === "password"){
+                x.attr("type", 'text');
+            } else {
+                x.attr("type", 'password');
+            }
+        }
+    </script>
 {% endblock %}
 
 {% block content %}
     {% include('navbar_login.tpl') %}
     <div class="container">
-    	<form action="/register" method="post" class="form-group form-control col-sm-6" accept-charset="UTF-8">
+        <div class="col-12">
+           <form action="/register" method="post" class="form-group form-control" accept-charset="UTF-8">
                 {{ form.csrf_token }}
                 {% from "_formelement.tpl" import render_field %}
 
                 {{ render_field(form.username, "form-control") }}
-                {{ render_field(form.password, "form-control") }}
-                {{ render_field(form.password_again, "form-control") }}
+                {{ form.password.label }}
+                <div class="form-row">
+                    <div class="col-10">
+                        {{ form.password(class_="form-control") }} 
+                    </div>
+                    <div class="col-2">
+                        <input type="button" class="btn" onclick="toggleVisibility()" value="Zobrazit heslo">
+                    </div>
+                </div>
 
                 <div class="form-row">
-
                     <div class="col">
                         {{ render_field(form.first_name, "form-control") }}
                     </div>
@@ -58,14 +53,13 @@
                     <div class="col">
                         {{ render_field(form.last_name, "form-control") }}
                     </div>
-
                 </div>
-                <!-- {{ render_field(form.recaptcha) }} -->
-                {{ form.recaptcha }}
+                <!-- {{ form.recaptcha }} -->
                 {{ form.submit(class_='btn btn-primary')}}
 
                 <a class="col-sm-2" href="/login">Přihlásit se</a><br>
             </form>
+        </div>
     </div>
 {% endblock %}
 

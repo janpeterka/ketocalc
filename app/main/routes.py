@@ -11,19 +11,21 @@ from flask import abort
 
 from flask_mail import Message
 from werkzeug import secure_filename
-# import flask_security
 
 # import requests
 # import json
 
-from app import models, forms
-from app import application
+from app import models
+
+from app.main import forms
+from app.main import bp as main_bp
 from app import mail
 
 from app.calc import calculations
 
-from .data import template_data
-from utils import *
+from app.data import template_data
+
+# from utils import *
 
 # Math library
 import numpy
@@ -38,41 +40,36 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 
 # global data
-@application.context_processor
+@main_bp.app_context_processor
 def inject_globals():
     return dict(icons=template_data.icons, texts=template_data.texts)
 
 
 # MAIN
 
-@application.before_first_request
-def session_setup():
-    # make the session last indefinitely until it is cleared
-    session.permanent = True
+
+# @main_bp.before_request
+# def session_management():
+#     if application.config['APP_STATE'] == 'shutdown' and request.path not in ['/shutdown', '/static/style.css']:
+#         return redirect('/shutdown')
+#     elif request.path == '/shutdown' and application.config['APP_STATE'] != 'shutdown':
+#         return redirect('/')
 
 
-@application.before_request
-def session_management():
-    if application.config['APP_STATE'] == 'shutdown' and request.path not in ['/shutdown', '/static/style.css']:
-        return redirect('/shutdown')
-    elif request.path == '/shutdown' and application.config['APP_STATE'] != 'shutdown':
-        return redirect('/')
-
-
-@application.route('/', methods=['GET'])
+@main_bp.route('/', methods=['GET'])
 def main():
     return redirect('/dashboard')
 
 
 # USER PAGE
-@application.route('/dashboard')
+@main_bp.route('/dashboard')
 @login_required
 def showDashboard():
     user = models.User.load(current_user.id)
     return template('dashboard.tpl', diets=user.activeDiets, firstname=user.firstName)
 
 
-@application.route('/selectDietAJAX', methods=['POST'])
+@main_bp.route('/selectDietAJAX', methods=['POST'])
 @login_required
 def selectDietAJAX():
     """returns recipes of diet
@@ -97,7 +94,7 @@ def selectDietAJAX():
 
 
 # NEW DIET
-@application.route('/newdiet', methods=['GET', 'POST'])
+@main_bp.route('/newdiet', methods=['GET', 'POST'])
 @login_required
 def showNewDiet():
     form = forms.NewDietForm()
@@ -129,8 +126,8 @@ def showNewDiet():
 
 
 # SHOW DIET PAGE
-@application.route('/diet=<int:diet_id>')
-@application.route('/diet=<int:diet_id>/<page_type>', methods=['POST', 'GET'])
+@main_bp.route('/diet=<int:diet_id>')
+@main_bp.route('/diet=<int:diet_id>/<page_type>', methods=['POST', 'GET'])
 @login_required
 def showDiet(diet_id, page_type=None):
     diet = models.Diet.load(diet_id)
@@ -171,7 +168,7 @@ def showDiet(diet_id, page_type=None):
         return redirect('/diet={}'.format(diet_id))
 
 
-# @application.route('/diet=<dietID>/export', methods=['POST'])
+# @main_bp.route('/diet=<dietID>/export', methods=['POST'])
 # def exportDiet(dietID):
 #     recipes = loadDietRecipes(dietID)
 #     newDietID = int(request.form['diet'])
@@ -189,7 +186,7 @@ def showDiet(diet_id, page_type=None):
 #     return redirect('/diet={}'.format(newDietID))
 
 
-@application.route('/alldiets')
+@main_bp.route('/alldiets')
 @login_required
 def showAllDiets():
     """show all diets sorted (active first)
@@ -209,7 +206,7 @@ def showAllDiets():
 
 
 # NEW RECIPE PAGE
-@application.route('/trialnewrecipe')
+@main_bp.route('/trialnewrecipe')
 def showTrialNewRecipe():
     # trial_diet = models.Diet.load(2)  # wip
     active_diets = [models.Diet.load(2)]
@@ -217,7 +214,7 @@ def showTrialNewRecipe():
     return template('recipe/new.tpl', ingredients=ingredients, diets=active_diets, trialrecipe=True)
 
 
-@application.route('/newrecipe')
+@main_bp.route('/newrecipe')
 @login_required
 def showNewRecipe():
     active_diets = models.User.load(current_user.id).activeDiets
@@ -225,7 +222,7 @@ def showNewRecipe():
     return template('recipe/new.tpl', ingredients=ingredients, diets=active_diets, trialrecipe=False)
 
 
-@application.route('/addIngredientAJAX', methods=['POST'])
+@main_bp.route('/addIngredientAJAX', methods=['POST'])
 def addIngredienttoRecipeAJAX():
     ingredient = models.Ingredient.load(request.json['ingredient_id'])
     template_data = template('recipe/addingredientAJAX.tpl', ingredient=ingredient)
@@ -233,7 +230,7 @@ def addIngredienttoRecipeAJAX():
     return jsonify(result)
 
 
-@application.route('/calcRecipeAJAX', methods=['POST'])
+@main_bp.route('/calcRecipeAJAX', methods=['POST'])
 def calcRecipeAJAX(test_dataset=None):
     """[summary]
 
@@ -328,7 +325,7 @@ def calcRecipeAJAX(test_dataset=None):
     return jsonify(result)
 
 
-@application.route('/recalcRecipeAJAX', methods=['POST'])
+@main_bp.route('/recalcRecipeAJAX', methods=['POST'])
 def recalcRecipeAJAX(test_dataset=None):
     # need to rewrite #wip
 
@@ -437,7 +434,7 @@ def recalcRecipeAJAX(test_dataset=None):
     return jsonify(solutionJSON)
 
 
-@application.route('/saveRecipeAJAX', methods=['POST'])
+@main_bp.route('/saveRecipeAJAX', methods=['POST'])
 @login_required
 def saveRecipeAJAX():
     temp_ingredients = request.json['ingredients']
@@ -460,8 +457,8 @@ def saveRecipeAJAX():
     return ('/recipe=' + str(last_id))
 
 
-@application.route('/recipe=<int:recipe_id>', methods=['GET'])
-@application.route('/recipe=<int:recipe_id>/<page_type>', methods=['POST', 'GET'])
+@main_bp.route('/recipe=<int:recipe_id>', methods=['GET'])
+@main_bp.route('/recipe=<int:recipe_id>/<page_type>', methods=['POST', 'GET'])
 @login_required
 def showRecipe(recipe_id, page_type=None):
     try:
@@ -494,14 +491,14 @@ def showRecipe(recipe_id, page_type=None):
         redirect('/wrongpage')
 
 
-@application.route('/allrecipes')
+@main_bp.route('/allrecipes')
 @login_required
 def showAllRecipes():
     user = models.User.load(current_user.id)
     return template('recipe/all.tpl', diets=user.diets)
 
 
-@application.route('/diet=<int:diet_id>/print')
+@main_bp.route('/diet=<int:diet_id>/print')
 @login_required
 def printDietRecipes(diet_id):
     diet = models.Diet.load(diet_id)
@@ -511,7 +508,7 @@ def printDietRecipes(diet_id):
     return template('recipe/printAll.tpl', recipes=diet.recipes)
 
 
-@application.route('/printallrecipes')
+@main_bp.route('/printallrecipes')
 @login_required
 def printAllRecipes():
     recipes = models.User.load(current_user.id).recipes
@@ -522,7 +519,7 @@ def printAllRecipes():
 
 
 # NEW INGREDIENT PAGE
-@application.route('/newingredient', methods=['GET', 'POST'])
+@main_bp.route('/newingredient', methods=['GET', 'POST'])
 @login_required
 def showNewIngredient():
     form = forms.NewIngredientForm()
@@ -547,8 +544,8 @@ def showNewIngredient():
             return template('ingredient/new.tpl', form=form)
 
 
-@application.route('/ingredient=<int:ingredient_id>')
-@application.route('/ingredient=<int:ingredient_id>/<page_type>', methods=['POST', 'GET'])
+@main_bp.route('/ingredient=<int:ingredient_id>')
+@main_bp.route('/ingredient=<int:ingredient_id>/<page_type>', methods=['POST', 'GET'])
 @login_required
 def showIngredient(ingredient_id, page_type=None):
     ingredient = models.Ingredient.load(ingredient_id)
@@ -587,7 +584,7 @@ def showIngredient(ingredient_id, page_type=None):
             return redirect('/ingredient={}'.format(ingredient_id))
 
 
-@application.route('/allingredients')
+@main_bp.route('/allingredients')
 @login_required
 def showAllIngredients():
     # basic_ingredients = models.Ingredient.loadAllByAuthor('default')
@@ -595,8 +592,8 @@ def showAllIngredients():
     return template('ingredient/all.tpl', ingredients=ingredients)
 
 
-@application.route('/user')
-@application.route('/user/<page_type>', methods=['POST', 'GET'])
+@main_bp.route('/user')
+@main_bp.route('/user/<page_type>', methods=['POST', 'GET'])
 @login_required
 def showUser(page_type=None):
     user = models.User.load(current_user.id)
@@ -626,10 +623,7 @@ def showUser(page_type=None):
         return template('showUser.tpl', user=user)
 
 
-
-
-
-@application.route('/feedback', methods=['GET', 'POST'])
+@main_bp.route('/feedback', methods=['GET', 'POST'])
 @login_required
 def showFeedback():
     if request.method == 'GET':
@@ -671,16 +665,16 @@ def allowed_file(filename):
 
 
 # S'MORE
-@application.route('/changelog')
+@main_bp.route('/changelog')
 @login_required
 def showChangelog():
     return template('changelog.tpl')
 
 
-@application.route('/help')
+@main_bp.route('/help')
 def showHelp():
     return template('help.tpl')
 
 
-if __name__ == '__main__':
-    aplication.run(debug=True)
+# if __name__ == '__main__':
+#     aplication.run(debug=True)

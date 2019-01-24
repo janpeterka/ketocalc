@@ -1,6 +1,7 @@
 # coding: utf-8
 
-from app import db, login
+from app import db
+from app.auth import login
 
 import math
 
@@ -318,8 +319,9 @@ class User(db.Model, UserMixin, BaseMixin):
     __tablename__ = 'users'
 
     id = db.Column(db.INTEGER, primary_key=True, unique=True)
+    google_id = db.Column(db.INTEGER, unique=True)
     username = db.Column(db.String(255), nullable=False, unique=True)
-    pwdhash = db.Column(db.CHAR(64), nullable=False)
+    pwdhash = db.Column(db.CHAR(64), nullable=True)
     firstName = db.Column(db.String(255), nullable=False)
     lastName = db.Column(db.String(255), nullable=False)
     password_version = db.Column(db.String(45), nullable=True)

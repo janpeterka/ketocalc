@@ -4,15 +4,18 @@
 # run by pyserver
 from functools import wraps
 
-from flask import render_template as template, request, redirect
+from flask import render_template as template, request, redirect, Blueprint
 from flask import flash
 
 from flask_login import login_user, logout_user, current_user
 
 from app import models
-from app import application, login
 
 from app.auth.forms import LoginForm, RegisterForm
+
+from app.data import template_data
+
+auth_blueprint = Blueprint('auth', __name__, template_folder='templates/auth')
 
 
 def admin_required(f):
@@ -24,19 +27,23 @@ def admin_required(f):
     return decorated_function
 
 
-@application.route('/login', methods=['GET', 'POST'])
-@login.unauthorized_handler
+@auth_blueprint.app_context_processor
+def inject_globals():
+    return dict(icons=template_data.icons, texts=template_data.texts)
+
+
+@auth_blueprint.route('/login', methods=['GET', 'POST'])
 def showLogin():
     form = LoginForm(request.form)
     if request.method == 'GET':
         return template('auth/login.tpl', form=form)
     elif request.method == 'POST':
         if not form.validate_on_submit():
-            return template('auth/login.tpl', form=form)
+            return template('login.tpl', form=form)
         if doLogin(form.username.data, form.password.data.encode('utf-8')):
             return redirect('/dashboard')
         else:
-            return template('auth/login.tpl', form=form)
+            return template('login.tpl', form=form)
 
 
 def doLogin(username, password, from_register=False):
@@ -51,14 +58,14 @@ def doLogin(username, password, from_register=False):
         return False
 
 
-@application.route('/logout')
+@auth_blueprint.route('/logout')
 def doLogout():
     logout_user()
     flash('Byl jste úspěšně odhlášen.', 'info')
     return redirect('/login')
 
 
-@application.route('/register', methods=['GET', 'POST'])
+@auth_blueprint.route('/register', methods=['GET', 'POST'])
 def showRegister():
     form = RegisterForm(request.form)
     if request.method == 'GET':
@@ -69,7 +76,7 @@ def showRegister():
             return template('auth/register.tpl', form=form)
         if not validateRegister(form.username.data):
             form.username.errors += ('Toto jméno nemůžete použít')
-            return template('auth/register.tpl', form=form)
+            return template('register.tpl', form=form)
 
         user = models.User()
 
@@ -83,7 +90,7 @@ def showRegister():
         if doRegister(user):
             return redirect('/dashboard')
         else:
-            return template('auth/register.tpl', form=form)
+            return template('register.tpl', form=form)
 
 
 def doRegister(user):
@@ -96,7 +103,7 @@ def doRegister(user):
         return False
 
 
-@application.route('/registerValidate', methods=['POST'])
+@auth_blueprint.route('/registerValidate', methods=['POST'])
 def validateRegister(username):
     if models.User.load(username) is not None:
         return False

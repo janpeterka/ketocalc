@@ -1,4 +1,3 @@
-from app import application
+from app import create_app
 
-# This will run the app's run() method, in debugging mode.
-# application.run()
+application = create_app()

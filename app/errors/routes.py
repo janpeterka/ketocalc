@@ -8,23 +8,32 @@ from flask import abort
 
 from flask_login import login_required
 
-from app import application
+# from app import application
 from app.auth.routes import admin_required
+
+from app.errors import bp as errors
 # from app import login
+
+from app.data import template_data
+
+
+@errors.app_context_processor
+def inject_globals():
+    return dict(icons=template_data.icons, texts=template_data.texts)
 
 
 # ERROR
-@application.route('/wrongpage')
+@errors.route('/wrongpage')
 def wrongPage():
     abort(405)
 
 
-@application.route('/shutdown')
+@errors.route('/shutdown')
 def shutdown():
     return template('errors/shutdown.tpl')
 
 
-@application.route('/testing')
+@errors.route('/testing')
 @login_required
 @admin_required
 def testingPage():
@@ -33,24 +42,24 @@ def testingPage():
     return template('other/testing.tpl', tests=tests)
 
 
-@application.route('/google3748bc0390347e56.html')
+@errors.route('/google3748bc0390347e56.html')
 def googleVerification():
     return template('other/google3748bc0390347e56.html')
 
 
-@application.errorhandler(404)
+@errors.app_errorhandler(404)
 def error404(error):
     # Missing page
     return template('errors/err404.tpl')
 
 
-@application.errorhandler(405)
+@errors.app_errorhandler(405)
 def error405(error=None):
     # Action not allowed
     return template('errors/wrongPage.tpl')
 
 
-@application.errorhandler(500)
+@errors.app_errorhandler(500)
 def error500(error):
     # Internal error
     return template('errors/err500.tpl')
