@@ -15,5 +15,5 @@ class RegisterForm(FlaskForm):
     password = PasswordField('Heslo', [validators.InputRequired('Heslo musí být vyplněno'), validators.Length(min=8, message='Heslo musí mít alespoň 8 znaků')])
     first_name = StringField('Křestní jméno', [validators.InputRequired('Jméno musí být vyplněno')])
     last_name = StringField('Příjmení', [validators.InputRequired('Jméno musí být vyplněno')])
-    recaptcha = RecaptchaField()
+    # recaptcha = RecaptchaField()
     submit = SubmitField('Registrovat')

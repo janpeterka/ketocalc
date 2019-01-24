@@ -8,7 +8,6 @@
     <script>
         function toggleVisibility() {
             var x = $('#password')
-            // console.log(x.attr("type"));
             if (x.attr("type") === "password"){
                 x.attr("type", 'text');
             } else {
@@ -32,13 +31,12 @@
                         {{ form.password(class_="form-control") }} 
                     </div>
                     <div class="col-2">
-                        <input type="button" class="btn" onclick="toggleVisibility()" value="Zobrazit heslo">
+                        <input type="button" class="btn" onclick="toggleVisibility()" value="{{ texts.password_show }}">
                     </div>
                 </div>
                 {{ form.submit(class_='btn btn-primary col-sm-3') }}
-               <a href="{{ url_for('google.login')}}""><button type="button" class="loginBtn loginBtn--google">Přihlásit pomocí Google</button></a>
-                <a class="col-sm-2" href="/register">Registrovat</a>
-                <!-- <a class="col-sm-2" href="{{ url_for('google.login')}}">{{ icons.google }} Přihlásit přes Google</a> -->
+               <a href="{{ url_for('google.login')}}""><button type="button" class="loginBtn loginBtn--google">{{ texts.login_google}}</button></a>
+                <a class="col-sm-2" href="/register">{{ texts.register }}</a>
     	    </form>
     	</div>
     </div>

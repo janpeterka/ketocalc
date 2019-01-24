@@ -1,10 +1,11 @@
+# from flask import flash
+
 from flask_login import LoginManager
-from flask_login import login_user
 
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.consumer import oauth_authorized
 
-from app.auth.routes import auth_blueprint
+from app.auth.routes import auth_blueprint, doLogin
 
 login = LoginManager()
 
@@ -34,19 +35,26 @@ def logged_in(blueprint, token):
     if blueprint.name == 'google':
         user_info = google.get("/oauth2/v2/userinfo").json()
         username = user_info['email']
-        print(user_info['id'])
 
     user = User.query.filter_by(username=username).first()
+    if not user:
+        user = User.query.filter_by(google_id=user_info['id']).first()
     if not user:
         user = User()
         user.username = username
         user.google_id = user_info['id']
-        user.firstName = user_info['given_name']
-        user.lastName = user_info['family_name']
-        user.save()
-        print('new user {}'.format(user.username))
+        try:
+            user.firstName = user_info['given_name']
+        except Exception:
+            user.firstName = "-"
 
-    login_user(user)
+        try:
+            user.lastName = user_info['family_name']
+        except Exception:
+            user.lastName = "-"
+        user.save()
+
+    doLogin(user=user)
 
 
 from app.auth import routes

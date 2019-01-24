@@ -96,6 +96,14 @@ texts = {
     "password_new": 'Nové heslo',
     "password_new_again": 'Nové heslo znovu',
 
+    'password_show': 'Zobrazit heslo',
+
+    # Login / Register
+    'login': 'Přihlásit se',
+    'login_google': 'Přihlásit pomocí Google',
+    'register': 'Registrovat',
+
+
 
 
     "copyright": '&copy; Copyright since 2017 by Jan Peterka'

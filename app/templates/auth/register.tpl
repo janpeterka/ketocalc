@@ -41,7 +41,7 @@
                         {{ form.password(class_="form-control") }} 
                     </div>
                     <div class="col-2">
-                        <input type="button" class="btn" onclick="toggleVisibility()" value="Zobrazit heslo">
+                        <input type="button" class="btn" onclick="toggleVisibility()" value="{{ texts.password_show}}">
                     </div>
                 </div>
 
@@ -57,7 +57,7 @@
                 <!-- {{ form.recaptcha }} -->
                 {{ form.submit(class_='btn btn-primary')}}
 
-                <a class="col-sm-2" href="/login">Přihlásit se</a><br>
+                <a class="col-sm-2" href="/login">{{ texts.login }}</a><br>
             </form>
         </div>
     </div>

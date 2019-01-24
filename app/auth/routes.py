@@ -40,15 +40,16 @@ def showLogin():
     elif request.method == 'POST':
         if not form.validate_on_submit():
             return template('login.tpl', form=form)
-        if doLogin(form.username.data, form.password.data.encode('utf-8')):
+        if doLogin(username=form.username.data, password=form.password.data.encode('utf-8')):
             return redirect('/dashboard')
         else:
             return template('login.tpl', form=form)
 
 
-def doLogin(username, password, from_register=False):
-    user = models.User.load(username)
-    if user is not None and user.checkLogin(password):
+def doLogin(username=None, password=None, from_register=False, user=None):
+    if not user and username is not None:
+        user = models.User.load(username)
+    if user is not None and (user.google_id is not None or user.checkLogin(password)):
         login_user(user, remember=True)
         if not from_register:
             flash('Byl jste úspěšně přihlášen.', 'success')
@@ -95,7 +96,7 @@ def showRegister():
 
 def doRegister(user):
     if user.save() is not None:
-        doLogin(user.username, user.password.encode('utf-8'), from_register=True)
+        doLogin(username=user.username, password=user.password.encode('utf-8'), from_register=True)
         flash('Byl jste úspěšně zaregistrován.', 'success')
         return True
     else:

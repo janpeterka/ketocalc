@@ -318,8 +318,8 @@ class User(db.Model, UserMixin, BaseMixin):
     """
     __tablename__ = 'users'
 
-    id = db.Column(db.INTEGER, primary_key=True, unique=True)
-    google_id = db.Column(db.INTEGER, unique=True)
+    id = db.Column(db.Integer, primary_key=True, unique=True)
+    google_id = db.Column(db.String(30), unique=True)
     username = db.Column(db.String(255), nullable=False, unique=True)
     pwdhash = db.Column(db.CHAR(64), nullable=True)
     firstName = db.Column(db.String(255), nullable=False)
