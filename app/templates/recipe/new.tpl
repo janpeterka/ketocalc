@@ -180,7 +180,7 @@
                     // values for fixed
                     for (var i = 0; i < prerecipe__ingredient_array.length; i++) {
                         if (prerecipe__ingredient_array[i].fixed) {
-                            prerecipe__ingredient_array[i].amount = parseFloat(prompt("Množství suroviny " + prerecipe__ingredient_array[i].name + "v gramech :","").replace(",","."));
+                            prerecipe__ingredient_array[i].amount = parseFloat(prompt("Množství suroviny " + prerecipe__ingredient_array[i].name + " v gramech :","").replace(",","."));
                         }
                     }
 

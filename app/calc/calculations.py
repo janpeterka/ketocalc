@@ -25,9 +25,9 @@ def calculateRecipe(ingredients, diet):
     for i in range(len(ingredients)):
         if ingredients[i].fixed is True:
 
-            diet.sugar += ingredients[i].amount * ingredients[i].sugar
-            diet.protein += ingredients[i].amount * ingredients[i].protein
-            diet.fat += ingredients[i].amount * ingredients[i].fat
+            diet.sugar -= ingredients[i].amount * ingredients[i].sugar
+            diet.protein -= ingredients[i].amount * ingredients[i].protein
+            diet.fat -= ingredients[i].amount * ingredients[i].fat
 
             fixedIngredients.append(ingredients[i])
 

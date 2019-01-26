@@ -208,8 +208,7 @@ def showAllDiets():
 # NEW RECIPE PAGE
 @main_bp.route('/trialnewrecipe')
 def showTrialNewRecipe():
-    # trial_diet = models.Diet.load(2)  # wip
-    active_diets = [models.Diet.load(2)]
+    active_diets = models.User.load('ketocalc.jmp@gmail.com').activeDiets
     ingredients = models.Ingredient.loadAllByAuthor('basic')
     return template('recipe/new.tpl', ingredients=ingredients, diets=active_diets, trialrecipe=True)
 

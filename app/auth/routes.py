@@ -3,6 +3,7 @@
 
 # run by pyserver
 from functools import wraps
+import datetime
 
 from flask import render_template as template, request, redirect, Blueprint
 from flask import flash
@@ -15,7 +16,7 @@ from app.auth.forms import LoginForm, RegisterForm
 
 from app.data import template_data
 
-auth_blueprint = Blueprint('auth', __name__, template_folder='templates/auth')
+auth_blueprint = Blueprint('auth', __name__, template_folder='templates/auth/')
 
 
 def admin_required(f):
@@ -39,11 +40,11 @@ def showLogin():
         return template('auth/login.tpl', form=form)
     elif request.method == 'POST':
         if not form.validate_on_submit():
-            return template('login.tpl', form=form)
+            return template('auth/login.tpl', form=form)
         if doLogin(username=form.username.data, password=form.password.data.encode('utf-8')):
             return redirect('/dashboard')
         else:
-            return template('login.tpl', form=form)
+            return template('auth/login.tpl', form=form)
 
 
 def doLogin(username=None, password=None, from_register=False, user=None):
@@ -51,6 +52,8 @@ def doLogin(username=None, password=None, from_register=False, user=None):
         user = models.User.load(username)
     if user is not None and (user.google_id is not None or user.checkLogin(password)):
         login_user(user, remember=True)
+        user.last_logged_in = datetime.datetime.now()
+        user.save()
         if not from_register:
             flash('Byl jste úspěšně přihlášen.', 'success')
         return True
