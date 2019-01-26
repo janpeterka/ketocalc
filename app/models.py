@@ -4,6 +4,7 @@ from app import db
 from app.auth import login
 
 import math
+import datetime
 
 import bcrypt
 import hashlib
@@ -148,15 +149,17 @@ class Diet(db.Model, BaseMixin):
     """
     __tablename__ = 'diets'
 
-    id = db.Column(db.INTEGER, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
-    # calorie = db.Column(db.Float, nullable=False)
+    calorie = db.Column(db.Float, nullable=False)
     sugar = db.Column(db.Float, nullable=False)
     fat = db.Column(db.Float, nullable=False)
     protein = db.Column(db.Float, nullable=False)
     small_size = db.Column(db.Float, nullable=False)
     big_size = db.Column(db.Float, nullable=False)
     active = db.Column(db.Boolean, nullable=False)
+    created = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
+    last_updated = db.Column(db.DateTime, nullable=True, onupdate=datetime.datetime.now)
 
     recipes = db.relationship('Recipe', secondary='diets_has_recipes', order_by='Recipe.name')
     author = db.relationship('User', secondary='users_has_diets', uselist=False)
@@ -225,6 +228,8 @@ class Ingredient(db.Model, BaseMixin):
     fat = db.Column(db.Float, nullable=False, server_default=db.text("'0'"))
     protein = db.Column(db.Float, nullable=False, server_default=db.text("'0'"))
     author = db.Column(db.String(255), nullable=False)
+    created = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
+    last_updated = db.Column(db.DateTime, nullable=True, onupdate=datetime.datetime.now)
 
     recipes = db.relationship('Recipe',
                               primaryjoin="and_(Ingredient.id == remote(RecipesHasIngredient.ingredients_id), foreign(Recipe.id) == RecipesHasIngredient.recipes_id)",
@@ -325,6 +330,11 @@ class User(db.Model, UserMixin, BaseMixin):
     firstName = db.Column(db.String(255), nullable=False)
     lastName = db.Column(db.String(255), nullable=False)
     password_version = db.Column(db.String(45), nullable=True)
+
+    created = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
+    # last_updated = db.Column(db.DateTime, nullable=True, onupdate=datetime.datetime.now)
+
+    last_logged_in = db.Column(db.DateTime, nullable=True)
 
     diets = db.relationship('Diet', secondary='users_has_diets', order_by='desc(Diet.active)')
 
@@ -446,6 +456,8 @@ class Recipe(db.Model, BaseMixin):
     id = db.Column(db.INTEGER, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     type = db.Column(db.Enum('small', 'big'), nullable=False)
+    created = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
+    last_updated = db.Column(db.DateTime, nullable=True, onupdate=datetime.datetime.now)
 
     diet = db.relationship('Diet', secondary='diets_has_recipes', uselist=False)
     ingredients = db.relationship("Ingredient",

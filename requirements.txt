@@ -1,11 +1,12 @@
 Flask
 
 Flask-Mail
-Flask-Login
 Flask-SQLAlchemy
 Flask-Bcrypt
-Flask-Dance
 Flask-Security
+
+Flask-Login
+Flask-Dance
 
 Flask-WTF
 WTForms
@@ -15,6 +16,7 @@ requests
 mysqlclient
 
 PyMySQL
+Flask-Migrate
 
 pdfkit
 

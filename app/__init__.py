@@ -1,10 +1,12 @@
 from flask import Flask
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 # from flask_login import LoginManager
 
 mail = Mail()
 db = SQLAlchemy()
+migrate = Migrate()
 
 
 def create_app():
@@ -15,6 +17,7 @@ def create_app():
 
     mail.init_app(application)
     db.init_app(application)
+    migrate.init_app(application, db)
 
     from app.main import bp as main_bp
     application.register_blueprint(main_bp)
@@ -33,7 +36,5 @@ def create_app():
 
     return application
 
-
-# application = create_app()
 
 from app import models
