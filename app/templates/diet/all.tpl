@@ -21,7 +21,7 @@
 {% block content %}
     {% include('navbar.tpl') %}
     <div class="container">
-        <div class="col-6">
+        <div class="col-12">
             <table id="diets" class="table">
                 <tr>
                     <th>{{ texts.title }}</th>

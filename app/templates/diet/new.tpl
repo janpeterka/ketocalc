@@ -13,6 +13,7 @@
                 {{ form.csrf_token }}
                 {% from "_formelement.tpl" import render_field %}
                 {{ render_field(form.name, "form-control") }}
+                {{ render_field(form.calorie, "form-control") }}
                 {{ render_field(form.protein, "form-control") }}
                 {{ render_field(form.fat, "form-control") }}
                 {{ render_field(form.sugar, "form-control") }}

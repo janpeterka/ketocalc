@@ -103,7 +103,7 @@ def showNewDiet():
     elif request.method == 'POST':
         diet = models.Diet()
         diet.name = form.name.data
-        # diet.calorie = form.calorie.data
+        diet.calorie = form.calorie.data
         diet.sugar = form.sugar.data
         diet.fat = form.fat.data
         diet.protein = form.protein.data

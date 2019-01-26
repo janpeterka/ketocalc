@@ -10,7 +10,7 @@
 {% block content %}
     {% include('navbar.tpl') %}
     <div class="container">
-        <div class="col-10">
+        <div class="col-12">
             <table id="diets" class="table">
 
                 {% for diet in diets: %}

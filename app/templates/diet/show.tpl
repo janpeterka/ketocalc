@@ -92,12 +92,14 @@
                 <table id="ingredients" class="table data__table">
                     <tr>
                         <th>{{ texts.title }}</th>
+                        <th>{{ texts.energy_simple }}</th>
                         <th>{{ texts.protein_simple }}</th>
                         <th>{{ texts.fat_simple }}</th>
                         <th>{{ texts.sugar_simple }}</th>
                     </tr>
                     <tr>
                         <td>{{ diet.name }}</td>
+                        <td>{{ diet.calorie }}</td>
                         <td>{{ diet.protein }}</td>
                         <td>{{ diet.fat }}</td>
                         <td>{{ diet.sugar }}</td>
@@ -123,29 +125,37 @@
                     <table class="table">
                         <tr>
                             <th>{{ texts.title }}</th>
+                            <th>{{ texts.energy_simple }}</th>
                             <th>{{ texts.protein_simple }}</th>
                             <th>{{ texts.fat_simple }}</th>
                             <th>{{ texts.sugar_simple }}</th>
                         </tr>
                         <tr>
-                            <td>
+                            <td class="col-4">
                                 <input type="text" class="form-control" name="name" size="12" value="{{ diet.name }}" />
                             </td>
-                            <td>
+                            <td class="col-2">
+                                {% if diet.used == False %}
+                                    <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="calorie" value="{{ diet.calorie }}"/>
+                                {% else %}
+                                    {{ diet.calorie }}
+                                {% endif %}
+                            </td>
+                            <td class="col-2">
                                 {% if diet.used == False %}
                                     <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="protein" value="{{ diet.protein }}"/>
                                 {% else %}
                                     {{ diet.protein }}
                                 {% endif %}
                             </td>
-                            <td>
+                            <td class="col-2">
                                 {% if diet.used == False %}
                                     <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="fat" value="{{ diet.fat }}"/>
                                 {% else %}
                                     {{ diet.fat }}
                                 {% endif %}
                             </td>
-                            <td>
+                            <td class="col-2">
                                 {% if diet.used == False %}
                                     <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="sugar" value="{{ diet.sugar }}"/>
                                 {% else %}

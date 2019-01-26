@@ -29,7 +29,7 @@ class NewIngredientForm(FlaskForm):
 
 class NewDietForm(FlaskForm):
     name = StringField('Název diety', [validators.InputRequired('Název musí být vyplněn')])
-    # calorie = MyFloatField('Množství (kJ) kalorií / den', [validators.InputRequired('Množství musí být vyplněno')])
+    calorie = MyFloatField('Množství (kJ) kalorií / den', [validators.InputRequired('Množství musí být vyplněno')])
     protein = MyFloatField('Množství (g) bílkovin / den', [validators.InputRequired('Množství musí být vyplněno')])
     sugar = MyFloatField('Množství (g) sacharidů / den', [validators.InputRequired('Množství musí být vyplněno')])
     fat = MyFloatField('Množství (g) tuku / den', [validators.InputRequired('Množství musí být vyplněno')])

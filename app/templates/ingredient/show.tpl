@@ -63,34 +63,34 @@
                             <th>{{ texts.edit }}</th>
                         </tr>
                         <tr>
-                            <td>
+                            <td class="col-4">
                                 <input type="text" class="form-control" name="name" value="{{ ingredient.name }}" />
                             </td>
-                            <td>
+                            <td class="col-2">
                                 <input type="text" class="form-control" name="calorie" value="{{ ingredient.calorie }}" />
                             </td>
-                            <td>
+                            <td class="col-1">
                                 {% if ingredient.used == False %}
                                     <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="protein" value="{{ ingredient.protein }}"/>
                                 {% else %}
                                     {{ ingredient.protein }}
                                 {% endif %}
                             </td>
-                            <td>
+                            <td class="col-1">
                                 {% if ingredient.used == False %}
                                     <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="fat" value="{{ ingredient.fat }}"/>
                                 {% else %}
                                     {{ ingredient.fat }}
                                 {% endif %}
                             </td>
-                            <td>
+                            <td class="col-1">
                                 {% if ingredient.used == False %}
                                     <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="sugar" value="{{ ingredient.sugar }}"/>
                                 {% else %}
                                     {{ ingredient.sugar }}
                                 {% endif %}
                             </td>
-                            <td>
+                            <td class="col-2">
                                 <input type="submit" class="btn btn-warning" value="{{ texts.edit_confirm}}" />
                             </td>
                         </tr>
