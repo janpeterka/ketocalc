@@ -29,6 +29,7 @@
                     <th>{{ texts.fat_100 }}</th>
                     <th>{{ texts.sugar_100 }}</th>
                     <th>{{ texts.diet_active }}</th>
+                    <th>{{ texts.diet_recipes_count }}</th>
                 </tr>
                 {% for diet in diets: %}
                     <tr class= {% if diet.active%} active {% else %} inactive {% endif %}>                        
@@ -42,6 +43,8 @@
                             {% else %}
                                 {{ texts.no }}
                             {% endif %}
+                        </td>
+                        <td>{{ diet.recipes|length }}</td>
                     </tr>
                 {% endfor %}
             </table>

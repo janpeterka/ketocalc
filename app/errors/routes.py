@@ -8,18 +8,9 @@ from flask import abort
 
 from flask_login import login_required
 
-# from app import application
 from app.auth.routes import admin_required
 
 from app.errors import bp as errors
-# from app import login
-
-from app.data import template_data
-
-
-@errors.app_context_processor
-def inject_globals():
-    return dict(icons=template_data.icons, texts=template_data.texts)
 
 
 # ERROR

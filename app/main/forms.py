@@ -22,11 +22,6 @@ class NewIngredientForm(FlaskForm):
     submit = SubmitField('Přidat surovinu')
 
 
-# U edit formů je problém s default values
-# class EditIngredientForm(FlaskForm):
-#     name = StringField('')
-#     protein = MyFloatField('')
-
 class NewDietForm(FlaskForm):
     name = StringField('Název diety', [validators.InputRequired('Název musí být vyplněn')])
     calorie = MyFloatField('Množství (kJ) kalorií / den', [validators.InputRequired('Množství musí být vyplněno')])

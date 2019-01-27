@@ -5,7 +5,6 @@
 
 from flask import render_template as template, request, redirect
 from flask import jsonify
-from flask import session
 from flask import flash
 from flask import abort
 
@@ -23,8 +22,6 @@ from app import mail
 
 from app.calc import calculations
 
-from app.data import template_data
-
 # from utils import *
 
 # Math library
@@ -39,23 +36,7 @@ from flask_login import login_required, current_user
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 
-# global data
-@main_bp.app_context_processor
-def inject_globals():
-    return dict(icons=template_data.icons, texts=template_data.texts)
-
-
 # MAIN
-
-
-# @main_bp.before_request
-# def session_management():
-#     if application.config['APP_STATE'] == 'shutdown' and request.path not in ['/shutdown', '/static/style.css']:
-#         return redirect('/shutdown')
-#     elif request.path == '/shutdown' and application.config['APP_STATE'] != 'shutdown':
-#         return redirect('/')
-
-
 @main_bp.route('/', methods=['GET'])
 def main():
     return redirect('/dashboard')
@@ -208,7 +189,7 @@ def showAllDiets():
 # NEW RECIPE PAGE
 @main_bp.route('/trialnewrecipe')
 def showTrialNewRecipe():
-    active_diets = models.User.load('ketocalc.jmp@gmail.com').activeDiets
+    active_diets = models.User.load('ketocalc.jmp@gmail.com', load_type="username").activeDiets
     ingredients = models.Ingredient.loadAllByAuthor('basic')
     return template('recipe/new.tpl', ingredients=ingredients, diets=active_diets, trialrecipe=True)
 
@@ -461,19 +442,23 @@ def saveRecipeAJAX():
 @login_required
 def showRecipe(recipe_id, page_type=None):
     try:
-        recipe_data = models.Recipe.load(recipe_id).loadRecipeForShow()
+        recipe = models.Recipe.load(recipe_id)
+        recipe_data = recipe.loadRecipeForShow()
     except AttributeError:
         return abort(404)
 
-    if current_user.username != models.Recipe.load(recipe_id).author.username:
+    if current_user.username != recipe.author.username:
         return redirect('/wrongpage')
 
     if page_type is None:
+        try:
+            recipe.view_count += 1
+        except Exception:
+            recipe.view_count = 1
         return template('recipe/show.tpl', recipe=recipe_data['recipe'], totals=recipe_data['totals'], show=True)
     elif page_type == 'print':
         return template('recipe/show.tpl', recipe=recipe_data['recipe'], totals=recipe_data['totals'], show=False)
     elif page_type == 'edit' and request.method == 'POST':
-        # print(recipe_data)
         recipe = recipe_data['recipe']
         recipe.name = request.form['name']
         recipe.type = request.form['size']
@@ -494,7 +479,7 @@ def showRecipe(recipe_id, page_type=None):
 @login_required
 def showAllRecipes():
     user = models.User.load(current_user.id)
-    return template('recipe/all.tpl', diets=user.diets)
+    return template('recipe/all.tpl', diets=user.activeDiets)
 
 
 @main_bp.route('/diet=<int:diet_id>/print')
@@ -599,7 +584,7 @@ def showUser(page_type=None):
     if user is None:
         return redirect('/wrongpage')
     if page_type is None:
-        return template('showUser.tpl', user=user)
+        return template('user/show.tpl', user=user)
     elif page_type == 'edit' and request.method == 'POST':
         user.firstName = request.form['firstname']
         user.lastName = request.form['lastname']
@@ -608,7 +593,7 @@ def showUser(page_type=None):
             flash('Uživatel byl upraven', 'success')
         else:
             flash('Nepovedlo se změnit uživatele', 'error')
-        return template('showUser.tpl', user=user)
+        return template('user/show.tpl', user=user)
     elif page_type == 'password_change' and request.method == 'POST':
 
         user.pwdhash = user.getPassword(request.form['password'].encode('utf-8'))
@@ -619,7 +604,7 @@ def showUser(page_type=None):
             flash('Heslo bylo změněno', 'success')
         else:
             flash('Nepovedlo se změnit heslo', 'error')
-        return template('showUser.tpl', user=user)
+        return template('user/show.tpl', user=user)
 
 
 @main_bp.route('/feedback', methods=['GET', 'POST'])

@@ -74,7 +74,9 @@ texts = {
     "diet_active": 'Aktivní',
     "diet_add": 'Přidat dietu',
     "diet_delete": 'Smazat dietu',
-    "die_name": 'Název diety',
+    "diet_name": 'Název diety',
+
+    "diet_recipes_count": 'Receptů:',
 
     # Ingredient
     "ingredient_add": 'Přidat surovinu',

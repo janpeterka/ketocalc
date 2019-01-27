@@ -39,7 +39,7 @@ class BaseMixin(object):
             db.session.commit()
             return True
         except Exception as e:
-            print(e)
+            print("Edit error: {}".format(e))
             return False
 
     def save(self, **kw):
@@ -53,7 +53,7 @@ class BaseMixin(object):
             db.session.commit()
             return self.id
         except Exception as e:
-            print(e)
+            print("Save error: {}".format(e))
             return False
 
     def remove(self, **kw):
@@ -64,7 +64,7 @@ class BaseMixin(object):
             db.session.commit()
             return True
         except Exception as e:
-            print(e)
+            print("Remove error: {}".format(e))
             return False
 
     def expire(self, **kw):
@@ -77,8 +77,7 @@ class BaseMixin(object):
             db.session.expire(self)
             return True
         except Exception as e:
-            print("expire error")
-            print(e)
+            print("Expire error: {}".format(e))
             return False
 
     @classmethod
@@ -99,8 +98,7 @@ class BaseMixin(object):
             db.session.refresh(self)
             return True
         except Exception as e:
-            print("refresh error")
-            print(e)
+            print("Refresh error: {}".format(e))
             return False
 
 
@@ -335,11 +333,12 @@ class User(db.Model, UserMixin, BaseMixin):
     # last_updated = db.Column(db.DateTime, nullable=True, onupdate=datetime.datetime.now)
 
     last_logged_in = db.Column(db.DateTime, nullable=True)
+    login_count = db.Column(db.Integer, nullable=True, default=0)
 
     diets = db.relationship('Diet', secondary='users_has_diets', order_by='desc(Diet.active)')
 
     @staticmethod
-    def load(user_id):
+    def load(user_id, load_type="id"):
         """Load User
 
         Load User by ID or username
@@ -350,12 +349,14 @@ class User(db.Model, UserMixin, BaseMixin):
         Returns:
             User -- SQLAlchemy object
         """
-        if type(user_id) is int:
+        if load_type == "id":
             user = db.session.query(User).filter(User.id == user_id).first()
-        else:
+        elif load_type == "username":
             user = db.session.query(User).filter(User.username == user_id).first()
-
-        # endSession(session)
+        elif load_type == "google_id":
+            user = db.session.query(User).filter(User.google_id == user_id).first()
+        else:
+            return None
 
         return user
 
@@ -453,11 +454,14 @@ class Recipe(db.Model, BaseMixin):
     """
     __tablename__ = 'recipes'
 
-    id = db.Column(db.INTEGER, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     type = db.Column(db.Enum('small', 'big'), nullable=False)
+
     created = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
     last_updated = db.Column(db.DateTime, nullable=True, onupdate=datetime.datetime.now)
+
+    view_count = db.Column(db.Integer, nullable=True, default=0)
 
     diet = db.relationship('Diet', secondary='diets_has_recipes', uselist=False)
     ingredients = db.relationship("Ingredient",

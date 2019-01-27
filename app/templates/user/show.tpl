@@ -39,10 +39,6 @@
                 bootbox.alert("Heslo je příliš krátké!");
                 return false
             }
-            else if ($(".password").val() != $(".againPassword").val()){
-                bootbox.alert("Hesla jsou rozdílná!");
-                return false
-            }
             else {
               return true  
             }
@@ -57,15 +53,16 @@
             }
 
         });
-        $(document).on('blur','.againPassword',function(){
-            if ($(this).val() === $(".password").val()){
-                $(".diffPassword").empty();
+
+        function toggleVisibility() {
+            var x = $('#password')
+            if (x.attr("type") === "password"){
+                x.attr("type", 'text');
             } else {
-                $(".diffPassword").empty();
-                $(".diffPassword").append("<small class='form-text'>Hesla jsou rozdílná!</small>");
+                x.attr("type", 'password');
             }
-        });
-    
+        }
+
     </script>
 {% endblock %}
 
@@ -102,12 +99,13 @@
             <form action="/user/password_change" method="post" onsubmit="return validateRegister()" >
                 <table class="table">
                     <td>
-                        <input name="password" type="password" class="form-control password" placeholder="{{ texts.password_new }}" />
+                        <input id="password" name="password" type="password" class="form-control password" placeholder="{{ texts.password_new }}" />
                         <span class="warning wrongPassword"></span>
                     </td>
                     <td>
-                        <input type="password" class="form-control againPassword" placeholder="{{ texts.password_new_again }}" />
-                        <span class="warning diffPassword"></span>
+                        <!-- <input type="password" class="form-control againPassword" placeholder="{{ texts.password_new_again }}" /> -->
+                        <!-- <span class="warning diffPassword"></span> -->
+                        <input type="button" class="btn" onclick="toggleVisibility()" value="{{ texts.password_show }}">
                     </td>
                     <td>
                         <input type="submit" class="btn btn-warning" value="{{ texts.password_change }}">

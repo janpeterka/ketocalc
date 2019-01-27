@@ -5,16 +5,19 @@
 from functools import wraps
 import datetime
 
-from flask import render_template as template, request, redirect, Blueprint
+from flask import Blueprint
+from flask import render_template as template, request, redirect
 from flask import flash
 
 from flask_login import login_user, logout_user, current_user
+
+from flask_dance.contrib.google import google
+from flask_dance.consumer import oauth_authorized
 
 from app import models
 
 from app.auth.forms import LoginForm, RegisterForm
 
-from app.data import template_data
 
 auth_blueprint = Blueprint('auth', __name__, template_folder='templates/auth/')
 
@@ -26,11 +29,6 @@ def admin_required(f):
             return redirect('/wrongpage')
         return f(*args, **kwargs)
     return decorated_function
-
-
-@auth_blueprint.app_context_processor
-def inject_globals():
-    return dict(icons=template_data.icons, texts=template_data.texts)
 
 
 @auth_blueprint.route('/login', methods=['GET', 'POST'])
@@ -47,13 +45,48 @@ def showLogin():
             return template('auth/login.tpl', form=form)
 
 
+@oauth_authorized.connect
+def oauthLogin(blueprint, token):
+    from app.models import User
+    if blueprint.name == 'google':
+        user_info = google.get("/oauth2/v2/userinfo").json()
+        username = user_info['email']
+        google_id = user_info['id']
+
+    user = User.load(username, load_type="username")
+    doLogin(user=user)
+    if not user:
+        user = User.load(google_id, load_type="google_id")
+        doLogin(user=user)
+    if not user:
+        user = User()
+        user.username = username
+        user.google_id = google_id
+
+        try:
+            user.firstName = user_info['given_name']
+        except Exception:
+            user.firstName = "-"
+
+        try:
+            user.lastName = user_info['family_name']
+        except Exception:
+            user.lastName = "-"
+
+        doRegister(user)
+
+
 def doLogin(username=None, password=None, from_register=False, user=None):
     if not user and username is not None:
-        user = models.User.load(username)
+        user = models.User.load(username, load_type="username")
     if user is not None and (user.google_id is not None or user.checkLogin(password)):
         login_user(user, remember=True)
         user.last_logged_in = datetime.datetime.now()
-        user.save()
+        try:
+            user.login_count += 1
+        except Exception:
+            user.login_count = 1
+        user.edit()
         if not from_register:
             flash('Byl jste úspěšně přihlášen.', 'success')
         return True
@@ -76,11 +109,10 @@ def showRegister():
         return template('auth/register.tpl', form=form)
     elif request.method == 'POST':
         if not form.validate_on_submit():
-            print("Not validated")
             return template('auth/register.tpl', form=form)
         if not validateRegister(form.username.data):
-            form.username.errors += ('Toto jméno nemůžete použít')
-            return template('register.tpl', form=form)
+            form.username.errors = ['Toto jméno nemůžete použít']
+            return template('auth/register.tpl', form=form)
 
         user = models.User()
 
@@ -94,7 +126,7 @@ def showRegister():
         if doRegister(user):
             return redirect('/dashboard')
         else:
-            return template('register.tpl', form=form)
+            return template('auth/register.tpl', form=form)
 
 
 def doRegister(user):
@@ -109,7 +141,20 @@ def doRegister(user):
 
 @auth_blueprint.route('/registerValidate', methods=['POST'])
 def validateRegister(username):
-    if models.User.load(username) is not None:
+    """[summary]
+
+    Tests for usename uniqueness
+
+    Decorators:
+        auth_blueprint.route
+
+    Arguments:
+        username {[type]} -- [description]
+
+    Returns:
+        bool -- [description]
+    """
+    if models.User.load(username, load_type="username") is not None:
         return False
     else:
         return True

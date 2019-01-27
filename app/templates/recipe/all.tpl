@@ -28,7 +28,7 @@
             </table>
             <div style="margin-left: 15px">
                 <div class="row">
-                    <a href="/newrecipe" target="_blank" class="btn btn-secondary">{{ texts.recipe_add }}</a>
+                    <a href="/newrecipe" target="_blank" class="btn btn-secondary">{{ texts.recipe_new }}</a>
                 </div>
 
                 <div class="row" style="margin-top: 5px">
