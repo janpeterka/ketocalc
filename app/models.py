@@ -479,6 +479,15 @@ class Recipe(db.Model, BaseMixin):
             Recipe -- Recipe object
         """
         recipe = db.session.query(Recipe).filter(Recipe.id == recipe_id).first()
+
+        if recipe.type == "big":
+            coef = float(recipe.diet.big_size / 100)
+        else:
+            coef = float(recipe.diet.small_size / 100)
+
+        for ingredient in recipe.ingredients:
+            ingredient.amount = float(math.floor(ingredient.loadAmount(recipe.id) * coef * 100000)) / 100000
+
         return recipe
 
     def loadRecipeForShow(self):
@@ -567,6 +576,39 @@ class Recipe(db.Model, BaseMixin):
         db.session.delete(self)
         db.session.commit()
         return True
+
+    @property
+    def totals(self):
+        # if self.type == "big":
+            # coef = float(self.diet.big_size / 100)
+        # else:
+            # coef = float(self.diet.small_size / 100)
+
+        # for ingredient in self.ingredients:
+            # ingredient.amount = float(math.floor(ingredient.loadAmount(self.id) * coef * 100000)) / 100000
+
+        totals = type('', (), {})()
+        totals.calorie = 0
+        totals.protein = 0
+        totals.fat = 0
+        totals.sugar = 0
+        totals.amount = 0
+
+        for i in self.ingredients:
+            totals.calorie += i.amount * i.calorie
+            totals.protein += i.amount * i.protein
+            totals.fat += i.amount * i.fat
+            totals.sugar += i.amount * i.sugar
+            totals.amount += i.amount
+
+        totals.calorie = math.floor(totals.calorie) / 100
+        totals.protein = math.floor(totals.protein) / 100
+        totals.fat = math.floor(totals.fat) / 100
+        totals.sugar = math.floor(totals.sugar) / 100
+        totals.amount = math.floor(totals.amount)
+
+        totals.ratio = math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
+        return totals
 
     @property
     def json(self):

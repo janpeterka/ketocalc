@@ -15,6 +15,22 @@ def create_app():
     application.config.from_object('config')
     application.secret_key = application.config['SECRET_KEY']
 
+    import logging
+    from flask import request
+
+    class RequestFormatter(logging.Formatter):
+        def format(self, record):
+            record.url = request.url
+            record.remote_addr = request.remote_addr
+            return super().format(record)
+
+    file_handler = logging.FileHandler('app/static/error.log')
+    file_handler.setLevel(logging.WARNING)
+    file_handler.setFormatter(RequestFormatter(
+        '[%(asctime)s] %(remote_addr)s requested %(url)s: %(levelname)s in %(module)s: %(message)s'
+    ))
+    application.logger.addHandler(file_handler)
+
     mail.init_app(application)
     db.init_app(application)
     migrate.init_app(application, db)

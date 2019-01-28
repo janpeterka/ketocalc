@@ -121,7 +121,7 @@
 
                 <tr class="totals">
                     <td>Celkem</td>
-                    <td>{{ totals.calorie }} kc</td>
+                    <td>{{ totals.calorie }}</td>
                     <td>{{ totals.protein }}</td>
                     <td>{{ totals.fat }}</td>
                     <td>{{ totals.sugar }}</td>

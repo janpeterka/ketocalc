@@ -8,6 +8,8 @@ from flask import jsonify
 from flask import flash
 from flask import abort
 
+from flask import current_app as application
+
 from flask_mail import Message
 from werkzeug import secure_filename
 
@@ -58,7 +60,7 @@ def selectDietAJAX():
     Used on dashboard
 
     Decorators:
-        application.route
+        main_bp.route
         login_required
 
     Returns:
@@ -113,6 +115,7 @@ def showNewDiet():
 def showDiet(diet_id, page_type=None):
     diet = models.Diet.load(diet_id)
     if diet is None:
+        application.logger.warning('{} not loaded'.format(diet_id))
         abort(404)
     if diet.author.username != current_user.username:
         return redirect('/wrongpage')
@@ -443,23 +446,32 @@ def saveRecipeAJAX():
 def showRecipe(recipe_id, page_type=None):
     try:
         recipe = models.Recipe.load(recipe_id)
-        recipe_data = recipe.loadRecipeForShow()
-    except AttributeError:
+        if recipe is None:
+            application.logger.warning('recipe {} not loaded'.format(recipe_id))
+            return abort(404)
+    except AttributeError as e:
+        application.logger.warning('recipe {} not loaded: {}'.format(recipe_id, e))
         return abort(404)
 
     if current_user.username != recipe.author.username:
+        application.logger.warning('unauthorized')
         return redirect('/wrongpage')
 
     if page_type is None:
         try:
             recipe.view_count += 1
-        except Exception:
-            recipe.view_count = 1
-        return template('recipe/show.tpl', recipe=recipe_data['recipe'], totals=recipe_data['totals'], show=True)
+        except Exception as e:
+            application.logger.error(e)
+            try:
+                recipe.view_count = 1
+                recipe.edit()
+            except Exception as e:
+                application.logger.error(e)
+        return template('recipe/show.tpl', recipe=recipe, totals=recipe.totals, show=True)
     elif page_type == 'print':
-        return template('recipe/show.tpl', recipe=recipe_data['recipe'], totals=recipe_data['totals'], show=False)
+        return template('recipe/show.tpl', recipe=recipe, totals=recipe.totals, show=False)
     elif page_type == 'edit' and request.method == 'POST':
-        recipe = recipe_data['recipe']
+        recipe = recipe
         recipe.name = request.form['name']
         recipe.type = request.form['size']
         recipe.edit()
@@ -467,7 +479,7 @@ def showRecipe(recipe_id, page_type=None):
         flash('Recept byl upraven.', 'success')
         return redirect('/recipe={}'.format(recipe_id))
     elif page_type == 'remove' and request.method == 'POST':
-        recipe = recipe_data['recipe']
+        recipe = recipe
         recipe.remove()
         flash('Recept byl smazán.', 'success')
         return redirect('/')
@@ -488,7 +500,7 @@ def printDietRecipes(diet_id):
     diet = models.Diet.load(diet_id)
     for recipe in diet.recipes:
         recipe_data = recipe.loadRecipeForShow()
-        recipe.totals = recipe_data['totals']
+        recipe.show_totals = recipe_data['totals']
     return template('recipe/printAll.tpl', recipes=diet.recipes)
 
 
@@ -498,7 +510,7 @@ def printAllRecipes():
     recipes = models.User.load(current_user.id).recipes
     for recipe in recipes:
         recipe_data = recipe.loadRecipeForShow()
-        recipe.totals = recipe_data['totals']
+        recipe.show_totals = recipe_data['totals']
     return template('recipe/printAll.tpl', recipes=recipes)
 
 
@@ -532,9 +544,15 @@ def showNewIngredient():
 @main_bp.route('/ingredient=<int:ingredient_id>/<page_type>', methods=['POST', 'GET'])
 @login_required
 def showIngredient(ingredient_id, page_type=None):
-    ingredient = models.Ingredient.load(ingredient_id)
-    if ingredient is None:
-        abort(404)
+    try:
+        ingredient = models.Ingredient.load(ingredient_id)
+        if ingredient is None:
+            application.logger.warning('ingredient {} not loaded'.format(ingredient_id))
+            abort(404)
+    except Exception as e:
+        application.logger.error(e)
+        abort(500)
+
     if current_user.username != ingredient.author:
         return redirect('/wrongpage')
 
@@ -580,9 +598,13 @@ def showAllIngredients():
 @main_bp.route('/user/<page_type>', methods=['POST', 'GET'])
 @login_required
 def showUser(page_type=None):
-    user = models.User.load(current_user.id)
-    if user is None:
-        return redirect('/wrongpage')
+    try:
+        user = models.User.load(current_user.id)
+        if user is None:
+            abort(404)
+    except Exception:
+        abort(500)
+
     if page_type is None:
         return template('user/show.tpl', user=user)
     elif page_type == 'edit' and request.method == 'POST':
@@ -599,8 +621,7 @@ def showUser(page_type=None):
         user.pwdhash = user.getPassword(request.form['password'].encode('utf-8'))
         user.password_version = 'bcrypt'
 
-        success = user.edit()
-        if success is True:
+        if user.edit():
             flash('Heslo bylo změněno', 'success')
         else:
             flash('Nepovedlo se změnit heslo', 'error')
@@ -658,7 +679,3 @@ def showChangelog():
 @main_bp.route('/help')
 def showHelp():
     return template('help.tpl')
-
-
-# if __name__ == '__main__':
-#     aplication.run(debug=True)

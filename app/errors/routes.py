@@ -33,6 +33,16 @@ def testingPage():
     return template('other/testing.tpl', tests=tests)
 
 
+@errors.route('/logging')
+@login_required
+@admin_required
+def logPage():
+    with open('app/static/error.log', 'r') as f:
+        logs = f.readlines()
+
+    return template('other/logs.tpl', logs=logs)
+
+
 @errors.route('/google3748bc0390347e56.html')
 def googleVerification():
     return template('other/google3748bc0390347e56.html')

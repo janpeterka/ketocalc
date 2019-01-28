@@ -1,0 +1,2 @@
+[2019-01-28 14:29:52,587] 127.0.0.1 requested http://127.0.0.1:5000/login: WARNING in routes: Warning: hana.zabojnikova@iol.cz logged in.
+[2019-01-28 14:29:52,589] 127.0.0.1 requested http://127.0.0.1:5000/login: ERROR in routes: Error: hana.zabojnikova@iol.cz logged in.
