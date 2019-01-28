@@ -33,6 +33,9 @@ def admin_required(f):
 
 @auth_blueprint.route('/login', methods=['GET', 'POST'])
 def showLogin():
+    if current_user.is_authenticated:
+        print(current_user)
+        return redirect('/dashboard')
     form = LoginForm(request.form)
     if request.method == 'GET':
         return template('auth/login.tpl', form=form)
