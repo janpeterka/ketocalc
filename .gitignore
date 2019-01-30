@@ -1,8 +1,5 @@
-__pycache__/
-v_ketocalc/
-todo/
-backup/
 .idea/
-run
-scripts
+__pycache__/
 migrations/
+todo/
+v_ketocalc/

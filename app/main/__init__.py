@@ -1,5 +1,5 @@
-from flask import Blueprint
+from app.main.routes import main_blueprint
 
-bp = Blueprint('main', __name__)
 
-from app.main import routes
+def create_module(app, **kwargs):
+    app.register_blueprint(main_blueprint)

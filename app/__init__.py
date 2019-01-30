@@ -2,7 +2,6 @@ from flask import Flask
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-# from flask_login import LoginManager
 
 mail = Mail()
 db = SQLAlchemy()
@@ -35,22 +34,20 @@ def create_app():
     db.init_app(application)
     migrate.init_app(application, db)
 
-    from app.main import bp as main_bp
-    application.register_blueprint(main_bp)
+    # Main module
+    from app.main import create_module as main_create_module
+    main_create_module(application)
 
+    # Auth module
     from app.auth import create_module as auth_create_module
     auth_create_module(application)
 
-    # from app.auth import bp as auth_bp
-    # application.register_blueprint(auth_bp)
+    # Calc module
+    from app.calc import create_module as calc_create_module
+    calc_create_module(application)
 
-    from app.calc import bp as calc_bp
-    application.register_blueprint(calc_bp)
-
-    from app.errors import bp as errors_bp
-    application.register_blueprint(errors_bp)
+    # Erros module
+    from app.errors import create_module as errors_create_module
+    errors_create_module(application)
 
     return application
-
-
-from app import models

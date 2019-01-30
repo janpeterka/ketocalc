@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # run by pyserver
+from flask import Blueprint
 
 from flask import render_template as template, request, redirect
 from flask import jsonify
@@ -19,7 +20,6 @@ from werkzeug import secure_filename
 from app import models
 
 from app.main import forms
-from app.main import bp as main_bp
 from app import mail
 
 from app.calc import calculations
@@ -37,22 +37,24 @@ from flask_login import login_required, current_user
 
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
+main_blueprint = Blueprint('main', __name__)
+
 
 # MAIN
-@main_bp.route('/', methods=['GET'])
+@main_blueprint.route('/', methods=['GET'])
 def main():
     return redirect('/dashboard')
 
 
 # USER PAGE
-@main_bp.route('/dashboard')
+@main_blueprint.route('/dashboard')
 @login_required
 def showDashboard():
     user = models.User.load(current_user.id)
     return template('dashboard.tpl', diets=user.activeDiets, firstname=user.firstName)
 
 
-@main_bp.route('/selectDietAJAX', methods=['POST'])
+@main_blueprint.route('/selectDietAJAX', methods=['POST'])
 @login_required
 def selectDietAJAX():
     """returns recipes of diet
@@ -77,7 +79,7 @@ def selectDietAJAX():
 
 
 # NEW DIET
-@main_bp.route('/newdiet', methods=['GET', 'POST'])
+@main_blueprint.route('/newdiet', methods=['GET', 'POST'])
 @login_required
 def showNewDiet():
     form = forms.NewDietForm()
@@ -109,8 +111,8 @@ def showNewDiet():
 
 
 # SHOW DIET PAGE
-@main_bp.route('/diet=<int:diet_id>')
-@main_bp.route('/diet=<int:diet_id>/<page_type>', methods=['POST', 'GET'])
+@main_blueprint.route('/diet=<int:diet_id>')
+@main_blueprint.route('/diet=<int:diet_id>/<page_type>', methods=['POST', 'GET'])
 @login_required
 def showDiet(diet_id, page_type=None):
     diet = models.Diet.load(diet_id)
@@ -152,7 +154,7 @@ def showDiet(diet_id, page_type=None):
         return redirect('/diet={}'.format(diet_id))
 
 
-# @main_bp.route('/diet=<dietID>/export', methods=['POST'])
+# @main_blueprint.route('/diet=<dietID>/export', methods=['POST'])
 # def exportDiet(dietID):
 #     recipes = loadDietRecipes(dietID)
 #     newDietID = int(request.form['diet'])
@@ -170,7 +172,7 @@ def showDiet(diet_id, page_type=None):
 #     return redirect('/diet={}'.format(newDietID))
 
 
-@main_bp.route('/alldiets')
+@main_blueprint.route('/alldiets')
 @login_required
 def showAllDiets():
     """show all diets sorted (active first)
@@ -190,14 +192,14 @@ def showAllDiets():
 
 
 # NEW RECIPE PAGE
-@main_bp.route('/trialnewrecipe')
+@main_blueprint.route('/trialnewrecipe')
 def showTrialNewRecipe():
     active_diets = models.User.load('ketocalc.jmp@gmail.com', load_type="username").activeDiets
     ingredients = models.Ingredient.loadAllByAuthor('basic')
     return template('recipe/new.tpl', ingredients=ingredients, diets=active_diets, trialrecipe=True)
 
 
-@main_bp.route('/newrecipe')
+@main_blueprint.route('/newrecipe')
 @login_required
 def showNewRecipe():
     active_diets = models.User.load(current_user.id).activeDiets
@@ -205,7 +207,7 @@ def showNewRecipe():
     return template('recipe/new.tpl', ingredients=ingredients, diets=active_diets, trialrecipe=False)
 
 
-@main_bp.route('/addIngredientAJAX', methods=['POST'])
+@main_blueprint.route('/addIngredientAJAX', methods=['POST'])
 def addIngredienttoRecipeAJAX():
     ingredient = models.Ingredient.load(request.json['ingredient_id'])
     template_data = template('recipe/addingredientAJAX.tpl', ingredient=ingredient)
@@ -213,7 +215,7 @@ def addIngredienttoRecipeAJAX():
     return jsonify(result)
 
 
-@main_bp.route('/calcRecipeAJAX', methods=['POST'])
+@main_blueprint.route('/calcRecipeAJAX', methods=['POST'])
 def calcRecipeAJAX(test_dataset=None):
     """[summary]
 
@@ -308,7 +310,7 @@ def calcRecipeAJAX(test_dataset=None):
     return jsonify(result)
 
 
-@main_bp.route('/recalcRecipeAJAX', methods=['POST'])
+@main_blueprint.route('/recalcRecipeAJAX', methods=['POST'])
 def recalcRecipeAJAX(test_dataset=None):
     # need to rewrite #wip
 
@@ -417,7 +419,7 @@ def recalcRecipeAJAX(test_dataset=None):
     return jsonify(solutionJSON)
 
 
-@main_bp.route('/saveRecipeAJAX', methods=['POST'])
+@main_blueprint.route('/saveRecipeAJAX', methods=['POST'])
 @login_required
 def saveRecipeAJAX():
     temp_ingredients = request.json['ingredients']
@@ -440,8 +442,8 @@ def saveRecipeAJAX():
     return ('/recipe=' + str(last_id))
 
 
-@main_bp.route('/recipe=<int:recipe_id>', methods=['GET'])
-@main_bp.route('/recipe=<int:recipe_id>/<page_type>', methods=['POST', 'GET'])
+@main_blueprint.route('/recipe=<int:recipe_id>', methods=['GET'])
+@main_blueprint.route('/recipe=<int:recipe_id>/<page_type>', methods=['POST', 'GET'])
 @login_required
 def showRecipe(recipe_id, page_type=None):
     try:
@@ -487,14 +489,14 @@ def showRecipe(recipe_id, page_type=None):
         redirect('/wrongpage')
 
 
-@main_bp.route('/allrecipes')
+@main_blueprint.route('/allrecipes')
 @login_required
 def showAllRecipes():
     user = models.User.load(current_user.id)
     return template('recipe/all.tpl', diets=user.activeDiets)
 
 
-@main_bp.route('/diet=<int:diet_id>/print')
+@main_blueprint.route('/diet=<int:diet_id>/print')
 @login_required
 def printDietRecipes(diet_id):
     diet = models.Diet.load(diet_id)
@@ -504,7 +506,7 @@ def printDietRecipes(diet_id):
     return template('recipe/printAll.tpl', recipes=diet.recipes)
 
 
-@main_bp.route('/printallrecipes')
+@main_blueprint.route('/printallrecipes')
 @login_required
 def printAllRecipes():
     recipes = models.User.load(current_user.id).recipes
@@ -515,7 +517,7 @@ def printAllRecipes():
 
 
 # NEW INGREDIENT PAGE
-@main_bp.route('/newingredient', methods=['GET', 'POST'])
+@main_blueprint.route('/newingredient', methods=['GET', 'POST'])
 @login_required
 def showNewIngredient():
     form = forms.NewIngredientForm()
@@ -540,8 +542,8 @@ def showNewIngredient():
             return template('ingredient/new.tpl', form=form)
 
 
-@main_bp.route('/ingredient=<int:ingredient_id>')
-@main_bp.route('/ingredient=<int:ingredient_id>/<page_type>', methods=['POST', 'GET'])
+@main_blueprint.route('/ingredient=<int:ingredient_id>')
+@main_blueprint.route('/ingredient=<int:ingredient_id>/<page_type>', methods=['POST', 'GET'])
 @login_required
 def showIngredient(ingredient_id, page_type=None):
     try:
@@ -586,7 +588,7 @@ def showIngredient(ingredient_id, page_type=None):
             return redirect('/ingredient={}'.format(ingredient_id))
 
 
-@main_bp.route('/allingredients')
+@main_blueprint.route('/allingredients')
 @login_required
 def showAllIngredients():
     # basic_ingredients = models.Ingredient.loadAllByAuthor('default')
@@ -594,8 +596,8 @@ def showAllIngredients():
     return template('ingredient/all.tpl', ingredients=ingredients)
 
 
-@main_bp.route('/user')
-@main_bp.route('/user/<page_type>', methods=['POST', 'GET'])
+@main_blueprint.route('/user')
+@main_blueprint.route('/user/<page_type>', methods=['POST', 'GET'])
 @login_required
 def showUser(page_type=None):
     try:
@@ -628,7 +630,7 @@ def showUser(page_type=None):
         return template('user/show.tpl', user=user)
 
 
-@main_bp.route('/feedback', methods=['GET', 'POST'])
+@main_blueprint.route('/feedback', methods=['GET', 'POST'])
 @login_required
 def showFeedback():
     if request.method == 'GET':
@@ -670,12 +672,12 @@ def allowed_file(filename):
 
 
 # S'MORE
-@main_bp.route('/changelog')
+@main_blueprint.route('/changelog')
 @login_required
 def showChangelog():
     return template('changelog.tpl')
 
 
-@main_bp.route('/help')
+@main_blueprint.route('/help')
 def showHelp():
     return template('help.tpl')

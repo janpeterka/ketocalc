@@ -26,6 +26,3 @@ def create_module(app, **kwargs):
     app.register_blueprint(google_blueprint, url_prefix="/login")
 
     app.register_blueprint(auth_blueprint)
-
-
-from app.auth import routes

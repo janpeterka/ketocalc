@@ -1,5 +1,5 @@
-from flask import Blueprint
+from app.calc.calculations import calc_blueprint
 
-bp = Blueprint('calc', __name__)
 
-from app.calc import calculations
+def create_module(app, **kwargs):
+    app.register_blueprint(calc_blueprint)

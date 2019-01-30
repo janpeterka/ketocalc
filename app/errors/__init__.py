@@ -1,5 +1,5 @@
-from flask import Blueprint
+from app.errors.routes import errors_blueprint
 
-bp = Blueprint('errors', __name__)
 
-from app.errors import routes
+def create_module(app, **kwargs):
+    app.register_blueprint(errors_blueprint)
