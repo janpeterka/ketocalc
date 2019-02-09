@@ -1,7 +1,5 @@
+.idea/
 __pycache__/
-scripts/
+migrations/
 todo/
-forms.py
-old/
-backup/
 v_ketocalc/

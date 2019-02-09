@@ -1,10 +1,22 @@
 Flask
 
 Flask-Mail
+Flask-SQLAlchemy
+Flask-Bcrypt
+Flask-Security
+
+Flask-Login
+Flask-Dance
+
+Flask-WTF
+WTForms
+
+requests
 
 mysqlclient
 
 PyMySQL
+Flask-Migrate
 
 pdfkit
 
@@ -12,10 +24,8 @@ numpy
 
 sympy
 
+unidecode
+
 pytest
-
-bcrypt
-
-WTForms
 
 gunicorn
