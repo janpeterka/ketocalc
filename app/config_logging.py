@@ -19,12 +19,17 @@ class SQLAlchemyHandler(logging.Handler):
         except Exception:
             remote_addr = None
 
+        try:
+            url = record.__dict__['url']
+        except Exception:
+            url = None
+
         log = Log(
             logger=record.__dict__['name'],
             level=record.__dict__['levelname'],
             msg=record.__dict__['msg'],
             remote_addr=remote_addr,
-            url=record.__dict__['url'],
+            url=url,
             module=record.__dict__['module'])
         log.save()
 
