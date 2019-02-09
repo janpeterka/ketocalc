@@ -14,26 +14,15 @@
 {% block content %}
     {% include('navbar.tpl') %}
     <div class="container">
-            <form class="form-control form-group col-6" method="POST" action="/feedback" enctype = "multipart/form-data">
-                <label for="type">Vyberte typ reakce</label>
-                <select name="type" class="form-control">
-                    <option value="bug">Chyba v programu</option>
-                    <option value="ux">Problém s používáním uživatelského rozhraní</option>
-                    <option value="suggestion">Doporučení na zlepšení aplikace</option>
-                </select>
-                
-                <label for="message">Popište<span style="color: black">*</span></label>
-                <input type="text" name="message" class="form-control" required oninvalid="this.setCustomValidity('Popište situaci')"
-                    oninput="setCustomValidity('')"  /> 
-                
-                <label for="sender">Váš email (pro případ nutnosti upřesnění)</label>
-                <input type="text" name="sender" class="form-control" />
-                
-                <label for="file">Screenshot s problémem</label>
-                <input type="file" name="file" class="form-control screenshot_file" value="Nahrajte screenshot">
-                
-                <input type="submit" class="btn btn-primary form-control" value="Poslat reakci" />
-            </form>
+        <form action="/feedback" method="POST" class="form-group form-control" enctype="multipart/form-data">
+            {{ form.csrf_token }}
+            {% from "_formelement.tpl" import render_field %}
+            {{ render_field(form.option, "form-control") }}
+            {{ render_field(form.message, "form-control") }}
+            {{ render_field(form.email, "form-control") }}
+            {{ form.feedback_file(class_='form-control') }}
+            {{ form.submit(class_='btn btn-primary col-sm-3') }}
+        </form>
     </div>
 {% endblock %}
 

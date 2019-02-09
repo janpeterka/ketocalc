@@ -9,10 +9,7 @@ from flask import jsonify
 from flask import flash
 from flask import abort
 
-from flask import current_app as application
-
-from flask_mail import Message
-from werkzeug import secure_filename
+# from flask import current_app as application
 
 # import requests
 # import json
@@ -20,7 +17,7 @@ from werkzeug import secure_filename
 from app import models
 
 from app.main import forms
-from app import mail
+
 
 from app.calc import calculations
 
@@ -29,13 +26,11 @@ from app.calc import calculations
 # Math library
 import numpy
 import math
-import os
+# import os
 
 from flask_login import login_required, current_user
 # Printing
 # import pdfkit
-
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 main_blueprint = Blueprint('main', __name__)
 
@@ -117,7 +112,7 @@ def showNewDiet():
 def showDiet(diet_id, page_type=None):
     diet = models.Diet.load(diet_id)
     if diet is None:
-        application.logger.warning('{} not loaded'.format(diet_id))
+        # application.logger.warning('{} not loaded'.format(diet_id))
         abort(404)
     if diet.author.username != current_user.username:
         return redirect('/wrongpage')
@@ -449,26 +444,27 @@ def showRecipe(recipe_id, page_type=None):
     try:
         recipe = models.Recipe.load(recipe_id)
         if recipe is None:
-            application.logger.warning('recipe {} not loaded'.format(recipe_id))
+            # application.logger.warning('recipe {} not loaded'.format(recipe_id))
             return abort(404)
     except AttributeError as e:
-        application.logger.warning('recipe {} not loaded: {}'.format(recipe_id, e))
+        # application.logger.warning('recipe {} not loaded: {}'.format(recipe_id, e))
         return abort(404)
 
     if current_user.username != recipe.author.username:
-        application.logger.warning('unauthorized')
+        # application.logger.warning('unauthorized')
         return redirect('/wrongpage')
 
     if page_type is None:
         try:
             recipe.view_count += 1
         except Exception as e:
-            application.logger.error(e)
+            # application.logger.error(e)
             try:
                 recipe.view_count = 1
                 recipe.edit()
             except Exception as e:
-                application.logger.error(e)
+                # application.logger.error(e)
+                pass
         return template('recipe/show.tpl', recipe=recipe, totals=recipe.totals, show=True)
     elif page_type == 'print':
         return template('recipe/show.tpl', recipe=recipe, totals=recipe.totals, show=False)
@@ -549,10 +545,10 @@ def showIngredient(ingredient_id, page_type=None):
     try:
         ingredient = models.Ingredient.load(ingredient_id)
         if ingredient is None:
-            application.logger.warning('ingredient {} not loaded'.format(ingredient_id))
+            # application.logger.warning('ingredient {} not loaded'.format(ingredient_id))
             abort(404)
     except Exception as e:
-        application.logger.error(e)
+        # application.logger.error(e)
         abort(500)
 
     if current_user.username != ingredient.author:
@@ -630,54 +626,6 @@ def showUser(page_type=None):
         return template('user/show.tpl', user=user)
 
 
-@main_blueprint.route('/feedback', methods=['GET', 'POST'])
-@login_required
-def showFeedback():
-    if request.method == 'GET':
-        return template('feedback.tpl')
-    elif request.method == 'POST':
-        msg = Message('[ketocalc] [{}]'.format(request.form['type']), sender='ketocalc', recipients=['ketocalc.jmp@gmail.com'])
-        msg.body = 'Message: {}\n'.format(request.form['message'])
-        msg.body += 'Send by: {} [user: {}]'.format(request.form['sender'], current_user.username)
-
-        if 'file' not in request.files:
-            try:
-                mail.send(msg)
-                flash('Vaše připomínka byla zaslána na vyšší místa.', 'success')
-                return redirect('/')
-            except Exception as error:
-                print(error)
-                abort(500)
-        else:
-            file = request.files['file']
-
-        if file.filename == '':
-            mail.send(msg)
-            flash('Vaše připomínka byla zaslána na vyšší místa.', 'success')
-            return redirect('/')
-        elif file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(application.config['UPLOAD_FOLDER'], filename))
-            with application.open_resource(os.path.join(application.config['UPLOAD_FOLDER'], filename)) as fp:
-                msg.attach('screenshot', 'image/{}'.format(filename.split('.')[1]), fp.read())
-
-            mail.send(msg)
-            flash('Vaše připomínka byla zaslána na vyšší místa.', 'success')
-            return redirect('/')
 
 
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
-# S'MORE
-@main_blueprint.route('/changelog')
-@login_required
-def showChangelog():
-    return template('changelog.tpl')
-
-
-@main_blueprint.route('/help')
-def showHelp():
-    return template('help.tpl')
