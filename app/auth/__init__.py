@@ -18,8 +18,8 @@ def create_module(app, **kwargs):
         client_id=app.config.get('GOOGLE_CLIENT_ID'),
         client_secret=app.config.get('GOOGLE_CLIENT_SECRET'),
         scope=[
-            "https://www.googleapis.com/auth/plus.me",
-            "https://www.googleapis.com/auth/userinfo.email",
+            # "https://www.googleapis.com/auth/plus.me",
+            "https://www.googleapis.com/auth/userinfo.email openid",
         ]
     )
 

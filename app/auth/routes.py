@@ -53,19 +53,22 @@ def showLogin():
 
 @oauth_authorized.connect
 def oauthLogin(blueprint, token):
-    from app.models import User
-    if blueprint.name == 'google':
-        user_info = google.get("/oauth2/v2/userinfo").json()
-        username = user_info['email']
-        google_id = user_info['id']
+    try:
+        if blueprint.name == 'google':
+            user_info = google.get("/oauth2/v2/userinfo").json()
+            print(user_info)
+            username = user_info['email']
+            google_id = user_info['id']
+    except Exception as e:
+        application.logger.error(e)
 
-    user = User.load(username, load_type="username")
+    user = models.User.load(username, load_type="username")
     doLogin(user=user)
     if not user:
-        user = User.load(google_id, load_type="google_id")
+        user = models.User.load(google_id, load_type="google_id")
         doLogin(user=user)
     if not user:
-        user = User()
+        user = models.User()
         user.username = username
         user.password = None
         user.google_id = google_id

@@ -122,11 +122,11 @@ class Log(db.Model, BaseMixin):
 
     log_id = db.Column(db.Integer, primary_key=True)
     logger = db.Column(db.String(255))
-    level = db.Column(db.String(255), nullable=False, index=True)
-    msg = db.Column(db.String(255), nullable=False)
-    url = db.Column(db.String(255), nullable=False)
-    remote_addr = db.Column(db.String(255), nullable=False)
-    module = db.Column(db.String(255), nullable=False)
+    level = db.Column(db.String(255), index=True)
+    msg = db.Column(db.String(255))
+    url = db.Column(db.String(255))
+    remote_addr = db.Column(db.String(255))
+    module = db.Column(db.String(255))
     timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
 
     @staticmethod
