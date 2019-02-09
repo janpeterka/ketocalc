@@ -9,7 +9,7 @@ from flask import jsonify
 from flask import flash
 from flask import abort
 
-# from flask import current_app as application
+from flask import current_app as application
 
 # import requests
 # import json
@@ -115,7 +115,8 @@ def showDiet(diet_id, page_type=None):
         # application.logger.warning('{} not loaded'.format(diet_id))
         abort(404)
     if diet.author.username != current_user.username:
-        return redirect('/wrongpage')
+        abort(405)
+        # return redirect('/wrongpage')
 
     if page_type is None:
         return template('diet/show.tpl', diet=diet, recipes=diet.recipes, diets=diet.author.diets)
@@ -451,20 +452,15 @@ def showRecipe(recipe_id, page_type=None):
         return abort(404)
 
     if current_user.username != recipe.author.username:
-        # application.logger.warning('unauthorized')
         return redirect('/wrongpage')
 
     if page_type is None:
-        try:
-            recipe.view_count += 1
-        except Exception as e:
-            # application.logger.error(e)
-            try:
+        if application.config['APP_STATE'] == 'production':
+            if recipe.view_count is not None:
+                recipe.view_count += 1
+            else:
                 recipe.view_count = 1
-                recipe.edit()
-            except Exception as e:
-                # application.logger.error(e)
-                pass
+        recipe.edit()
         return template('recipe/show.tpl', recipe=recipe, totals=recipe.totals, show=True)
     elif page_type == 'print':
         return template('recipe/show.tpl', recipe=recipe, totals=recipe.totals, show=False)

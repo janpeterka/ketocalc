@@ -5,7 +5,7 @@
 from flask import request, redirect, flash
 from flask import Blueprint
 from flask import render_template as template
-# from flask import current_app as application
+from flask import current_app as application
 
 from flask_login import login_required, current_user
 
@@ -27,7 +27,7 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 def testingPage():
     tests = []
     # tests.append()
-    return template('support/testing.tpl', tests=tests)
+    return template('support/testing.tpl', tests=tests, version=application.config['APP_STATE'])
 
 
 @support_blueprint.route('/logs')

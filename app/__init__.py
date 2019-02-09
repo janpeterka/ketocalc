@@ -3,6 +3,7 @@ from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
+
 mail = Mail()
 db = SQLAlchemy()
 migrate = Migrate()
@@ -11,28 +12,26 @@ migrate = Migrate()
 def create_app():
     application = Flask(__name__, instance_relative_config=True)
 
+    # CONFIG
     application.config.from_object('config')
-    application.secret_key = application.config['SECRET_KEY']
+    # application.secret_key = application.config['SECRET_KEY']
 
-    import logging
-    from flask import request
+    # LOGGING
+    # from app.config_logging import file_handler
+    # application.logger.addHandler(file_handler)
 
-    class RequestFormatter(logging.Formatter):
-        def format(self, record):
-            record.url = request.url
-            record.remote_addr = request.remote_addr
-            return super().format(record)
+    # from app.config_logging import mail_handler
+    # application.logger.addHandler(mail_handler)
 
-    file_handler = logging.FileHandler('app/static/error.log')
-    file_handler.setLevel(logging.WARNING)
-    file_handler.setFormatter(RequestFormatter(
-        '[%(asctime)s] %(remote_addr)s requested %(url)s: %(levelname)s in %(module)s: %(message)s'
-    ))
-    application.logger.addHandler(file_handler)
+    from app.config_logging import db_handler
+    application.logger.addHandler(db_handler)
 
+    # APPS
     mail.init_app(application)
     db.init_app(application)
     migrate.init_app(application, db)
+
+    # MODULES
 
     # Main module
     from app.main import create_module as main_create_module
@@ -46,8 +45,12 @@ def create_app():
     from app.calc import create_module as calc_create_module
     calc_create_module(application)
 
-    # Erros module
+    # Errors module
     from app.errors import create_module as errors_create_module
     errors_create_module(application)
+
+    # Support module
+    from app.support import create_module as support_create_module
+    support_create_module(application)
 
     return application

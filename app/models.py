@@ -1,8 +1,5 @@
 # coding: utf-8
 
-from app import db
-from app.auth import login
-
 import math
 import datetime
 
@@ -11,7 +8,13 @@ import hashlib
 
 import unidecode
 
+from flask import current_app as application
+
 from flask_login import UserMixin
+
+from app import db
+from app.auth import login
+
 
 t_diets_has_recipes = db.Table(
     'diets_has_recipes',
@@ -39,7 +42,7 @@ class BaseMixin(object):
             db.session.commit()
             return True
         except Exception as e:
-            print("Edit error: {}".format(e))
+            application.logger.error("Edit error: {}".format(e))
             return False
 
     def save(self, **kw):
@@ -51,9 +54,12 @@ class BaseMixin(object):
         try:
             db.session.add(self)
             db.session.commit()
-            return self.id
+            try:
+                return self.id
+            except Exception:
+                return True
         except Exception as e:
-            print("Save error: {}".format(e))
+            application.logger.error("Save error: {}".format(e))
             return False
 
     def remove(self, **kw):
@@ -64,7 +70,7 @@ class BaseMixin(object):
             db.session.commit()
             return True
         except Exception as e:
-            print("Remove error: {}".format(e))
+            application.logger.error("Remove error: {}".format(e))
             return False
 
     def expire(self, **kw):
@@ -77,7 +83,7 @@ class BaseMixin(object):
             db.session.expire(self)
             return True
         except Exception as e:
-            print("Expire error: {}".format(e))
+            application.logger.error("Expire error: {}".format(e))
             return False
 
     @classmethod
@@ -100,6 +106,33 @@ class BaseMixin(object):
         except Exception as e:
             print("Refresh error: {}".format(e))
             return False
+
+
+# class LogType(db.Model):
+#     # info, warning, error
+#     __tablename__ = 'log_types'
+#     log_type_id = db.Column(db.Integer, primary_key=True)
+#     log_type_name = db.Column(db.String, nullable=False)
+#     log_type_description = db.Column(db.String, nullable=True)
+
+#
+
+class Log(db.Model, BaseMixin):
+    __tablename__ = 'logs'
+
+    log_id = db.Column(db.Integer, primary_key=True)
+    logger = db.Column(db.String(255))
+    level = db.Column(db.String(255), nullable=False, index=True)
+    msg = db.Column(db.String(255), nullable=False)
+    url = db.Column(db.String(255), nullable=False)
+    remote_addr = db.Column(db.String(255), nullable=False)
+    module = db.Column(db.String(255), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
+
+    @staticmethod
+    def load_by_level(level):
+        logs = db.session.query(Log).filter(Log.level == level)
+        return logs
 
 
 class RecipesHasIngredient(db.Model):
@@ -219,7 +252,7 @@ class Ingredient(db.Model, BaseMixin):
     """
     __tablename__ = 'ingredients'
 
-    id = db.Column(db.INTEGER, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     calorie = db.Column(db.Float, nullable=False, server_default=db.text("'0'"))
     sugar = db.Column(db.Float, nullable=False, server_default=db.text("'0'"))
@@ -390,7 +423,6 @@ class User(db.Model, UserMixin, BaseMixin):
         """
         db_password_hash = self.pwdhash.encode('utf-8')
         if self.password_version == 'SHA256':
-
             if hashlib.sha256(password).hexdigest() == self.pwdhash:
                 # changing from sha256 to bcrypt
                 self.pwdhash = self.getPassword(password)
@@ -579,13 +611,6 @@ class Recipe(db.Model, BaseMixin):
 
     @property
     def totals(self):
-        # if self.type == "big":
-            # coef = float(self.diet.big_size / 100)
-        # else:
-            # coef = float(self.diet.small_size / 100)
-
-        # for ingredient in self.ingredients:
-            # ingredient.amount = float(math.floor(ingredient.loadAmount(self.id) * coef * 100000)) / 100000
 
         totals = type('', (), {})()
         totals.calorie = 0
@@ -594,12 +619,12 @@ class Recipe(db.Model, BaseMixin):
         totals.sugar = 0
         totals.amount = 0
 
-        for i in self.ingredients:
-            totals.calorie += i.amount * i.calorie
-            totals.protein += i.amount * i.protein
-            totals.fat += i.amount * i.fat
-            totals.sugar += i.amount * i.sugar
-            totals.amount += i.amount
+        for ingredient in self.ingredients:
+            totals.calorie += ingredient.amount * ingredient.calorie
+            totals.protein += ingredient.amount * ingredient.protein
+            totals.fat += ingredient.amount * ingredient.fat
+            totals.sugar += ingredient.amount * ingredient.sugar
+            totals.amount += ingredient.amount
 
         totals.calorie = math.floor(totals.calorie) / 100
         totals.protein = math.floor(totals.protein) / 100
@@ -623,7 +648,7 @@ class Recipe(db.Model, BaseMixin):
     def author(self):
         """[summary]
 
-        Returns User who created diet, in which this recipe is
+        Returns User who created diet in which this recipe is
 
         Returns:
             User -- User object

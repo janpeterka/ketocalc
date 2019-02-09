@@ -26,14 +26,14 @@ def shutdown():
 @errors_blueprint.app_errorhandler(404)
 def error404(error):
     # Missing page
-    application.logger.warning(error)
+    application.logger.info(error)
     return template('errors/err404.tpl')
 
 
 @errors_blueprint.errorhandler(405)
 def error405(error=None):
     # Action not allowed
-    application.logger.warning(error)
+    application.logger.info(error)
     return template('errors/wrongPage.tpl')
 
 

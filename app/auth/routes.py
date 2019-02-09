@@ -8,11 +8,13 @@ import datetime
 from flask import Blueprint
 from flask import render_template as template, request, redirect
 from flask import flash
+from flask import current_app as application
 
 from flask_login import login_user, logout_user, current_user
 
 from flask_dance.contrib.google import google
 from flask_dance.consumer import oauth_authorized
+
 
 from app import models
 
@@ -25,6 +27,7 @@ auth_blueprint = Blueprint('auth', __name__, template_folder='templates/auth/')
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
+
         if current_user.username != 'admin':
             return redirect('/wrongpage')
         return f(*args, **kwargs)
@@ -64,6 +67,7 @@ def oauthLogin(blueprint, token):
     if not user:
         user = User()
         user.username = username
+        user.password = None
         user.google_id = google_id
 
         try:
@@ -84,12 +88,13 @@ def doLogin(username=None, password=None, from_register=False, user=None):
         user = models.User.load(username, load_type="username")
     if user is not None and (user.google_id is not None or user.checkLogin(password)):
         login_user(user, remember=True)
-        user.last_logged_in = datetime.datetime.now()
-        try:
-            user.login_count += 1
-        except Exception:
-            user.login_count = 1
-        user.edit()
+        if application.config['APP_STATE'] == 'production':
+            user.last_logged_in = datetime.datetime.now()
+            try:
+                user.login_count += 1
+            except Exception:
+                user.login_count = 1
+            user.edit()
         if not from_register:
             flash('Byl jste úspěšně přihlášen.', 'success')
         return True

@@ -1,6 +1,6 @@
 {% extends "base.tpl" %}
 {% block title %}
-    Testování - {{ current_user.id}}
+    Testování - {{ version }}
 {% endblock %}
 
 {% block style %}
