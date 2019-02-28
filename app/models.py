@@ -619,7 +619,13 @@ class Recipe(db.Model, BaseMixin):
         totals.sugar = 0
         totals.amount = 0
 
+        if self.type == "big":
+            coef = float(self.diet.big_size / 100)
+        else:
+            coef = float(self.diet.small_size / 100)
+
         for ingredient in self.ingredients:
+            ingredient.amount = float(math.floor(ingredient.loadAmount(self.id) * coef * 100000)) / 100000
             totals.calorie += ingredient.amount * ingredient.calorie
             totals.protein += ingredient.amount * ingredient.protein
             totals.fat += ingredient.amount * ingredient.fat
