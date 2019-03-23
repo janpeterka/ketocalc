@@ -10,12 +10,14 @@
 			<h6>v2</h6>
 			<ul>
 				<li> v2.5 <i>1.2019</i>
-					<ul>všechno o kus lepší</ul>
-					<ul>přihlašování pomocí Google</ul>
-					<ul>energie u diet</ul>
-					<ul>konzistentnější popisky</ul>
-					<ul>spousta oprav</ul>
-					<ul>zveřejnění kódu</ul>
+					<ul>
+						<li>všechno o kus lepší</li>
+						<li>přihlašování pomocí Google</li>
+						<li>energie u diet</li>
+						<li>konzistentnější popisky</li>
+						<li>spousta oprav</li>
+						<li>zveřejnění kódu</li>
+					</ul>
 				</li>
 				<li> v2.4.2 <i>31.8.2018</i>
 					<ul>
