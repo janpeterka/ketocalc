@@ -14,7 +14,7 @@ from app.support import forms
 from app.models import Log
 
 from app.email import send_email
-from app.auth.routes import admin_required
+from app.auth import admin_required
 
 
 support_blueprint = Blueprint('support_blueprint', __name__)

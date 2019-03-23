@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # run by pyserver
-from functools import wraps
+
 import datetime
 
 from flask import Blueprint
@@ -21,17 +21,7 @@ from app import models
 from app.auth.forms import LoginForm, RegisterForm
 
 
-auth_blueprint = Blueprint('auth', __name__, template_folder='templates/auth/')
-
-
-def admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-
-        if current_user.username != 'admin':
-            return redirect('/wrongpage')
-        return f(*args, **kwargs)
-    return decorated_function
+auth_blueprint = Blueprint('auth', __name__, template_folder='templates/auth')
 
 
 @auth_blueprint.route('/login', methods=['GET', 'POST'])
@@ -56,7 +46,6 @@ def oauthLogin(blueprint, token):
     try:
         if blueprint.name == 'google':
             user_info = google.get("/oauth2/v2/userinfo").json()
-            print(user_info)
             username = user_info['email']
             google_id = user_info['id']
     except Exception as e:
