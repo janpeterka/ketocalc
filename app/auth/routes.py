@@ -27,7 +27,6 @@ auth_blueprint = Blueprint('auth', __name__, template_folder='templates/auth')
 @auth_blueprint.route('/login', methods=['GET', 'POST'])
 def showLogin():
     if current_user.is_authenticated:
-        print(current_user)
         return redirect('/dashboard')
     form = LoginForm(request.form)
     if request.method == 'GET':
@@ -63,14 +62,14 @@ def oauthLogin(blueprint, token):
         user.google_id = google_id
 
         try:
-            user.firstName = user_info['given_name']
+            user.first_name = user_info['given_name']
         except Exception:
-            user.firstName = "-"
+            user.first_name = "-"
 
         try:
-            user.lastName = user_info['family_name']
+            user.last_name = user_info['family_name']
         except Exception:
-            user.lastName = "-"
+            user.last_name = "-"
 
         doRegister(user)
 
@@ -117,8 +116,8 @@ def showRegister():
         user = models.User()
 
         user.username = form.username.data
-        user.firstName = form.first_name.data
-        user.lastName = form.last_name.data
+        user.first_name = form.first_name.data
+        user.last_name = form.last_name.data
         user.password = form.password.data
         user.pwdhash = user.getPassword(form.password.data.encode('utf-8'))
         user.password_version = 'bcrypt'

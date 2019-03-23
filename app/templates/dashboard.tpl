@@ -1,7 +1,7 @@
 {% extends "base.tpl" %}
 
 {% block title %}
-    Vítejte {{firstname}}
+    Vítejte {{first_name}}
 {% endblock %}
 
 {% block script %}
