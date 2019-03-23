@@ -8,6 +8,7 @@ from flask import abort
 from flask import current_app as application
 
 # from app.errors import bp as errors
+from app.auth import admin_required
 
 errors_blueprint = Blueprint('errors', __name__)
 
@@ -23,6 +24,24 @@ def shutdown():
     return template('errors/shutdown.tpl')
 
 
+@errors_blueprint.route('/err404')
+@admin_required
+def showError404():
+    return template('errors/err404.tpl')
+
+
+@errors_blueprint.route('/err405')
+@admin_required
+def showError405():
+    return template('errors/err405.tpl')
+
+
+@errors_blueprint.route('/err500')
+@admin_required
+def showError500():
+    return template('errors/err500.tpl')
+
+
 @errors_blueprint.app_errorhandler(404)
 def error404(error):
     # Missing page
@@ -34,7 +53,7 @@ def error404(error):
 def error405(error=None):
     # Action not allowed
     application.logger.info(error)
-    return template('errors/wrongPage.tpl')
+    return template('errors/err405.tpl')
 
 
 @errors_blueprint.errorhandler(500)
