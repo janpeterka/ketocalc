@@ -7,26 +7,54 @@
 {% endblock %}
 
 {% block script %}
+<style>
+    .ERROR{
+        background-color: red;
+    }
+
+    .WARNING{
+        background-color: orange;
+    }
+
+    .INFO{
+        background-color: white;
+    }
+
+    th{
+        padding-right:5em
+    }
+    td {
+        padding-right:5em
+    }
+</style>
 {% endblock %}
 
 {% block content %}
     {% include('navbar_empty.tpl') %}
     <div class="container">
         <div class="main">
-            <table>
-            <td class="col-2"></td>
+            <table class="log_table">
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Level</th>
+                    <th>Module</th>
+                    <th>Message</th>
+                    <th>URL</th>
+                    <th>Remote address</th>
+                </tr>
 
-            <td class="col-8">
                 {% for log in logs: %}
-                    <table>
-                        <th>{{ log }}</th>
-                    </table>
+                    <tr style="border: 1px solid black" class="{{ log.level }}">
+                        <td>{{ log.timestamp }}</td>
+                        <td>{{ log.level }} </td>
+                        <td>{{ log.module }}</td>
+                        <td>{{ log.msg }}</td>
+                        <td>{{ log.url }}</td>
+                        <td>{{ log.remote_addr }}</td>
+                    </tr>
                 {% endfor %}
-            </td>
 
-            <td class="col-2"></td>
             </table>
-        	
         </div>
     </div>
 {% endblock %}

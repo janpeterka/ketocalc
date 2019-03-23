@@ -134,6 +134,16 @@ class Log(db.Model, BaseMixin):
         logs = db.session.query(Log).filter(Log.level == level)
         return logs
 
+    @staticmethod
+    def load_all():
+        logs = db.session.query(Log).order_by(Log.timestamp.desc())
+        return logs
+
+    @staticmethod
+    def load_since(date='2019-01-01'):
+        logs = db.session.query(Log).filter(Log.timestamp > date).order_by(Log.timestamp.desc())
+        return logs
+
 
 class RecipesHasIngredient(db.Model):
     """Recipe-Ingredient connection class
