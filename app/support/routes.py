@@ -62,10 +62,10 @@ def showFeedback():
     from werkzeug.datastructures import CombinedMultiDict
     form = forms.FeedbackForm(CombinedMultiDict((request.files, request.form)))
     if request.method == 'GET':
-        return template('feedback.tpl', form=form)
+        return template('support/feedback.tpl', form=form)
     elif request.method == 'POST':
         if not form.validate_on_submit():
-            return template('feedback.tpl', form=form)
+            return template('support/feedback.tpl', form=form)
 
         attachments = []
         if form.feedback_file.data:
@@ -93,9 +93,9 @@ def showFeedback():
 @support_blueprint.route('/changelog')
 @login_required
 def showChangelog():
-    return template('changelog.tpl')
+    return template('support/changelog.tpl')
 
 
 @support_blueprint.route('/help')
 def showHelp():
-    return template('help.tpl')
+    return template('support/help.tpl')
