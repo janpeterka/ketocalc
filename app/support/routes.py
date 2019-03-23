@@ -11,6 +11,8 @@ from flask_login import login_required, current_user
 
 from app.support import forms
 
+from app.models import Log
+
 from app.email import send_email
 from app.auth.routes import admin_required
 
@@ -31,12 +33,12 @@ def testingPage():
 
 
 @support_blueprint.route('/logs')
+@support_blueprint.route('/logs/<date>')
 @support_blueprint.route('/logging')
 @login_required
 @admin_required
-def logPage():
-    with open('app/static/error.log', 'r') as f:
-        logs = f.readlines()
+def logPage(date='2019-01-01'):
+    logs = Log.load_since(date)
 
     return template('support/logs.tpl', logs=logs)
 
