@@ -357,8 +357,8 @@ class User(db.Model, UserMixin, BaseMixin):
         id {int} -- user id
         username {string} -- username (email)
         pwdhash {string} -- password hash (sha256 / bcrypt)
-        firstName {string} -- first name
-        lastName {string} -- last name
+        first_name {string} -- first name
+        last_name {string} -- last name
         password_version {string} -- password version (sha256 / bcrypt)
         diets {relationship} -- diets of user
     """
@@ -368,8 +368,8 @@ class User(db.Model, UserMixin, BaseMixin):
     google_id = db.Column(db.String(30), unique=True)
     username = db.Column(db.String(255), nullable=False, unique=True)
     pwdhash = db.Column(db.CHAR(64), nullable=True)
-    firstName = db.Column(db.String(255), nullable=False)
-    lastName = db.Column(db.String(255), nullable=False)
+    first_name = db.Column(db.String(255), nullable=False)
+    last_name = db.Column(db.String(255), nullable=False)
     password_version = db.Column(db.String(45), nullable=True)
 
     created = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)

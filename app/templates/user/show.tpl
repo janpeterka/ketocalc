@@ -84,10 +84,10 @@
                             {# <input type="text" class="form-control" value="{{ user.username }}" /> #}
                         </td>
                         <td>
-                            <input name="firstname" type="text" class="form-control" value="{{ user.firstName }}"/>
+                            <input name="firstname" type="text" class="form-control" value="{{ user.first_name }}"/>
                         </td>
                         <td>
-                            <input name="lastname" type="text" class="form-control" value="{{ user.lastName }}"/>
+                            <input name="lastname" type="text" class="form-control" value="{{ user.last_name }}"/>
                         </td>
                         <td>
                             <input type="submit" class="btn btn-warning" value="{{ texts.edit_confirm }}" />
@@ -123,8 +123,8 @@
                 </tr>
                 <tr>
                     <td>{{ user.username }}</td>
-                    <td>{{ user.firstName }}</td>
-                    <td>{{ user.lastName }}</td>
+                    <td>{{ user.first_name }}</td>
+                    <td>{{ user.last_name }}</td>
                 </tr>
              </table>
         </div>

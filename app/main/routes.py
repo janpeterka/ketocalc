@@ -46,7 +46,7 @@ def main():
 @login_required
 def showDashboard():
     user = models.User.load(current_user.id)
-    return template('dashboard.tpl', diets=user.activeDiets, firstname=user.firstName)
+    return template('dashboard.tpl', diets=user.activeDiets, first_name=user.first_name)
 
 
 @main_blueprint.route('/selectDietAJAX', methods=['POST'])
@@ -596,14 +596,15 @@ def showUser(page_type=None):
         user = models.User.load(current_user.id)
         if user is None:
             abort(404)
+
     except Exception:
         abort(500)
 
     if page_type is None:
         return template('user/show.tpl', user=user)
     elif page_type == 'edit' and request.method == 'POST':
-        user.firstName = request.form['firstname']
-        user.lastName = request.form['lastname']
+        user.first_name = request.form['firstname']
+        user.last_name = request.form['lastname']
         success = user.edit()
         if success is not None:
             flash('Uživatel byl upraven', 'success')
