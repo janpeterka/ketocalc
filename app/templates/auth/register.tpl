@@ -29,8 +29,19 @@
 {% block content %}
     {% include('navbar_login.tpl') %}
     <div class="container">
-        <div class="col-12">
+        <div class="col-10">
            <form action="/register" method="post" class="form-group form-control" accept-charset="UTF-8">
+                <div class="mx-auto" style="width: 200px;">
+                    <a href="{{ url_for('google.login')}}" >
+                        <button type="button" class="btn btn-social btn-google">
+                            <span class="fab fa-google"></span> {{ texts.register_google }}
+                        </button>
+                    </a>
+                    <p class="text-left" style="color:grey;">nebo</p>
+                </div>
+                
+                <hr class="col-xs-12">
+
                 {{ form.csrf_token }}
                 {% from "_formelement.tpl" import render_field %}
 
