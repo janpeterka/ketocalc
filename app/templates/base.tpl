@@ -34,8 +34,9 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     
 
-    <!-- Bootstrap Icons -->
+    <!-- Bootstrap Social -->
     <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='bootstrap-social.css') }}">
    
     <!-- My style -->
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
