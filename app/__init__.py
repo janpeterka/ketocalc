@@ -24,9 +24,15 @@ def create_app():
     # application.logger.addHandler(mail_handler)
 
     from app.config_logging import db_handler, gunicorn_logger
-    application.logger.addHandler(db_handler)
+    try:
+        application.logger.addHandler(db_handler)
+    except FileNotFoundError:
+        pass
 
-    application.logger.addHandler(gunicorn_logger)
+    try:
+        application.logger.addHandler(gunicorn_logger)
+    except FileNotFoundError:
+        pass
 
     # APPS
     mail.init_app(application)
