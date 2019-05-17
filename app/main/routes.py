@@ -82,13 +82,7 @@ def showNewDiet():
         return template('diet/new.tpl', form=form)
     elif request.method == 'POST':
         diet = models.Diet()
-        diet.name = form.name.data
-        diet.calorie = form.calorie.data
-        diet.sugar = form.sugar.data
-        diet.fat = form.fat.data
-        diet.protein = form.protein.data
-        diet.small_size = form.small_size.data
-        diet.big_size = form.big_size.data
+        form.populate_obj(diet)
         diet.active = 1
         diet.author = models.User.load(current_user.id)
 
@@ -517,11 +511,7 @@ def showNewIngredient():
         return template('ingredient/new.tpl', form=form)
     elif request.method == 'POST':
         ingredient = models.Ingredient()
-        ingredient.name = form.name.data
-        ingredient.calorie = form.calorie.data
-        ingredient.sugar = form.sugar.data
-        ingredient.fat = form.fat.data
-        ingredient.protein = form.protein.data
+        form.populate_obj(ingredient)
         ingredient.author = current_user.username
         if not form.validate_on_submit():
             return template('ingredient/new.tpl', form=form)

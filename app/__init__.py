@@ -23,8 +23,10 @@ def create_app():
     # from app.config_logging import mail_handler
     # application.logger.addHandler(mail_handler)
 
-    from app.config_logging import db_handler
+    from app.config_logging import db_handler, gunicorn_logger
     application.logger.addHandler(db_handler)
+
+    application.logger.addHandler(gunicorn_logger)
 
     # APPS
     mail.init_app(application)

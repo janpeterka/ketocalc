@@ -3,6 +3,7 @@
 
 # run by pyserver
 
+from functools import wraps
 import datetime
 
 from flask import Blueprint
@@ -21,7 +22,19 @@ from app import models
 from app.auth.forms import LoginForm, RegisterForm
 
 
-auth_blueprint = Blueprint('auth', __name__, template_folder='templates/auth')
+auth_blueprint = Blueprint('auth', __name__, template_folder='templates/auth/')
+
+PASSWORD_VERSION = 'bcrypt'
+
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+
+        if current_user.username != 'admin':
+            return redirect('/wrongpage')
+        return f(*args, **kwargs)
+    return decorated_function
 
 
 @auth_blueprint.route('/login', methods=['GET', 'POST'])
@@ -114,13 +127,13 @@ def showRegister():
             return template('auth/register.tpl', form=form)
 
         user = models.User()
-
-        user.username = form.username.data
-        user.first_name = form.first_name.data
-        user.last_name = form.last_name.data
-        user.password = form.password.data
+        form.populate_obj(user)
+        # user.username = form.username.data
+        # user.first_name = form.first_name.data
+        # user.last_name = form.last_name.data
+        # user.password = form.password.data
         user.pwdhash = user.getPassword(form.password.data.encode('utf-8'))
-        user.password_version = 'bcrypt'
+        user.password_version = PASSWORD_VERSION
 
         if doRegister(user):
             return redirect('/dashboard')

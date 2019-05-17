@@ -51,8 +51,11 @@ db_handler.setFormatter(RequestFormatter(
 
 
 # File error.log handler
-file_handler = logging.FileHandler('app/static/error.log')
+file_handler = logging.FileHandler('log/error.log')
 file_handler.setLevel(logging.WARNING)
 file_handler.setFormatter(RequestFormatter(
     '[%(asctime)s] %(remote_addr)s requested %(url)s: %(levelname)s in %(module)s: %(message)s'
 ))
+
+gunicorn_logger = logging.getLogger('gunicorn.error')
+gunicorn_logger.setLevel(logging.DEBUG)

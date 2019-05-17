@@ -3,5 +3,6 @@ __pycache__/
 migrations/
 todo/
 v_ketocalc/
-temp/
-*.pyc
+scripts/
+*.todo
+log/
