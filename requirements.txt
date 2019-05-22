@@ -29,3 +29,5 @@ unidecode
 pytest
 
 gunicorn
+
+python-dotenv
