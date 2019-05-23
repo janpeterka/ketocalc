@@ -23,7 +23,7 @@ def admin_required(f):
 
 def create_module(app, **kwargs):
     login.init_app(app)
-    login.login_view = 'auth.showLogin'
+    login.login_view = 'auth.show_login'
     login.login_message = 'Prosím přihlašte se.'
 
     google_blueprint = make_google_blueprint(

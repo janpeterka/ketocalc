@@ -31,7 +31,6 @@ PASSWORD_VERSION = 'bcrypt'
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-
         if current_user.username != 'admin':
             return redirect('/wrongpage')
         return f(*args, **kwargs)
@@ -39,7 +38,7 @@ def admin_required(f):
 
 
 @auth_blueprint.route('/login', methods=['GET', 'POST'])
-def showLogin():
+def show_login():
     if current_user.is_authenticated:
         return redirect('/dashboard')
     form = LoginForm(request.form)
@@ -48,14 +47,14 @@ def showLogin():
     elif request.method == 'POST':
         if not form.validate_on_submit():
             return template('auth/login.tpl', form=form)
-        if doLogin(username=form.username.data, password=form.password.data.encode('utf-8')):
+        if do_login(username=form.username.data, password=form.password.data.encode('utf-8')):
             return redirect('/dashboard')
         else:
             return template('auth/login.tpl', form=form)
 
 
 @oauth_authorized.connect
-def oauthLogin(blueprint, token):
+def oauth_login(blueprint, token):
     try:
         if blueprint.name == 'google':
             user_info = google.get("/oauth2/v2/userinfo").json()
@@ -64,12 +63,15 @@ def oauthLogin(blueprint, token):
     except Exception as e:
         application.logger.error(e)
 
-    user = models.User.load(username, load_type="username")
-    doLogin(user=user)
+    # Try to log with google_id
+    user = models.User.load(google_id, load_type="google_id")
     if not user:
-        user = models.User.load(google_id, load_type="google_id")
-        doLogin(user=user)
-    if not user:
+        user = models.User.load(username, load_type="username")
+
+    if user:
+        do_login(user=user)
+
+    else:
         user = models.User()
         user.username = username
         user.password = None
@@ -85,23 +87,40 @@ def oauthLogin(blueprint, token):
         except Exception:
             user.last_name = "-"
 
-        doRegister(user)
+        do_register(user, source="google_oauth")
 
 
-def doLogin(username=None, password=None, from_register=False, user=None):
-    if not user and username is not None:
+def do_login(username=None, password=None, from_register=False, user=None):
+    # get user if there is none
+    if user is None and username is None:
+        # This shouldn't happen
+        application.logger.error("Login error: user is None and username is None")
+        flash('Někde se stala chyba. Kontaktujte mě <a href="mailto:ketocalc.jmp@gmail.com">e-mailem</a>')
+        return False
+    elif user is None and username is not None:
+        # Load user by username
         user = models.User.load(username, load_type="username")
-    if user is not None and (user.google_id is not None or user.checkLogin(password)):
+    else:
+        # Already has user
+        pass
+
+    # log user, if either has google_id (going from oauth) or has valid password
+    # TODO this is not very nice
+    if user is not None and (user.google_id is not None or (password is not None and password != "" and user.checkLogin(password))):
         login_user(user, remember=True)
         if application.config['APP_STATE'] == 'production':
             user.last_logged_in = datetime.datetime.now()
             try:
                 user.login_count += 1
+            # in case login_count is NULL
+            # TODO which Exception is it?
             except Exception:
                 user.login_count = 1
             user.edit()
         if not from_register:
             flash('Byl jste úspěšně přihlášen.', 'success')
+        elif from_register:
+            flash('Byl jste úspěšně zaregistrován.', 'success')
         return True
     else:
         flash('Přihlášení se nezdařilo.', 'error')
@@ -109,43 +128,42 @@ def doLogin(username=None, password=None, from_register=False, user=None):
 
 
 @auth_blueprint.route('/logout')
-def doLogout():
+def do_logout():
     logout_user()
     flash('Byl jste úspěšně odhlášen.', 'info')
     return redirect('/login')
 
 
 @auth_blueprint.route('/register', methods=['GET', 'POST'])
-def showRegister():
+def show_register():
     form = RegisterForm(request.form)
     if request.method == 'GET':
         return template('auth/register.tpl', form=form)
     elif request.method == 'POST':
         if not form.validate_on_submit():
             return template('auth/register.tpl', form=form)
-        if not validateRegister(form.username.data):
+        if not validate_register(form.username.data):
             form.username.errors = ['Toto jméno nemůžete použít']
             return template('auth/register.tpl', form=form)
 
         user = models.User()
         form.populate_obj(user)
-        # user.username = form.username.data
-        # user.first_name = form.first_name.data
-        # user.last_name = form.last_name.data
-        # user.password = form.password.data
         user.pwdhash = user.getPassword(form.password.data.encode('utf-8'))
         user.password_version = PASSWORD_VERSION
 
-        if doRegister(user):
+        if do_register(user):
             return redirect('/dashboard')
         else:
             return template('auth/register.tpl', form=form)
 
 
-def doRegister(user):
+def do_register(user, source=None):
     if user.save() is not None:
-        doLogin(username=user.username, password=user.password.encode('utf-8'), from_register=True)
-        flash('Byl jste úspěšně zaregistrován.', 'success')
+        if source == "google_oauth":
+            do_login(user=user)
+        else:
+            do_login(username=user.username, password=user.password.encode(
+                'utf-8'), from_register=True)
         return True
     else:
         flash('Registrace neproběhla v pořádku', 'error')
@@ -153,10 +171,12 @@ def doRegister(user):
 
 
 @auth_blueprint.route('/registerValidate', methods=['POST'])
-def validateRegister(username):
+def validate_register(username):
     """[summary]
 
-    Tests for usename uniqueness
+    Tests for registration validity:
+        - unique username
+
 
     Decorators:
         auth_blueprint.route
