@@ -31,6 +31,7 @@ def create_module(app, **kwargs):
         client_secret=app.config.get('GOOGLE_CLIENT_SECRET'),
         scope=[
             "https://www.googleapis.com/auth/userinfo.email",
+            "https://www.googleapis.com/auth/userinfo.profile"
         ]
     )
 
