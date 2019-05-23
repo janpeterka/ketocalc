@@ -261,10 +261,8 @@ def calcRecipeAJAX(test_dataset=None):
 
         if hasattr(ing, 'min'):
             json_ingredient = {'id': ing.id, 'calorie': math.floor(ing.calorie * ing.amount * 100) / 100, 'name': ing.name, 'sugar': math.floor(ing.sugar * ing.amount * 100) / 100, 'fat': math.floor(ing.fat * ing.amount * 100) / 100, 'protein': math.floor(ing.protein * ing.amount * 100) / 100, 'amount': math.floor(ing.amount * 10000) / 100, 'main': ing.main, 'fixed': ing.fixed, 'min': ing.min, 'max': ing.max}  # wip
-            # json_ingredient = {'id': ing.id, }
         else:
             json_ingredient = {'id': ing.id, 'calorie': math.floor(ing.calorie * ing.amount * 100) / 100, 'name': ing.name, 'sugar': math.floor(ing.sugar * ing.amount * 100) / 100, 'fat': math.floor(ing.fat * ing.amount * 100) / 100, 'protein': math.floor(ing.protein * ing.amount * 100) / 100, 'amount': math.floor(ing.amount * 10000) / 100, 'main': ing.main, 'fixed': ing.fixed}  # wip
-            # json_ingredient = {'id': ing.id, }
 
         json_ingredients.append(json_ingredient)
 
@@ -280,8 +278,6 @@ def calcRecipeAJAX(test_dataset=None):
         totals.amount += ing.amount
         totals.calorie += ing.calorie
 
-        ing.expire()
-
     totals.calorie = math.floor(totals.calorie * 100) / 100
     totals.sugar = math.floor(totals.sugar * 100) / 100
     totals.fat = math.floor(totals.fat * 100) / 100
@@ -291,11 +287,17 @@ def calcRecipeAJAX(test_dataset=None):
     totals.ratio = math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
 
     if request.json['trial'] == 'True':
-        template_data = template('recipe/newreciperightform.tpl', ingredients=ingredients, totals=totals, diet=diet, trialrecipe=True)
+        trialrecipe = True
     else:
-        template_data = template('recipe/newreciperightform.tpl', ingredients=ingredients, totals=totals, diet=diet, trialrecipe=False)
+        trialrecipe = False
+
+    template_data = template('recipe/newreciperightform.tpl', ingredients=ingredients, totals=totals, diet=diet, trialrecipe=trialrecipe)
 
     result = {'template_data': str(template_data), 'ingredients': json_ingredients, 'diet': diet.json}
+
+    # reset ingredients (so they are not changed in db)
+    for ing in ingredients:
+        ing.expire()
 
     return jsonify(result)
 
