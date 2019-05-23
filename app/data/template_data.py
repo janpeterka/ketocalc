@@ -109,6 +109,6 @@ texts = {
 
 
 
-    "copyright": '&copy; Copyright since 2017 by Jan Peterka'
+    "copyright": '&copy; Copyright since 2017 by <a href="mailto:ketocalc.jmp@gmail.com">Jan Peterka</a>'
 
 }

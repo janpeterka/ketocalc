@@ -23,6 +23,7 @@
             {{ form.feedback_file(class_='form-control') }}
             {{ form.submit(class_='btn btn-primary col-sm-3') }}
         </form>
+        <span>nebo mi napište na <a href="mailto:ketocalc.jmp@gmail.com">e-mail</a></span>
     </div>
 {% endblock %}
 
