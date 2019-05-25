@@ -67,7 +67,7 @@
         </select>
 
         <span class="col-4">Dieta: {{ diet.name }}</span>
-        {% if not trialrecipe %}
+        {% if not is_trialrecipe %}
             <input type="submit" class="btn btn-primary col-4 " value="{{ texts.recipe_save }}" />
         {% else %}
             <input type="button" onclick='trialSaveConfirm()' class="btn btn-primary col-4 " value="{{ texts.recipe_save }}" />

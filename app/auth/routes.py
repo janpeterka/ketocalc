@@ -17,7 +17,6 @@ from flask_login import login_user, logout_user, current_user
 from flask_dance.contrib.google import google
 from flask_dance.consumer import oauth_authorized
 
-
 from app import models
 
 from app.auth.forms import LoginForm, RegisterForm
@@ -55,13 +54,17 @@ def show_login():
 
 @oauth_authorized.connect
 def oauth_login(blueprint, token):
-    try:
-        if blueprint.name == 'google':
+    # TODO rewrite for multiple oaths
+    if blueprint.name == 'google':
+        try:
             user_info = google.get("/oauth2/v2/userinfo").json()
             username = user_info['email']
             google_id = user_info['id']
-    except Exception as e:
-        application.logger.error(e)
+        except Exception as e:
+            application.logger.error(e)
+    else:
+        # not implemented
+        pass
 
     # Try to log with google_id
     user = models.User.load(google_id, load_type="google_id")

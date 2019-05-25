@@ -1,6 +1,6 @@
 {% extends "base.tpl" %}
 {% block title %}
-    {% if show %}
+    {% if not is_print %}
         {{ texts.recipe}}
     {% else %}
         {{ texts.recipe_print}} - {{ recipe.name }}
@@ -8,18 +8,7 @@
 {% endblock %}
     
 {% block style %}
-
-    {% if show %}
-        <style type="text/css" media="screen">
-            .edit__form{
-                display: none;
-            }
-
-            .editHideButton{
-                display: none;
-            }
-        </style>
-    {% else %}
+    {% if is_print %}
         <style type="text/css" media="screen">
             .totals {
                 background-color: var(--bgcolor_totals);
@@ -36,50 +25,15 @@
 {% endblock %}
 
 {% block script %}
-    {% if show %}
-	<script type="text/javascript">
-
-            $(document).on("click", ".editShowButton", function() {
-                $('.edit__form').show();
-                $('.data__table').hide();
-                $('.editShowButton').hide();
-                $('.editHideButton').show();
-            });
-
-            $(document).on("click", ".editHideButton", function() {
-                $('.edit__form').hide();
-                $('.data__table').show();
-                $('.editShowButton').show();
-                $('.editHideButton').hide();
-            });
-
-            $(document).on("click", ".printButton", function() {
-                var win = window.open(window.location.href + '/print');
-                win.focus();
-            });
-    
-        </script>
-        {% endif %}
 {% endblock %}
 
 {% block content %}
-    {% if show %}
+    {% if not is_print %}
         {% include('navbar.tpl') %}
     {% endif %}
     <div class="container">
         <div class="col-12">
-            {% if show %}
-            <form action="/recipe={{recipe.id}}/edit" class="form-inline edit__form" method="post" accept-charset="utf-8">
-                <input type="text" name="name" class="form-control col-4" value="{{ recipe.name }}"><br>
-                <select name="size" class="form-control">
-                    <option value="small">{{ texts.meal_size_small }} ({{ recipe.diet.small_size }})</option>
-                    <option value="big">{{ texts.meal_size_big }} ({{ recipe.diet.big_size }})</option>
-                </select>
-                <input type="submit" value="{{ texts.recipe_edit }}" class="btn btn-warning">
-            </form>
-            {% endif %}
-
-            {% if show %}
+            {% if not is_print %}
                 <span class="data__table">
             {% else %}
                 <span class="data__table d-print-table">
@@ -93,7 +47,8 @@
                 <h5>{{ texts.meal_size_big }} ({{ recipe.diet.big_size }}%)</h5> 
             {% endif %}
 
-        </span>
+                 </span>
+
             <table id="ingredients" class="table">
                 <tr>
                     <th>{{ texts.title }}</th>
@@ -107,9 +62,7 @@
 
                 {% for ingredient in recipe.ingredients: %}
                     <tr>
-                        <td>
-                            <a href="/ingredient={{ingredient.id}}">{{ ingredient.name }}</a>
-                        </td>
+                        <td><a href="/ingredient={{ingredient.id}}">{{ ingredient.name }}</a></td>
                         <td>{{ (ingredient.calorie / 100 * ingredient.amount)|round(2,'common') }}</td>
                         <td>{{ (ingredient.protein / 100 * ingredient.amount)|round(2,'common') }}</td>
                         <td>{{ (ingredient.fat / 100 * ingredient.amount)|round(2,'common') }}</td>
@@ -130,26 +83,24 @@
                 </tr>
             </table>
 
-            {% if show %}
+            {% if not is_print %}
             <div class="row">
                 <form action="/recipe={{recipe.id}}/remove" method="post" class="form col-5"  accept-charset="utf-8" onsubmit="return confirm('{{ texts.recipe_delete_confirm }}');">
-                    <button type="button" class="editShowButton btn btn-warning">{{ texts.edit }} {{ icons.edit }}</button>
-                    <button type="button" class="editHideButton btn btn-warning">{{ texts.edit_cancel }} {{ icons.edit }}</button>
-                    <button type="button" class="printButton btn">{{ texts.print }} {{ icons.print }}</button>
+                    <a class="btn btn-warning" href="/recipe={{recipe.id}}/edit">{{ texts.edit }} {{ icons.edit }}</a>
+                    <a class="btn btn-secondary" href="/recipe={{recipe.id}}/print" target="_blank" rel="noopener noreferrer">{{ texts.print }} {{ icons.print }}</a>
                     <button type="submit" class="btn btn-danger">{{ texts.recipe_delete}} {{ icons.delete }}</button>
                 </form>
 
-                <span class="col-2"></span>
+                {# <span class="col-2"></span> #}
 
-					<!--
-					<form action="/recipe={{recipe.id}}/export" class="form-inline col-5" method="post" accept-charset="utf-8">
+{# 				<form action="/recipe={{recipe.id}}/export" class="form-inline col-5" method="post" accept-charset="utf-8">
                     <input type="submit" class="btn btn-secondary" value="Exportovat recept do diety" />
                     <select name="diet" class="form-control">
                             {% for diet in diets %}
                                 <option value="{{ diet.id }}">{{ diet.name }}</option>
                             {% endfor %}
                     </select>
-                </form> -->
+                </form> #}
             </div>
             {% endif %}
         </div>

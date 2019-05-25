@@ -40,9 +40,10 @@ class SQLAlchemyHandler(logging.Handler):
 
 # DB handler
 db_handler = SQLAlchemyHandler()
-db_handler.setLevel(logging.INFO)
+db_handler.setLevel(logging.DEBUG)
 db_handler.setFormatter(RequestFormatter(
-    '[%(asctime)s] %(remote_addr)s requested %(url)s: %(levelname)s in %(module)s: %(message)s'
+    '[%(asctime)s] %(remote_addr)s requested \
+     %(url)s: %(levelname)s in %(module)s: %(message)s'
 ))
 
 # Mail handler
@@ -53,13 +54,14 @@ db_handler.setFormatter(RequestFormatter(
 #     subject='Application Error'
 # )
 
-
 # File error.log handler
-# file_handler = logging.FileHandler('log/error.log')
-# file_handler.setLevel(logging.WARNING)
+# file_handler = logging.FileHandler('tmp/error.log')
+# file_handler.setLevel(logging.DEBUG)
 # file_handler.setFormatter(RequestFormatter(
-#     '[%(asctime)s] %(remote_addr)s requested %(url)s: %(levelname)s in %(module)s: %(message)s'
+#     '[%(asctime)s] %(remote_addr)s requested \
+#      %(url)s: %(levelname)s in %(module)s: %(message)s'
 # ))
 
-# gunicorn_logger = logging.getLogger('gunicorn.error')
-# gunicorn_logger.setLevel(logging.DEBUG)
+# Gunicorn error logger
+gunicorn_logger = logging.getLogger('gunicorn.error')
+gunicorn_logger.setLevel(logging.DEBUG)

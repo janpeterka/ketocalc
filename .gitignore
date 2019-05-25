@@ -6,4 +6,5 @@ v_ketocalc/
 scripts/
 *.todo
 log/
+tmp/
 .*

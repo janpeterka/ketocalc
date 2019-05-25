@@ -190,7 +190,7 @@
                         data: JSON.stringify({
                             'ingredients' : prerecipe__ingredient_array,
                             'dietID' : $('.select-diet').val(),
-                            'trial' : '{{ trialrecipe|safe }}'
+                            'trial' : '{{ is_trialrecipe|safe }}'
                         }),
                         contentType: 'application/json;charset=UTF-8',
                         success: function(response){
@@ -401,7 +401,7 @@
 {% endblock %}
 
 {% block content %}
-    {% if not trialrecipe %}
+    {% if not is_trialrecipe %}
 	   {% include('navbar.tpl') %}
     {% else %}
         {% include('navbar_login.tpl')%}

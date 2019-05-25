@@ -381,7 +381,7 @@ class User(db.Model, UserMixin, BaseMixin):
     diets = db.relationship('Diet', secondary='users_has_diets', order_by='desc(Diet.active)')
 
     @staticmethod
-    def load(user_id, load_type="id"):
+    def load(user_identifier, load_type="id"):
         """Load User
 
         Load User by ID or username
@@ -393,11 +393,11 @@ class User(db.Model, UserMixin, BaseMixin):
             User -- SQLAlchemy object
         """
         if load_type == "id":
-            user = db.session.query(User).filter(User.id == user_id).first()
+            user = db.session.query(User).filter(User.id == user_identifier).first()
         elif load_type == "username":
-            user = db.session.query(User).filter(User.username == user_id).first()
+            user = db.session.query(User).filter(User.username == user_identifier).first()
         elif load_type == "google_id":
-            user = db.session.query(User).filter(User.google_id == user_id).first()
+            user = db.session.query(User).filter(User.google_id == user_identifier).first()
         else:
             return None
 
@@ -407,6 +407,7 @@ class User(db.Model, UserMixin, BaseMixin):
     def load_user(user_id):
         return db.session.query(User).filter(User.id == user_id).first()
 
+    # @staticmethod
     def getPassword(self, password):
         """Creates hash from password
 

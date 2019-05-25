@@ -13,9 +13,8 @@ from app.auth import admin_required
 errors_blueprint = Blueprint('errors', __name__)
 
 
-# ERROR
 @errors_blueprint.route('/wrongpage')
-def wrongPage():
+def show_wrongpage():
     abort(405)
 
 
@@ -24,21 +23,22 @@ def shutdown():
     return template('errors/shutdown.tpl')
 
 
+# REFACTOR only for testing
 @errors_blueprint.route('/err404')
 @admin_required
-def showError404():
+def show_error404():
     return template('errors/err404.tpl')
 
 
 @errors_blueprint.route('/err405')
 @admin_required
-def showError405():
+def show_error405():
     return template('errors/err405.tpl')
 
 
 @errors_blueprint.route('/err500')
 @admin_required
-def showError500():
+def show_error500():
     return template('errors/err500.tpl')
 
 
