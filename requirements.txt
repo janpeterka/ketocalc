@@ -27,6 +27,7 @@ sympy
 unidecode
 
 pytest
+pytest-flask
 
 gunicorn
 
