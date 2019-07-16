@@ -12,7 +12,7 @@ from flask import render_template as template, request, redirect
 from flask import flash
 from flask import current_app as application
 
-from flask_login import login_user, logout_user, current_user
+from flask_login import login_user, logout_user, current_user, login_required
 
 from flask_dance.contrib.google import google
 from flask_dance.consumer import oauth_authorized
@@ -64,7 +64,7 @@ def oauth_login(blueprint, token):
             application.logger.error(e)
     else:
         # not implemented
-        pass
+        return False
 
     # Try to log with google_id
     user = models.User.load(google_id, load_type="google_id")
@@ -109,7 +109,7 @@ def do_login(username=None, password=None, from_register=False, user=None):
 
     # log user, if either has google_id (going from oauth) or has valid password
     # TODO this is not very nice
-    if user is not None and (user.google_id is not None or (password is not None and password != "" and user.checkLogin(password))):
+    if user is not None and (user.google_id is not None or (password is not None and password != "" and user.check_login(password))):
         login_user(user, remember=True)
         if application.config['APP_STATE'] == 'production':
             user.last_logged_in = datetime.datetime.now()
@@ -130,10 +130,12 @@ def do_login(username=None, password=None, from_register=False, user=None):
         return False
 
 
+@login_required
 @auth_blueprint.route('/logout')
 def do_logout():
-    logout_user()
-    flash('Byl jste úspěšně odhlášen.', 'info')
+    if current_user.is_authenticated:
+        logout_user()
+        flash('Byl jste úspěšně odhlášen.', 'info')
     return redirect('/login')
 
 
@@ -151,7 +153,7 @@ def show_register():
 
         user = models.User()
         form.populate_obj(user)
-        user.pwdhash = user.getPassword(form.password.data.encode('utf-8'))
+        user.set_password_hash(form.password.data.encode('utf-8'))
         user.password_version = PASSWORD_VERSION
 
         if do_register(user):
@@ -161,7 +163,7 @@ def show_register():
 
 
 def do_register(user, source=None):
-    if user.save() is not None:
+    if user.save() is True:
         if source == "google_oauth":
             do_login(user=user)
         else:

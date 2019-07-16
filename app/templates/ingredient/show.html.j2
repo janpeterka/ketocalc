@@ -33,7 +33,7 @@
 
                 <form action="/ingredient={{ingredient.id}}/remove" onsubmit="return confirm('{{ texts.ingredient_delete_confirm }}');" method="post" accept-charset="utf-8">
                     <a class="btn btn-secondary" href="/ingredient={{ ingredient.id }}/edit">{{ texts.edit }} {{ icons.edit }}</a>
-                    {% if ingredient.used == False %}
+                    {% if ingredient.is_used == False %}
                         <button type="submit" class="btn btn-danger">{{ texts.ingredient_delete }} {{ icons.delete }}</button>
                     {% else %}
                         <button type="submit" class="btn btn-danger" disabled>{{ texts.delete_error }} {{ icons.delete }}</button>

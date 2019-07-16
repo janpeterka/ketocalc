@@ -7,7 +7,6 @@ from flask_login import current_user
 
 from flask_dance.contrib.google import make_google_blueprint
 
-from app.auth.routes import auth_blueprint
 
 login = LoginManager()
 
@@ -22,6 +21,7 @@ def admin_required(f):
 
 
 def create_module(app, **kwargs):
+    from app.auth.routes import auth_blueprint
     login.init_app(app)
     login.login_view = 'auth.show_login'
     login.login_message = 'Prosím přihlašte se.'

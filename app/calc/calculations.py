@@ -27,7 +27,7 @@ def calculateRecipe(ingredients, diet):
     """
     fixed_ingredients = []
     for i in range(len(ingredients)):
-        if ingredients[i].fixed is True:
+        if hasattr(ingredients[i], "fixed") and ingredients[i].fixed is True:
 
             diet.sugar -= ingredients[i].amount * ingredients[i].sugar
             diet.protein -= ingredients[i].amount * ingredients[i].protein
@@ -39,7 +39,7 @@ def calculateRecipe(ingredients, diet):
         ingredients.remove(ing)
 
     for i in range(len(ingredients)):
-        if ingredients[i].main is True:
+        if hasattr(ingredients[i], "fixed") and ingredients[i].main is True:
             mainIngredient = ingredients[i]
             ingredients.pop(i)
             ingredients.append(mainIngredient)

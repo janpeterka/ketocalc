@@ -88,7 +88,7 @@
                 </table>
                 <form action="/diet={{ diet.id }}/remove" method="post" accept-charset="utf-8">
                     <a href="/diet={{ diet.id }}/edit" class="btn btn-warning">{{ texts.edit }} {{ icons.edit }}</a>
-                    {% if diet.used == False %}
+                    {% if diet.is_used == False %}
                         <button type="submit" class="btn btn-danger">{{ texts.diet_delete }} {{ icons.delete }}</button>
                     {% else %}
                         <button type="submit" class="btn btn-danger" disabled>{{ texts.delete_error }} {{ icons.delete }}</button>

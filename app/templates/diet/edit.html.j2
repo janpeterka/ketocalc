@@ -83,28 +83,28 @@
                                 <input type="text" class="form-control" name="name" size="12" value="{{ diet.name }}" />
                             </td>
                             <td class="col-2">
-                                {% if diet.used == False %}
+                                {% if diet.is_used == False %}
                                     <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="calorie" value="{{ diet.calorie }}"/>
                                 {% else %}
                                     {{ diet.calorie }}
                                 {% endif %}
                             </td>
                             <td class="col-2">
-                                {% if diet.used == False %}
+                                {% if diet.is_used == False %}
                                     <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="protein" value="{{ diet.protein }}"/>
                                 {% else %}
                                     {{ diet.protein }}
                                 {% endif %}
                             </td>
                             <td class="col-2">
-                                {% if diet.used == False %}
+                                {% if diet.is_used == False %}
                                     <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="fat" value="{{ diet.fat }}"/>
                                 {% else %}
                                     {{ diet.fat }}
                                 {% endif %}
                             </td>
                             <td class="col-2">
-                                {% if diet.used == False %}
+                                {% if diet.is_used == False %}
                                     <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="sugar" value="{{ diet.sugar }}"/>
                                 {% else %}
                                     {{ diet.sugar }}
@@ -136,7 +136,7 @@
 
                 <form action="/diet={{ diet.id }}/remove" method="post" accept-charset="utf-8">
                     <a href="/diet={{ diet.id }}" class="btn btn-secondary">{{ texts.edit_cancel }} {{ icons.edit }}</a>
-                    {% if diet.used == False %}
+                    {% if diet.is_used == False %}
                         <button type="submit" class="btn btn-danger">{{ texts.diet_delete }} {{ icons.delete }}</button>
                     {% else %}
                         <button type="submit" class="btn btn-danger" disabled>{{ texts.delete_error }} {{ icons.delete }}</button>
