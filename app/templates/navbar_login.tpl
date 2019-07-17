@@ -18,4 +18,4 @@
     </ul>
   </div>
 </nav>
-{% include('flashing.tpl') %}
+{% include('_flashing.html.j2') %}

@@ -3,69 +3,20 @@
     {{ texts.diet }}: {{ diet.name }}
 {% endblock %}
 
-{% block style %}
-{#     <style type="text/css" media="screen">
-            .btn{
-                margin-top: 5px;
-            }
-            .edit__form{
-                display: none;
-            }
-
-            .editHideButton{
-                display: none;
-            }    
-
-            .loader {
-                display: none;
-                border: 16px solid var(--color_loader_outer); /* Light grey */
-                border-top: 16px solid var(--color_loader_inner); /* Blue */
-                border-radius: 50%;
-                width: 300px;
-                height: 300px;
-                animation: spin 2s linear infinite;
-                margin: 80px auto;
-            }
-
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }        
-        </style> #}
-{% endblock %}
+{% block style %}{% endblock %}
 
 {% block script %}
 {# 	<script type="text/javascript">
 
-            $(document).on("click", ".editShowButton", function() {
-                $('.edit__form').show();
-                $('.data__table').hide();
-                $('.editShowButton').hide();
-                $('.editHideButton').show();
-            });
-
-            $(document).on("click", ".editHideButton", function() {
-                $('.edit__form').hide();
-                $('.data__table').show();
-                $('.editShowButton').show();
-                $('.editHideButton').hide();
-            });
-
-            // $(document).on("click", ".export__button", function() {
-            //     $('.row').hide();
-            //     $('.loader').show();
-            // });
-
-            $(document).on("click", ".printButton", function() {
-                var win = window.open(window.location.href + '/print');
-                win.focus();
-            });
-    
-        </script> #}
+        // $(document).on("click", ".export__button", function() {
+        //     $('.row').hide();
+        //     $('.loader').show();
+        // });
+   
+    </script> #}
 {% endblock %}
 
 {% block content %}
-    {% include('navbar.tpl') %}
     <div class="container">
         <div class="row">
             <div class="col-8">

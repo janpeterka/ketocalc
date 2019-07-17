@@ -3,8 +3,7 @@
     Uživatel
 {% endblock %}
 
-{% block style %}
-{% endblock %}
+{% block style %}{% endblock %}
 
 {% block script %}
     <script type="text/javascript">
@@ -41,7 +40,6 @@
 {% endblock %}
 
 {% block content %}
-    {% include('navbar.tpl') %}
     <div class="container">
         <div class="col-12">
             <form action="/user/edit" class="form-group" method="post" accept-charset="utf-8">

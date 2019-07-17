@@ -16,7 +16,6 @@
     <script>
         function toggleVisibility() {
             var x = $('#password')
-            // console.log(x.attr("type"));
             if (x.attr("type") === "password"){
                 x.attr("type", 'text');
             } else {
@@ -27,7 +26,6 @@
 {% endblock %}
 
 {% block content %}
-    {% include('navbar_login.tpl') %}
     <div class="container">
         <div class="col-10">
            <form action="/register" method="post" class="form-group form-control" accept-charset="UTF-8">
@@ -43,7 +41,7 @@
                 <hr class="col-xs-12">
 
                 {{ form.csrf_token }}
-                {% from "_formelement.tpl" import render_field %}
+                {% from "_form_element.html.j2" import render_field %}
 
                 {{ render_field(form.username, "form-control") }}
                 {{ form.password.label }}

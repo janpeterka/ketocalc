@@ -7,8 +7,11 @@
 
 {% block script %}{% endblock %}
 
-{% block content %}
+{% block navbar %}
     {% include('navbar_empty.tpl') %}
+{% endblock %}
+
+{% block content %}
     <div class="container error_main">
 		<h1>Něco se nepovedlo.</h1>
         <a href="/feedback">Napište mi</a> a já to zkusím rychle opravit.

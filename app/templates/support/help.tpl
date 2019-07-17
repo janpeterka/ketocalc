@@ -6,7 +6,6 @@
 {% block style %}{% endblock %}
 
 {% block content %}
-    {% include('navbar_login.tpl') %}
     <div>
     	<h1>FAQ</h1>
     	<ul>

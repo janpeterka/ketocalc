@@ -5,43 +5,17 @@
 
 {% block style %}
     <style type="text/css" media="screen">
-            .btn{
-                margin-top: 5px;
-            }
-/*
-            .loader {
-                display: none;
-                border: 16px solid var(--color_loader_outer);
-                border-top: 16px solid var(--color_loader_inner);
-                border-radius: 50%;
-                width: 300px;
-                height: 300px;
-                animation: spin 2s linear infinite;
-                margin: 80px auto;
-            }
-
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }      
-*/
-        </style>
+        .btn{
+            margin-top: 5px;
+        }
+    </style>
 {% endblock %}
 
-{% block script %}
-{# 	<script type="text/javascript">
-            // $(document).on("click", ".export__button", function() {
-            //     $('.row').hide();
-            //     $('.loader').show();
-            // });
-    </script> #}
-{% endblock %}
+{% block script %}{% endblock %}
 
 {% block content %}
-    {% include('navbar.tpl') %}
     <div class="container">
         <div class="row">
-             
 
 {#                 <form action="/diet={{ diet.id }}/export" class="form-inline" method="post">
                     {% if recipes|length > 0 %}

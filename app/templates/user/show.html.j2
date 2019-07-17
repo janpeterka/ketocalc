@@ -10,7 +10,6 @@
 {% endblock %}
 
 {% block content %}
-    {% include('navbar.tpl') %}
     <div class="container">
         <div class="col-12">
             <table class="table">
@@ -28,9 +27,7 @@
         </div>
 
         <div>
-            {# <form> #}
-                <a href="/user/edit" class="btn btn-secondary">{{ texts.edit }} {{ icons.edit }}</a>
-            {# </form> #}
+            <a href="/user/edit" class="btn btn-secondary">{{ texts.edit }} {{ icons.edit }}</a>
         </div>
     </div>
 {% endblock %}

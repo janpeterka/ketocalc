@@ -7,8 +7,11 @@
 
 {% block script %}{% endblock %}
 
-{% block content %}
+{% block navbar %}
     {% include('navbar_empty.tpl') %}
+{% endblock %}
+
+{% block content %}
     <div class="container error_main">
     	<h1>Tato stránka neexistuje.</h1>
         Jste si jistí, že jste chtěli být tady? Pokud ano, <a href="/feedback">napište mi</a> a já to zkusím rychle opravit.

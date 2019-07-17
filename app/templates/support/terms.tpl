@@ -11,7 +11,6 @@
 {% endblock %}
 
 {% block content %}
-    {% include('navbar_empty.tpl') %}
     <div class="container">
         <div class="main">
             <table>

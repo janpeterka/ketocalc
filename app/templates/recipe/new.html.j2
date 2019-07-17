@@ -400,68 +400,72 @@
         </script>
 {% endblock %}
 
-{% block content %}
+{% block navbar %}
     {% if not is_trialrecipe %}
-	   {% include('navbar.tpl') %}
+        {% include('navbar.tpl') %}
     {% else %}
         {% include('navbar_login.tpl')%}
     {% endif %}
-        <div class="container-fluid container__main">
-            <div class="row">
-                <div class="prerecipe col-lg-6 col-md-12">
+{% endblock %}
 
-                    <div class="prerecipe__add-ingredient col-12">
-                        <form class="prerecipe__add-ingredient__form form-inline">
-                            <select class="prerecipe__add-ingredient__form__select form-control"
-                            name="prerecipe__add-ingredient__form__select" id="prerecipe__add-ingredient__form__select">
-                            {% for ingredient in ingredients: %}
-                                <option name='{{ingredient.name}}' value="{{ingredient.id}}">{{ingredient.name}}</option>
-                            {% endfor %}
-                            </select>
-                            <input type="submit" class="btn btn-primary add-ingredient-btn" value="Přidat surovinu" />
-                        </form>
-                    </div>
 
-                    <div class="prerecipe__selected-ingredients col-11">
-                        <form class="form-group">
-                            <table class="prerecipe__selected-ingredients__table table">
-                                <tr>
-                                    <th>{{ texts.title }}</th>
-                                    <th>{{ texts.energy_simple }}</th>
-                                    <th>{{ texts.protein_simple }}</th>
-                                    <th>{{ texts.fat_simple }}</th>
-                                    <th>{{ texts.sugar_simple}}</th>
-                                    <th></th>
-                                </tr>
-                            </table>
-                        </form>
-                    </div>
+{% block content %}
+    <div class="container-fluid container__main">
+        <div class="row">
+            <div class="prerecipe col-lg-6 col-md-12">
 
-                    <div class="prerecipe__calc col-12">
-                        <form class="prerecipe__calc__form form-inline">
-                            <label for="select-diet">{{ texts.diet_name}}</label>
-                            <select name="select-diet" class="select-diet form-control">
-                            {% for diet in diets: %}
-                                <option value="{{diet.id}}">{{ diet.name }}</option>
-                            {% endfor %}
-                            </select>
-                            <input type="submit" class=" prerecipe__calc__form__submit btn btn-primary" value="{{ texts.calc_amount }}" />
-                        </form>
-                    </div>
-
+                <div class="prerecipe__add-ingredient col-12">
+                    <form class="prerecipe__add-ingredient__form form-inline">
+                        <select class="prerecipe__add-ingredient__form__select form-control"
+                        name="prerecipe__add-ingredient__form__select" id="prerecipe__add-ingredient__form__select">
+                        {% for ingredient in ingredients: %}
+                            <option name='{{ingredient.name}}' value="{{ingredient.id}}">{{ingredient.name}}</option>
+                        {% endfor %}
+                        </select>
+                        <input type="submit" class="btn btn-primary add-ingredient-btn" value="Přidat surovinu" />
+                    </form>
                 </div>
 
-                <div class="recipe col-lg-6 col-md-12">
+                <div class="prerecipe__selected-ingredients col-11">
+                    <form class="form-group">
+                        <table class="prerecipe__selected-ingredients__table table">
+                            <tr>
+                                <th>{{ texts.title }}</th>
+                                <th>{{ texts.energy_simple }}</th>
+                                <th>{{ texts.protein_simple }}</th>
+                                <th>{{ texts.fat_simple }}</th>
+                                <th>{{ texts.sugar_simple}}</th>
+                                <th></th>
+                            </tr>
+                        </table>
+                    </form>
+                </div>
 
-                    <div class="recipe__loader"></div>
+                <div class="prerecipe__calc col-12">
+                    <form class="prerecipe__calc__form form-inline">
+                        <label for="select-diet">{{ texts.diet_name}}</label>
+                        <select name="select-diet" class="select-diet form-control">
+                        {% for diet in diets: %}
+                            <option value="{{diet.id}}">{{ diet.name }}</option>
+                        {% endfor %}
+                        </select>
+                        <input type="submit" class=" prerecipe__calc__form__submit btn btn-primary" value="{{ texts.calc_amount }}" />
+                    </form>
+                </div>
 
-                    <div class="recipe__wrong">
-                        <span>{{ texts.recipe_impossible}}</span>
-                    </div>
+            </div>
 
-                    <div class="recipe__right" id="recipe__right">
-                    </div>
+            <div class="recipe col-lg-6 col-md-12">
+
+                <div class="recipe__loader"></div>
+
+                <div class="recipe__wrong">
+                    <span>{{ texts.recipe_impossible}}</span>
+                </div>
+
+                <div class="recipe__right" id="recipe__right">
                 </div>
             </div>
         </div>
+    </div>
 {% endblock %}

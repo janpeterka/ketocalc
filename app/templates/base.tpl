@@ -59,6 +59,14 @@
     {% endblock head %}
 </head>
 <body>
+    {% block navbar %}
+        {% if current_user.is_authenticated %}
+            {% include('navbar.tpl') %}
+        {% else %}
+            {% include('navbar_login.tpl') %}
+        {% endif %}
+    {% endblock %}
+
     {% if config.APP_STATE == "development" %}
         <div style="background-color: #25e869; position:absolute; left: 2rem; top: 5rem; z-index: 2; border-radius: 0.4rem; padding: 0.3rem 0.5rem"><strong>DEV</strong></div>
     {% endif %}

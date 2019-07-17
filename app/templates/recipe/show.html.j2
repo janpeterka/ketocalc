@@ -24,13 +24,15 @@
     {% endif %}
 {% endblock %}
 
-{% block script %}
+{% block script %}{% endblock %}
+
+{% block navbar %}
+    {% if not is_print %}
+        {{ super() }}
+    {% endif %}
 {% endblock %}
 
 {% block content %}
-    {% if not is_print %}
-        {% include('navbar.tpl') %}
-    {% endif %}
     <div class="container">
         <div class="col-12">
             {% if not is_print %}
