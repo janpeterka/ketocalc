@@ -82,8 +82,6 @@ def show_diet(diet_id, page_type=None):
     diet = models.Diet.load(diet_id)
 
     if diet is None:
-        # TODO LOGGING
-        # application.logger.warning('{} not loaded'.format(diet_id))
         abort(404)
     elif diet.author.username != current_user.username:
         abort(405)
@@ -213,9 +211,12 @@ def calcRecipeAJAX(test_dataset=None):
     ingredients = []
     for json_i in json_ingredients:
         ingredient = models.Ingredient.load(json_i['id'])
-        ingredient.fixed = json_i['fixed']
-        ingredient.main = json_i['main']
-        ingredient.amount = float(json_i['amount']) / 100  # from grams per 100g
+        if 'fixed' in json_i:
+            ingredient.fixed = json_i['fixed']
+        if 'main' in json_i:
+            ingredient.main = json_i['main']
+        if 'amount' in json_i:
+            ingredient.amount = float(json_i['amount']) / 100  # from grams per 100g
         ingredients.append(ingredient)
 
     ingredients = calculations.calculateRecipe(ingredients, diet)
@@ -265,11 +266,6 @@ def calcRecipeAJAX(test_dataset=None):
 
     totals.ratio = math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
 
-    if request.json['trial'] == 'True':
-        is_trialrecipe = True
-    else:
-        is_trialrecipe = False
-
     template_data = template('recipe/_right_form.tpl', ingredients=ingredients, totals=totals, diet=diet, is_trialrecipe=is_trialrecipe)
 
     result = {'template_data': str(template_data), 'ingredients': json_ingredients, 'diet': diet.json}
@@ -278,12 +274,16 @@ def calcRecipeAJAX(test_dataset=None):
     for ing in ingredients:
         ing.expire()
 
-    return jsonify(result)
+    # TODO
+    if test_dataset is not None:
+        return {"sugar": float(totals.sugar), "fat": float(totals.fat), "protein": float(totals.protein)}
+    else:
+        return jsonify(result)
 
 
 @main_blueprint.route('/recalcRecipeAJAX', methods=['POST'])
 def recalcRecipeAJAX(test_dataset=None):
-    # TODO need to rewrite -> user calcRecipeAJAX instead
+    # TODO need to rewrite -> use calcRecipeAJAX instead
 
     # get data
     if test_dataset is None:

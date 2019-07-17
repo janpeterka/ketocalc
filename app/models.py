@@ -324,12 +324,13 @@ class Ingredient(db.Model, BaseMixin):
         else:
             return True
 
-    def set_fixed(self):
-        self.fixed = True
+    def set_fixed(self, value=True, amount=0):
+        self.fixed = value
+        self.amount = amount
         return self
 
-    def set_main(self):
-        self.main = True
+    def set_main(self, value=True):
+        self.main = value
         return self
 
 
@@ -371,6 +372,22 @@ class User(db.Model, UserMixin, BaseMixin):
     @staticmethod
     @login.user_loader
     def load(user_identifier, load_type="id"):
+        """[summary]
+
+        [description]
+
+        Decorators:
+            login.user_loader
+
+        Arguments:
+            user_identifier {[type]} -- [description]
+
+        Keyword Arguments:
+            load_type {str} -- [description] (default: {"id"})
+
+        Returns:
+            [type] -- [description]
+        """
         if load_type == "id":
             user = db.session.query(User).filter(User.id == user_identifier).first()
         elif load_type == "username":
