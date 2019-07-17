@@ -47,10 +47,10 @@
                 {{ form.password.label }}
                 <div class="form-row">
                     <div class="col-10">
-                        {{ form.password(class_="form-control") }} 
+                        {{ render_field(form.password(class_="form-control", label=False)) }} 
                     </div>
                     <div class="col-2">
-                        <input type="button" class="btn" onclick="toggleVisibility()" value="{{ texts.password_show}}">
+                        <input type="button" class="btn" onclick="toggleVisibility()" value="{{ texts.password_show }}">
                     </div>
                 </div>
 
@@ -63,7 +63,7 @@
                         {{ render_field(form.last_name, "form-control") }}
                     </div>
                 </div>
-                <!-- {{ form.recaptcha }} -->
+                {{ render_field(form.recaptcha) }}
                 {{ form.submit(class_='btn btn-primary')}}
 
                 <a class="col-sm-2" href="/login">{{ texts.login }}</a><br>

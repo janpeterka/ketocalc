@@ -20,8 +20,6 @@ TEST_VAR = os.environ.get('TEST_VAR')
 
 APP_STATE = os.environ.get('APP_STATE')  # production, dev, debug, shutdown
 
-# old
-# RECAPTCHA_SECRET = os.environ.get('RECAPTCHA_SECRET')
 # new
 RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_SECRET')
 RECAPTCHA_PUBLIC_KEY = '6LfFdWkUAAAAALQkac4_BJhv7W9Q3v11kDH62aO2'
