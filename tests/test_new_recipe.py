@@ -4,15 +4,11 @@ import json
 from app.main.routes import calculate_recipe_AJAX
 from app.models import Ingredient, Diet
 
-# def load_datasets_calc():
-    # datasets = []
 
+def load_datasets_calc():
+    datasets = []
 
-def test_calc(app, client):
-    url = "/calcRecipeAJAX"
-    # test calculate_recipe_AJAX (json dataset)
     # 4
-
     diet = Diet.load_by_name("3.5")
     ingredients = [
         Ingredient.load_by_name("Brambory skladované").set_main().json,
@@ -20,20 +16,8 @@ def test_calc(app, client):
         Ingredient.load_by_name("Máslo výběrové").json,
         Ingredient.load_by_name("Okurka salátová").json
     ]
-    test_dataset = {"ingredients": ingredients, "dietID": diet.id, "test": 'True'}
-
-    result = calculate_recipe_AJAX(test_dataset)
-
-    assert round(result['sugar']) == diet.sugar
-    assert round(result['fat']) == diet.fat
-    assert round(result['protein']) == diet.protein
-
-    response = client.post(url, json=test_dataset)
-    assert response == 200
-    assert response.json is not None
-    assert round(float(json.loads(response.json['totals'])['sugar'])) == diet.sugar
-    assert round(float(json.loads(response.json['totals'])['fat'])) == diet.fat
-    assert round(float(json.loads(response.json['totals'])['protein'])) == diet.protein
+    test_dataset = {"ingredients": ingredients, "dietID": diet.id, "test": 'True', "diet": diet.json, "none": "False"}
+    datasets.append(test_dataset)
 
     # 4 + fixed
     diet = Diet.load_by_name("3.5")
@@ -47,17 +31,8 @@ def test_calc(app, client):
         Ingredient.load_by_name("Cuketa").set_fixed(amount=30).set_main(False).json,
         Ingredient.load_by_name("Kurkuma").set_fixed(amount=0.2).set_main(False).json
     ]
-    test_dataset = {"ingredients": ingredients, "dietID": diet.id, "test": 'True'}
-
-    result = calculate_recipe_AJAX(test_dataset)
-
-    assert round(result['sugar']) == diet.sugar
-    assert round(result['fat']) == diet.fat
-    assert round(result['protein']) == diet.protein
-
-    response = client.post(url, json=test_dataset)
-    assert response == 200
-    assert response is not None
+    test_dataset = {"ingredients": ingredients, "dietID": diet.id, "test": 'True', "diet": diet.json, "none": "False"}
+    datasets.append(test_dataset)
 
     # too many / too few
     diet = Diet.load_by_name("3.5")
@@ -65,14 +40,8 @@ def test_calc(app, client):
         Ingredient.load_by_name("Brambory skladované").json,
         Ingredient.load_by_name("Filé z Aljašky").json
     ]
-    test_dataset = {"ingredients": ingredients, "dietID": diet.id, "test": 'True'}
-
-    result = calculate_recipe_AJAX(test_dataset)
-    assert result == 'False'
-
-    response = client.post(url, json=test_dataset)
-    assert response == 200
-    assert response.json is None
+    test_dataset = {"ingredients": ingredients, "dietID": diet.id, "test": 'True', "diet": diet.json, "none": "True"}
+    datasets.append(test_dataset)
 
     # with no solution
     diet = Diet.load_by_name("3.5")
@@ -82,14 +51,31 @@ def test_calc(app, client):
         Ingredient.load_by_name("Okurka salátová").json,
         Ingredient.load_by_name("Kurkuma").json
     ]
-    test_dataset = {"ingredients": ingredients, "dietID": diet.id, "test": 'True'}
+    test_dataset = {"ingredients": ingredients, "dietID": diet.id, "test": 'True', "diet": diet.json, "none": "True"}
+    datasets.append(test_dataset)
 
-    result = calculate_recipe_AJAX(test_dataset)
-    assert result == 'False'
+    return datasets
 
-    response = client.post(url, json=test_dataset)
-    assert response == 200
-    assert response.json is None
+
+def test_calc(app, client):
+    url = "/calcRecipeAJAX"
+    # test calculate_recipe_AJAX (json dataset)
+
+    datasets = load_datasets_calc()
+
+    for dataset in datasets:
+        response = client.post(url, json=dataset)
+
+        assert response == 200
+        if dataset['none'] == "True":
+            assert response.json is None
+        else:
+            assert response.json is not None
+            assert round(float(json.loads(response.json['totals'])['sugar'])) == dataset['diet']['sugar']
+            assert round(float(json.loads(response.json['totals'])['fat'])) == dataset['diet']['fat']
+            assert round(float(json.loads(response.json['totals'])['protein'])) == dataset['diet']['protein']
+
+    print("tested ", len(datasets), "datasets")
 
 
 # def test_recalc():
