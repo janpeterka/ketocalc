@@ -174,7 +174,7 @@ def add_ingredient_to_recipe_AJAX():
 
 
 @main_blueprint.route('/calcRecipeAJAX', methods=['POST'])
-def calcRecipeAJAX(test_dataset=None):
+def calculate_recipe_AJAX(test_dataset=None):
     """[summary]
 
     [description]
@@ -195,13 +195,13 @@ def calcRecipeAJAX(test_dataset=None):
     if test_dataset is None:
         json_ingredients = request.json['ingredients']
         diet = models.Diet.load(request.json['dietID'])
-        if request.json['trial'] == 'True':
+        if 'trial' in request.json and request.json['trial'] == 'True':
             is_trialrecipe = True
         else:
             is_trialrecipe = False
     else:
         json_ingredients = test_dataset['ingredients']
-        diet = models.Diet.load(test_dataset['diet_id'])
+        diet = models.Diet.load(test_dataset['dietID'])
         is_trialrecipe = False
     # end testing
 
@@ -237,15 +237,6 @@ def calcRecipeAJAX(test_dataset=None):
         if ing.amount < 0:
             return 'False'
 
-        if hasattr(ing, 'min'):
-            json_ingredient = {'id': ing.id, 'calorie': math.floor(ing.calorie * ing.amount * 100) / 100, 'name': ing.name, 'sugar': math.floor(ing.sugar * ing.amount * 100) / 100, 'fat': math.floor(
-                ing.fat * ing.amount * 100) / 100, 'protein': math.floor(ing.protein * ing.amount * 100) / 100, 'amount': math.floor(ing.amount * 10000) / 100, 'main': ing.main, 'fixed': ing.fixed, 'min': ing.min, 'max': ing.max}  # wip
-        else:
-            json_ingredient = {'id': ing.id, 'calorie': math.floor(ing.calorie * ing.amount * 100) / 100, 'name': ing.name, 'sugar': math.floor(ing.sugar * ing.amount * 100) / 100, 'fat': math.floor(
-                ing.fat * ing.amount * 100) / 100, 'protein': math.floor(ing.protein * ing.amount * 100) / 100, 'amount': math.floor(ing.amount * 10000) / 100, 'main': ing.main, 'fixed': ing.fixed}  # wip
-
-        json_ingredients.append(json_ingredient)
-
         ing.calorie = math.floor(ing.calorie * ing.amount * 100) / 100
         ing.fat = math.floor(ing.fat * ing.amount * 100) / 100
         ing.sugar = math.floor(ing.sugar * ing.amount * 100) / 100
@@ -258,6 +249,8 @@ def calcRecipeAJAX(test_dataset=None):
         totals.amount += ing.amount
         totals.calorie += ing.calorie
 
+        json_ingredients.append(ing.json)
+
     totals.calorie = math.floor(totals.calorie * 100) / 100
     totals.sugar = math.floor(totals.sugar * 100) / 100
     totals.fat = math.floor(totals.fat * 100) / 100
@@ -268,7 +261,9 @@ def calcRecipeAJAX(test_dataset=None):
 
     template_data = template('recipe/_right_form.tpl', ingredients=ingredients, totals=totals, diet=diet, is_trialrecipe=is_trialrecipe)
 
-    result = {'template_data': str(template_data), 'ingredients': json_ingredients, 'diet': diet.json}
+    # result = {'template_data': str(template_data), 'ingredients': json_ingredients, 'diet': diet.json}
+    import json
+    result = {'template_data': str(template_data), 'totals': json.dumps(totals.__dict__), 'ingredients': json_ingredients, 'diet': diet.json}
 
     # reset ingredients (so they are not changed in db)
     for ing in ingredients:
