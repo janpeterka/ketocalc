@@ -9,7 +9,7 @@ import numpy
 # import pdfkit
 
 # import requests
-# import json
+import json
 
 
 from flask import Blueprint
@@ -71,7 +71,7 @@ def show_new_diet():
             flash('Nepodařilo se vytvořit dietu', 'error')
             return template('diet/new.html.j2', form=form)
 
-    return template('diet/new.html.j2')
+    return template('diet/new.html.j2', form=form)
 
 
 # SHOW DIET PAGE
@@ -82,8 +82,6 @@ def show_diet(diet_id, page_type=None):
     diet = models.Diet.load(diet_id)
 
     if diet is None:
-        # TODO LOGGING
-        # application.logger.warning('{} not loaded'.format(diet_id))
         abort(404)
     elif diet.author.username != current_user.username:
         abort(405)
@@ -176,36 +174,14 @@ def add_ingredient_to_recipe_AJAX():
 
 
 @main_blueprint.route('/calcRecipeAJAX', methods=['POST'])
-def calcRecipeAJAX(test_dataset=None):
-    """[summary]
+def calculate_recipe_AJAX():
 
-    [description]
-
-    Decorators:
-        application.route
-
-    Keyword Arguments:
-        test_dataset {array} -- array of json ingredients (default: {None})
-            ingredients
-            diet_id
-
-    Returns:
-        [type] -- [description]
-    """
-
-    # testing
-    if test_dataset is None:
-        json_ingredients = request.json['ingredients']
-        diet = models.Diet.load(request.json['dietID'])
-        if request.json['trial'] == 'True':
-            is_trialrecipe = True
-        else:
-            is_trialrecipe = False
+    json_ingredients = request.json['ingredients']
+    diet = models.Diet.load(request.json['dietID'])
+    if 'trial' in request.json and request.json['trial'] == 'True':
+        is_trialrecipe = True
     else:
-        json_ingredients = test_dataset['ingredients']
-        diet = models.Diet.load(test_dataset['diet_id'])
         is_trialrecipe = False
-    # end testing
 
     if diet is None:
         return 'False'
@@ -213,9 +189,12 @@ def calcRecipeAJAX(test_dataset=None):
     ingredients = []
     for json_i in json_ingredients:
         ingredient = models.Ingredient.load(json_i['id'])
-        ingredient.fixed = json_i['fixed']
-        ingredient.main = json_i['main']
-        ingredient.amount = float(json_i['amount']) / 100  # from grams per 100g
+        if 'fixed' in json_i:
+            ingredient.fixed = json_i['fixed']
+        if 'main' in json_i:
+            ingredient.main = json_i['main']
+        if 'amount' in json_i:
+            ingredient.amount = float(json_i['amount']) / 100  # from grams per 100g
         ingredients.append(ingredient)
 
     ingredients = calculations.calculateRecipe(ingredients, diet)
@@ -236,20 +215,11 @@ def calcRecipeAJAX(test_dataset=None):
         if ing.amount < 0:
             return 'False'
 
-        if hasattr(ing, 'min'):
-            json_ingredient = {'id': ing.id, 'calorie': math.floor(ing.calorie * ing.amount * 100) / 100, 'name': ing.name, 'sugar': math.floor(ing.sugar * ing.amount * 100) / 100, 'fat': math.floor(
-                ing.fat * ing.amount * 100) / 100, 'protein': math.floor(ing.protein * ing.amount * 100) / 100, 'amount': math.floor(ing.amount * 10000) / 100, 'main': ing.main, 'fixed': ing.fixed, 'min': ing.min, 'max': ing.max}  # wip
-        else:
-            json_ingredient = {'id': ing.id, 'calorie': math.floor(ing.calorie * ing.amount * 100) / 100, 'name': ing.name, 'sugar': math.floor(ing.sugar * ing.amount * 100) / 100, 'fat': math.floor(
-                ing.fat * ing.amount * 100) / 100, 'protein': math.floor(ing.protein * ing.amount * 100) / 100, 'amount': math.floor(ing.amount * 10000) / 100, 'main': ing.main, 'fixed': ing.fixed}  # wip
-
-        json_ingredients.append(json_ingredient)
-
-        ing.calorie = math.floor(ing.calorie * ing.amount * 100) / 100
-        ing.fat = math.floor(ing.fat * ing.amount * 100) / 100
-        ing.sugar = math.floor(ing.sugar * ing.amount * 100) / 100
-        ing.protein = math.floor(ing.protein * ing.amount * 100) / 100
-        ing.amount = math.floor(ing.amount * 10000) / 100
+        ing.calorie = round(ing.calorie * ing.amount, 2)
+        ing.fat = round(ing.fat * ing.amount, 2)
+        ing.sugar = round(ing.sugar * ing.amount, 2)
+        ing.protein = round(ing.protein * ing.amount, 2)
+        ing.amount = round(ing.amount * 100, 2)
 
         totals.sugar += ing.sugar
         totals.fat += ing.fat
@@ -257,22 +227,18 @@ def calcRecipeAJAX(test_dataset=None):
         totals.amount += ing.amount
         totals.calorie += ing.calorie
 
-    totals.calorie = math.floor(totals.calorie * 100) / 100
-    totals.sugar = math.floor(totals.sugar * 100) / 100
-    totals.fat = math.floor(totals.fat * 100) / 100
-    totals.protein = math.floor(totals.protein * 100) / 100
-    totals.amount = math.floor(totals.amount * 100) / 100
+        json_ingredients.append(ing.json)
 
-    totals.ratio = math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
-
-    if request.json['trial'] == 'True':
-        is_trialrecipe = True
-    else:
-        is_trialrecipe = False
+    totals.calorie = round(totals.calorie, 2)
+    totals.sugar = round(totals.sugar, 2)
+    totals.fat = round(totals.fat, 2)
+    totals.protein = round(totals.protein, 2)
+    totals.amount = round(totals.amount, 2)
+    totals.ratio = round((totals.fat / (totals.protein + totals.sugar)), 2)
 
     template_data = template('recipe/_right_form.tpl', ingredients=ingredients, totals=totals, diet=diet, is_trialrecipe=is_trialrecipe)
 
-    result = {'template_data': str(template_data), 'ingredients': json_ingredients, 'diet': diet.json}
+    result = {'template_data': str(template_data), 'totals': json.dumps(totals.__dict__), 'ingredients': json_ingredients, 'diet': diet.json}
 
     # reset ingredients (so they are not changed in db)
     for ing in ingredients:
@@ -282,16 +248,11 @@ def calcRecipeAJAX(test_dataset=None):
 
 
 @main_blueprint.route('/recalcRecipeAJAX', methods=['POST'])
-def recalcRecipeAJAX(test_dataset=None):
-    # TODO need to rewrite -> user calcRecipeAJAX instead
+def recalcRecipeAJAX():
+    # TODO need to rewrite -> use calcRecipeAJAX instead
 
-    # get data
-    if test_dataset is None:
-        json_ingredients = request.json['ingredients']
-        diet = models.Diet.load(request.json['dietID'])
-    else:
-        json_ingredients = test_dataset['ingredients']
-        diet = models.Diet.load(test_dataset['diet_id'])
+    json_ingredients = request.json['ingredients']
+    diet = models.Diet.load(request.json['dietID'])
 
     ingredients = []
     for json_ingredient in json_ingredients:
@@ -417,15 +378,8 @@ def saveRecipeAJAX():
 @main_blueprint.route('/recipe=<int:recipe_id>/<page_type>', methods=['POST', 'GET'])
 @login_required
 def show_recipe(recipe_id, page_type=None):
-    try:
-        recipe = models.Recipe.load(recipe_id)
-        if recipe is None:
-            # TODO
-            # application.logger.warning('recipe {} not loaded'.format(recipe_id))
-            return abort(404)
-    except AttributeError as e:
-        # TODO
-        # application.logger.warning('recipe {} not loaded: {}'.format(recipe_id, e))
+    recipe = models.Recipe.load(recipe_id)
+    if recipe is None:
         return abort(404)
 
     if current_user.username != recipe.author.username:
@@ -508,14 +462,9 @@ def show_new_ingredient():
 @main_blueprint.route('/ingredient=<int:ingredient_id>/<page_type>', methods=['POST', 'GET'])
 @login_required
 def show_ingredient(ingredient_id, page_type=None):
-    try:
-        ingredient = models.Ingredient.load(ingredient_id)
-        if ingredient is None:
-            # application.logger.warning('ingredient {} not loaded'.format(ingredient_id))
-            abort(404)
-    except Exception as e:
-        # application.logger.error(e)
-        abort(500)
+    ingredient = models.Ingredient.load(ingredient_id)
+    if ingredient is None:
+        abort(404)
 
     if current_user.username != ingredient.author:
         return redirect('/wrongpage')

@@ -163,34 +163,30 @@ def show_register():
 
 
 def do_register(user, source=None):
-    if user.save() is True:
+    if not validate_register(user.username):
+        # user with same username
+        flash('Toto uživatelské jméno nemůžete použít', 'error')
+        return False
+    elif user.save() is True:
         if source == "google_oauth":
             do_login(user=user)
         else:
-            do_login(username=user.username, password=user.password.encode(
-                'utf-8'), from_register=True)
+            do_login(username=user.username, password=user.password.encode('utf-8'), from_register=True)
         return True
     else:
         flash('Registrace neproběhla v pořádku', 'error')
         return False
 
 
-@auth_blueprint.route('/registerValidate', methods=['POST'])
 def validate_register(username):
-    """[summary]
-
+    """
     Tests for registration validity:
         - unique username
 
-
-    Decorators:
-        auth_blueprint.route
-
     Arguments:
-        username {[type]} -- [description]
-
+        username {string}
     Returns:
-        bool -- [description]
+        bool
     """
     if models.User.load(username, load_type="username") is not None:
         return False

@@ -39,7 +39,7 @@ def calculateRecipe(ingredients, diet):
         ingredients.remove(ing)
 
     for i in range(len(ingredients)):
-        if hasattr(ingredients[i], "fixed") and ingredients[i].main is True:
+        if hasattr(ingredients[i], "main") and ingredients[i].main is True:
             mainIngredient = ingredients[i]
             ingredients.pop(i)
             ingredients.append(mainIngredient)
