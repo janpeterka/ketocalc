@@ -1,4 +1,4 @@
-{% extends "base.tpl" %}
+{% extends "base.html.j2" %}
 {% block title %}
     Tady nemáte co pohledávat
 {% endblock %}
