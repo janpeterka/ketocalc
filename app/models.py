@@ -15,6 +15,8 @@ from flask_login import UserMixin
 from app import db
 from app.auth import login
 
+from sqlalchemy.exc import DatabaseError
+
 
 t_diets_has_recipes = db.Table(
     'diets_has_recipes',
@@ -42,6 +44,7 @@ class BaseMixin(object):
             db.session.commit()
             return True
         except Exception as e:
+            db.session.rollback()
             application.logger.error("Edit error: {}".format(e))
             return False
 
@@ -54,11 +57,12 @@ class BaseMixin(object):
         try:
             db.session.add(self)
             db.session.commit()
-            try:
-                return self.id
-            except Exception:
+            if self.id is not None:
                 return True
-        except Exception as e:
+            else:
+                return False
+        except DatabaseError as e:
+            db.session.rollback()
             application.logger.error("Save error: {}".format(e))
             return False
 
@@ -69,7 +73,8 @@ class BaseMixin(object):
             db.session.delete(self)
             db.session.commit()
             return True
-        except Exception as e:
+        except DatabaseError as e:
+            db.session.rollback()
             application.logger.error("Remove error: {}".format(e))
             return False
 
@@ -83,6 +88,7 @@ class BaseMixin(object):
             db.session.expire(self)
             return True
         except Exception as e:
+            db.session.rollback()
             application.logger.error("Expire error: {}".format(e))
             return False
 
@@ -104,8 +110,18 @@ class BaseMixin(object):
             db.session.refresh(self)
             return True
         except Exception as e:
-            print("Refresh error: {}".format(e))
+            db.session.rollback()
+            application.logger.error("Refresh error: {}".format(e))
             return False
+
+    @property
+    def json(self):
+        attributes = []
+        for attr in self.__dict__.keys():
+            if not attr.startswith('_'):
+                attributes.append(attr)
+
+        return {attr: getattr(self, attr) for attr in attributes}
 
 
 # class LogType(db.Model):
@@ -122,16 +138,26 @@ class Log(db.Model, BaseMixin):
 
     log_id = db.Column(db.Integer, primary_key=True)
     logger = db.Column(db.String(255))
-    level = db.Column(db.String(255), nullable=False, index=True)
-    msg = db.Column(db.String(255), nullable=False)
-    url = db.Column(db.String(255), nullable=False)
-    remote_addr = db.Column(db.String(255), nullable=False)
-    module = db.Column(db.String(255), nullable=False)
+    level = db.Column(db.String(255), index=True)
+    msg = db.Column(db.Text)
+    url = db.Column(db.String(255))
+    remote_addr = db.Column(db.String(255))
+    module = db.Column(db.String(255))
     timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
 
     @staticmethod
     def load_by_level(level):
         logs = db.session.query(Log).filter(Log.level == level)
+        return logs
+
+    @staticmethod
+    def load_all():
+        logs = db.session.query(Log).order_by(Log.timestamp.desc())
+        return logs
+
+    @staticmethod
+    def load_since(date='2019-01-01'):
+        logs = db.session.query(Log).filter(Log.timestamp > date).order_by(Log.timestamp.desc())
         return logs
 
 
@@ -197,34 +223,16 @@ class Diet(db.Model, BaseMixin):
 
     @staticmethod
     def load(diet_id):
-        """Load Diet object by ID
-
-        Arguments:
-            diet_id {int} -- object ID in database
-
-        Returns:
-            Diet -- SQLAlchemy Diet object
-        """
         diet = db.session.query(Diet).filter(Diet.id == diet_id).first()
         return diet
 
-    @property
-    def json(self):
-        """returns Diet object as JSON
-
-        Returns:
-            json -- Diet data
-        """
-        return {'id': self.id, 'name': self.name, 'sugar': self.sugar, 'fat': self.fat,
-                'protein': self.protein, 'small_size': self.small_size, 'big_size': self.big_size}
+    @staticmethod
+    def load_by_name(diet_name):
+        diet = db.session.query(Diet).filter(Diet.name == diet_name).first()
+        return diet
 
     @property
-    def used(self):
-        """Is Diet used in Recipe?
-
-        Returns:
-            bool --
-        """
+    def is_used(self):
         if len(self.recipes) == 0:
             return False
         else:
@@ -268,21 +276,16 @@ class Ingredient(db.Model, BaseMixin):
 
     @staticmethod
     def load(ingredient_id):
-        """Load Ingredient object by ID
-
-        SQLAlchemy class
-
-        Arguments:
-            ingredient_id {int} -- object ID in database
-
-        Returns:
-            Ingredient -- SQLAlchemy Ingredient object
-        """
         ingredient = db.session.query(Ingredient).filter(Ingredient.id == ingredient_id).first()
         return ingredient
 
     @staticmethod
-    def loadAllByAuthor(username, ordered=True):
+    def load_by_name(ingredient_name):
+        ingredient = db.session.query(Ingredient).filter(Ingredient.name == ingredient_name).first()
+        return ingredient
+
+    @staticmethod
+    def load_all_by_author(username, ordered=True):
         """Load Ingredient objects by author
 
         used for loading all ingredients for user
@@ -297,11 +300,11 @@ class Ingredient(db.Model, BaseMixin):
             list -- list of Ingredient objects
         """
         ingredients = db.session.query(Ingredient).filter(Ingredient.author == username).all()
-        if ordered:
+        if ordered is True:
             ingredients.sort(key=lambda x: unidecode.unidecode(x.name.lower()), reverse=False)
         return ingredients
 
-    def loadAmount(self, recipe_id):
+    def load_amount_by_recipe(self, recipe_id):
         """Load amount of Ingredient in Recipe
 
         Arguments:
@@ -310,29 +313,25 @@ class Ingredient(db.Model, BaseMixin):
         Returns:
             int -- amount
         """
-        rhi = db.session.query(RecipesHasIngredient).filter(RecipesHasIngredient.recipes_id == recipe_id).filter(RecipesHasIngredient.ingredients_id == self.id).first()
+        rhi = db.session.query(RecipesHasIngredient).filter(RecipesHasIngredient.recipes_id == recipe_id).filter(
+            RecipesHasIngredient.ingredients_id == self.id).first()
         return rhi.amount
 
     @property
-    def json(self):
-        """returns Diet object as JSON
-
-        Returns:
-            json -- Diet data
-        """
-        return {'id': self.id, 'name': self.name, 'calorie': self.calorie, 'sugar': self.sugar, 'fat': self.fat, 'protein': self.protein}
-
-    @property
-    def used(self):
-        """Is Ingredient used in Recipe?
-
-        Returns:
-            bool -- Ingredient used in Recipe
-        """
+    def is_used(self):
         if len(self.recipes) == 0:
             return False
         else:
             return True
+
+    def set_fixed(self, value=True, amount=0):
+        self.fixed = value
+        self.amount = amount
+        return self
+
+    def set_main(self, value=True):
+        self.main = value
+        return self
 
 
 class User(db.Model, UserMixin, BaseMixin):
@@ -347,8 +346,8 @@ class User(db.Model, UserMixin, BaseMixin):
         id {int} -- user id
         username {string} -- username (email)
         pwdhash {string} -- password hash (sha256 / bcrypt)
-        firstName {string} -- first name
-        lastName {string} -- last name
+        first_name {string} -- first name
+        last_name {string} -- last name
         password_version {string} -- password version (sha256 / bcrypt)
         diets {relationship} -- diets of user
     """
@@ -358,8 +357,8 @@ class User(db.Model, UserMixin, BaseMixin):
     google_id = db.Column(db.String(30), unique=True)
     username = db.Column(db.String(255), nullable=False, unique=True)
     pwdhash = db.Column(db.CHAR(64), nullable=True)
-    firstName = db.Column(db.String(255), nullable=False)
-    lastName = db.Column(db.String(255), nullable=False)
+    first_name = db.Column(db.String(255), nullable=False)
+    last_name = db.Column(db.String(255), nullable=False)
     password_version = db.Column(db.String(45), nullable=True)
 
     created = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
@@ -371,46 +370,40 @@ class User(db.Model, UserMixin, BaseMixin):
     diets = db.relationship('Diet', secondary='users_has_diets', order_by='desc(Diet.active)')
 
     @staticmethod
-    def load(user_id, load_type="id"):
-        """Load User
+    @login.user_loader
+    def load(user_identifier, load_type="id"):
+        """[summary]
 
-        Load User by ID or username
+        [description]
+
+        Decorators:
+            login.user_loader
 
         Arguments:
-            user_id {int / string} -- database ID or username
+            user_identifier {[type]} -- [description]
+
+        Keyword Arguments:
+            load_type {str} -- [description] (default: {"id"})
 
         Returns:
-            User -- SQLAlchemy object
+            [type] -- [description]
         """
         if load_type == "id":
-            user = db.session.query(User).filter(User.id == user_id).first()
+            user = db.session.query(User).filter(User.id == user_identifier).first()
         elif load_type == "username":
-            user = db.session.query(User).filter(User.username == user_id).first()
+            user = db.session.query(User).filter(User.username == user_identifier).first()
         elif load_type == "google_id":
-            user = db.session.query(User).filter(User.google_id == user_id).first()
+            user = db.session.query(User).filter(User.google_id == user_identifier).first()
         else:
             return None
 
         return user
 
-    @login.user_loader
-    def load_user(user_id):
-        return db.session.query(User).filter(User.id == user_id).first()
+    def set_password_hash(self, password):
+        self.pwdhash = bcrypt.hashpw(password, bcrypt.gensalt())
+        return self
 
-    def getPassword(self, password):
-        """Creates hash from password
-
-        Uses bcrypt hash function
-
-        Arguments:
-            password {string} -- plaintext password
-
-        Returns:
-            string -- hashed password
-        """
-        return bcrypt.hashpw(password, bcrypt.gensalt())
-
-    def checkLogin(self, password):
+    def check_login(self, password):
         """Verifies login data
 
         Verifies login data and changes hash function if necessary
@@ -425,7 +418,7 @@ class User(db.Model, UserMixin, BaseMixin):
         if self.password_version == 'SHA256':
             if hashlib.sha256(password).hexdigest() == self.pwdhash:
                 # changing from sha256 to bcrypt
-                self.pwdhash = self.getPassword(password)
+                self.set_password_hash(password)
                 self.password_version = 'bcrypt'
                 self.edit()
                 return True
@@ -439,28 +432,15 @@ class User(db.Model, UserMixin, BaseMixin):
 
     @property
     def recipes(self, ordered=True):
-        """User's Recipes
-
-        Keyword Arguments:
-            ordered {bool} -- is ordered alphabetically? (default: {True})
-
-        Returns:
-            list -- list of Recipe objects
-        """
         recipes = []
         for diet in self.diets:
             recipes.extend(diet.recipes)
-        if ordered:
+        if ordered is True:
             recipes.sort(key=lambda x: unidecode.unidecode(x.name.lower()), reverse=False)
         return recipes
 
     @property
-    def activeDiets(self):
-        """User's active Diets
-
-        Returns:
-            list -- list of active diets
-        """
+    def active_diets(self):
         active_diets = []
         for diet in self.diets:
             if diet.active == 1:
@@ -502,14 +482,6 @@ class Recipe(db.Model, BaseMixin):
 
     @staticmethod
     def load(recipe_id):
-        """Load Recipe by id
-
-        Arguments:
-            recipe_id {int} -- recipe id
-
-        Returns:
-            Recipe -- Recipe object
-        """
         recipe = db.session.query(Recipe).filter(Recipe.id == recipe_id).first()
 
         if recipe.type == "big":
@@ -518,11 +490,11 @@ class Recipe(db.Model, BaseMixin):
             coef = float(recipe.diet.small_size / 100)
 
         for ingredient in recipe.ingredients:
-            ingredient.amount = float(math.floor(ingredient.loadAmount(recipe.id) * coef * 100000)) / 100000
+            ingredient.amount = float(math.floor(ingredient.load_amount_by_recipe(recipe.id) * coef * 100000)) / 100000
 
         return recipe
 
-    def loadRecipeForShow(self):
+    def load_recipe_for_show(self):
         """Load Recipe for print
 
         Returns:
@@ -534,7 +506,7 @@ class Recipe(db.Model, BaseMixin):
             coef = float(self.diet.small_size / 100)
 
         for ingredient in self.ingredients:
-            ingredient.amount = float(math.floor(ingredient.loadAmount(self.id) * coef * 100000)) / 100000
+            ingredient.amount = float(math.floor(ingredient.load_amount_by_recipe(self.id) * coef * 100000)) / 100000
 
         totals = type('', (), {})()
         totals.calorie = 0
@@ -560,30 +532,11 @@ class Recipe(db.Model, BaseMixin):
         return {'recipe': self, 'totals': totals}
 
     @staticmethod
-    def loadByIngredient(ingredient_id):
-        """Load all recipes by ingredient
-
-        Arguments:
-            ingredient_id {int} -- Ingredient id
-
-        Returns:
-            list -- list of Recipes
-        """
-
+    def load_by_ingredient(ingredient_id):
         recipes = db.session.query(Recipe).filter(Recipe.ingredients.any(Ingredient.id == ingredient_id)).all()
         return recipes
 
     def save(self, ingredients):
-        """Save recipe
-
-        [description]
-
-        Arguments:
-            ingredients {list} -- list of Ingredients
-
-        Returns:
-            int -- Recipe id
-        """
         db.session.add(self)
         db.session.flush()
 
@@ -595,12 +548,7 @@ class Recipe(db.Model, BaseMixin):
         return self.id
 
     def remove(self):
-        """Deletes Recipe
-
-        Returns:
-            None
-        """
-        # wip - to improve w/ orphan cascade
+        # TODO - to improve w/ orphan cascade
         ingredients = db.session.query(RecipesHasIngredient).filter(RecipesHasIngredient.recipes_id == self.id)
         for i in ingredients:
             db.session.delete(i)
@@ -619,7 +567,13 @@ class Recipe(db.Model, BaseMixin):
         totals.sugar = 0
         totals.amount = 0
 
+        if self.type == "big":
+            coef = float(self.diet.big_size / 100)
+        else:
+            coef = float(self.diet.small_size / 100)
+
         for ingredient in self.ingredients:
+            ingredient.amount = float(math.floor(ingredient.load_amount_by_recipe(self.id) * coef * 100000)) / 100000
             totals.calorie += ingredient.amount * ingredient.calorie
             totals.protein += ingredient.amount * ingredient.protein
             totals.fat += ingredient.amount * ingredient.fat
@@ -636,21 +590,5 @@ class Recipe(db.Model, BaseMixin):
         return totals
 
     @property
-    def json(self):
-        """Returns JSON of Recipe
-
-        Returns:
-            json
-        """
-        return {'id': self.id, 'name': self.name, 'size': self.type}
-
-    @property
     def author(self):
-        """[summary]
-
-        Returns User who created diet in which this recipe is
-
-        Returns:
-            User -- User object
-        """
         return self.diet.author

@@ -1,6 +1,6 @@
 {% extends "base.tpl" %}
 {% block title %}
-    Něco se nepovedlo
+    Tady nemáte co pohledávat
 {% endblock %}
 
 {% block style %}{% endblock %}
@@ -13,9 +13,8 @@
 
 {% block content %}
     <div class="container error_main">
-		<h1>Něco se nepovedlo.</h1>
-        <a href="/feedback">Napište mi</a> a já to zkusím rychle opravit.
-        <p>Zatím se můžete vrátit na <a href="/">hlavní stránku</a></p>
+        <h1>Na této stránce byste neměli být</h1>
+        Radši se vraťte na <a href="/">hlavní stránku</a>
     </div>
 {% endblock %}
 

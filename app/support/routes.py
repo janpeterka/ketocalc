@@ -11,8 +11,10 @@ from flask_login import login_required, current_user
 
 from app.support import forms
 
+from app.models import Log
+
 from app.email import send_email
-from app.auth.routes import admin_required
+from app.auth import admin_required
 
 
 support_blueprint = Blueprint('support_blueprint', __name__)
@@ -30,14 +32,21 @@ def testingPage():
     return template('support/testing.tpl', tests=tests, version=application.config['APP_STATE'])
 
 
+@support_blueprint.route('/test_landing')
+def testingLandingPage():
+    # tests.append()
+    return template('support/tests.html.j2')
+
+
 @support_blueprint.route('/logs')
+@support_blueprint.route('/logs/<date>')
 @support_blueprint.route('/logging')
+@support_blueprint.route('/logging/<date>')
 @login_required
 @admin_required
-def logPage():
-    with open('app/static/error.log', 'r') as f:
-        logs = f.readlines()
-
+def logPage(date='2019-05-01'):
+    application.logger.info('{} accessed logs.'.format(current_user.id))
+    logs = Log.load_since(date)
     return template('support/logs.tpl', logs=logs)
 
 
@@ -62,10 +71,10 @@ def showFeedback():
     from werkzeug.datastructures import CombinedMultiDict
     form = forms.FeedbackForm(CombinedMultiDict((request.files, request.form)))
     if request.method == 'GET':
-        return template('feedback.tpl', form=form)
+        return template('support/feedback.tpl', form=form)
     elif request.method == 'POST':
         if not form.validate_on_submit():
-            return template('feedback.tpl', form=form)
+            return template('support/feedback.tpl', form=form)
 
         attachments = []
         if form.feedback_file.data:
@@ -93,9 +102,9 @@ def showFeedback():
 @support_blueprint.route('/changelog')
 @login_required
 def showChangelog():
-    return template('changelog.tpl')
+    return template('support/changelog.tpl')
 
 
 @support_blueprint.route('/help')
 def showHelp():
-    return template('help.tpl')
+    return template('support/help.tpl')

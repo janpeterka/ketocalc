@@ -3,22 +3,15 @@
     Plánovaná odstávka
 {% endblock %}
 
-{% block style %}
-    <style type="text/css" media="screen">
-    .main{
-        margin-left: auto;
-        margin-right: auto;
-        margin-top: 20px;
-    }
-    </style>
-{% endblock %}
+{% block style %}{% endblock %}
 
-{% block script %}
+{% block script %}{% endblock %}
 
+{% block navbar %}
+    {% include('navbar_empty.tpl') %}
 {% endblock %}
 
 {% block content %}
-    {% include('navbar_empty.tpl') %}
     <div class="container">
         <div class="col-12 main">
             <table>

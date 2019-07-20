@@ -19,21 +19,31 @@ class SQLAlchemyHandler(logging.Handler):
         except Exception:
             remote_addr = None
 
+        try:
+            url = record.__dict__['url']
+        except Exception:
+            url = None
+
         log = Log(
             logger=record.__dict__['name'],
             level=record.__dict__['levelname'],
             msg=record.__dict__['msg'],
             remote_addr=remote_addr,
-            url=record.__dict__['url'],
-            module=record.__dict__['module'])
-        log.save()
+            url=url,
+            module=record.__dict__['module']
+        )
+        try:
+            log.save()
+        except Exception:
+            pass
 
 
 # DB handler
 db_handler = SQLAlchemyHandler()
-db_handler.setLevel(logging.INFO)
+db_handler.setLevel(logging.DEBUG)
 db_handler.setFormatter(RequestFormatter(
-    '[%(asctime)s] %(remote_addr)s requested %(url)s: %(levelname)s in %(module)s: %(message)s'
+    '[%(asctime)s] %(remote_addr)s requested \
+     %(url)s: %(levelname)s in %(module)s: %(message)s'
 ))
 
 # Mail handler
@@ -44,10 +54,14 @@ db_handler.setFormatter(RequestFormatter(
 #     subject='Application Error'
 # )
 
-
 # File error.log handler
-file_handler = logging.FileHandler('app/static/error.log')
-file_handler.setLevel(logging.WARNING)
-file_handler.setFormatter(RequestFormatter(
-    '[%(asctime)s] %(remote_addr)s requested %(url)s: %(levelname)s in %(module)s: %(message)s'
-))
+# file_handler = logging.FileHandler('tmp/error.log')
+# file_handler.setLevel(logging.DEBUG)
+# file_handler.setFormatter(RequestFormatter(
+#     '[%(asctime)s] %(remote_addr)s requested \
+#      %(url)s: %(levelname)s in %(module)s: %(message)s'
+# ))
+
+# Gunicorn error logger
+gunicorn_logger = logging.getLogger('gunicorn.error')
+gunicorn_logger.setLevel(logging.DEBUG)

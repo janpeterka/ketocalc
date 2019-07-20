@@ -190,13 +190,13 @@
                         data: JSON.stringify({
                             'ingredients' : prerecipe__ingredient_array,
                             'dietID' : $('.select-diet').val(),
-                            'trial' : '{{ trialrecipe|safe }}'
+                            'trial' : '{{ is_trialrecipe|safe }}'
                         }),
                         contentType: 'application/json;charset=UTF-8',
                         success: function(response){
                             var ingredients = response.ingredients;
                             var template_data = response.template_data;
-                            console.log(template_data);
+                            var diet = response.diet
 
                             if (response == "False"){
                                 recipe__wrong__show();
@@ -217,7 +217,7 @@
                             }
 
                             // diet ID
-                            recipe__ingredient_dietID = response.diet.id
+                            recipe__ingredient_dietID = diet.id
 
                             // change visibility
                             recipe__right__show();
@@ -314,44 +314,56 @@
             $(document).on("slideStop", "#slider", function(e) {
                 recipe__loader__show();
 
+                for (let i = 0; i < recipe__ingredient_array.length; i++) {
+                    if (recipe__ingredient_array[i].main === true){
+                        recipe__ingredient_array[i].amount = $('#slider').val();
+                        recipe__ingredient_array[i].fixed = true;
+                        recipe__ingredient_array[i].min = $('#slider')[0].dataset.sliderMin;
+                        recipe__ingredient_array[i].max = $('#slider')[0].dataset.sliderMax;
+                        break;
+                    }
+                }
+
                 $.ajax({
                         type: 'POST',
-                        url: '/recalcRecipeAJAX',
+                        url: '/calcRecipeAJAX',
                         data: JSON.stringify({
                             'dietID'       : recipe__ingredient_dietID,
-                            'ingredients'  : prerecipe__ingredient_array,
-                            'slider'       : $('#slider').val()},
-                            null, '\t'), // wip not sure why
+                            'ingredients'  : recipe__ingredient_array},
+                            null, '\t'), // WIP not sure why
                         contentType: 'application/json;charset=UTF-8',
 
                         success: function(response) {
+                            var ingredients = response.ingredients;
+                            var template_data = response.template_data;
 
                             if (response == "False"){
                                 recipe__wrong__show();
                                 return;
                             }
+                            
+                            // // empty recipe all
+                            recipe__ingredient_array.empty();
 
-                            // ingredients
-                            for (var i = 0; i < response.ingredients.length; i++) {
-                                $('#amount_'+response.ingredients[i].id).text(response.ingredients[i].amount+" g");
-                                $('#calorie_'+response.ingredients[i].id).text(response.ingredients[i].calorie);
-                                $('#fat_'+response.ingredients[i].id).text(response.ingredients[i].fat);
-                                $('#protein_'+response.ingredients[i].id).text(response.ingredients[i].protein);
-                                $('#sugar_'+response.ingredients[i].id).text(response.ingredients[i].sugar);
+                            // fill with html
+                            $('#recipe__right').html(template_data);
+
+                            var mySlider = $("#slider").slider();
+
+                            // ingredients to inputs
+                            for (let i = 0; i < ingredients.length; i++ ){
+                                recipe__right__form__addIngredient(ingredients[i]);
                             }
-                            recipe__ingredient_array = response.ingredients
 
-                            // new totals
-                            $('#totalFat').text(response.totals.fat);
-                            $('#totalSugar').text(response.totals.sugar);
-                            $('#totalProtein').text(response.totals.protein);
-                            $('#totalCalorie').text(response.totals.calorie);
-                            $('#totalWeight').text(response.totals.amount);
-                            $('#totalRatio').text(response.totals.ratio);
+                            // diet ID
+                            recipe__ingredient_dietID = response.diet.id
+
+                            // change visibility
                             recipe__right__show();
 
                         },
                         error: function(error) {
+                            console.log(error);
                         }
 
                     });
@@ -400,68 +412,72 @@
         </script>
 {% endblock %}
 
-{% block content %}
-    {% if not trialrecipe %}
-	   {% include('navbar.tpl') %}
+{% block navbar %}
+    {% if not is_trialrecipe %}
+        {% include('navbar.tpl') %}
     {% else %}
         {% include('navbar_login.tpl')%}
     {% endif %}
-        <div class="container-fluid container__main">
-            <div class="row">
-                <div class="prerecipe col-lg-6 col-md-12">
+{% endblock %}
 
-                    <div class="prerecipe__add-ingredient col-12">
-                        <form class="prerecipe__add-ingredient__form form-inline">
-                            <select class="prerecipe__add-ingredient__form__select form-control"
-                            name="prerecipe__add-ingredient__form__select" id="prerecipe__add-ingredient__form__select">
-                            {% for ingredient in ingredients: %}
-                                <option name='{{ingredient.name}}' value="{{ingredient.id}}">{{ingredient.name}}</option>
-                            {% endfor %}
-                            </select>
-                            <input type="submit" class="btn btn-primary add-ingredient-btn" value="Přidat surovinu" />
-                        </form>
-                    </div>
 
-                    <div class="prerecipe__selected-ingredients col-11">
-                        <form class="form-group">
-                            <table class="prerecipe__selected-ingredients__table table">
-                                <tr>
-                                    <th>{{ texts.title }}</th>
-                                    <th>{{ texts.energy_simple }}</th>
-                                    <th>{{ texts.protein_simple }}</th>
-                                    <th>{{ texts.fat_simple }}</th>
-                                    <th>{{ texts.sugar_simple}}</th>
-                                    <th></th>
-                                </tr>
-                            </table>
-                        </form>
-                    </div>
+{% block content %}
+    <div class="container-fluid container__main">
+        <div class="row">
+            <div class="prerecipe col-lg-6 col-md-12">
 
-                    <div class="prerecipe__calc col-12">
-                        <form class="prerecipe__calc__form form-inline">
-                            <label for="select-diet">{{ texts.diet_name}}</label>
-                            <select name="select-diet" class="select-diet form-control">
-                            {% for diet in diets: %}
-                                <option value="{{diet.id}}">{{ diet.name }}</option>
-                            {% endfor %}
-                            </select>
-                            <input type="submit" class=" prerecipe__calc__form__submit btn btn-primary" value="{{ texts.calc_amount }}" />
-                        </form>
-                    </div>
-
+                <div class="prerecipe__add-ingredient col-12">
+                    <form class="prerecipe__add-ingredient__form form-inline">
+                        <select class="prerecipe__add-ingredient__form__select form-control"
+                        name="prerecipe__add-ingredient__form__select" id="prerecipe__add-ingredient__form__select">
+                        {% for ingredient in ingredients: %}
+                            <option name='{{ingredient.name}}' value="{{ingredient.id}}">{{ingredient.name}}</option>
+                        {% endfor %}
+                        </select>
+                        <input type="submit" class="btn btn-primary add-ingredient-btn" value="Přidat surovinu" />
+                    </form>
                 </div>
 
-                <div class="recipe col-lg-6 col-md-12">
+                <div class="prerecipe__selected-ingredients col-11">
+                    <form class="form-group">
+                        <table class="prerecipe__selected-ingredients__table table">
+                            <tr>
+                                <th>{{ texts.title }}</th>
+                                <th>{{ texts.energy_100 }}</th>
+                                <th>{{ texts.protein_100 }}</th>
+                                <th>{{ texts.fat_100 }}</th>
+                                <th>{{ texts.sugar_100}}</th>
+                                <th></th>
+                            </tr>
+                        </table>
+                    </form>
+                </div>
 
-                    <div class="recipe__loader"></div>
+                <div class="prerecipe__calc col-12">
+                    <form class="prerecipe__calc__form form-inline">
+                        <label for="select-diet">{{ texts.diet_name}}</label>
+                        <select name="select-diet" class="select-diet form-control">
+                        {% for diet in diets: %}
+                            <option value="{{diet.id}}">{{ diet.name }}</option>
+                        {% endfor %}
+                        </select>
+                        <input type="submit" class=" prerecipe__calc__form__submit btn btn-primary" value="{{ texts.calc_amount }}" />
+                    </form>
+                </div>
 
-                    <div class="recipe__wrong">
-                        <span>{{ texts.recipe_impossible}}</span>
-                    </div>
+            </div>
 
-                    <div class="recipe__right" id="recipe__right">
-                    </div>
+            <div class="recipe col-lg-6 col-md-12">
+
+                <div class="recipe__loader"></div>
+
+                <div class="recipe__wrong">
+                    <span>{{ texts.recipe_impossible}}</span>
+                </div>
+
+                <div class="recipe__right" id="recipe__right">
                 </div>
             </div>
         </div>
+    </div>
 {% endblock %}

@@ -6,4 +6,4 @@
   <div class="collapse navbar-collapse" id="navbarNav">
   </div>
 </nav>
-{% include('flashing.tpl') %}
+{% include('_flashing.html.j2') %}

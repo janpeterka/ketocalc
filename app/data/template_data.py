@@ -104,10 +104,11 @@ texts = {
     'login': 'Přihlásit se',
     'login_google': 'Přihlásit pomocí Google',
     'register': 'Registrovat',
+    'register_google': 'Registrovat pomocí Google',
 
 
 
 
-    "copyright": '&copy; Copyright since 2017 by Jan Peterka'
+    "copyright": '&copy; Copyright since 2017 by <a href="mailto:ketocalc.jmp@gmail.com">Jan Peterka</a>'
 
 }

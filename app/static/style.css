@@ -3,14 +3,15 @@
     --color_success: #007E33; /* Green */
     --color_warning: #FF8800; /* Orange */
     --color_info: grey; /* Grey */
+    --color_debug: pink; /* Pink */
 
-    --color_loader_outer: #f3f3f3; /* Light grey */
+    --color_loader_outer: #f3f3f3; /* Light Grey */
     --color_loader_inner: #4285F4; /* Blue */
 
-    --bgcolor_mainIngredient: #00C851; /* Light green */
+    --bgcolor_mainIngredient: #00C851; /* Light Green */
     --bgcolor_fixedIngredient: grey; /* Grey */
 
-    --color_icon_remove: #8b0000; /* Dark red */
+    --color_icon_remove: #8b0000; /* Dark Red */
 
     --color_inactive: grey;
     --bgcolor_inactive: lightgrey;
@@ -166,6 +167,10 @@ div.flashes ul li.info{
 
 div.flashes ul li.warning{
     color: var(--color_warning);
+}
+
+div.flashes ul li.debug{
+    color: var(--color_debug);
 }
 
 /* Form */

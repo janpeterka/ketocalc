@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <link rel="icon" href="data:,">
+    <!-- <link rel="icon" href="data:,"> -->
 
     <!-- Bootstrap -->
     <!-- Latest compiled and minified CSS -->
@@ -34,8 +34,9 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     
 
-    <!-- Bootstrap Icons -->
+    <!-- Bootstrap Social -->
     <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='bootstrap-social.css') }}">
    
     <!-- My style -->
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
@@ -58,6 +59,17 @@
     {% endblock head %}
 </head>
 <body>
+    {% block navbar %}
+        {% if current_user.is_authenticated %}
+            {% include('navbar.tpl') %}
+        {% else %}
+            {% include('navbar_login.tpl') %}
+        {% endif %}
+    {% endblock %}
+
+    {% if config.APP_STATE == "development" %}
+        <div style="background-color: #25e869; position:absolute; left: 2rem; top: 5rem; z-index: 2; border-radius: 0.4rem; padding: 0.3rem 0.5rem"><strong>DEV</strong></div>
+    {% endif %}
     <div id="content">{% block content %}{% endblock %}</div>
     <div class="footer">
         {% block footer %}

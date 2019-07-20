@@ -1,0 +1,36 @@
+{% extends "base.tpl" %}
+
+{% block title %}
+    Vítejte {{first_name}}
+{% endblock %}
+
+{% block script %}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-8">
+                <h4>Seznam receptů:</h4>
+                <ul>
+                    {% for recipe in selected_diet.recipes %}
+                        <li><a href='/recipe={{ recipe.id }}'>{{ recipe.name }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="form-inline col-3" style="display: block;">
+                <form method="POST" action="/dashboard">
+                    <select name="select_diet" class="form-control" onchange="this.form.submit()">
+                        {% for diet in diets: %}
+                            {% if selected_diet.id == diet.id %}
+                                <option value="{{diet.id}}" selected="selected">{{ diet.name }}</option>
+                            {% else %}
+                                <option value="{{diet.id}}">{{ diet.name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

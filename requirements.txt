@@ -27,5 +27,8 @@ sympy
 unidecode
 
 pytest
+pytest-flask
 
 gunicorn
+
+python-dotenv

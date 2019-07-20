@@ -31,7 +31,7 @@
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
               <a class="dropdown-item" href="/allingredients">Všechny suroviny</a>
               <a class="dropdown-item" href="/alldiets">Všechny diety</a>
-              <!-- <div class="dropdown-divider"></div> -->
+              {# <div class="dropdown-divider"></div> #}
               <a class="dropdown-item" href="/allrecipes">Všechny recepty</a>
             </div>
           </li>
@@ -40,9 +40,9 @@
 
         <ul class="nav navbar-nav navbar-right ml-auto">
 
-          <li class="nav-item">
+{#           <li class="nav-item">
             <a class="nav-link small" href="/changelog">Změny</a>
-          </li>
+          </li> #}
           <li class="nav-item">
             <a class="nav-link small" href="/feedback">Připomínky</a>
           </li>
@@ -58,4 +58,4 @@
 
   </div>
 </nav>
-{% include('flashing.tpl') %}
+{% include('_flashing.html.j2') %}

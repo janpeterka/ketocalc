@@ -16,7 +16,6 @@
     <script>
         function toggleVisibility() {
             var x = $('#password')
-            // console.log(x.attr("type"));
             if (x.attr("type") === "password"){
                 x.attr("type", 'text');
             } else {
@@ -27,21 +26,31 @@
 {% endblock %}
 
 {% block content %}
-    {% include('navbar_login.tpl') %}
     <div class="container">
-        <div class="col-12">
+        <div class="col-10">
            <form action="/register" method="post" class="form-group form-control" accept-charset="UTF-8">
+                <div class="mx-auto" style="width: 200px;">
+                    <a href="{{ url_for('google.login')}}" >
+                        <button type="button" class="btn btn-social btn-google">
+                            <span class="fab fa-google"></span> {{ texts.register_google }}
+                        </button>
+                    </a>
+                    <p class="text-left" style="color:grey;">nebo</p>
+                </div>
+                
+                <hr class="col-xs-12">
+
                 {{ form.csrf_token }}
-                {% from "_formelement.tpl" import render_field %}
+                {% from "_form_element.html.j2" import render_field %}
 
                 {{ render_field(form.username, "form-control") }}
                 {{ form.password.label }}
                 <div class="form-row">
                     <div class="col-10">
-                        {{ form.password(class_="form-control") }} 
+                        {{ render_field(form.password(class_="form-control", label=False)) }} 
                     </div>
                     <div class="col-2">
-                        <input type="button" class="btn" onclick="toggleVisibility()" value="{{ texts.password_show}}">
+                        <input type="button" class="btn" onclick="toggleVisibility()" value="{{ texts.password_show }}">
                     </div>
                 </div>
 
@@ -54,7 +63,7 @@
                         {{ render_field(form.last_name, "form-control") }}
                     </div>
                 </div>
-                <!-- {{ form.recaptcha }} -->
+                {{ render_field(form.recaptcha) }}
                 {{ form.submit(class_='btn btn-primary')}}
 
                 <a class="col-sm-2" href="/login">{{ texts.login }}</a><br>
