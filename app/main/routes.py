@@ -195,6 +195,12 @@ def calculate_recipe_AJAX():
             ingredient.main = json_i['main']
         if 'amount' in json_i:
             ingredient.amount = float(json_i['amount']) / 100  # from grams per 100g
+
+        if 'min' in json_i:
+            ingredient.min = float(json_i['min'])
+        if 'max' in json_i:
+            ingredient.max = float(json_i['max'])
+
         ingredients.append(ingredient)
 
     ingredients = calculations.calculateRecipe(ingredients, diet)
@@ -245,110 +251,6 @@ def calculate_recipe_AJAX():
         ing.expire()
 
     return jsonify(result)
-
-
-@main_blueprint.route('/recalcRecipeAJAX', methods=['POST'])
-def recalcRecipeAJAX():
-    # TODO need to rewrite -> use calcRecipeAJAX instead
-
-    json_ingredients = request.json['ingredients']
-    diet = models.Diet.load(request.json['dietID'])
-
-    ingredients = []
-    for json_ingredient in json_ingredients:
-        ingredient = models.Ingredient.load(json_ingredient['id'])
-        ingredient.fixed = json_ingredient['fixed']
-        ingredient.main = json_ingredient['main']
-        ingredient.amount = float(json_ingredient['amount']) / 100
-        ingredients.append(ingredient)
-
-    # remove main
-    for i in range(len(ingredients)):
-        if ingredients[i].main:
-            mainIngredient = ingredients[i]
-            ingredients.pop(i)
-            break
-
-    # count fixed values and remove from array (wip use calc instead - code duplicity)
-    fixedSugar = 0
-    fixedProtein = 0
-    fixedFat = 0
-    fixedIngredients = []
-    fixedCalorie = 0
-    fixedAmount = 0
-    for i in range(len(ingredients)):
-        if ingredients[i].fixed:
-            fixedIngredients.append(ingredients[i])
-            fixedSugar += ingredients[i].sugar * ingredients[i].amount
-            fixedProtein += ingredients[i].protein * ingredients[i].amount
-            fixedFat += ingredients[i].fat * ingredients[i].amount
-            fixedAmount += ingredients[i].amount
-            fixedCalorie += ingredients[i].calorie * ingredients[i].amount
-
-    for ing in fixedIngredients:
-        ingredients.remove(ing)
-
-    slider = request.json['slider']
-    slider = float(slider)
-
-    # recalc
-    a = numpy.array([
-        [ingredients[0].protein, ingredients[1].protein, ingredients[2].protein],
-        [ingredients[0].fat, ingredients[1].fat, ingredients[2].fat],
-        [ingredients[0].sugar, ingredients[1].sugar, ingredients[2].sugar],
-    ])
-    b = numpy.array([
-        (diet.protein * 10000 - mainIngredient.protein * math.floor(slider * 100) - fixedProtein) / 10000,
-        (diet.fat * 10000 - mainIngredient.fat * math.floor(slider * 100) - fixedFat) / 10000,
-        (diet.sugar * 10000 - mainIngredient.sugar * math.floor(slider * 100) - fixedSugar) / 10000,
-    ])
-    results = numpy.linalg.solve(a, b)
-    for i in range(len(results)):
-        results[i] = math.floor(results[i] * 10000) / 100
-    x = {'id': ingredients[0].id, 'amount': results[0]}
-    y = {'id': ingredients[1].id, 'amount': results[1]}
-    z = {'id': ingredients[2].id, 'amount': results[2]}
-    results = [x, y, z]
-    count = 0
-    for ing in json_ingredients:
-        if ing['main'] is True:
-            ing['amount'] = slider
-        elif ing['fixed'] is True:
-            pass
-        else:
-            ing['amount'] = math.floor(results[count]['amount'] * 100) / 100
-            count += 1
-
-    totals = {'calorie': 0, 'protein': 0, 'sugar': 0, 'fat': 0, 'amount': 0, 'ratio': 0}
-
-    # calc ingredient nutritients
-    for ing in json_ingredients:
-        base_ing = models.Ingredient.load(int(ing['id']))
-
-        ing['calorie'] = math.floor(base_ing.calorie * ing['amount']) / 100
-        ing['sugar'] = math.floor(base_ing.sugar * ing['amount']) / 100
-        ing['fat'] = math.floor(base_ing.fat * ing['amount']) / 100
-        ing['protein'] = math.floor(base_ing.protein * ing['amount']) / 100
-
-        totals['calorie'] += ing['calorie']
-        totals['sugar'] += ing['sugar']
-        totals['fat'] += ing['fat']
-        totals['protein'] += ing['protein']
-        totals['amount'] += ing['amount']
-
-    totals['ratio'] = math.floor((totals['fat'] / (totals['protein'] + totals['sugar'])) * 100) / 100
-
-    totals['calorie'] = math.floor(totals['calorie'] * 100) / 100
-    totals['sugar'] = math.floor(totals['sugar'] * 100) / 100
-    totals['fat'] = math.floor(totals['fat'] * 100) / 100
-    totals['protein'] = math.floor(totals['protein'] * 100) / 100
-    totals['amount'] = math.floor(totals['amount'] * 100) / 100
-    totals['ratio'] = math.floor(totals['ratio'] * 100) / 100
-
-    solutionJSON = {'ingredients': json_ingredients, 'totals': totals}
-
-    # return ingredients with amounts + totals
-    return jsonify(solutionJSON)
 
 
 @main_blueprint.route('/saveRecipeAJAX', methods=['POST'])

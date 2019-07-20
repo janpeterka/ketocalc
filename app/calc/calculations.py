@@ -25,6 +25,8 @@ def calculateRecipe(ingredients, diet):
         3 - ingredients {array} -- array of Ingredients (w/ amounts - 2 decimals)
         4 - ingredients {array} (last-main ing has min, max)
     """
+
+    # remove fixed ingredient values from diet
     fixed_ingredients = []
     for i in range(len(ingredients)):
         if hasattr(ingredients[i], "fixed") and ingredients[i].fixed is True:
@@ -35,9 +37,11 @@ def calculateRecipe(ingredients, diet):
 
             fixed_ingredients.append(ingredients[i])
 
+    # remove fixed ingredients from list of ingredients
     for ing in fixed_ingredients:
         ingredients.remove(ing)
 
+    # move main ingredient to end of list
     for i in range(len(ingredients)):
         if hasattr(ingredients[i], "main") and ingredients[i].main is True:
             mainIngredient = ingredients[i]
@@ -91,12 +95,14 @@ def calculateRecipe(ingredients, diet):
         if interval.right > 100:
             max_sol = 100
         else:
-            max_sol = float(math.floor(interval.right * 10000) / 10000)
+            # max_sol = float(math.floor(interval.right * 10000) / 10000)
+            max_sol = round(interval.right, 2)
 
         if interval.left < 0:
             min_sol = 0
         else:
-            min_sol = float(math.floor(interval.left * 10000) / 10000)
+            # min_sol = float(math.floor(interval.left * 10000) / 10000)
+            min_sol = round(interval.left, 2)
 
         if max_sol < min_sol:
             return None
@@ -112,9 +118,9 @@ def calculateRecipe(ingredients, diet):
         in3_dict = in3.as_coefficients_dict()
         z = in3_dict[e] * sol + in3_dict[1]
 
-        x = float(math.floor(x * 100000) / 100000)
-        y = float(math.floor(y * 100000) / 100000)
-        z = float(math.floor(z * 100000) / 100000)
+        x = round(x, 4)
+        y = round(y, 4)
+        z = round(z, 4)
 
         if x < 0 or y < 0 or z < 0:
             return None
@@ -123,8 +129,8 @@ def calculateRecipe(ingredients, diet):
         ingredients[1].amount = y
         ingredients[2].amount = z
         ingredients[3].amount = sol
-        ingredients[3].min = min_sol
-        ingredients[3].max = max_sol
+        ingredients[3].min = min_sol * 100
+        ingredients[3].max = max_sol * 100
 
     elif len(ingredients) == 5:
         # TODO

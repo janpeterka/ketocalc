@@ -4,15 +4,16 @@
     <table class="recipe__right__form__ingredient-table table">
         <tr>
             <th>{{ texts.title }}</th>
-            <th>{{ texts.energy_100 }}</th>
-            <th>{{ texts.protein_100 }}</th>
-            <th>{{ texts.fat_100 }}</th>
-            <th>{{ texts.sugar_100 }}</th>
+            <th>{{ texts.energy_simple }}</th>
+            <th>{{ texts.protein_simple }}</th>
+            <th>{{ texts.fat_simple }}</th>
+            <th>{{ texts.sugar_simple }}</th>
             <th>{{ texts.amount_simple }}</th>
         </tr>
 
         {% for ingredient in ingredients %}
             {% if ingredient.main %}
+                {# <tr class="tr-mainIngredient" data-min="{{ingredient.min * 100}}" data-max="{{ingredient.max * 100}}"> #}
                 <tr class="tr-mainIngredient">
             {% elif ingredient.fixed %}
                 <tr class="tr-fixedIngredient">
@@ -21,17 +22,17 @@
             {% endif %}
 
                     <td>{{ ingredient.name }} </td>
-                    <td><span id="calorie_{{ingredient.id}}">{{ ingredient.calorie }}</span></td>
-                    <td><span id="protein_{{ingredient.id}}">{{ ingredient.protein }}</span></td>
-                    <td><span id="fat_{{ingredient.id}}">{{ ingredient.fat }}</span></td>
-                    <td><span id="sugar_{{ingredient.id}}">{{ ingredient.sugar }}</span></td>
-                    <td><span id="amount_{{ingredient.id}}">{{ ingredient.amount }} g</span></td>
+                    <td><span>{{ ingredient.calorie }}</span></td>
+                    <td><span>{{ ingredient.protein }}</span></td>
+                    <td><span>{{ ingredient.fat }}</span></td>
+                    <td><span>{{ ingredient.sugar }}</span></td>
+                    <td><span>{{ ingredient.amount }} g</span></td>
                 </tr>
 
             {% if ingredient.main %}
-                <tr>
-                    <td id="slider_tr" name="{ingredient.id}">
-                        <input type="text" class="col" id="slider" data-slider-id="slider_data" name="slider" data-provide="slider" data-slider-min="{{ingredient.min * 100}}" data-slider-max="{{ingredient.max * 100}}" data-slider-step="0.1" data-slider-value="{{ingredient.amount}}" data-slider-tooltip="show">
+                <tr class="tr-slider">
+                    <td> 
+                        <input type="text" class="col" id="slider" data-slider-id="slider_data" name="slider" data-provide="slider" data-slider-min="{{ingredient.min}}" data-slider-max="{{ingredient.max}}" data-slider-step="0.1" data-slider-value="{{ingredient.amount}}" data-slider-tooltip="show">
                     </td>
 
                     <td colspan=5>
