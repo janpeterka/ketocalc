@@ -13,10 +13,7 @@ from app.models import Ingredient, Diet
 
 @pytest.fixture
 def app(scope="session"):
-    app = create_app()
-
-    app.config['TESTING'] = True
-    app.config['WTF_CSRF_ENABLED'] = False
+    app = create_app('test')
 
     env_path = Path('.') / '.env.test'
     load_dotenv(dotenv_path=env_path)

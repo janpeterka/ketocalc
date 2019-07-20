@@ -5,12 +5,10 @@ def test_assert():
 def test_application(app, client):
     # app is correctly set
 
-    # from conftest
-    assert app.config['TESTING'] is True
     # from conftest>.env.test
     assert app.config['SECRET_KEY'] == "justtesting"
     # from config.py
-    assert app.config['TEMPLATES_AUTO_RELOAD'] is True
+    assert app.config['TESTING'] is True
 
 
 def test_request(client):

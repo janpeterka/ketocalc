@@ -1,3 +1,4 @@
+import os
 from flask import request, redirect
 
 from app import create_app
@@ -5,8 +6,10 @@ from app import create_app
 from app.models import db, User
 
 from app.data import template_data
+from config import configs
 
-application = create_app()
+evn = os.environ.get('FLASK_ENV', 'default')
+application = create_app(config=configs[evn])
 
 
 @application.context_processor
