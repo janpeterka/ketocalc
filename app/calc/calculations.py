@@ -2,7 +2,6 @@ import numpy
 import sympy as sp
 from sympy import solve_poly_inequality as solvei
 from sympy import poly
-import math
 
 from flask import Blueprint
 
@@ -95,13 +94,11 @@ def calculateRecipe(ingredients, diet):
         if interval.right > 100:
             max_sol = 100
         else:
-            # max_sol = float(math.floor(interval.right * 10000) / 10000)
             max_sol = round(interval.right, 2)
 
         if interval.left < 0:
             min_sol = 0
         else:
-            # min_sol = float(math.floor(interval.left * 10000) / 10000)
             min_sol = round(interval.left, 2)
 
         if max_sol < min_sol:
