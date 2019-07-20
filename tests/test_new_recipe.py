@@ -1,7 +1,5 @@
-# import math
 import json
 
-from app.main.routes import calculate_recipe_AJAX
 from app.models import Ingredient, Diet
 
 

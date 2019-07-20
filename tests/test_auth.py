@@ -12,8 +12,8 @@ def test_login(app, client):
 
 
 def test_logout(app, client):
+    # WIP
     assert client.get("/logout") == 302
-    # assert do_logout()
 
 
 def test_register(db):
