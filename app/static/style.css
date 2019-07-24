@@ -5,6 +5,11 @@
     --color_info: grey; /* Grey */
     --color_debug: pink; /* Pink */
 
+    --color_primary: #4242FF;
+    --color_secondary: #42C241;
+    --color_danger: #E23131;
+
+
     --color_loader_outer: #f3f3f3; /* Light Grey */
     --color_loader_inner: #4285F4; /* Blue */
 

@@ -1,0 +1,22 @@
+
+.btn {
+	border-radius: 0.3rem;
+	border: none;
+	margin: 0.5rem;
+	padding: 0.3rem;
+	background-color: var(--color_primary);
+}
+
+
+.btn.btn-primary {
+	background-color: var(--color_primary)
+}
+
+.btn.btn-primary {
+	background-color: var(--color_secondary)
+}
+
+.btn.btn-warning {
+	background-color: var(--color_warning)
+}
+
