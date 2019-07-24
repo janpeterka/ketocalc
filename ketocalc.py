@@ -6,10 +6,9 @@ from app import create_app
 from app.models import db, User
 
 from app.data import template_data
-from config import configs
 
-evn = os.environ.get('FLASK_ENV', 'default')
-application = create_app(config=configs[evn])
+env = os.environ.get('FLASK_ENV', 'default')
+application = create_app(config_name=env)
 
 
 @application.context_processor

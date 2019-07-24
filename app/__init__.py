@@ -9,12 +9,12 @@ db = SQLAlchemy()
 migrate = Migrate()
 
 
-def create_app():
+def create_app(config_name='default'):
     application = Flask(__name__, instance_relative_config=True)
 
     # CONFIG
-    application.config.from_object('config')
-    # application.secret_key = application.config['SECRET_KEY']
+    from config import configs
+    application.config.from_object(configs[config_name])
 
     # LOGGING
     # from app.config_logging import file_handler
@@ -24,10 +24,8 @@ def create_app():
     # application.logger.addHandler(mail_handler)
 
     from app.config_logging import db_handler, gunicorn_logger
-    # , file_handler
     application.logger.addHandler(gunicorn_logger)
     application.logger.addHandler(db_handler)
-    # application.logger.addHandler(file_handler)
 
     # APPS
     mail.init_app(application)

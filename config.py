@@ -1,7 +1,7 @@
 import os
 
 
-class Config:
+class Config(object):
     UPLOAD_FOLDER = '/tmp'
     ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
