@@ -7,7 +7,7 @@ from app.models import db, User
 
 from app.data import template_data
 
-env = os.environ.get('FLASK_ENV', 'default')
+env = os.environ.get("FLASK_ENV", "default")
 application = create_app(config_name=env)
 
 
@@ -18,12 +18,15 @@ def inject_globals():
 
 @application.before_request
 def session_management():
-    if application.config['APP_STATE'] == 'shutdown' and request.path not in ['/shutdown', '/static/style.css']:
-        return redirect('/shutdown')
-    elif request.path == '/shutdown' and application.config['APP_STATE'] != 'shutdown':
-        return redirect('/')
+    if application.config["APP_STATE"] == "shutdown" and request.path not in [
+        "/shutdown",
+        "/static/style.css",
+    ]:
+        return redirect("/shutdown")
+    elif request.path == "/shutdown" and application.config["APP_STATE"] != "shutdown":
+        return redirect("/")
 
 
 @application.shell_context_processor
 def make_shell_context():
-    return {'db': db, 'User': User}
+    return {"db": db, "User": User}

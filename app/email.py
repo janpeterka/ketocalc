@@ -9,5 +9,7 @@ def send_email(subject, sender, recipients, text_body, html_body, attachments=No
     msg.html = html_body
     if attachments:
         for attachment in attachments:
-            msg.attach(attachment.filename, 'application/octact-stream', attachment.read())
+            msg.attach(
+                attachment.filename, "application/octact-stream", attachment.read()
+            )
     mail.send(msg)
