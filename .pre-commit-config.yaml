@@ -3,6 +3,8 @@
     hooks:
     -   id: check-merge-conflict
     -   id: debug-statements
+    -   id: flake8
+        args: ['--ignore=E501,W503']
 
 -   repo: https://github.com/ambv/black
     rev: stable
