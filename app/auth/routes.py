@@ -98,6 +98,12 @@ def oauth_login(blueprint, token):
 
 
 def do_login(username=None, password=None, from_register=False, user=None):
+    # TODO - better solving of not encoded string
+    try:
+        password = password.encode("utf-8")
+    except Exception:
+        pass
+
     # get user if there is none
     if user is None and username is None:
         # This shouldn't happen
