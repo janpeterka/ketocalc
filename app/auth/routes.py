@@ -3,7 +3,6 @@
 
 # run by pyserver
 
-
 from functools import wraps
 import datetime
 
@@ -22,44 +21,47 @@ from app import models
 from app.auth.forms import LoginForm, RegisterForm
 
 
-auth_blueprint = Blueprint('auth', __name__, template_folder='templates/auth/')
+auth_blueprint = Blueprint("auth", __name__, template_folder="templates/auth/")
 
-PASSWORD_VERSION = 'bcrypt'
+PASSWORD_VERSION = "bcrypt"
 
 
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if current_user.username != 'admin':
-            return redirect('/wrongpage')
+        if current_user.username != "admin":
+            return redirect("/wrongpage")
         return f(*args, **kwargs)
+
     return decorated_function
 
 
-@auth_blueprint.route('/login', methods=['GET', 'POST'])
+@auth_blueprint.route("/login", methods=["GET", "POST"])
 def show_login():
     if current_user.is_authenticated:
-        return redirect('/dashboard')
+        return redirect("/dashboard")
     form = LoginForm(request.form)
-    if request.method == 'GET':
-        return template('auth/login.tpl', form=form)
-    elif request.method == 'POST':
+    if request.method == "GET":
+        return template("auth/login.tpl", form=form)
+    elif request.method == "POST":
         if not form.validate_on_submit():
-            return template('auth/login.tpl', form=form)
-        if do_login(username=form.username.data, password=form.password.data.encode('utf-8')):
-            return redirect('/dashboard')
+            return template("auth/login.tpl", form=form)
+        if do_login(
+            username=form.username.data, password=form.password.data.encode("utf-8")
+        ):
+            return redirect("/dashboard")
         else:
-            return template('auth/login.tpl', form=form)
+            return template("auth/login.tpl", form=form)
 
 
 @oauth_authorized.connect
 def oauth_login(blueprint, token):
     # TODO rewrite for multiple oaths
-    if blueprint.name == 'google':
+    if blueprint.name == "google":
         try:
             user_info = google.get("/oauth2/v2/userinfo").json()
-            username = user_info['email']
-            google_id = user_info['id']
+            username = user_info["email"]
+            google_id = user_info["id"]
         except Exception as e:
             application.logger.error(e)
     else:
@@ -81,12 +83,12 @@ def oauth_login(blueprint, token):
         user.google_id = google_id
 
         try:
-            user.first_name = user_info['given_name']
+            user.first_name = user_info["given_name"]
         except Exception:
             user.first_name = "-"
 
         try:
-            user.last_name = user_info['family_name']
+            user.last_name = user_info["family_name"]
         except Exception:
             user.last_name = "-"
 
@@ -94,11 +96,19 @@ def oauth_login(blueprint, token):
 
 
 def do_login(username=None, password=None, from_register=False, user=None):
+    # TODO - better solving of not encoded string
+    try:
+        password = password.encode("utf-8")
+    except Exception:
+        pass
+
     # get user if there is none
     if user is None and username is None:
         # This shouldn't happen
         application.logger.error("Login error: user is None and username is None")
-        flash('Někde se stala chyba. Kontaktujte mě <a href="mailto:ketocalc.jmp@gmail.com">e-mailem</a>')
+        flash(
+            'Někde se stala chyba. Kontaktujte mě <a href="mailto:ketocalc.jmp@gmail.com">e-mailem</a>'
+        )
         return False
     elif user is None and username is not None:
         # Load user by username
@@ -109,9 +119,12 @@ def do_login(username=None, password=None, from_register=False, user=None):
 
     # log user, if either has google_id (going from oauth) or has valid password
     # TODO this is not very nice
-    if user is not None and (user.google_id is not None or (password is not None and password != "" and user.check_login(password))):
+    if user is not None and (
+        user.google_id is not None
+        or (password is not None and password != "" and user.check_login(password))
+    ):
         login_user(user, remember=True)
-        if application.config['APP_STATE'] == 'production':
+        if application.config["APP_STATE"] == "production":
             user.last_logged_in = datetime.datetime.now()
             try:
                 user.login_count += 1
@@ -121,60 +134,64 @@ def do_login(username=None, password=None, from_register=False, user=None):
                 user.login_count = 1
             user.edit()
         if not from_register:
-            flash('Byl jste úspěšně přihlášen.', 'success')
+            flash("Byl jste úspěšně přihlášen.", "success")
         elif from_register:
-            flash('Byl jste úspěšně zaregistrován.', 'success')
+            flash("Byl jste úspěšně zaregistrován.", "success")
         return True
     else:
-        flash('Přihlášení se nezdařilo.', 'error')
+        flash("Přihlášení se nezdařilo.", "error")
         return False
 
 
 @login_required
-@auth_blueprint.route('/logout')
+@auth_blueprint.route("/logout")
 def do_logout():
     if current_user.is_authenticated:
         logout_user()
-        flash('Byl jste úspěšně odhlášen.', 'info')
-    return redirect('/login')
+        flash("Byl jste úspěšně odhlášen.", "info")
+    return redirect("/login")
 
 
-@auth_blueprint.route('/register', methods=['GET', 'POST'])
+@auth_blueprint.route("/register", methods=["GET", "POST"])
 def show_register():
     form = RegisterForm(request.form)
-    if request.method == 'GET':
-        return template('auth/register.tpl', form=form)
-    elif request.method == 'POST':
+    if request.method == "GET":
+        return template("auth/register.tpl", form=form)
+    elif request.method == "POST":
         if not form.validate_on_submit():
-            return template('auth/register.tpl', form=form)
+            return template("auth/register.tpl", form=form)
         if not validate_register(form.username.data):
-            form.username.errors = ['Toto jméno nemůžete použít']
-            return template('auth/register.tpl', form=form)
+            form.username.errors = ["Toto jméno nemůžete použít"]
+            return template("auth/register.tpl", form=form)
 
         user = models.User()
         form.populate_obj(user)
-        user.set_password_hash(form.password.data.encode('utf-8'))
+        user.set_password_hash(form.password.data.encode("utf-8"))
         user.password_version = PASSWORD_VERSION
 
         if do_register(user):
-            return redirect('/dashboard')
+            return redirect("/dashboard")
         else:
-            return template('auth/register.tpl', form=form)
+            return template("auth/register.tpl", form=form)
 
 
 def do_register(user, source=None):
     if not validate_register(user.username):
         # user with same username
-        flash('Toto uživatelské jméno nemůžete použít', 'error')
+        flash("Toto uživatelské jméno nemůžete použít", "error")
         return False
     elif user.save() is True:
         if source == "google_oauth":
             do_login(user=user)
         else:
-            do_login(username=user.username, password=user.password.encode('utf-8'), from_register=True)
+            do_login(
+                username=user.username,
+                password=user.password.encode("utf-8"),
+                from_register=True,
+            )
         return True
     else:
-        flash('Registrace neproběhla v pořádku', 'error')
+        flash("Registrace neproběhla v pořádku", "error")
         return False
 
 

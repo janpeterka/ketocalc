@@ -1,4 +1,4 @@
-{% extends "base.tpl" %}
+{% extends "base.html.j2" %}
 {% block title %}
     Zásady ochrany osobních údajů aplikace KetoCalc
 {% endblock %}

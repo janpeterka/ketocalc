@@ -1,4 +1,5 @@
 import logging
+
 # from logging.handlers import SMTPHandler
 from flask import request
 
@@ -15,22 +16,22 @@ class RequestFormatter(logging.Formatter):
 class SQLAlchemyHandler(logging.Handler):
     def emit(self, record):
         try:
-            remote_addr = record.__dict__['remote_addr']
+            remote_addr = record.__dict__["remote_addr"]
         except Exception:
             remote_addr = None
 
         try:
-            url = record.__dict__['url']
+            url = record.__dict__["url"]
         except Exception:
             url = None
 
         log = Log(
-            logger=record.__dict__['name'],
-            level=record.__dict__['levelname'],
-            msg=record.__dict__['msg'],
+            logger=record.__dict__["name"],
+            level=record.__dict__["levelname"],
+            msg=record.__dict__["msg"],
             remote_addr=remote_addr,
             url=url,
-            module=record.__dict__['module']
+            module=record.__dict__["module"],
         )
         try:
             log.save()
@@ -41,10 +42,12 @@ class SQLAlchemyHandler(logging.Handler):
 # DB handler
 db_handler = SQLAlchemyHandler()
 db_handler.setLevel(logging.DEBUG)
-db_handler.setFormatter(RequestFormatter(
-    '[%(asctime)s] %(remote_addr)s requested \
-     %(url)s: %(levelname)s in %(module)s: %(message)s'
-))
+db_handler.setFormatter(
+    RequestFormatter(
+        "[%(asctime)s] %(remote_addr)s requested \
+     %(url)s: %(levelname)s in %(module)s: %(message)s"
+    )
+)
 
 # Mail handler
 # mail_handler = logging.handlers.SMTPHandler(
@@ -63,5 +66,5 @@ db_handler.setFormatter(RequestFormatter(
 # ))
 
 # Gunicorn error logger
-gunicorn_logger = logging.getLogger('gunicorn.error')
-gunicorn_logger.setLevel(logging.DEBUG)
+gunicorn_logger = logging.getLogger("gunicorn.error")
+gunicorn_logger.setLevel(logging.WARNING)
