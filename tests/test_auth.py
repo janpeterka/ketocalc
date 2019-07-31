@@ -45,9 +45,9 @@ def test_register(db):
 
 
 def test_new_password(app, client, db):
-    # generate new token, change password.
+    # TODO generate new token, change password.
 
-    # try invalid token
+    # TODO try invalid token
 
-    # try already used token
+    # TODO try already used token
     pass
