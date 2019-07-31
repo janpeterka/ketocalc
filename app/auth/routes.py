@@ -223,7 +223,7 @@ def generate_new_password_token(user):
 
 def set_new_password_token(user, token):
     user.new_password_token = token
-    user.save()
+    user.edit()
     return True
 
 
@@ -286,7 +286,7 @@ def show_new_password(token=None):
             user.set_password_hash(form.password.data.encode("utf-8"))
             user.password_version = PASSWORD_VERSION
             user.new_password_token = None
-            user.save()
+            user.edit()
             flash("heslo bylo změněno", "success")
 
         return redirect("/login")
