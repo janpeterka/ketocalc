@@ -18,7 +18,7 @@ from flask_dance.consumer import oauth_authorized
 
 from app import models
 
-from app.auth.forms import LoginForm, RegisterForm
+from app.auth.forms import LoginForm, RegisterForm, NewPasswordForm
 
 
 auth_blueprint = Blueprint("auth", __name__, template_folder="templates/auth/")
@@ -201,3 +201,35 @@ def validate_register(username):
         return False
     else:
         return True
+
+
+def generate_new_password_token(user):
+    import secrets
+    user.new_password_token = secrets.token_hex(20)
+
+
+@auth_blueprint.route("/new_password", methods=["GET", "POST"])
+@auth_blueprint.route("/new_password/<token>", methods=["GET", "POST"])
+def show_new_password(token=None):
+    form = NewPasswordForm(request.form)
+    form.token = token
+
+    if request.method == "GET":
+        return template("auth/new_password.tpl", form=form)
+    elif request.method == "POST":
+        if not form.validate_on_submit():
+            return template("auth/new_password.tpl", form=form)
+
+        user = models.User.load(form.token, load_type="new_password_token")
+        if user is None:
+            flash("nemůžete změnit heslo", "error")
+            print("wrong user")
+        else:
+            flash("heslo bylo změněno", "success")
+            user.set_password_hash(form.password.data.encode("utf-8"))
+            user.password_version = PASSWORD_VERSION
+
+        if do_login(user):
+            return redirect("/dashboard")
+        else:
+            return redirect("/login")

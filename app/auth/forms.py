@@ -38,3 +38,15 @@ class RegisterForm(FlaskForm):
     )
     recaptcha = RecaptchaField()
     submit = SubmitField("Registrovat")
+
+
+class NewPasswordForm(FlaskForm):
+    password = PasswordField(
+        "Nové heslo",
+        [
+            validators.InputRequired("Heslo musí být vyplněno"),
+            validators.Length(min=8, message="Heslo musí mít alespoň 8 znaků"),
+        ],
+    )
+    recaptcha = RecaptchaField()
+    submit = SubmitField("Registrovat")

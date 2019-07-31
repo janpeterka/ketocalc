@@ -455,6 +455,8 @@ class User(db.Model, UserMixin, BaseMixin):
             user = (
                 db.session.query(User).filter(User.google_id == user_identifier).first()
             )
+        elif load_type == "new_password_token":
+            user = db.session.query(User).filter(User.new_password_token == user_identifier).first()
         else:
             return None
 
