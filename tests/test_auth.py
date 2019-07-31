@@ -42,3 +42,12 @@ def test_register(db):
     assert do_login(user.username, user.password) is False
 
     # TODO OAuth
+
+
+def test_new_password(app, client, db):
+    # generate new token, change password.
+
+    # try invalid token
+
+    # try already used token
+    pass

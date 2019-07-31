@@ -85,12 +85,12 @@ def oauth_login(blueprint, token):
         user.google_id = google_id
 
         try:
-            user.first_name = user_info['given_name']
+            user.first_name = user_info["given_name"]
         except Exception:
             user.first_name = "-"
 
         try:
-            user.last_name = user_info['family_name']
+            user.last_name = user_info["family_name"]
         except Exception:
             user.last_name = "-"
 
@@ -102,7 +102,9 @@ def do_login(username=None, password=None, from_register=False, user=None):
     if user is None and username is None:
         # This shouldn't happen
         application.logger.error("Login error: user is None and username is None")
-        flash('Někde se stala chyba. Kontaktujte mě <a href="mailto:ketocalc.jmp@gmail.com">e-mailem</a>')
+        flash(
+            'Někde se stala chyba. Kontaktujte mě <a href="mailto:ketocalc.jmp@gmail.com">e-mailem</a>'
+        )
         return False
     elif user is None and username is not None:
         # Load user by username
@@ -207,7 +209,14 @@ def validate_register(username):
 
 def generate_new_password_token(user):
     import secrets
-    user.new_password_token = secrets.token_hex(20)
+
+    token = secrets.token_hex(20)
+    set_new_password_token(user, token)
+    return token
+
+
+def set_new_password_token(user, token):
+    user.new_password_token = token
     user.save()
     return True
 
@@ -221,35 +230,57 @@ def get_new_password():
         if not form.validate_on_submit():
             return template("auth/get_new_password.html.j2", form=form)
 
-        # user = models.User.load(form.username.data, load_type="username")
-        user = models.User.load("admin", load_type="username")
-        text_body = "spam"
-        html_body = template("auth/_new_password_email.html.j2", token=generate_new_password_token(user))
-        # send_email(user.username, "ketocalc.jmp@gmail.com", text_body, html_body)
-        send_email("Nové heslo", "ketocalc.jmp@gmail.com", "janmpeterka@gmail.com", text_body, html_body)
+        user = models.User.load(form.username.data, load_type="username")
+        if user is None:
+            form.username.errors = ["Uživatel s tímto emailem neexistuje"]
+            return template("auth/get_new_password.html.j2", form=form)
+
+        html_body = template(
+            "auth/_new_password_email.html.j2", token=generate_new_password_token(user)
+        )
+        send_email(
+            subject="Nové heslo",
+            sender="ketocalc.jmp@gmail.com",
+            recipients=[user.username],
+            text_body="",
+            html_body=html_body,
+        )
+    flash(
+        "Nové heslo vám bylo zasláno do emailu. Zkontrolujte i složku Spam", "success"
+    )
+    return redirect("/login")
 
 
-@auth_blueprint.route("/new_password/", methods=["GET", "POST"])
+@auth_blueprint.route("/new_password", methods=["GET", "POST"])
 @auth_blueprint.route("/new_password/<token>", methods=["GET", "POST"])
 def show_new_password(token=None):
     form = NewPasswordForm(request.form)
-    form.token = token
+    user = models.User.load(token, load_type="new_password_token")
+    if user is None:
+        flash("tento token již není platný", "error")
+        return redirect("/login")
 
     if request.method == "GET":
-        return template("auth/new_password.html.j2", form=form)
+        return template(
+            "auth/new_password.html.j2", form=form, username=user.username, token=token
+        )
     elif request.method == "POST":
         if not form.validate_on_submit():
-            return template("auth/new_password.html.j2", form=form)
+            return template(
+                "auth/new_password.html.j2",
+                form=form,
+                username=user.username,
+                token=token,
+            )
 
-        user = models.User.load(form.token, load_type="new_password_token")
+        # print(user.username)
         if user is None:
             flash("nemůžete změnit heslo", "error")
         else:
-            flash("heslo bylo změněno", "success")
             user.set_password_hash(form.password.data.encode("utf-8"))
             user.password_version = PASSWORD_VERSION
+            user.new_password_token = None
+            user.save()
+            flash("heslo bylo změněno", "success")
 
-        if do_login(user):
-            return redirect("/dashboard")
-        else:
-            return redirect("/login")
+        return redirect("/login")

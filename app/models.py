@@ -446,6 +446,9 @@ class User(db.Model, UserMixin, BaseMixin):
         Returns:
             [type] -- [description]
         """
+        if user_identifier is None:
+            return None
+
         if load_type == "id":
             user = db.session.query(User).filter(User.id == user_identifier).first()
         elif load_type == "username":
