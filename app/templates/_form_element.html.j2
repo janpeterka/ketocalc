@@ -1,16 +1,17 @@
-{% macro render_field(field, class=None, label=True) %}
+{% macro render_field(field, class=None, label=True, errors=True) %}
 
   {% if label %}
     {{ field.label }}
   {% endif %}
 
-  {% if class is not none %}
-    {{ field(class=class)|safe }}
-  {% else %}
-    {{ field }}
+
+  {% if class %}
+    {{ field(class_=class, **kwargs) }}
+  {% else %}  
+    {{ field(**kwargs) }}
   {% endif %}
 
-  {% if field.errors %}
+  {% if errors and field.errors %}
     <ul class=errors>
     {% for error in field.errors %}
       <li style="list-style: none" class="warning">{{ error }}</li>
