@@ -22,7 +22,6 @@
     -   id: tests
         name: run tests
         entry: pipenv run pytest -v tests/
-        # pass_filenames: false
         language: system
         types: [python]
-        # stages: [push]
+        stages: [push]
