@@ -1,0 +1,32 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+requests = "*"
+mysqlclient = "*"
+pdfkit = "*"
+numpy = "*"
+sympy = "*"
+pytest = "*"
+pytest-flask = "*"
+gunicorn = "*"
+python-dotenv = "*"
+Flask = "*"
+Flask-Mail = "*"
+Flask-SQLAlchemy = "*"
+Flask-Bcrypt = "*"
+Flask-Security = "*"
+Flask-Login = "*"
+Flask-Dance = "*"
+Flask-WTF = "*"
+WTForms = "*"
+PyMySQL = "*"
+Flask-Migrate = "*"
+Unidecode = "*"
+
+[requires]
+python_version = "3.7"

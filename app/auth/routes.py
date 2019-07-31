@@ -25,8 +25,6 @@ from app.auth.forms import LoginForm, RegisterForm, NewPasswordForm, GetNewPassw
 
 auth_blueprint = Blueprint("auth", __name__, template_folder="templates/auth/")
 
-PASSWORD_VERSION = "bcrypt"
-
 
 def admin_required(f):
     @wraps(f)
@@ -102,7 +100,7 @@ def do_login(username=None, password=None, from_register=False, user=None):
     try:
         password = password.encode("utf-8")
     except Exception:
-        pass
+        password = password
 
     # get user if there is none
     if user is None and username is None:
@@ -123,7 +121,7 @@ def do_login(username=None, password=None, from_register=False, user=None):
     # TODO this is not very nice
     if user is not None and (
         user.google_id is not None
-        or (password is not None and password != "" and user.check_login(password))
+        or (password is not None and len(password) > 0 and user.check_login(password))
     ):
         login_user(user, remember=True)
         if application.config["APP_STATE"] == "production":
@@ -169,7 +167,7 @@ def show_register():
         user = models.User()
         form.populate_obj(user)
         user.set_password_hash(form.password.data.encode("utf-8"))
-        user.password_version = PASSWORD_VERSION
+        user.password_version = application.config["PASSWORD_VERSION"]
 
         if do_register(user):
             return redirect("/dashboard")

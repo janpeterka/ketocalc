@@ -1,8 +1,4 @@
 import pytest
-import os
-
-from pathlib import Path  # python3 only
-from dotenv import load_dotenv
 
 from app import create_app
 from app import db as _db
@@ -14,12 +10,6 @@ from app.models import Ingredient, Diet
 @pytest.fixture
 def app(scope="session"):
     app = create_app(config_name="test")
-
-    env_path = Path('.') / '.env'
-    load_dotenv(dotenv_path=env_path)
-
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('TESTING_DB_STRING')
-    app.config['SECRET_KEY'] = os.getenv('TESTING_SECRET_KEY')
 
     @app.context_processor
     def inject_globals():
