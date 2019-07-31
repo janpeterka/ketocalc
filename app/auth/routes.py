@@ -18,7 +18,9 @@ from flask_dance.consumer import oauth_authorized
 
 from app import models
 
-from app.auth.forms import LoginForm, RegisterForm, NewPasswordForm
+from app.email import send_email
+
+from app.auth.forms import LoginForm, RegisterForm, NewPasswordForm, GetNewPasswordForm
 
 
 auth_blueprint = Blueprint("auth", __name__, template_folder="templates/auth/")
@@ -42,16 +44,16 @@ def show_login():
         return redirect("/dashboard")
     form = LoginForm(request.form)
     if request.method == "GET":
-        return template("auth/login.tpl", form=form)
+        return template("auth/login.html.j2", form=form)
     elif request.method == "POST":
         if not form.validate_on_submit():
-            return template("auth/login.tpl", form=form)
+            return template("auth/login.html.j2", form=form)
         if do_login(
             username=form.username.data, password=form.password.data.encode("utf-8")
         ):
             return redirect("/dashboard")
         else:
-            return template("auth/login.tpl", form=form)
+            return template("auth/login.html.j2", form=form)
 
 
 @oauth_authorized.connect
@@ -148,13 +150,13 @@ def do_logout():
 def show_register():
     form = RegisterForm(request.form)
     if request.method == "GET":
-        return template("auth/register.tpl", form=form)
+        return template("auth/register.html.j2", form=form)
     elif request.method == "POST":
         if not form.validate_on_submit():
-            return template("auth/register.tpl", form=form)
+            return template("auth/register.html.j2", form=form)
         if not validate_register(form.username.data):
             form.username.errors = ["Toto jméno nemůžete použít"]
-            return template("auth/register.tpl", form=form)
+            return template("auth/register.html.j2", form=form)
 
         user = models.User()
         form.populate_obj(user)
@@ -164,7 +166,7 @@ def show_register():
         if do_register(user):
             return redirect("/dashboard")
         else:
-            return template("auth/register.tpl", form=form)
+            return template("auth/register.html.j2", form=form)
 
 
 def do_register(user, source=None):
@@ -206,24 +208,42 @@ def validate_register(username):
 def generate_new_password_token(user):
     import secrets
     user.new_password_token = secrets.token_hex(20)
+    user.save()
+    return True
 
 
-@auth_blueprint.route("/new_password", methods=["GET", "POST"])
+@auth_blueprint.route("/get_new_password", methods=["GET", "POST"])
+def get_new_password():
+    form = GetNewPasswordForm(request.form)
+    if request.method == "GET":
+        return template("auth/get_new_password.html.j2", form=form)
+    elif request.method == "POST":
+        if not form.validate_on_submit():
+            return template("auth/get_new_password.html.j2", form=form)
+
+        # user = models.User.load(form.username.data, load_type="username")
+        user = models.User.load("admin", load_type="username")
+        text_body = "spam"
+        html_body = template("auth/_new_password_email.html.j2", token=generate_new_password_token(user))
+        # send_email(user.username, "ketocalc.jmp@gmail.com", text_body, html_body)
+        send_email("Nové heslo", "ketocalc.jmp@gmail.com", "janmpeterka@gmail.com", text_body, html_body)
+
+
+@auth_blueprint.route("/new_password/", methods=["GET", "POST"])
 @auth_blueprint.route("/new_password/<token>", methods=["GET", "POST"])
 def show_new_password(token=None):
     form = NewPasswordForm(request.form)
     form.token = token
 
     if request.method == "GET":
-        return template("auth/new_password.tpl", form=form)
+        return template("auth/new_password.html.j2", form=form)
     elif request.method == "POST":
         if not form.validate_on_submit():
-            return template("auth/new_password.tpl", form=form)
+            return template("auth/new_password.html.j2", form=form)
 
         user = models.User.load(form.token, load_type="new_password_token")
         if user is None:
             flash("nemůžete změnit heslo", "error")
-            print("wrong user")
         else:
             flash("heslo bylo změněno", "success")
             user.set_password_hash(form.password.data.encode("utf-8"))
