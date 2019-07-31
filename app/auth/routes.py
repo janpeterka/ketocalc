@@ -83,12 +83,12 @@ def oauth_login(blueprint, token):
         user.google_id = google_id
 
         try:
-            user.first_name = user_info['given_name']
+            user.first_name = user_info["given_name"]
         except Exception:
             user.first_name = "-"
 
         try:
-            user.last_name = user_info['family_name']
+            user.last_name = user_info["family_name"]
         except Exception:
             user.last_name = "-"
 
@@ -96,11 +96,19 @@ def oauth_login(blueprint, token):
 
 
 def do_login(username=None, password=None, from_register=False, user=None):
+    # TODO - better solving of not encoded string
+    try:
+        password = password.encode("utf-8")
+    except Exception:
+        pass
+
     # get user if there is none
     if user is None and username is None:
         # This shouldn't happen
         application.logger.error("Login error: user is None and username is None")
-        flash('Někde se stala chyba. Kontaktujte mě <a href="mailto:ketocalc.jmp@gmail.com">e-mailem</a>')
+        flash(
+            'Někde se stala chyba. Kontaktujte mě <a href="mailto:ketocalc.jmp@gmail.com">e-mailem</a>'
+        )
         return False
     elif user is None and username is not None:
         # Load user by username

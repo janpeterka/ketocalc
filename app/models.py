@@ -59,10 +59,6 @@ t_users_has_diets = db.Table(
 # Custom methods for all my classes
 class BaseMixin(object):
     def edit(self, **kw):
-        """Edits object
-
-        Saves object changes
-        """
         try:
             db.session.commit()
             return True
@@ -72,10 +68,7 @@ class BaseMixin(object):
             return False
 
     def save(self, **kw):
-        """Saves new object
-
-        Returns:
-            int -- database ID of new object
+        """Saves (new) object
         """
         try:
             db.session.add(self)
@@ -103,8 +96,6 @@ class BaseMixin(object):
 
     def expire(self, **kw):
         """Dumps database changes
-
-        [description]
         """
 
         try:
@@ -117,18 +108,6 @@ class BaseMixin(object):
 
     @classmethod
     def refresh(self, **kw):
-        """Refreshes object
-
-        Expires changes and loads object
-
-        Arguments:
-            **kw {[type]} -- [description]
-
-        Returns:
-            bool -- [description]
-        """
-        # obj = cls(**kw)
-
         try:
             db.session.refresh(self)
             return True
@@ -145,16 +124,6 @@ class BaseMixin(object):
                 attributes.append(attr)
 
         return {attr: getattr(self, attr) for attr in attributes}
-
-
-# class LogType(db.Model):
-#     # info, warning, error
-#     __tablename__ = 'log_types'
-#     log_type_id = db.Column(db.Integer, primary_key=True)
-#     log_type_name = db.Column(db.String, nullable=False)
-#     log_type_description = db.Column(db.String, nullable=True)
-
-#
 
 
 class Log(db.Model, BaseMixin):
