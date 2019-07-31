@@ -2,7 +2,7 @@ import os
 
 
 class Config(object):
-    UPLOAD_FOLDER = "/tmp"
+    UPLOAD_FOLDER = "/temporary"
     ALLOWED_EXTENSIONS = set(["png", "jpg", "jpeg", "gif"])
 
     SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -25,6 +25,8 @@ class Config(object):
 
     GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
     GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
+
+    PASSWORD_VERSION = os.environ.get("PASSWORD_VERSION")
 
 
 class TestConfig(Config):

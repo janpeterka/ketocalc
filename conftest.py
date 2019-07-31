@@ -15,11 +15,12 @@ from app.models import Ingredient, Diet
 def app(scope="session"):
     app = create_app(config_name="test")
 
-    env_path = Path('.') / '.env'
+    env_path = Path(".") / ".env"
     load_dotenv(dotenv_path=env_path)
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('TESTING_DB_STRING')
-    app.config['SECRET_KEY'] = os.getenv('TESTING_SECRET_KEY')
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("TESTING_DB_STRING")
+    app.config["SECRET_KEY"] = os.getenv("TESTING_SECRET_KEY")
+    app.config["PASSWORD_VERSION"] = os.environ.get("PASSWORD_VERSION")
 
     @app.context_processor
     def inject_globals():
