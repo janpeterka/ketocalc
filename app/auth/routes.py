@@ -56,7 +56,7 @@ def show_login():
 
 @oauth_authorized.connect
 def oauth_login(blueprint, token):
-    # TODO rewrite for multiple oaths
+    # TODO: rewrite for multiple oaths @TEST (30)
     if blueprint.name == "google":
         try:
             user_info = google.get("/oauth2/v2/userinfo").json()
@@ -96,7 +96,7 @@ def oauth_login(blueprint, token):
 
 
 def do_login(username=None, password=None, from_register=False, user=None):
-    # TODO - better solving of not encoded string
+    # TODO: - better solving of not encoded string (5)
     try:
         password = password.encode("utf-8")
     except Exception:
@@ -118,7 +118,7 @@ def do_login(username=None, password=None, from_register=False, user=None):
         pass
 
     # log user, if either has google_id (going from oauth) or has valid password
-    # TODO this is not very nice
+    # TODO: this is not very nice (5)
     if user is not None and (
         user.google_id is not None
         or (password is not None and len(password) > 0 and user.check_login(password))
@@ -129,7 +129,7 @@ def do_login(username=None, password=None, from_register=False, user=None):
             try:
                 user.login_count += 1
             # in case login_count is NULL
-            # TODO which Exception is it?
+            # TODO: which Exception is it? (5)
             except Exception:
                 user.login_count = 1
             user.edit()
@@ -282,7 +282,7 @@ def show_new_password(token=None):
             flash("nemůžete změnit heslo", "error")
         else:
             user.set_password_hash(form.password.data.encode("utf-8"))
-            user.password_version = PASSWORD_VERSION
+            user.password_version = application.config["PASSWORD_VERSION"]
             user.new_password_token = None
             user.edit()
             flash("heslo bylo změněno", "success")

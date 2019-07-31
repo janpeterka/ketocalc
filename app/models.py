@@ -429,7 +429,11 @@ class User(db.Model, UserMixin, BaseMixin):
                 db.session.query(User).filter(User.google_id == user_identifier).first()
             )
         elif load_type == "new_password_token":
-            user = db.session.query(User).filter(User.new_password_token == user_identifier).first()
+            user = (
+                db.session.query(User)
+                .filter(User.new_password_token == user_identifier)
+                .first()
+            )
         else:
             return None
 
@@ -610,7 +614,7 @@ class Recipe(db.Model, BaseMixin):
         return self.id
 
     def remove(self):
-        # TODO - to improve w/ orphan cascade
+        # TODO: - to improve w/ orphan cascade (80)
         ingredients = db.session.query(RecipesHasIngredient).filter(
             RecipesHasIngredient.recipes_id == self.id
         )

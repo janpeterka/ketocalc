@@ -108,7 +108,7 @@ def show_diet(diet_id, page_type=None):
             )
     elif request.method == "POST":
         if page_type == "remove":
-            # TODO enable deleting diet with all recipes
+            # TODO: enable deleting diet with all recipes (20)
             if not diet.is_used:
                 diet.remove()
                 flash("Dieta byla smazána", "success")
@@ -428,7 +428,7 @@ def show_ingredient(ingredient_id, page_type=None):
                 "ingredient/edit.html.j2", ingredient=ingredient, recipes=recipes
             )
         if page_type is None:
-            # TODO -> if multiple users user same ingredient, they see each other recipes. probably should load_by_ingredient_and_recipe_author
+            # TODO: -> if multiple users user same ingredient, they see each other recipes. probably should load_by_ingredient_and_recipe_author (20)
             recipes = models.Recipe.load_by_ingredient(ingredient.id)
             return template(
                 "ingredient/show.html.j2", ingredient=ingredient, recipes=recipes
