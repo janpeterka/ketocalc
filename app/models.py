@@ -417,10 +417,11 @@ class User(db.Model, UserMixin, BaseMixin):
     password_version = db.Column(db.String(45), nullable=True)
 
     created = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
-    # last_updated = db.Column(db.DateTime, nullable=True, onupdate=datetime.datetime.now)
 
     last_logged_in = db.Column(db.DateTime, nullable=True)
     login_count = db.Column(db.Integer, nullable=True, default=0)
+
+    new_password_token = db.Column(db.String(255), nullable=True)
 
     diets = db.relationship(
         "Diet", secondary="users_has_diets", order_by="desc(Diet.active)"
