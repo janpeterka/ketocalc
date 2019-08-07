@@ -21,12 +21,14 @@
                 </div>
 
                 {{ form.submit(class_='btn btn-primary col-sm-3') }}
-                <a href="{{ url_for('google.login')}}">
+                <a href="{{ url_for('google.login')}}" style="text-decoration: none;">
                     <button type="button" class="btn btn-social btn-google">
                         <span class="fab fa-google"></span> {{ texts.login_google }}
                     </button>
                 </a>
                 <a class="col-sm-2" href="/register">{{ texts.register }}</a>
+                <a class="col-sm-2" style="color: var(--color_info)" href="/get_new_password">{{ texts.forgotten_password }}</a>
+
     	    </form>
     	</div>
     </div>
