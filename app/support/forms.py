@@ -13,6 +13,7 @@ class FeedbackForm(FlaskForm):
             ("bug", "Chyba v programu"),
             ("ux", "Problém s používáním uživatelského rozhraní"),
             ("suggestion", "Doporučení na zlepšení aplikace"),
+            ("other", "Jiné"),
         ],
     )
     message = StringField("Popište", [validators.InputRequired("Musí být vyplněno")])
