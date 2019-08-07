@@ -214,7 +214,7 @@ def validate_register(username):
 def generate_new_password_token(user):
     import secrets
 
-    token = secrets.token_hex(20)
+    token = secrets.token_hex(40)
     set_new_password_token(user, token)
     return token
 
