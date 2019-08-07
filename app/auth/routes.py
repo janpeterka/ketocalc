@@ -18,7 +18,9 @@ from flask_dance.consumer import oauth_authorized
 
 from app import models
 
-from app.auth.forms import LoginForm, RegisterForm
+from app.email import send_email
+
+from app.auth.forms import LoginForm, RegisterForm, NewPasswordForm, GetNewPasswordForm
 
 
 auth_blueprint = Blueprint("auth", __name__, template_folder="templates/auth/")
@@ -40,21 +42,21 @@ def show_login():
         return redirect("/dashboard")
     form = LoginForm(request.form)
     if request.method == "GET":
-        return template("auth/login.tpl", form=form)
+        return template("auth/login.html.j2", form=form)
     elif request.method == "POST":
         if not form.validate_on_submit():
-            return template("auth/login.tpl", form=form)
+            return template("auth/login.html.j2", form=form)
         if do_login(
             username=form.username.data, password=form.password.data.encode("utf-8")
         ):
             return redirect("/dashboard")
         else:
-            return template("auth/login.tpl", form=form)
+            return template("auth/login.html.j2", form=form)
 
 
 @oauth_authorized.connect
 def oauth_login(blueprint, token):
-    # TODO rewrite for multiple oaths
+    # TODO: rewrite for multiple oaths @TEST (30)
     if blueprint.name == "google":
         try:
             user_info = google.get("/oauth2/v2/userinfo").json()
@@ -94,7 +96,7 @@ def oauth_login(blueprint, token):
 
 
 def do_login(username=None, password=None, from_register=False, user=None):
-    # TODO - better solving of not encoded string
+    # TODO: - better solving of not encoded string (5)
     try:
         password = password.encode("utf-8")
     except Exception:
@@ -116,7 +118,7 @@ def do_login(username=None, password=None, from_register=False, user=None):
         pass
 
     # log user, if either has google_id (going from oauth) or has valid password
-    # TODO this is not very nice
+    # TODO: this is not very nice (5)
     if user is not None and (
         user.google_id is not None
         or (password is not None and len(password) > 0 and user.check_login(password))
@@ -127,7 +129,7 @@ def do_login(username=None, password=None, from_register=False, user=None):
             try:
                 user.login_count += 1
             # in case login_count is NULL
-            # TODO which Exception is it?
+            # TODO: which Exception is it? (5)
             except Exception:
                 user.login_count = 1
             user.edit()
@@ -154,13 +156,13 @@ def do_logout():
 def show_register():
     form = RegisterForm(request.form)
     if request.method == "GET":
-        return template("auth/register.tpl", form=form)
+        return template("auth/register.html.j2", form=form)
     elif request.method == "POST":
         if not form.validate_on_submit():
-            return template("auth/register.tpl", form=form)
+            return template("auth/register.html.j2", form=form)
         if not validate_register(form.username.data):
             form.username.errors = ["Toto jméno nemůžete použít"]
-            return template("auth/register.tpl", form=form)
+            return template("auth/register.html.j2", form=form)
 
         user = models.User()
         form.populate_obj(user)
@@ -170,7 +172,7 @@ def show_register():
         if do_register(user):
             return redirect("/dashboard")
         else:
-            return template("auth/register.tpl", form=form)
+            return template("auth/register.html.j2", form=form)
 
 
 def do_register(user, source=None):
@@ -207,3 +209,81 @@ def validate_register(username):
         return False
     else:
         return True
+
+
+def generate_new_password_token(user):
+    import secrets
+
+    token = secrets.token_hex(40)
+    set_new_password_token(user, token)
+    return token
+
+
+def set_new_password_token(user, token):
+    user.new_password_token = token
+    user.edit()
+    return True
+
+
+@auth_blueprint.route("/get_new_password", methods=["GET", "POST"])
+def get_new_password():
+    form = GetNewPasswordForm(request.form)
+    if request.method == "GET":
+        return template("auth/get_new_password.html.j2", form=form)
+    elif request.method == "POST":
+        if not form.validate_on_submit():
+            return template("auth/get_new_password.html.j2", form=form)
+
+        user = models.User.load(form.username.data, load_type="username")
+        if user is None:
+            form.username.errors = ["Uživatel s tímto emailem neexistuje"]
+            return template("auth/get_new_password.html.j2", form=form)
+
+        html_body = template(
+            "auth/mails/_new_password_email.html.j2",
+            token=generate_new_password_token(user),
+        )
+        send_email(
+            subject="Nové heslo",
+            sender="ketocalc.jmp@gmail.com",
+            recipients=[user.username],
+            text_body="",
+            html_body=html_body,
+        )
+    flash("Nové heslo vám bylo zasláno do emailu", "success")
+    return redirect("/login")
+
+
+@auth_blueprint.route("/new_password", methods=["GET", "POST"])
+@auth_blueprint.route("/new_password/<token>", methods=["GET", "POST"])
+def show_new_password(token=None):
+    form = NewPasswordForm(request.form)
+    user = models.User.load(token, load_type="new_password_token")
+    if user is None:
+        flash("tento token již není platný", "error")
+        return redirect("/login")
+
+    if request.method == "GET":
+        return template(
+            "auth/new_password.html.j2", form=form, username=user.username, token=token
+        )
+    elif request.method == "POST":
+        if not form.validate_on_submit():
+            return template(
+                "auth/new_password.html.j2",
+                form=form,
+                username=user.username,
+                token=token,
+            )
+
+        # print(user.username)
+        if user is None:
+            flash("nemůžete změnit heslo", "error")
+        else:
+            user.set_password_hash(form.password.data.encode("utf-8"))
+            user.password_version = application.config["PASSWORD_VERSION"]
+            user.new_password_token = None
+            user.edit()
+            flash("heslo bylo změněno", "success")
+
+        return redirect("/login")
