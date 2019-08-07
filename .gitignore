@@ -5,7 +5,9 @@ ketocalc.egg-info/
 
 migrations/
 
-v_ketocalc/
+*.sublime-project
+*.sublime-workspace
+
 
 todo/
 scripts/
