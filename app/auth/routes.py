@@ -240,7 +240,8 @@ def get_new_password():
             return template("auth/get_new_password.html.j2", form=form)
 
         html_body = template(
-            "auth/_new_password_email.html.j2", token=generate_new_password_token(user)
+            "auth/mails/_new_password_email.html.j2",
+            token=generate_new_password_token(user),
         )
         send_email(
             subject="Nové heslo",
@@ -249,9 +250,7 @@ def get_new_password():
             text_body="",
             html_body=html_body,
         )
-    flash(
-        "Nové heslo vám bylo zasláno do emailu. Zkontrolujte i složku Spam", "success"
-    )
+    flash("Nové heslo vám bylo zasláno do emailu", "success")
     return redirect("/login")
 
 
