@@ -33,10 +33,7 @@ class SQLAlchemyHandler(logging.Handler):
             url=url,
             module=record.__dict__["module"],
         )
-        try:
-            log.save()
-        except Exception:
-            pass
+        log.save()
 
 
 # DB handler

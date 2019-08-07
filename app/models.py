@@ -129,7 +129,7 @@ class BaseMixin(object):
 class Log(db.Model, BaseMixin):
     __tablename__ = "logs"
 
-    log_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     logger = db.Column(db.String(255))
     level = db.Column(db.String(255), index=True)
     msg = db.Column(db.Text)

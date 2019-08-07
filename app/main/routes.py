@@ -1,14 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Math library
-import math
-import numpy
-
 # Printing
 # import pdfkit
 
-# import requests
 import json
 
 
