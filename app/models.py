@@ -129,7 +129,7 @@ class BaseMixin(object):
 class Log(db.Model, BaseMixin):
     __tablename__ = "logs"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     logger = db.Column(db.String(255))
     level = db.Column(db.String(255), index=True)
     msg = db.Column(db.Text)
@@ -386,10 +386,11 @@ class User(db.Model, UserMixin, BaseMixin):
     password_version = db.Column(db.String(45), nullable=True)
 
     created = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
-    # last_updated = db.Column(db.DateTime, nullable=True, onupdate=datetime.datetime.now)
 
     last_logged_in = db.Column(db.DateTime, nullable=True)
     login_count = db.Column(db.Integer, nullable=True, default=0)
+
+    new_password_token = db.Column(db.String(255), nullable=True)
 
     diets = db.relationship(
         "Diet", secondary="users_has_diets", order_by="desc(Diet.active)"
@@ -414,6 +415,9 @@ class User(db.Model, UserMixin, BaseMixin):
         Returns:
             [type] -- [description]
         """
+        if user_identifier is None:
+            return None
+
         if load_type == "id":
             user = db.session.query(User).filter(User.id == user_identifier).first()
         elif load_type == "username":
@@ -423,6 +427,12 @@ class User(db.Model, UserMixin, BaseMixin):
         elif load_type == "google_id":
             user = (
                 db.session.query(User).filter(User.google_id == user_identifier).first()
+            )
+        elif load_type == "new_password_token":
+            user = (
+                db.session.query(User)
+                .filter(User.new_password_token == user_identifier)
+                .first()
             )
         else:
             return None
@@ -604,7 +614,7 @@ class Recipe(db.Model, BaseMixin):
         return self.id
 
     def remove(self):
-        # TODO - to improve w/ orphan cascade
+        # TODO: - to improve w/ orphan cascade (80)
         ingredients = db.session.query(RecipesHasIngredient).filter(
             RecipesHasIngredient.recipes_id == self.id
         )

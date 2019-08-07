@@ -52,10 +52,10 @@ def calculateRecipe(ingredients, diet):
     if len(ingredients) == 0:
         return None
     elif len(ingredients) == 1:
-        # TODO: Teoreticky je možné
+        # TODO: Teoreticky je možné (99)
         return None
     elif len(ingredients) == 2:
-        # TODO: Teoreticky je možné
+        # TODO: Teoreticky je možné (99)
         return None
     elif len(ingredients) == 3:
         a = numpy.array(
@@ -156,7 +156,7 @@ def calculateRecipe(ingredients, diet):
         ingredients[3].max = max_sol * 100
 
     elif len(ingredients) == 5:
-        # TODO
+        # TODO: 5 ingredients (30)
         return None
     else:
         return None
