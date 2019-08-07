@@ -7,12 +7,15 @@ from wtforms.fields.html5 import EmailField
 
 
 class FeedbackForm(FlaskForm):
-    option = SelectField('Vyberte typ reakce', choices=[
-        ('bug', 'Chyba v programu'),
-        ('ux', 'Problém s používáním uživatelského rozhraní'),
-        ('suggestion', 'Doporučení na zlepšení aplikace')
-    ])
-    message = StringField('Popište', [validators.InputRequired('Musí být vyplněno')])
-    email = EmailField('Váš email (pro případ nutnosti upřesnění)')
-    feedback_file = FileField('Screenshot s problémem')
-    submit = SubmitField('Poslat reakci')
+    option = SelectField(
+        "Vyberte typ reakce",
+        choices=[
+            ("bug", "Chyba v programu"),
+            ("ux", "Problém s používáním uživatelského rozhraní"),
+            ("suggestion", "Doporučení na zlepšení aplikace"),
+        ],
+    )
+    message = StringField("Popište", [validators.InputRequired("Musí být vyplněno")])
+    email = EmailField("Váš email (pro případ nutnosti upřesnění)")
+    feedback_file = FileField("Screenshot s problémem")
+    submit = SubmitField("Poslat reakci")

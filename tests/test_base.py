@@ -6,9 +6,10 @@ def test_application(app, client):
     # app is correctly set
 
     # from conftest>.env.test
-    assert app.config['SECRET_KEY'] == "justtesting"
+    assert app.config["WTF_CSRF_ENABLED"] is False
+    assert app.config["SECRET_KEY"] == "justtesting"
     # from config.py
-    assert app.config['TESTING'] is True
+    assert app.config["TESTING"] is True
 
 
 def test_request(client):

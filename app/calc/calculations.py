@@ -5,7 +5,7 @@ from sympy import poly
 
 from flask import Blueprint
 
-calc_blueprint = Blueprint('calc', __name__)
+calc_blueprint = Blueprint("calc", __name__)
 
 
 # CALCULATE RECIPE
@@ -58,9 +58,17 @@ def calculateRecipe(ingredients, diet):
         # TODO: Teoreticky je možné
         return None
     elif len(ingredients) == 3:
-        a = numpy.array([[ingredients[0].sugar, ingredients[1].sugar, ingredients[2].sugar],
-                         [ingredients[0].fat, ingredients[1].fat, ingredients[2].fat],
-                         [ingredients[0].protein, ingredients[1].protein, ingredients[2].protein]])
+        a = numpy.array(
+            [
+                [ingredients[0].sugar, ingredients[1].sugar, ingredients[2].sugar],
+                [ingredients[0].fat, ingredients[1].fat, ingredients[2].fat],
+                [
+                    ingredients[0].protein,
+                    ingredients[1].protein,
+                    ingredients[2].protein,
+                ],
+            ]
+        )
         b = numpy.array([diet.sugar, diet.fat, diet.protein])
         x = numpy.linalg.solve(a, b)
 
@@ -69,13 +77,31 @@ def calculateRecipe(ingredients, diet):
         ingredients[2].amount = x[2]
 
     elif len(ingredients) == 4:
-        x, y, z = sp.symbols('x, y, z')
-        e = sp.symbols('e')
+        x, y, z = sp.symbols("x, y, z")
+        e = sp.symbols("e")
 
         # set of linear equations
-        f1 = ingredients[0].sugar * x + ingredients[1].sugar * y + ingredients[2].sugar * z + ingredients[3].sugar * e - (diet.sugar)
-        f2 = ingredients[0].fat * x + ingredients[1].fat * y + ingredients[2].fat * z + ingredients[3].fat * e - (diet.fat)
-        f3 = ingredients[0].protein * x + ingredients[1].protein * y + ingredients[2].protein * z + ingredients[3].protein * e - (diet.protein)
+        f1 = (
+            ingredients[0].sugar * x
+            + ingredients[1].sugar * y
+            + ingredients[2].sugar * z
+            + ingredients[3].sugar * e
+            - (diet.sugar)
+        )
+        f2 = (
+            ingredients[0].fat * x
+            + ingredients[1].fat * y
+            + ingredients[2].fat * z
+            + ingredients[3].fat * e
+            - (diet.fat)
+        )
+        f3 = (
+            ingredients[0].protein * x
+            + ingredients[1].protein * y
+            + ingredients[2].protein * z
+            + ingredients[3].protein * e
+            - (diet.protein)
+        )
 
         # solve equations with args
         in1 = sp.solvers.solve((f1, f2, f3), (x, y, z))[x]
@@ -83,9 +109,9 @@ def calculateRecipe(ingredients, diet):
         in3 = sp.solvers.solve((f1, f2, f3), (x, y, z))[z]
 
         # solve for positive numbers
-        result1 = solvei(poly(in1), '>=')
-        result2 = solvei(poly(in2), '>=')
-        result3 = solvei(poly(in3), '>=')
+        result1 = solvei(poly(in1), ">=")
+        result2 = solvei(poly(in2), ">=")
+        result3 = solvei(poly(in3), ">=")
 
         interval = (result1[0].intersect(result2[0])).intersect(result3[0])
         if interval.is_EmptySet:

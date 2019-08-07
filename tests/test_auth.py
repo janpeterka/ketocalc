@@ -19,7 +19,7 @@ def test_logout(app, client):
 def test_register(db):
     user = User(username="test")
     user.password = "testtest"
-    user.set_password_hash(user.password.encode('utf-8'))
+    user.set_password_hash(user.password.encode("utf-8"))
     user.first_name = "TEST"
     user.last_name = "TEST"
     user.password_version = "bcrypt"
@@ -30,7 +30,7 @@ def test_register(db):
     # duplicate username
     another_user = User(username="test")
     another_user.password = "otherpassword"
-    another_user.set_password_hash(another_user.password.encode('utf-8'))
+    another_user.set_password_hash(another_user.password.encode("utf-8"))
     another_user.first_name = "TEST"
     another_user.last_name = "TEST"
     another_user.password_version = "bcrypt"
