@@ -353,14 +353,13 @@ class Ingredient(db.Model, BaseMixin):
         return rhi.amount
 
     def duplicate(self):
-        attributes = []
-        for attr in self.__dict__.keys():
-            if not attr.startswith("_") and attr != "id":
-                attributes.append(attr)
-
         new_ingredient = Ingredient()
-        for attr in attributes:
-            setattr(new_ingredient, attr, getattr(self, attr))
+
+        new_ingredient.name = self.name
+        new_ingredient.calorie = self.calorie
+        new_ingredient.sugar = self.sugar
+        new_ingredient.fat = self.fat
+        new_ingredient.protein = self.protein
 
         return new_ingredient
 
