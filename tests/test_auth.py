@@ -51,3 +51,8 @@ def test_new_password(app, client, db):
 
     # TODO: try already used token @TEST (20)
     pass
+
+
+def test_default_ingredients_on_register(app, client, db):
+    # Test that valid default ingredients are added on new register
+    pass
