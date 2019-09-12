@@ -1,5 +1,7 @@
 from app.auth.routes import do_login, do_register
-from app.models import User
+from app.models import Ingredient
+
+import helpers
 
 
 def test_login(app, client):
@@ -16,12 +18,12 @@ def test_logout(app, client):
 
 
 def test_register(db):
-    user = helper_create_user("test", "testtest")
+    user = helpers.create_user("test", "testtest")
 
     assert do_register(user) is True
     assert do_login(user.username, user.password) is True
 
-    another_user = helper_create_user("test", "otherpassword")
+    another_user = helpers.create_user("test", "otherpassword")
 
     assert do_register(another_user) is False
 
@@ -41,17 +43,10 @@ def test_new_password(app, client, db):
     pass
 
 
-def helper_create_user(username, password):
-    user = User(username)
-    user.password = password
-    user.set_password_hash(user.password.encode("utf-8"))
-    user.first_name = "TEST"
-    user.last_name = "TEST"
-    user.password_version = "bcrypt"
-
-    return user
-
-
 def test_default_ingredients_on_register(app, client, db):
     # Test that valid default ingredients are added on new register
-    pass
+    user = helpers.create_user("new_defaults")
+    do_register(user)
+
+    assert len(Ingredient.load_all_by_author(user.username)) != 0
+    assert len(Ingredient.load_all_by_author(user.username)) == 3

@@ -16,6 +16,7 @@ from app import db
 from app.auth import login
 
 from sqlalchemy.exc import DatabaseError
+from sqlalchemy.sql import func
 
 
 t_diets_has_recipes = db.Table(
@@ -126,7 +127,7 @@ class BaseMixin(object):
         return {attr: getattr(self, attr) for attr in attributes}
 
 
-class Log(db.Model, BaseMixin):
+class Log(db.Model):
     __tablename__ = "logs"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -136,7 +137,18 @@ class Log(db.Model, BaseMixin):
     url = db.Column(db.String(255))
     remote_addr = db.Column(db.String(255))
     module = db.Column(db.String(255))
-    timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
+    timestamp = db.Column(db.DateTime, default=func.now())
+
+    def save(self, **kw):
+        try:
+            db.session.add(self)
+            db.session.commit()
+            if self.id is not None:
+                return True
+            else:
+                return False
+        except DatabaseError:
+            pass
 
     @staticmethod
     def load_by_level(level):
@@ -340,6 +352,18 @@ class Ingredient(db.Model, BaseMixin):
         )
         return rhi.amount
 
+    def duplicate(self):
+        attributes = []
+        for attr in self.__dict__.keys():
+            if not attr.startswith("_") and attr != "id":
+                attributes.append(attr)
+
+        new_ingredient = Ingredient()
+        for attr in attributes:
+            setattr(new_ingredient, attr, getattr(self, attr))
+
+        return new_ingredient
+
     @property
     def is_used(self):
         if len(self.recipes) == 0:
@@ -469,6 +493,13 @@ class User(db.Model, UserMixin, BaseMixin):
                 return True
             else:
                 return False
+
+    def add_default_ingredients(self):
+        ingredients = Ingredient.load_all_by_author("default")
+        for ingredient in ingredients:
+            new_ingredient = ingredient.duplicate()
+            new_ingredient.author = self.username
+            new_ingredient.save()
 
     @property
     def recipes(self, ordered=True):
