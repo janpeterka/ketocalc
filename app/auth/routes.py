@@ -181,6 +181,7 @@ def do_register(user, source=None):
         flash("Toto uživatelské jméno nemůžete použít", "error")
         return False
     elif user.save() is True:
+        user.add_default_ingredients()
         if source == "google_oauth":
             do_login(user=user)
         else:
