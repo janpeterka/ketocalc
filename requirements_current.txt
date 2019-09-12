@@ -31,7 +31,6 @@ Mako==1.0.12
 MarkupSafe==1.1.1
 more-itertools==7.0.0
 mpmath==1.1.0
-mysqlclient==1.4.2.post1
 numpy==1.16.4
 oauthlib==3.0.1
 packaging==19.0

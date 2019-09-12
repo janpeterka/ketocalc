@@ -13,8 +13,6 @@ WTForms
 
 requests
 
-mysqlclient
-
 PyMySQL
 Flask-Migrate
 
