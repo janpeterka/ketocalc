@@ -48,5 +48,10 @@ def test_default_ingredients_on_register(app, client, db):
     user = helpers.create_user("new_defaults")
     do_register(user)
 
-    assert len(Ingredient.load_all_by_author(user.username)) != 0
-    assert len(Ingredient.load_all_by_author(user.username)) == 3
+    ingredients = Ingredient.load_all_by_author(user.username)
+    assert len(ingredients) == 3
+
+    assert ingredients[0].calorie == 100
+    assert ingredients[0].author == user.username
+    assert ingredients[1].sugar == 100
+    assert ingredients[2].fat == 100

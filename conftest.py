@@ -81,7 +81,7 @@ def db_fill_calc():
     # for do_register add_default_ingredients confirmation
     Ingredient(
         name="Default salátová",
-        calorie=54,
+        calorie=100,
         sugar=2.1,
         fat=0.2,
         protein=1,
@@ -90,7 +90,7 @@ def db_fill_calc():
     Ingredient(
         name="Okurka defaultová",
         calorie=54,
-        sugar=2.1,
+        sugar=100,
         fat=0.2,
         protein=1,
         author="default",
@@ -99,7 +99,7 @@ def db_fill_calc():
         name="Okurka salátová",
         calorie=54,
         sugar=2.1,
-        fat=0.2,
+        fat=100,
         protein=1,
         author="default",
     ).save()
