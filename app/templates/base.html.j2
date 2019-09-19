@@ -80,23 +80,6 @@
         {% endblock %}
     </div>
     <!-- cookies -->
-    <script src="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.js" data-cfasync="false"></script>
-    <script>
-    window.cookieconsent.initialise({
-      "palette": {
-        "popup": {
-          "background": "#000"
-        },
-        "button": {
-          "background": "#f1d600"
-        }
-      },
-      "content": {
-        "message": 'Tato stránka používá cookies, aby Vám zajistila co nejlepší používání',
-        "dismiss": "OK",
-        "link": "více zde"
-      }
-    });
-    </script>
+    {% include('support/_cookies_consent.html.j2') %}
 </body>
 </html>
