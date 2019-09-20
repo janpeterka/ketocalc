@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <!-- <link rel="icon" href="data:,"> -->
+    <link rel="icon" href="{{ url_for('static', filename='calculator-solid.svg') }}">
 
     <!-- Bootstrap -->
     <!-- Latest compiled and minified CSS -->
@@ -48,8 +48,11 @@
     <!-- Bootstrap alert, prompt -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
    
-   <!-- reCaptcha -->
+    <!-- reCaptcha -->
     <script src='https://www.google.com/recaptcha/api.js?hl=cs'></script>
+
+    <!-- cookieconsent -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.css" />
 
     {% block style %} {% endblock %}
 
@@ -76,5 +79,7 @@
             {{ texts.copyright }}
         {% endblock %}
     </div>
+    <!-- cookies -->
+    {% include('support/_cookies_consent.html.j2') %}
 </body>
 </html>
