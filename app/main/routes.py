@@ -428,7 +428,6 @@ def show_ingredient(ingredient_id, page_type=None):
                 "ingredient/edit.html.j2", ingredient=ingredient, recipes=recipes
             )
         if page_type is None:
-            # TODO: -> if multiple users user same ingredient, they see each other recipes. probably should load_by_ingredient_and_recipe_author (20)
             recipes = models.Recipe.load_by_ingredient(ingredient.id)
             return template(
                 "ingredient/show.html.j2", ingredient=ingredient, recipes=recipes
@@ -463,7 +462,6 @@ def show_ingredient(ingredient_id, page_type=None):
 @main_blueprint.route("/allingredients")
 @login_required
 def show_all_ingredients():
-    # basic_ingredients = models.Ingredient.load_all_by_author('default')
     ingredients = models.Ingredient.load_all_by_author(current_user.username)
     return template("ingredient/all.html.j2", ingredients=ingredients)
 
@@ -473,12 +471,9 @@ def show_all_ingredients():
 @main_blueprint.route("/user/<page_type>", methods=["POST", "GET"])
 @login_required
 def show_user(page_type=None):
-    try:
-        user = models.User.load(current_user.id)
-        if user is None:
-            abort(404)
-    except Exception:
-        abort(500)
+    user = models.User.load(current_user.id)
+    if user is None:
+        abort(404)
 
     if request.method == "GET":
         if page_type == "edit":
