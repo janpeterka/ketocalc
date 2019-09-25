@@ -3,6 +3,12 @@ from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
+import pymysql
+import numpy as np
+
+pymysql.converters.encoders[np.float64] = pymysql.converters.escape_float
+pymysql.converters.conversions = pymysql.converters.encoders.copy()
+pymysql.converters.conversions.update(pymysql.converters.decoders)
 
 mail = Mail()
 db = SQLAlchemy()
