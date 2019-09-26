@@ -15,7 +15,7 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: 3.7
-    - name: Install docker db
+
     - uses: mirromutth/mysql-action@v1.1
       with:
         host port: 3800 # Optional, default value is 3306. The port of host
