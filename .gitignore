@@ -3,7 +3,7 @@
 __pycache__/
 ketocalc.egg-info/
 
-migrations/
+# migrations/
 
 *.sublime-project
 *.sublime-workspace
