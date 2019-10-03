@@ -117,18 +117,11 @@ def calculateRecipe(ingredients, diet):
         if interval.is_EmptySet:
             return None
 
-        if interval.right > 100:
-            max_sol = 100
-        else:
-            max_sol = round(interval.right, 2)
-
-        if interval.left < 0:
-            min_sol = 0
-        else:
-            min_sol = round(interval.left, 2)
-
+        max_sol = min(100, round(interval.right, 2))
+        min_sol = max(0, round(interval.left, 2))
         if max_sol < min_sol:
             return None
+
         # max_sol = max for e (variable)
         sol = (min_sol + max_sol) / 2
 
@@ -164,5 +157,24 @@ def calculateRecipe(ingredients, diet):
     for ing in fixed_ingredients:
         ingredients.append(ing)
 
+    totals = type("", (), {})()
+    totals.sugar = 0
+    totals.fat = 0
+    totals.protein = 0
+    totals.amount = 0
+    totals.calorie = 0
+
+    for ing in ingredients:
+        ing.calorie = ing.calorie * ing.amount
+        ing.fat = ing.fat * ing.amount
+        ing.sugar = ing.sugar * ing.amount
+        ing.protein = ing.protein * ing.amount
+
+        totals.sugar += ing.sugar
+        totals.fat += ing.fat
+        totals.protein += ing.protein
+        totals.calorie += ing.calorie
+        totals.amount += ing.amount
+
     diet.expire()
-    return ingredients
+    return {"ingredients": ingredients, "totals": totals}
