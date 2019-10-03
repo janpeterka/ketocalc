@@ -219,7 +219,7 @@ def calculate_recipe_AJAX():
         ingredient.fill_from_json(json_i)
         ingredients.append(ingredient)
 
-    result = calculations.calculateRecipe(ingredients, diet)
+    result = calculations.calculate_recipe(ingredients, diet)
     if result is None:
         return "False"
 

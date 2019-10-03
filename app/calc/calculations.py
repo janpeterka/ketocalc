@@ -1,3 +1,4 @@
+import types
 import numpy
 import sympy as sp
 from sympy import solve_poly_inequality as solvei
@@ -9,7 +10,7 @@ calc_blueprint = Blueprint("calc", __name__)
 
 
 # CALCULATE RECIPE
-def calculateRecipe(ingredients, diet):
+def calculate_recipe(ingredients, diet):
     """
     [summary]
 
@@ -20,9 +21,6 @@ def calculateRecipe(ingredients, diet):
         diet {Diet} -- Diet
 
     Returns:
-        [type] -- solution object
-        3 - ingredients {array} -- array of Ingredients (w/ amounts - 2 decimals)
-        4 - ingredients {array} (last-main ing has min, max)
     """
 
     # remove fixed ingredient values from diet
@@ -157,7 +155,8 @@ def calculateRecipe(ingredients, diet):
     for ing in fixed_ingredients:
         ingredients.append(ing)
 
-    totals = type("", (), {})()
+    # totals = type("", (), {})()
+    totals = types.SimpleNamespace()
     totals.sugar = 0
     totals.fat = 0
     totals.protein = 0

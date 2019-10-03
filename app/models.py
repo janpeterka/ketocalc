@@ -2,6 +2,7 @@
 
 import math
 import datetime
+import types
 
 import bcrypt
 import hashlib
@@ -376,13 +377,6 @@ class Ingredient(db.Model, BaseMixin):
         if "max" in json_ing:
             self.max = float(json_ing["max"])
 
-    @property
-    def is_used(self):
-        if len(self.recipes) == 0:
-            return False
-        else:
-            return True
-
     def set_fixed(self, value=True, amount=0):
         self.fixed = value
         self.amount = amount
@@ -391,6 +385,13 @@ class Ingredient(db.Model, BaseMixin):
     def set_main(self, value=True):
         self.main = value
         return self
+
+    @property
+    def is_used(self):
+        if len(self.recipes) == 0:
+            return False
+        else:
+            return True
 
 
 class User(db.Model, UserMixin, BaseMixin):
@@ -611,7 +612,7 @@ class Recipe(db.Model, BaseMixin):
                 / 100000
             )
 
-        totals = type("", (), {})()
+        totals = types.SimpleNamespace()
         totals.calorie = 0
         totals.protein = 0
         totals.fat = 0
@@ -670,8 +671,7 @@ class Recipe(db.Model, BaseMixin):
 
     @property
     def totals(self):
-
-        totals = type("", (), {})()
+        totals = types.SimpleNamespace()
         totals.calorie = 0
         totals.protein = 0
         totals.fat = 0
