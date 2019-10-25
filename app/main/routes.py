@@ -216,49 +216,26 @@ def calculate_recipe_AJAX():
     ingredients = []
     for json_i in json_ingredients:
         ingredient = models.Ingredient.load(json_i["id"])
-        if "fixed" in json_i:
-            ingredient.fixed = json_i["fixed"]
-        if "main" in json_i:
-            ingredient.main = json_i["main"]
-        if "amount" in json_i:
-            ingredient.amount = float(json_i["amount"]) / 100  # from grams per 100g
-
-        if "min" in json_i:
-            ingredient.min = float(json_i["min"])
-        if "max" in json_i:
-            ingredient.max = float(json_i["max"])
-
+        ingredient.fill_from_json(json_i)
         ingredients.append(ingredient)
 
-    ingredients = calculations.calculateRecipe(ingredients, diet)
-
-    if ingredients is None:
+    result = calculations.calculate_recipe(ingredients, diet)
+    if result is None:
         return "False"
 
-    totals = type("", (), {})()
-    totals.sugar = 0
-    totals.fat = 0
-    totals.protein = 0
-    totals.amount = 0
-    totals.calorie = 0
+    ingredients = result["ingredients"]
+    totals = result["totals"]
 
     json_ingredients = []
     for ing in ingredients:
-
         if ing.amount < 0:
             return "False"
 
         ing.calorie = round(ing.calorie * ing.amount, 2)
-        ing.fat = round(ing.fat * ing.amount, 2)
-        ing.sugar = round(ing.sugar * ing.amount, 2)
-        ing.protein = round(ing.protein * ing.amount, 2)
+        ing.fat = round(ing.fat, 2)
+        ing.sugar = round(ing.sugar, 2)
+        ing.protein = round(ing.protein, 2)
         ing.amount = round(ing.amount * 100, 2)
-
-        totals.sugar += ing.sugar
-        totals.fat += ing.fat
-        totals.protein += ing.protein
-        totals.amount += ing.amount
-        totals.calorie += ing.calorie
 
         json_ingredients.append(ing.json)
 
@@ -270,7 +247,7 @@ def calculate_recipe_AJAX():
     totals.ratio = round((totals.fat / (totals.protein + totals.sugar)), 2)
 
     template_data = template(
-        "recipe/_right_form.tpl",
+        "recipe/_right_form.html.j2",
         ingredients=ingredients,
         totals=totals,
         diet=diet,
