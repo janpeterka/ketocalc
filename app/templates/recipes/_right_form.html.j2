@@ -1,4 +1,4 @@
-<form method="post" class="recipe__right__form form-group"  action="/saveRecipeAJAX" >
+<form method="post" class="recipe__right__form form-group"  action="{{ url_for('RecipesView:saveRecipeAJAX')) }}" >
     <label for="recipe__right__form__name-input">Název receptu</label>
     <input type="text" name="recipe__right__form__name-input" required class="form-control"/>
     <table class="recipe__right__form__ingredient-table table">
@@ -13,7 +13,6 @@
 
         {% for ingredient in ingredients %}
             {% if ingredient.main %}
-                {# <tr class="tr-mainIngredient" data-min="{{ingredient.min * 100}}" data-max="{{ingredient.max * 100}}"> #}
                 <tr class="tr-mainIngredient">
             {% elif ingredient.fixed %}
                 <tr class="tr-fixedIngredient">
@@ -32,7 +31,7 @@
             {% if ingredient.main %}
                 <tr class="tr-slider">
                     <td> 
-                        <input type="text" class="col" id="slider" data-slider-id="slider_data" name="slider" data-provide="slider" data-slider-min="{{ingredient.min}}" data-slider-max="{{ingredient.max}}" data-slider-step="0.1" data-slider-value="{{ingredient.amount}}" data-slider-tooltip="show">
+                        <input type="text" class="col" id="slider" data-slider-id="slider_data" name="slider" data-provide="slider" data-slider-min="{{ ingredient.min }}" data-slider-max="{{ ingredient.max }}" data-slider-step="0.1" data-slider-value="{{ ingredient.amount }}" data-slider-tooltip="show">
                     </td>
 
                     <td colspan=5>
