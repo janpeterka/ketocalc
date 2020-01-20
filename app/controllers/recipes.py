@@ -1,7 +1,10 @@
-from werkzeug import MultiDict
+# from werkzeug import MultiDict
+import json
+import jsonify
 
 from flask import render_template as template
-from flask import request, redirect, url_for, session
+from flask import current_app as application
+from flask import request, redirect, url_for, session, flash
 from flask import abort
 
 from flask_login import login_required, current_user
@@ -10,6 +13,9 @@ from flask_classful import FlaskView, route
 
 from app.models.recipes import Recipe
 from app.models.diets import Diet
+from app.models.users import User
+from app.models.ingredients import Ingredient
+from app.models.recipes_has_ingredients import RecipesHasIngredient
 
 from app.calc import calculations
 
@@ -17,7 +23,7 @@ from app.calc import calculations
 class RecipesView(FlaskView):
     decorators = [login_required]
 
-    def before_request(self, name, id):
+    def before_request(self, name, id=None):
         if id is not None:
             self.recipe = Recipe.load(id)
 
@@ -28,7 +34,7 @@ class RecipesView(FlaskView):
 
     def index(self):
         user = User.load(current_user.id)
-        return template("recipe/all.html.j2", diets=user.active_diets)
+        return template("recipes/all.html.j2", diets=user.active_diets)
 
     def new(self):
         active_diets = User.load(current_user.id).active_diets
@@ -45,23 +51,26 @@ class RecipesView(FlaskView):
         session.pop("form_type")
 
         if form_type == "edit":
-            recipe.name = request.form["name"]
-            recipe.type = request.form["size"]
-            recipe.edit()
-            recipe.refresh()
+            self.recipe.name = request.form["name"]
+            self.recipe.type = request.form["size"]
+            self.recipe.edit()
+            self.recipe.refresh()
             flash("Recept byl upraven.", "success")
-            return redirect("/recipe={}".format(recipe_id))
+            return redirect(url_for("RecipesView:show", id=self.recipe.id))
 
     def show(self, id):
         if application.config["APP_STATE"] == "production":
-            if recipe.view_count is not None:
-                recipe.view_count += 1
+            if self.recipe.view_count is not None:
+                self.recipe.view_count += 1
             else:
-                recipe.view_count = 1
-            recipe.edit()
+                self.recipe.view_count = 1
+            self.recipe.edit()
 
         return template(
-            "recipe/show.html.j2", recipe=recipe, totals=recipe.totals, is_print=False,
+            "recipe/show.html.j2",
+            recipe=self.recipe,
+            totals=self.recipe.totals,
+            is_print=False,
         )
 
     def print(self, id):
@@ -85,10 +94,12 @@ class RecipesView(FlaskView):
 
     def edit(self, id):
         session["form_type"] = "edit"
-        return template("recipes/edit.html.j2", recipe=recipe, totals=recipe.totals)
+        return template(
+            "recipes/edit.html.j2", recipe=self.recipe, totals=self.recipe.totals
+        )
 
     def delete(self, id):
-        recipe.remove()
+        self.recipe.remove()
         flash("Recept byl smazán.", "success")
         return redirect(url_for("DashboardView:show"))
 

@@ -14,7 +14,7 @@ mail = Mail()
 db = SQLAlchemy()
 migrate = Migrate()
 
-from app.controllers import register_all_controllers
+from app.controllers import register_all_controllers  # noqa: F401
 
 
 def create_app(config_name="default"):

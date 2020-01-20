@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 
-from wtforms import StringField, SubmitField, FloatField
+from wtforms import StringField, SubmitField
 from wtforms import validators
 
 from app.controllers.forms.custom import MyFloatField

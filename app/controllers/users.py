@@ -1,16 +1,14 @@
-from werkzeug import MultiDict
+# from werkzeug import MultiDict
 
 from flask import render_template as template
-from flask import request, redirect, url_for, session
-from flask import abort
+from flask import request, url_for, redirect
+from flask import abort, flash
 
 from flask_login import login_required, current_user
 
 from flask_classful import FlaskView
 
 from app.models.users import User
-
-# from app.controllers.forms.users import NewUsersForm
 
 
 class UsersView(FlaskView):
@@ -30,7 +28,7 @@ class UsersView(FlaskView):
                 flash("Heslo bylo změněno", "success")
             else:
                 flash("Nepovedlo se změnit heslo", "error")
-            return template("users/show.html.j2", user=self.user)
+            return redirect(url_for("UsersView:show"))
         else:
             self.user.first_name = request.form["firstname"]
             self.user.last_name = request.form["lastname"]
@@ -38,7 +36,7 @@ class UsersView(FlaskView):
                 flash("Uživatel byl upraven", "success")
             else:
                 flash("Nepovedlo se změnit uživatele", "error")
-            return template("users/show.html.j2", user=self.user)
+            return redirect(url_for("UsersView:show"))
 
     def show(self):
         return template("users/show.html.j2", user=self.user)

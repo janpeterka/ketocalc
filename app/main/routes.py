@@ -4,28 +4,14 @@
 # Printing
 # import pdfkit
 
-import json
+# import json
 
 
 from flask import Blueprint
-from flask import render_template as template, request, redirect
-from flask import jsonify
-from flask import flash
-from flask import abort
-
-from flask import current_app as application
-
-from flask_login import login_required, current_user
-
+from flask import render_template as template
 
 from app.models.users import User
-from app.models.diets import Diet
 from app.models.ingredients import Ingredient
-from app.models.recipes import Recipe
-from app.models.recipe_has_ingredient import RecipesHasIngredient
-
-# from app.main import forms
-from app.calc import calculations
 
 
 main_blueprint = Blueprint("main", __name__)

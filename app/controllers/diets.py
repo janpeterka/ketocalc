@@ -59,18 +59,18 @@ class DietsView(FlaskView):
                 return redirect(url_for("DietsView:new"))
 
         if form_type == "edit":
-            diet.name = request.form["name"]
-            diet.id = id
-            diet.small_size = request.form["small_size"]
-            diet.big_size = request.form["big_size"]
+            self.diet.name = request.form["name"]
+            self.diet.id = id
+            self.diet.small_size = request.form["small_size"]
+            self.diet.big_size = request.form["big_size"]
 
-            if not diet.is_used:
-                diet.protein = request.form["protein"]
-                diet.fat = request.form["fat"]
-                diet.sugar = request.form["sugar"]
+            if not self.diet.is_used:
+                self.diet.protein = request.form["protein"]
+                self.diet.fat = request.form["fat"]
+                self.diet.sugar = request.form["sugar"]
 
-            diet.save()
-            return redirect(url_for("DietsView:show", id=diet.id))
+            self.diet.save()
+            return redirect(url_for("DietsView:show", id=self.diet.id))
 
         diet = Diet()
         form.populate_obj(diet)

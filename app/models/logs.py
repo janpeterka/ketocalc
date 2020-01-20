@@ -1,5 +1,6 @@
 from sqlalchemy.sql import func
-from sqlalchemy.exc import DatabaseError
+
+# from sqlalchemy.exc import DatabaseError
 
 from app import db
 
@@ -17,6 +18,7 @@ class Log(db.Model):
     timestamp = db.Column(db.DateTime, default=func.now())
 
     def save(self, **kw):
+        # TODO: not working now?
         # try:
         #     db.session.add(self)
         #     db.session.commit()

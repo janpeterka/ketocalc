@@ -1,5 +1,7 @@
 import datetime
 import bcrypt
+import hashlib
+
 
 from flask_login import UserMixin
 
@@ -7,6 +9,9 @@ from app import db
 from app.auth import login
 
 from app.models.base_mixin import BaseMixin
+from app.models.ingredients import Ingredient
+
+# from app.models.diets import Diet
 
 
 class User(db.Model, UserMixin, BaseMixin):
@@ -47,8 +52,8 @@ class User(db.Model, UserMixin, BaseMixin):
     diets = db.relationship(
         "Diet",
         secondary="users_has_diets",
-        backref=db.backref("authors")
-        # , order_by="desc(Diet.active)"
+        backref=db.backref("authors"),
+        order_by="desc(Diet.active)",
     )
     diets = []
 
