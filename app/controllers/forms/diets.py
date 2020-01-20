@@ -5,6 +5,7 @@ from wtforms import validators
 
 from app.controllers.forms.custom import MyFloatField
 
+
 class NewDietsForm(FlaskForm):
     name = StringField(
         "Název diety", [validators.InputRequired("Název musí být vyplněn")]

@@ -1,9 +1,10 @@
 import datetime
 from app import db
 
-from app.models.base_mixin import BaseMixin 
+from app.models.base_mixin import BaseMixin
 
 from app.models.ingredients import Ingredient
+
 
 class Recipe(db.Model, BaseMixin):
     """[summary]

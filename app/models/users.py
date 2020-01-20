@@ -45,7 +45,9 @@ class User(db.Model, UserMixin, BaseMixin):
     new_password_token = db.Column(db.String(255), nullable=True)
 
     diets = db.relationship(
-        "Diet", secondary="users_has_diets", backref=db.backref("authors")
+        "Diet",
+        secondary="users_has_diets",
+        backref=db.backref("authors")
         # , order_by="desc(Diet.active)"
     )
     diets = []
@@ -144,9 +146,9 @@ class User(db.Model, UserMixin, BaseMixin):
 
     @property
     def active_diets(self):
-    #     active_diets = []
-    #     for diet in self.diets:
-    #         if diet.active == 1:
-    #             active_diets.append(diet)
+        #     active_diets = []
+        #     for diet in self.diets:
+        #         if diet.active == 1:
+        #             active_diets.append(diet)
         # return active_diets
         return []

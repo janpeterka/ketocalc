@@ -9,6 +9,7 @@ from flask_login import login_required, current_user
 from flask_classful import FlaskView
 
 from app.models.recipes import Recipe
+
 # from app.models.users import User
 
 # from app.controllers.forms.recipes import NewRecipesForm

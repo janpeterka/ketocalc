@@ -32,7 +32,6 @@ def create_app(config_name="default"):
     # from app.config_logging import mail_handler
     # application.logger.addHandler(mail_handler)
 
-
     # APPS
     mail.init_app(application)
     db.init_app(application)

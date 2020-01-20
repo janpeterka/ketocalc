@@ -57,6 +57,7 @@ def show_dashboard():
             first_name=user.first_name,
         )
 
+
 # NEW RECIPE PAGE
 @main_blueprint.route("/trialnewrecipe")
 def show_trial_new_recipe():

@@ -113,7 +113,7 @@ class IngredientsView(FlaskView):
             recipes=self.ingredient.recipes,
         )
 
-    @route('/ingredients/<id>', methods=['POST'])
+    @route("/ingredients/<id>", methods=["POST"])
     def delete(self, id):
         if not self.ingredient.is_used:
             self.ingredient.remove()

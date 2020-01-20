@@ -3,6 +3,7 @@ from app import db
 
 from app.models.base_mixin import BaseMixin
 
+
 class Diet(db.Model, BaseMixin):
     """Diet object
 
@@ -40,7 +41,9 @@ class Diet(db.Model, BaseMixin):
     recipes = db.relationship(
         "Recipe", secondary="diets_has_recipes", order_by="Recipe.name"
     )
-    author = db.relationship("User", secondary="users_has_diets", uselist=False, backref="diets")
+    author = db.relationship(
+        "User", secondary="users_has_diets", uselist=False, backref="diets"
+    )
 
     @staticmethod
     def load(diet_id):
