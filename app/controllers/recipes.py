@@ -104,7 +104,7 @@ class RecipesView(FlaskView):
         return redirect(url_for("DashboardView:show"))
 
     @route("/addIngredientAJAX", methods=["POST"])
-    def add_ingredient_to_recipe_AJAX():
+    def addIngredientAJAX(self):
         ingredient = Ingredient.load(request.json["ingredient_id"])
         template_data = template(
             "recipes/_add_ingredient.html.j2", ingredient=ingredient
@@ -113,7 +113,7 @@ class RecipesView(FlaskView):
         return jsonify(result)
 
     @route("/calcRecipeAJAX", methods=["POST"])
-    def calculate_recipe_AJAX():
+    def calcRecipeAJAX(self):
 
         json_ingredients = request.json["ingredients"]
         diet = Diet.load(request.json["dietID"])
@@ -180,7 +180,7 @@ class RecipesView(FlaskView):
         return jsonify(result)
 
     @route("/saveRecipeAJAX", methods=["POST"])
-    def saveRecipeAJAX():
+    def saveRecipeAJAX(self):
         temp_ingredients = request.json["ingredients"]
         diet_id = request.json["dietID"]
 

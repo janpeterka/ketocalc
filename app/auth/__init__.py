@@ -15,7 +15,7 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if current_user.username != "admin":
-            return redirect("/wrongpage")
+            return redirect("support/wrongpage")
         return f(*args, **kwargs)
 
     return decorated_function
