@@ -1,11 +1,10 @@
 # from werkzeug import MultiDict
 import json
-import jsonify
 
 from flask import render_template as template
 from flask import current_app as application
 from flask import request, redirect, url_for, session, flash
-from flask import abort
+from flask import abort, jsonify
 
 from flask_login import login_required, current_user
 

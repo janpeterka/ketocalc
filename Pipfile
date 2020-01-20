@@ -27,7 +27,6 @@ PyMySQL = "*"
 Flask-Migrate = "*"
 Unidecode = "*"
 flask-classful = "*"
-jsonify = "*"
 
 [requires]
 python_version = "3.7"

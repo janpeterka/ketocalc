@@ -12,7 +12,8 @@ class DashboardView(FlaskView):
     decorators = [login_required]
 
     def before_request(self, name):
-        self.user = User.load(current_user.id)
+        if hasattr(current_user, "id"):
+            self.user = User.load(current_user.id)
 
     def index(self, selected_diet_id=None):
         if selected_diet_id is None:
