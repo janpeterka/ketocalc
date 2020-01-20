@@ -6,9 +6,26 @@ def register_all_controllers(application):
     from app.controllers.dashboard import DashboardView
     from app.controllers.index import IndexView
 
+    # from app.controllers.trial_recipes import TrialRecipesView
+    from app.controllers.supports import SupportsView
+    from app.controllers.errors import ErrorsView
+
     DietsView.register(application)
     UsersView.register(application)
     IngredientsView.register(application)
     RecipesView.register(application)
     DashboardView.register(application)
     IndexView.register(application)
+    # TrialRecipesView.register(application)
+    SupportsView.register(application)
+    ErrorsView.register(application)
+
+
+def register_error_handlers(application):
+    from app.controllers.errors import error404
+    from app.controllers.errors import error405
+    from app.controllers.errors import error500
+
+    application.register_error_handler(404, error404)
+    application.register_error_handler(405, error405)
+    application.register_error_handler(500, error500)

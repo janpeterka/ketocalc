@@ -14,8 +14,6 @@ mail = Mail()
 db = SQLAlchemy()
 migrate = Migrate()
 
-from app.controllers import register_all_controllers  # noqa: F401
-
 
 def create_app(config_name="default"):
     application = Flask(__name__, instance_relative_config=True)
@@ -43,11 +41,6 @@ def create_app(config_name="default"):
     application.logger.addHandler(db_handler)
     # MODULES
 
-    # Main module
-    from app.main import create_module as main_create_module
-
-    main_create_module(application)
-
     # Auth module
     from app.auth import create_module as auth_create_module
 
@@ -58,16 +51,12 @@ def create_app(config_name="default"):
 
     calc_create_module(application)
 
-    # Errors module
-    from app.errors import create_module as errors_create_module
-
-    errors_create_module(application)
-
-    # Support module
-    from app.support import create_module as support_create_module
-
-    support_create_module(application)
+    from app.controllers import register_all_controllers  # noqa: F401
 
     register_all_controllers(application)
+
+    from app.controllers import register_error_handlers  # noqa: F401
+
+    register_error_handlers(application)
 
     return application

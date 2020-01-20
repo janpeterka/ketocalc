@@ -7,7 +7,7 @@ from app import db
 from app.models.base_mixin import BaseMixin
 
 from app.models.ingredients import Ingredient
-from app.models.recipe_has_ingredient import RecipesHasIngredient
+from app.models.recipes_has_ingredients import RecipesHasIngredient
 
 
 class Recipe(db.Model, BaseMixin):

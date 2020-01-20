@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "7fca0a03faa609b85ea211b33b3bb2f76dc9815c4589b896e6a0b5314645df4e"
+            "sha256": "c73e96d5431e2dfca717001c708d5f310454431afd3c806a8f3ad769b5972de1"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -250,6 +250,13 @@
             ],
             "version": "==2.10.3"
         },
+        "jsonify": {
+            "hashes": [
+                "sha256:f340032753577575e9777835809b283fdc9b251867d5d5600389131647f8bfe1"
+            ],
+            "index": "pypi",
+            "version": "==0.5"
+        },
         "mako": {
             "hashes": [
                 "sha256:a36919599a9b7dc5d86a7a8988f23a9a3a3d083070023bab23d64f7f1d1e0a4b"
@@ -375,7 +382,6 @@
         },
         "pycparser": {
             "hashes": [
-                "sha256:2ac6586a9a7489b4a4f87f2c56df1d12f758f808f6999b168b4a7a066236221b",
                 "sha256:a988718abfad80b6b157acce7bf130a30876d27603738ac39f140993246b25b3"
             ],
             "version": "==2.19"
@@ -527,9 +533,10 @@
         },
         "zipp": {
             "hashes": [
-
+                "sha256:57147f6b0403b59f33fd357f169f860e031303415aeb7d04ede4839d23905ab8",
+                "sha256:7ae5ccaca427bafa9760ac3cd8f8c244bfc259794b5b6bb9db4dda2241575d09"
             ],
-
+            "version": "==2.0.0"
         }
     },
     "develop": {}
