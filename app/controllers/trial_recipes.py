@@ -12,7 +12,7 @@ class TrialRecipesView(FlaskView):
         ).active_diets
         ingredients = Ingredient.load_all_by_author("basic")
         return template(
-            "recipe/new.html.j2",
+            "recipes/new.html.j2",
             ingredients=ingredients,
             diets=active_diets,
             is_trialrecipe=True,

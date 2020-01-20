@@ -67,7 +67,7 @@ class RecipesView(FlaskView):
             self.recipe.edit()
 
         return template(
-            "recipe/show.html.j2",
+            "recipes/show.html.j2",
             recipe=self.recipe,
             totals=self.recipe.totals,
             is_print=False,
@@ -90,7 +90,7 @@ class RecipesView(FlaskView):
         for recipe in recipes:
             recipe_data = recipe.load_recipe_for_show()
             recipe.show_totals = recipe_data["totals"]
-        return template("recipe/print_all.html.j2", recipes=recipes)
+        return template("recipes/print_all.html.j2", recipes=recipes)
 
     def edit(self, id):
         session["form_type"] = "edit"
@@ -159,7 +159,7 @@ class RecipesView(FlaskView):
         totals.ratio = round((totals.fat / (totals.protein + totals.sugar)), 2)
 
         template_data = template(
-            "recipe/_right_form.html.j2",
+            "recipes/_right_form.html.j2",
             ingredients=ingredients,
             totals=totals,
             diet=diet,

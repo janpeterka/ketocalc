@@ -8,7 +8,7 @@
 
 {% block content %}
     <div class="container">
-        <form method="POST" action="/newdiet" class="form-group col-6" accept-charset="UTF-8">
+        <form method="POST" action="{{ url_for('DietsView:post') }}" class="form-group col-6" accept-charset="UTF-8">
             {{ form.csrf_token }}
             {% from "_form_element.html.j2" import render_field %}
             {{ render_field(form.name, "form-control") }}

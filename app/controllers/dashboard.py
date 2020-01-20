@@ -12,12 +12,12 @@ class DashboardView(FlaskView):
     def before_request(self, name):
         self.user = User.load(current_user.id)
 
-    def index(self):
-
-        if len(self.user.active_diets) > 0:
-            selected_diet = self.user.active_diets[0]
+    def index(self, selected_diet_id=None):
+        if selected_diet_id is None:
+            if len(self.user.active_diets) > 0:
+                selected_diet = self.user.active_diets[0]
         else:
-            selected_diet = None
+            selected_diet = Diet.load(selected_diet_id)
 
         return template(
             "dashboard/dashboard.html.j2",
