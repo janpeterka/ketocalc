@@ -2,11 +2,11 @@ from werkzeug import MultiDict
 
 from flask import render_template as template
 from flask import request, redirect, url_for, session
-from flask import abort
+from flask import abort, flash
 
 from flask_login import login_required, current_user
 
-from flask_classful import FlaskView
+from flask_classful import FlaskView, route
 
 from app.models.diets import Diet
 from app.models.users import User
@@ -22,7 +22,7 @@ class DietsView(FlaskView):
         self.diets.sort(key=lambda x: (-x.active, x.name))
 
     def before_request(self, name, id=None):
-        if id is not None and name != "post":
+        if id is not None:
             self.diet = Diet.load(id)
 
             if self.diet is None:
@@ -52,7 +52,7 @@ class DietsView(FlaskView):
         if not form.validate_on_submit():
             session["formdata"] = request.form
             if form_type == "edit":
-                return redirect(url_for("DietsView:edit"))
+                return redirect(url_for("DietsView:edit", id=self.diet.id))
             elif form_type == "new":
                 return redirect(url_for("DietsView:new"))
             else:
@@ -78,7 +78,6 @@ class DietsView(FlaskView):
         diet.author = User.load(current_user.id)
 
         if diet.save():
-            # TODO: nezohledňuje změněnou
             flash("Nová dieta byla vytvořena", "success")
             return redirect(url_for("DietsView:show", id=diet.id))
         else:
@@ -96,36 +95,24 @@ class DietsView(FlaskView):
     def edit(self, id):
         return template(
             "diets/edit.html.j2",
-            diet=diet,
-            recipes=diet.recipes,
-            diets=diet.author.diets,
+            diet=self.diet,
+            recipes=self.diet.recipes,
+            diets=self.diet.author.diets,
         )
 
+    @route("/<id>/delete", methods=["POST"])
     def delete(self, id):
-        diet = Diet.load(id)
-        if diet is None:
-            abort(404)
-        elif diet.author.username != current_user.username:
-            abort(405)
-
-        if not diet.is_used:
-            diet.remove()
+        if not self.diet.is_used:
+            self.diet.remove()
             flash("Dieta byla smazána", "success")
             return redirect("/alldiets")
         else:
             flash("Tato dieta má recepty, nelze smazat", "error")
-            # return redirect("/diet={}".format(id))
             return redirect(url_for("DietsView:show", id=id))
 
+    @route("/<id>/archive", methods=["POST"])
     def archive(self, id):
-        # diet = Diet.load(id)
-        # if diet is None:
-        #     abort(404)
-        # elif diet.author.username != current_user.username:
-        #     abort(405)
-
-        self.diet.refresh()
-        self.diet.active = not diet.active
+        self.diet.active = not self.diet.active
         self.diet.edit()
 
         if self.diet.active:
@@ -133,7 +120,7 @@ class DietsView(FlaskView):
         else:
             flash("Dieta byla archivována", "success")
 
-        return redirect("/diet={}".format(id))
+        return redirect(url_for("DietsView:show", id=id))
 
     def print(self, id):
         return None

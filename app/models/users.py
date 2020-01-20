@@ -146,9 +146,9 @@ class User(db.Model, UserMixin, BaseMixin):
 
     @property
     def active_diets(self):
-        #     active_diets = []
-        #     for diet in self.diets:
-        #         if diet.active == 1:
-        #             active_diets.append(diet)
-        # return active_diets
-        return []
+        active_diets = []
+        for diet in self.diets:
+            if diet.active == 1:
+                active_diets.append(diet)
+
+        return active_diets

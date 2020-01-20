@@ -53,9 +53,7 @@ class IngredientsView(FlaskView):
         session["form_type"] = "new"
         return template("ingredients/new.html.j2", form=form)
 
-    def post(self, **kwargs):
-        print("kwargs:")
-        print(**kwargs)
+    def post(self, id=None):
         form_type = session["form_type"]
         session.pop("form_type")
         form = NewIngredientsForm(request.form)

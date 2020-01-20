@@ -5,6 +5,8 @@ from app import db
 
 from app.models.base_mixin import BaseMixin
 
+from app.models.recipe_has_ingredient import RecipesHasIngredient
+
 
 class Ingredient(db.Model, BaseMixin):
     """Ingredient class

@@ -42,7 +42,7 @@
 {% block content %}
     <div class="container">
         <div class="col-12">
-            <form action="/user/edit" class="form-group" method="post" accept-charset="utf-8">
+            <form action="{{ url_for('UsersView:post', page_type='edit')}}" class="form-group" method="post" accept-charset="utf-8">
                 <table class="table">
                     <thead>
                         <tr>
@@ -71,7 +71,7 @@
                 </table>
             </form>
 
-            <form action="/user/password_change" method="post" onsubmit="return validateRegister()" >
+            <form action="{{ url_for('UsersView:post', page_type='change_password')}}" method="post" onsubmit="return validateRegister()" >
                 <table class="table">
                     <td>
                         <input id="password" name="password" type="password" class="form-control password" placeholder="{{ texts.password_new }}" />

@@ -55,7 +55,6 @@ class BaseMixin(object):
             application.logger.error("Expire error: {}".format(e))
             return False
 
-    @classmethod
     def refresh(self, **kw):
         try:
             db.session.refresh(self)

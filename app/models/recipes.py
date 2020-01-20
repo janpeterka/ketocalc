@@ -1,4 +1,7 @@
 import datetime
+import math
+import types
+
 from app import db
 
 from app.models.base_mixin import BaseMixin

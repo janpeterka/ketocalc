@@ -6,153 +6,185 @@ from flask import abort
 
 from flask_login import login_required, current_user
 
-from flask_classful import FlaskView
+from flask_classful import FlaskView, route
 
 from app.models.recipes import Recipe
+from app.models.diets import Diet
 
-# from app.models.users import User
-
-# from app.controllers.forms.recipes import NewRecipesForm
+from app.calc import calculations
 
 
 class RecipesView(FlaskView):
     decorators = [login_required]
 
-    # def before_request(self, id):
-    #     print(id)
-    #     if id is not None:
-    #         diet = Diet.load(id)
+    def before_request(self, name, id):
+        if id is not None:
+            self.recipe = Recipe.load(id)
 
-    #         if diet is None:
-    #             # abort(404)
-    #             print("no diet")
-    #         elif diet.author.username != current_user.username:
-    #             print("not your diet")
-    #             # abort(405)
+            if self.recipe is None:
+                abort(404)
+            if current_user.username != self.recipe.author.username:
+                abort(403)
 
     def index(self):
-        # ingredients = User.load(current_user.id).ingredients
-        # ingredients.sort(key=lambda x: (-x.active, x.name))
-
-        # return template("ingredients/all.html.j2", ingredients=ingredients)
-        return None
+        user = User.load(current_user.id)
+        return template("recipe/all.html.j2", diets=user.active_diets)
 
     def new(self):
-        # if session.get("formdata") is not None:
-        #     data = MultiDict(session.get("formdata"))
-        #     session.pop("formdata")
-        #     form = NewIngredientsForm(data)
-        #     form.validate()
-        # else:
-        #     form = NewIngredientsForm()
-        # session["form_type"] = "new"
-        # return template("ingredients/new.html.j2", form=form)
-        return None
+        active_diets = User.load(current_user.id).active_diets
+        ingredients = Ingredient.load_all_by_author(current_user.username)
+        return template(
+            "recipes/new.html.j2",
+            ingredients=ingredients,
+            diets=active_diets,
+            is_trialrecipe=False,
+        )
 
     def post(self):
-        # form = NewIngredientsForm(request.form)
-        # if not form.validate_on_submit():
-        #     session["formdata"] = request.form
-        #     form_type = session["form_type"]
-        #     session.pop("form_type")
-        #     if form_type == "edit":
-        #         return redirect(url_for("IngredientsView:edit"))
-        #     elif form_type == "new":
-        #         return redirect(url_for("IngredientsView:new"))
-        #     else:
-        #         return redirect(url_for("IngredientsView:new"))
+        form_type = session["form_type"]
+        session.pop("form_type")
 
-        # if form_type == "edit":
-        #     diet.name = request.form["name"]
-        #     diet.id = id
-        #     diet.small_size = request.form["small_size"]
-        #     diet.big_size = request.form["big_size"]
-
-        #     if not diet.is_used:
-        #         diet.protein = request.form["protein"]
-        #         diet.fat = request.form["fat"]
-        #         diet.sugar = request.form["sugar"]
-        #     # flash("Dieta je používána, nemůžete ji změnit")
-        #     diet.save()
-        #     return redirect(url_for("IngredientsView:show", id=diet.id))
-
-        # diet = Diet()
-        # form.populate_obj(diet)
-        # diet.active = 1
-        # diet.author = User.load(current_user.id)
-
-        # if diet.save():
-        #     # TODO: nezohledňuje změněnou
-        #     flash("Nová dieta byla vytvořena", "success")
-        #     return redirect(url_for("IngredientsView:show", id=diet.id))
-        # else:
-        #     flash("Nepodařilo se vytvořit dietu", "error")
-        #     return redirect(url_for("IngredientsView:new"))
-        return None
+        if form_type == "edit":
+            recipe.name = request.form["name"]
+            recipe.type = request.form["size"]
+            recipe.edit()
+            recipe.refresh()
+            flash("Recept byl upraven.", "success")
+            return redirect("/recipe={}".format(recipe_id))
 
     def show(self, id):
-        # diet = Diet.load(id)
+        if application.config["APP_STATE"] == "production":
+            if recipe.view_count is not None:
+                recipe.view_count += 1
+            else:
+                recipe.view_count = 1
+            recipe.edit()
 
-        # if diet is None:
-        #     abort(404)
-        # elif diet.author.username != current_user.username:
-        #     abort(405)
+        return template(
+            "recipe/show.html.j2", recipe=recipe, totals=recipe.totals, is_print=False,
+        )
 
-        # return template(
-        #     "ingredients/show.html.j2",
-        #     diet=diet,
-        #     recipes=diet.recipes,
-        #     ingredients=diet.author.ingredients,
-        # )
-        return None
+    def print(self, id):
+        return template(
+            "recipes/show.html.j2",
+            recipe=self.recipe,
+            totals=self.recipe.totals,
+            is_print=True,
+        )
+
+    def print_all(self, diet_id=None):
+        if diet_id is None:
+            recipes = User.load(current_user.id).recipes
+        else:
+            recipes = Diet.load(diet_id).recipes
+
+        for recipe in recipes:
+            recipe_data = recipe.load_recipe_for_show()
+            recipe.show_totals = recipe_data["totals"]
+        return template("recipe/print_all.html.j2", recipes=recipes)
 
     def edit(self, id):
-        # diet = Diet.load(id)
-
-        # if diet is None:
-        #     abort(404)
-        # elif diet.author.username != current_user.username:
-        #     abort(405)
-        # return template(
-        #     "ingredients/edit.html.j2",
-        #     diet=diet,
-        #     recipes=diet.recipes,
-        #     ingredients=diet.author.ingredients,
-        # )
-        return None
+        session["form_type"] = "edit"
+        return template("recipes/edit.html.j2", recipe=recipe, totals=recipe.totals)
 
     def delete(self, id):
-        # diet = Diet.load(id)
-        # if diet is None:
-        #     abort(404)
-        # elif diet.author.username != current_user.username:
-        #     abort(405)
+        recipe.remove()
+        flash("Recept byl smazán.", "success")
+        return redirect(url_for("DashboardView:show"))
 
-        # if not diet.is_used:
-        #     diet.remove()
-        #     flash("Dieta byla smazána", "success")
-        #     return redirect("/allingredients")
-        # else:
-        #     flash("Tato dieta má recepty, nelze smazat", "error")
-        #     # return redirect("/diet={}".format(id))
-        #     return redirect(url_for("IngredientsView:show", id=id))
-        return None
+    @route("/addIngredientAJAX", methods=["POST"])
+    def add_ingredient_to_recipe_AJAX():
+        ingredient = Ingredient.load(request.json["ingredient_id"])
+        template_data = template(
+            "recipes/_add_ingredient.html.j2", ingredient=ingredient
+        )
+        result = {"ingredient": ingredient.json, "template_data": template_data}
+        return jsonify(result)
 
-    def archive(self, id):
-        # diet = Diet.load(id)
-        # if diet is None:
-        #     abort(404)
-        # elif diet.author.username != current_user.username:
-        #     abort(405)
+    @route("/calcRecipeAJAX", methods=["POST"])
+    def calculate_recipe_AJAX():
 
-        # diet.refresh()
-        # diet.active = not diet.active
-        # diet.edit()
+        json_ingredients = request.json["ingredients"]
+        diet = Diet.load(request.json["dietID"])
+        if "trial" in request.json and request.json["trial"] == "True":
+            is_trialrecipe = True
+        else:
+            is_trialrecipe = False
 
-        # if diet.active:
-        #     flash("Dieta byla aktivována", "success")
-        # else:
-        #     flash("Dieta byla archivována", "success")
+        if diet is None:
+            return "False"
 
-        # return redirect("/diet={}".format(id))
-        return None
+        ingredients = []
+        for json_i in json_ingredients:
+            ingredient = Ingredient.load(json_i["id"])
+            ingredient.fill_from_json(json_i)
+            ingredients.append(ingredient)
+
+        result = calculations.calculate_recipe(ingredients, diet)
+        if result is None:
+            return "False"
+
+        ingredients = result["ingredients"]
+        totals = result["totals"]
+
+        json_ingredients = []
+        for ing in ingredients:
+            if ing.amount < 0:
+                return "False"
+
+            ing.calorie = round(ing.calorie * ing.amount, 2)
+            ing.fat = round(ing.fat, 2)
+            ing.sugar = round(ing.sugar, 2)
+            ing.protein = round(ing.protein, 2)
+            ing.amount = round(ing.amount * 100, 2)
+
+            json_ingredients.append(ing.json)
+
+        totals.calorie = round(totals.calorie, 2)
+        totals.sugar = round(totals.sugar, 2)
+        totals.fat = round(totals.fat, 2)
+        totals.protein = round(totals.protein, 2)
+        totals.amount = round(totals.amount, 2)
+        totals.ratio = round((totals.fat / (totals.protein + totals.sugar)), 2)
+
+        template_data = template(
+            "recipe/_right_form.html.j2",
+            ingredients=ingredients,
+            totals=totals,
+            diet=diet,
+            is_trialrecipe=is_trialrecipe,
+        )
+
+        result = {
+            "template_data": str(template_data),
+            "totals": json.dumps(totals.__dict__),
+            "ingredients": json_ingredients,
+            "diet": diet.json,
+        }
+
+        # reset ingredients (so they are not changed in db)
+        for ing in ingredients:
+            ing.expire()
+
+        return jsonify(result)
+
+    @route("/saveRecipeAJAX", methods=["POST"])
+    def saveRecipeAJAX():
+        temp_ingredients = request.json["ingredients"]
+        diet_id = request.json["dietID"]
+
+        ingredients = []
+        for temp_i in temp_ingredients:
+            rhi = RecipesHasIngredient()
+            rhi.ingredients_id = temp_i["id"]
+            rhi.amount = temp_i["amount"]
+            ingredients.append(rhi)
+
+        recipe = Recipe()
+        recipe.name = request.json["name"]
+        recipe.type = request.json["size"]
+        recipe.diet = Diet.load(diet_id)
+
+        last_id = recipe.save(ingredients)
+        flash("Recept byl uložen", "success")
+        return "/recipe=" + str(last_id)

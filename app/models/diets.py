@@ -61,3 +61,6 @@ class Diet(db.Model, BaseMixin):
             return False
         else:
             return True
+
+    # def refresh(self):
+    #     super()
