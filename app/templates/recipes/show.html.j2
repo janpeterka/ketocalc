@@ -64,7 +64,7 @@
 
                 {% for ingredient in recipe.ingredients: %}
                     <tr>
-                        <td><a href="{{ url_for('IngredientsView:show'))}}">{{ ingredient.name }}</a></td>
+                        <td><a href="{{ url_for('IngredientsView:show') }}">{{ ingredient.name }}</a></td>
                         <td>{{ (ingredient.calorie / 100 * ingredient.amount)|round(2,'common') }}</td>
                         <td>{{ (ingredient.protein / 100 * ingredient.amount)|round(2,'common') }}</td>
                         <td>{{ (ingredient.fat / 100 * ingredient.amount)|round(2,'common') }}</td>

@@ -14,7 +14,7 @@
 {% block content %}
     <div class="container error_main">
         <h1>Na této stránce byste neměli být</h1>
-        Radši se vraťte na <a href="{{ url_for('IndexView:index)')}}">hlavní stránku</a>
+        Radši se vraťte na <a href="{{ url_for('IndexView:index)') }}">hlavní stránku</a>
     </div>
 {% endblock %}
 

@@ -112,7 +112,7 @@
             $(document).on("submit", ".recipe__right__form", function(e){
                 $.ajax({
                         type: 'POST',
-                        url: "{{ url_for('RecipesView:saveRecipeAJAX'))}}",
+                        url: "{{ url_for('RecipesView:saveRecipeAJAX') }}",
                         data: JSON.stringify({
                             'ingredients' : recipe__ingredient_array,
                             'dietID' : recipe__ingredient_dietID,
@@ -239,7 +239,7 @@
                 else{
                     $.ajax({
                         type: 'POST',
-                        url: "{{ url_for('RecipesView:addIngredientAJAX'))}}",
+                        url: "{{ url_for('RecipesView:addIngredientAJAX') }}",
                         data: $(this).serialize(),
                         data: JSON.stringify({
                             'ingredient_id' : $('[name="prerecipe__add-ingredient__form__select"]').val()},
@@ -326,7 +326,7 @@
 
                 $.ajax({
                         type: 'POST',
-                        url: "{{ url_for('RecipesView:calcRecipeAJAX'))}}",
+                        url: "{{ url_for('RecipesView:calcRecipeAJAX') }}",
                         data: JSON.stringify({
                             'dietID'       : recipe__ingredient_dietID,
                             'ingredients'  : recipe__ingredient_array},
