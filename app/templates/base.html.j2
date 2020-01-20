@@ -64,9 +64,9 @@
 <body>
     {% block navbar %}
         {% if current_user.is_authenticated %}
-            {% include('navbar.tpl') %}
+            {% include('navbar.html.j2') %}
         {% else %}
-            {% include('navbar_login.tpl') %}
+            {% include('navbar_login.html.j2') %}
         {% endif %}
     {% endblock %}
 

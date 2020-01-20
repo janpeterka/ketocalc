@@ -186,7 +186,7 @@
 
                     $.ajax({
                         type: 'POST',
-                        url: "{{ url_for('RecipesView:calcRecipeAJAX')) }}",
+                        url: "{{ url_for('RecipesView:calcRecipeAJAX') }}",
                         data: JSON.stringify({
                             'ingredients' : prerecipe__ingredient_array,
                             'dietID' : $('.select-diet').val(),
@@ -414,9 +414,9 @@
 
 {% block navbar %}
     {% if not is_trialrecipe %}
-        {% include('navbar.tpl') %}
+        {% include('navbar.html.j2') %}
     {% else %}
-        {% include('navbar_login.tpl')%}
+        {% include('navbar_login.html.j2')%}
     {% endif %}
 {% endblock %}
 

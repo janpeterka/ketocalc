@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container">
-    <a class="navbar-brand" href="/">Ketogenní kalkulačka</a>
+    <a class="navbar-brand" href="{{ url_for('IndexView:index') }}">Ketogenní kalkulačka</a>
 
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -18,7 +18,7 @@
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="/trialnewrecipe">Ukázka</a>
+            <a class="nav-link" href="{{ url_for('TrialRecipesView:show') }}">Ukázka</a>
           </li>
 
       </ul>

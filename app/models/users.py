@@ -1,6 +1,7 @@
 import datetime
 import bcrypt
 import hashlib
+import unidecode
 
 
 from flask_login import UserMixin
@@ -138,16 +139,16 @@ class User(db.Model, UserMixin, BaseMixin):
             new_ingredient.author = self.username
             new_ingredient.save()
 
-    # @property
-    # def recipes(self, ordered=True):
-    #     recipes = []
-    #     for diet in self.diets:
-    #         recipes.extend(diet.recipes)
-    #     if ordered is True:
-    #         recipes.sort(
-    #             key=lambda x: unidecode.unidecode(x.name.lower()), reverse=False
-    #         )
-    #     return recipes
+    @property
+    def recipes(self, ordered=True):
+        recipes = []
+        for diet in self.diets:
+            recipes.extend(diet.recipes)
+        if ordered is True:
+            recipes.sort(
+                key=lambda x: unidecode.unidecode(x.name.lower()), reverse=False
+            )
+        return recipes
 
     @property
     def active_diets(self):

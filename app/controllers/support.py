@@ -10,7 +10,7 @@ from app.email import send_email
 from app.controllers.forms.feedback import FeedbackForm
 
 
-class SupportsView(FlaskView):
+class SupportView(FlaskView):
     @route("/terms")
     def showTerms(self):
         return template("support/terms.tpl")

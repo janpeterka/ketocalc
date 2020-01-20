@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container">
-    <a class="navbar-brand" href="/">Ketogenní kalkulačka</a>
+    <a class="navbar-brand" href="{{ url_for('IndexView:index') }}">Ketogenní kalkulačka</a>
 
     <button class="navbar-toggler" type="button"
             data-toggle="collapse"data-target=".navbar-collapse"
@@ -48,7 +48,7 @@
           <a class="nav-link small" href="/changelog">Změny</a>
         </li> #}
         <li class="nav-item">
-          <a class="nav-link small" href="/feedback">Připomínky</a>
+          <a class="nav-link small" href="{{ url_for('SupportView:feedback') }}">Připomínky</a>
         </li>
 {#           <li class="nav-item">
           <a class="nav-link small" href="/help">Nápověda</a>

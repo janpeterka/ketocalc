@@ -9,7 +9,7 @@
 
 {% block content %}
     <div class="container">
-        <form action="{{ url_for('SupportView:feedback')) }}" method="POST" class="form-group form-control" enctype="multipart/form-data">
+        <form action="{{ url_for('SupportView:feedback') }}}" method="POST" class="form-group form-control" enctype="multipart/form-data">
             {{ form.csrf_token }}
             {% from "_form_element.html.j2" import render_field %}
             {{ render_field(form.option, "form-control") }}

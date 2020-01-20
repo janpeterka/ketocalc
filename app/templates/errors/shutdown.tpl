@@ -8,7 +8,7 @@
 {% block script %}{% endblock %}
 
 {% block navbar %}
-    {% include('navbar_empty.tpl') %}
+    {% include('navbar_empty.html.j2') %}
 {% endblock %}
 
 {% block content %}

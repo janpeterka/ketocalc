@@ -2,13 +2,15 @@ from flask import render_template as template
 from flask import request
 
 from flask_classful import FlaskView
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 from app.models.users import User
 from app.models.diets import Diet
 
 
 class DashboardView(FlaskView):
+    decorators = [login_required]
+
     def before_request(self, name):
         self.user = User.load(current_user.id)
 
