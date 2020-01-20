@@ -12,7 +12,7 @@
 
       <ul class="nav navbar-nav navbar-center">
         <li class="nav-item">
-          <a class="nav-link" href="/user">{{ icons.user }}</a>
+          <a class="nav-link" href="{{ url_for('UsersView:show') }}">{{ icons.user }}</a>
         </li>
 
         <li class="nav-item dropdown">
@@ -21,9 +21,9 @@
             Přidat
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="/newrecipe">recept</a>
-            <a class="dropdown-item" href="/newdiet">dietu</a>
-            <a class="dropdown-item" href="/newingredient">surovinu</a>
+            <a class="dropdown-item" href="{{ url_for('RecipesView:new') }}">recept</a>
+            <a class="dropdown-item" href="{{ url_for('DietsView:new') }}">dietu</a>
+            <a class="dropdown-item" href="{{ url_for('IngredientsView:new') }}">surovinu</a>
           </div>
         </li>
 
@@ -33,9 +33,9 @@
             Seznamy
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="/allingredients">Všechny suroviny</a>
-            <a class="dropdown-item" href="/alldiets">Všechny diety</a>
-            <a class="dropdown-item" href="/allrecipes">Všechny recepty</a>
+            <a class="dropdown-item" href="{{ url_for('IngredientsView:index') }}">Všechny suroviny</a>
+            <a class="dropdown-item" href="{{ url_for('DietsView:index') }}">Všechny diety</a>
+            <a class="dropdown-item" href="{{ url_for('RecipesView:index') }}">Všechny recepty</a>
             {# <div class="dropdown-divider"></div> #}
           </div>
         </li>

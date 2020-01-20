@@ -26,6 +26,7 @@ WTForms = "*"
 PyMySQL = "*"
 Flask-Migrate = "*"
 Unidecode = "*"
+flask-classful = "*"
 
 [requires]
 python_version = "3.7"

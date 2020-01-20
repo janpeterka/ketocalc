@@ -4,7 +4,8 @@ from app import create_app
 from app import db as _db
 from app.data import template_data
 
-from app.models import Ingredient, Diet
+from app.models.ingredients import Ingredient
+from app.models.diets import Diet
 
 
 @pytest.fixture

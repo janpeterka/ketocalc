@@ -3,7 +3,7 @@ import logging
 # from logging.handlers import SMTPHandler
 from flask import request
 
-from app.models import Log
+from app.models.logs import Log
 
 
 class RequestFormatter(logging.Formatter):

@@ -17,7 +17,7 @@
     <div class="container">
         <div class="row">
 
-{#                 <form action="/diet={{ diet.id }}/export" class="form-inline" method="post">
+{#                 <form action="{{ url_for('DietsView:show', id=diet.id) }}/export" class="form-inline" method="post">
                     {% if recipes|length > 0 %}
                         <!-- <input type="submit" class="btn btn-default export__button" value="Exportovat recepty do diety"> -->
                         <select name="diet" class="form-control">
@@ -60,16 +60,16 @@
                         <td>{{ diet.small_size }} %</td>
                     </tr>
                 </table>
-                <form action="/diet={{ diet.id }}/remove" method="post" accept-charset="utf-8">
-                    <a href="/diet={{ diet.id }}/edit" class="btn btn-warning">{{ texts.edit }} {{ icons.edit }}</a>
+                <form action="{{ url_for('DietsView:delete', id=diet.id) }}" method="post" accept-charset="utf-8">
+                    <a href="{{ url_for('DietsView:edit', id=diet.id) }}" class="btn btn-warning">{{ texts.edit }} {{ icons.edit }}</a>
                     {% if diet.is_used == False %}
                         <button type="submit" class="btn btn-danger">{{ texts.diet_delete }} {{ icons.delete }}</button>
                     {% else %}
                         <button type="submit" class="btn btn-danger" disabled>{{ texts.delete_error }} {{ icons.delete }}</button>
                     {% endif %}
-                    <a class="btn btn-secondary" href="/diet={{diet.id}}/print" target="_blank" rel="noopener noreferrer">{{ texts.print }} {{ icons.print }}</a>
+                    <a class="btn btn-secondary" href="{{ url_for('DietsView:print', id=diet.id) }}" target="_blank" rel="noopener noreferrer">{{ texts.print }} {{ icons.print }}</a>
                 </form>
-                <form action="/diet={{ diet.id }}/archive" method="post" accept-charset="utf-8">
+                <form action="{{ url_for('DietsView:archive', id=diet.id) }}" method="post" accept-charset="utf-8">
                     {% if diet.active == True %}
                         <button type="submit" class="btn btn-secondary">{{ texts.archive }} {{ icons.archive }}</button>
                     {% else %}

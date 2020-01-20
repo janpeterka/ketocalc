@@ -16,7 +16,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from flask_dance.contrib.google import google
 from flask_dance.consumer import oauth_authorized
 
-from app import models
+from app.models.users import User
 
 from app.email import send_email
 
@@ -69,15 +69,15 @@ def oauth_login(blueprint, token):
         return False
 
     # Try to log with google_id
-    user = models.User.load(google_id, load_type="google_id")
+    user = User.load(google_id, load_type="google_id")
     if not user:
-        user = models.User.load(username, load_type="username")
+        user = User.load(username, load_type="username")
 
     if user:
         do_login(user=user)
 
     else:
-        user = models.User()
+        user = User()
         user.username = username
         user.password = None
         user.google_id = google_id
@@ -112,7 +112,7 @@ def do_login(username=None, password=None, from_register=False, user=None):
         return False
     elif user is None and username is not None:
         # Load user by username
-        user = models.User.load(username, load_type="username")
+        user = User.load(username, load_type="username")
     else:
         # Already has user
         pass
@@ -164,7 +164,7 @@ def show_register():
             form.username.errors = ["Toto jméno nemůžete použít"]
             return template("auth/register.html.j2", form=form)
 
-        user = models.User()
+        user = User()
         form.populate_obj(user)
         user.set_password_hash(form.password.data.encode("utf-8"))
         user.password_version = application.config["PASSWORD_VERSION"]
@@ -206,7 +206,7 @@ def validate_register(username):
     Returns:
         bool
     """
-    if models.User.load(username, load_type="username") is not None:
+    if User.load(username, load_type="username") is not None:
         return False
     else:
         return True
@@ -235,7 +235,7 @@ def get_new_password():
         if not form.validate_on_submit():
             return template("auth/get_new_password.html.j2", form=form)
 
-        user = models.User.load(form.username.data, load_type="username")
+        user = User.load(form.username.data, load_type="username")
         if user is None:
             form.username.errors = ["Uživatel s tímto emailem neexistuje"]
             return template("auth/get_new_password.html.j2", form=form)
@@ -259,7 +259,7 @@ def get_new_password():
 @auth_blueprint.route("/new_password/<token>", methods=["GET", "POST"])
 def show_new_password(token=None):
     form = NewPasswordForm(request.form)
-    user = models.User.load(token, load_type="new_password_token")
+    user = User.load(token, load_type="new_password_token")
     if user is None:
         flash("tento token již není platný", "error")
         return redirect("/login")

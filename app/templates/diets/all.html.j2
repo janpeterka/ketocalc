@@ -32,7 +32,8 @@
                 </tr>
                 {% for diet in diets: %}
                     <tr class= {% if diet.active%} active {% else %} inactive {% endif %}>                        
-                        <td><a href="/diet={{diet.id}}">{{ diet.name }}</a></td>
+                        {# <td><a href="/diet={{diet.id}}">{{ diet.name }}</a></td> #}
+                        <td><a href="{{ url_for('DietsView:show', id=diet.id) }}">{{ diet.name }}</a></td>
                         <td>{{ diet.protein }}</td>
                         <td>{{ diet.fat }}</td>
                         <td>{{ diet.sugar }}</td>

@@ -11,7 +11,7 @@ from flask_login import login_required, current_user
 
 from app.support import forms
 
-from app.models import Log
+from app.models.logs import Log
 
 from app.email import send_email
 from app.auth import admin_required

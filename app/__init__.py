@@ -14,6 +14,8 @@ mail = Mail()
 db = SQLAlchemy()
 migrate = Migrate()
 
+from app.controllers import register_all_controllers
+
 
 def create_app(config_name="default"):
     application = Flask(__name__, instance_relative_config=True)
@@ -30,16 +32,16 @@ def create_app(config_name="default"):
     # from app.config_logging import mail_handler
     # application.logger.addHandler(mail_handler)
 
-    from app.config_logging import db_handler, gunicorn_logger
-
-    application.logger.addHandler(gunicorn_logger)
-    application.logger.addHandler(db_handler)
 
     # APPS
     mail.init_app(application)
     db.init_app(application)
     migrate.init_app(application, db)
 
+    from app.config_logging import db_handler, gunicorn_logger
+
+    application.logger.addHandler(gunicorn_logger)
+    application.logger.addHandler(db_handler)
     # MODULES
 
     # Main module
@@ -66,5 +68,7 @@ def create_app(config_name="default"):
     from app.support import create_module as support_create_module
 
     support_create_module(application)
+
+    register_all_controllers(application)
 
     return application

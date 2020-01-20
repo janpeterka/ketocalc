@@ -1,6 +1,7 @@
 import json
 
-from app.models import Ingredient, Diet
+from app.models.ingredients import Ingredient
+from app.models.diets import Diet
 
 
 def load_datasets_calc():

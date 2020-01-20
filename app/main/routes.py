@@ -18,8 +18,13 @@ from flask import current_app as application
 from flask_login import login_required, current_user
 
 
-from app import models
-from app.main import forms
+from app.models.users import User
+from app.models.diets import Diet
+from app.models.ingredients import Ingredient
+from app.models.recipes import Recipe
+from app.models.recipe_has_ingredient import RecipesHasIngredient
+
+# from app.main import forms
 from app.calc import calculations
 
 
@@ -31,7 +36,7 @@ main_blueprint = Blueprint("main", __name__)
 @main_blueprint.route("/dashboard", methods=["GET", "POST"])
 @login_required
 def show_dashboard():
-    user = models.User.load(current_user.id)
+    user = User.load(current_user.id)
     if request.method == "GET":
         if len(user.active_diets) > 0:
             selected_diet = user.active_diets[0]
@@ -44,7 +49,7 @@ def show_dashboard():
             first_name=user.first_name,
         )
     elif request.method == "POST":
-        selected_diet = models.Diet.load(request.form["select_diet"])
+        selected_diet = Diet.load(request.form["select_diet"])
         return template(
             "dashboard/dashboard.html.j2",
             diets=user.active_diets,
@@ -52,125 +57,13 @@ def show_dashboard():
             first_name=user.first_name,
         )
 
-
-# NEW DIET
-@main_blueprint.route("/newdiet", methods=["GET", "POST"])
-@login_required
-def show_new_diet():
-    form = forms.NewDietForm()
-    if request.method == "GET":
-        return template("diet/new.html.j2", form=form)
-    elif request.method == "POST":
-        diet = models.Diet()
-        form.populate_obj(diet)
-        diet.active = 1
-        diet.author = models.User.load(current_user.id)
-
-        if not form.validate_on_submit():
-            return template("diet/new.html.j2", form=form)
-
-        if diet.save():
-            flash("Nová dieta byla vytvořena", "success")
-            return redirect("/diet={}".format(diet.id))
-        else:
-            flash("Nepodařilo se vytvořit dietu", "error")
-            return template("diet/new.html.j2", form=form)
-
-    return template("diet/new.html.j2", form=form)
-
-
-# SHOW DIET PAGE
-@main_blueprint.route("/diet=<int:diet_id>")
-@main_blueprint.route("/diet=<int:diet_id>/<page_type>", methods=["POST", "GET"])
-@login_required
-def show_diet(diet_id, page_type=None):
-    diet = models.Diet.load(diet_id)
-
-    if diet is None:
-        abort(404)
-    elif diet.author.username != current_user.username:
-        abort(405)
-
-    if request.method == "GET":
-        if page_type == "edit":
-            return template(
-                "diet/edit.html.j2",
-                diet=diet,
-                recipes=diet.recipes,
-                diets=diet.author.diets,
-            )
-        else:
-            return template(
-                "diet/show.html.j2",
-                diet=diet,
-                recipes=diet.recipes,
-                diets=diet.author.diets,
-            )
-    elif request.method == "POST":
-        if page_type == "remove":
-            # TODO: enable deleting diet with all recipes (20)
-            if not diet.is_used:
-                diet.remove()
-                flash("Dieta byla smazána", "success")
-                return redirect("/alldiets")
-            else:
-                flash("Tato dieta má recepty, nelze smazat", "error")
-                return redirect("/diet={}".format(diet_id))
-        elif page_type == "archive":
-            diet.refresh()
-            diet.active = not diet.active
-            diet.edit()
-
-            if diet.active:
-                flash("Dieta byla aktivována", "success")
-            else:
-                flash("Dieta byla archivována", "success")
-
-            return redirect("/diet={}".format(diet_id))
-        elif page_type == "edit":
-            diet.name = request.form["name"]
-            diet.id = diet_id
-            diet.small_size = request.form["small_size"]
-            diet.big_size = request.form["big_size"]
-
-            if not diet.is_used:
-                diet.protein = request.form["protein"]
-                diet.fat = request.form["fat"]
-                diet.sugar = request.form["sugar"]
-
-            diet.edit()
-            flash("Dieta byla upravena.", "success")
-            return redirect("/diet={}".format(diet_id))
-        else:
-            return abort(404)
-
-
-@main_blueprint.route("/alldiets")
-@login_required
-def show_all_diets():
-    """show all diets sorted (active first)
-
-    active on top
-
-    Decorators:
-        application.route
-
-    Returns:
-        template -- [description]
-    """
-    diets = models.User.load(current_user.id).diets
-    diets.sort(key=lambda x: (-x.active, x.name))
-
-    return template("diet/all.html.j2", diets=diets)
-
-
 # NEW RECIPE PAGE
 @main_blueprint.route("/trialnewrecipe")
 def show_trial_new_recipe():
-    active_diets = models.User.load(
+    active_diets = User.load(
         "ketocalc.jmp@gmail.com", load_type="username"
     ).active_diets
-    ingredients = models.Ingredient.load_all_by_author("basic")
+    ingredients = Ingredient.load_all_by_author("basic")
     return template(
         "recipe/new.html.j2",
         ingredients=ingredients,
@@ -182,8 +75,8 @@ def show_trial_new_recipe():
 @main_blueprint.route("/newrecipe")
 @login_required
 def show_new_recipe():
-    active_diets = models.User.load(current_user.id).active_diets
-    ingredients = models.Ingredient.load_all_by_author(current_user.username)
+    active_diets = User.load(current_user.id).active_diets
+    ingredients = Ingredient.load_all_by_author(current_user.username)
     return template(
         "recipe/new.html.j2",
         ingredients=ingredients,
@@ -194,7 +87,7 @@ def show_new_recipe():
 
 @main_blueprint.route("/addIngredientAJAX", methods=["POST"])
 def add_ingredient_to_recipe_AJAX():
-    ingredient = models.Ingredient.load(request.json["ingredient_id"])
+    ingredient = Ingredient.load(request.json["ingredient_id"])
     template_data = template("recipe/_add_ingredient.html.j2", ingredient=ingredient)
     result = {"ingredient": ingredient.json, "template_data": template_data}
     return jsonify(result)
@@ -204,7 +97,7 @@ def add_ingredient_to_recipe_AJAX():
 def calculate_recipe_AJAX():
 
     json_ingredients = request.json["ingredients"]
-    diet = models.Diet.load(request.json["dietID"])
+    diet = Diet.load(request.json["dietID"])
     if "trial" in request.json and request.json["trial"] == "True":
         is_trialrecipe = True
     else:
@@ -215,7 +108,7 @@ def calculate_recipe_AJAX():
 
     ingredients = []
     for json_i in json_ingredients:
-        ingredient = models.Ingredient.load(json_i["id"])
+        ingredient = Ingredient.load(json_i["id"])
         ingredient.fill_from_json(json_i)
         ingredients.append(ingredient)
 
@@ -276,15 +169,15 @@ def saveRecipeAJAX():
 
     ingredients = []
     for temp_i in temp_ingredients:
-        rhi = models.RecipesHasIngredient()
+        rhi = RecipesHasIngredient()
         rhi.ingredients_id = temp_i["id"]
         rhi.amount = temp_i["amount"]
         ingredients.append(rhi)
 
-    recipe = models.Recipe()
+    recipe = Recipe()
     recipe.name = request.json["name"]
     recipe.type = request.json["size"]
-    recipe.diet = models.Diet.load(diet_id)
+    recipe.diet = Diet.load(diet_id)
 
     last_id = recipe.save(ingredients)
     flash("Recept byl uložen", "success")
@@ -295,7 +188,7 @@ def saveRecipeAJAX():
 @main_blueprint.route("/recipe=<int:recipe_id>/<page_type>", methods=["POST", "GET"])
 @login_required
 def show_recipe(recipe_id, page_type=None):
-    recipe = models.Recipe.load(recipe_id)
+    recipe = Recipe.load(recipe_id)
     if recipe is None:
         return abort(404)
 
@@ -344,7 +237,7 @@ def show_recipe(recipe_id, page_type=None):
 @main_blueprint.route("/allrecipes")
 @login_required
 def show_all_recipes():
-    user = models.User.load(current_user.id)
+    user = User.load(current_user.id)
     return template("recipe/all.html.j2", diets=user.active_diets)
 
 
@@ -353,9 +246,9 @@ def show_all_recipes():
 @login_required
 def print_recipes(diet_id=None):
     if diet_id is None:
-        recipes = models.User.load(current_user.id).recipes
+        recipes = User.load(current_user.id).recipes
     else:
-        recipes = models.Diet.load(diet_id).recipes
+        recipes = Diet.load(diet_id).recipes
 
     for recipe in recipes:
         recipe_data = recipe.load_recipe_for_show()
@@ -363,92 +256,12 @@ def print_recipes(diet_id=None):
     return template("recipe/print_all.html.j2", recipes=recipes)
 
 
-# NEW INGREDIENT PAGE
-@main_blueprint.route("/newingredient", methods=["GET", "POST"])
-@login_required
-def show_new_ingredient():
-    form = forms.NewIngredientForm()
-    if request.method == "GET":
-        return template("ingredient/new.html.j2", form=form)
-    elif request.method == "POST":
-        ingredient = models.Ingredient()
-        form.populate_obj(ingredient)
-        ingredient.author = current_user.username
-        if not form.validate_on_submit():
-            return template("ingredient/new.html.j2", form=form)
-
-        if ingredient.save():
-            flash("Nová surovina byla vytvořena", "success")
-            return redirect("/ingredient={}".format(ingredient.id))
-        else:
-            flash("Nepodařilo se vytvořit surovinu", "error")
-            return template("ingredient/new.html.j2", form=form)
-
-
-@main_blueprint.route("/ingredient=<int:ingredient_id>")
-@main_blueprint.route(
-    "/ingredient=<int:ingredient_id>/<page_type>", methods=["POST", "GET"]
-)
-@login_required
-def show_ingredient(ingredient_id, page_type=None):
-    ingredient = models.Ingredient.load(ingredient_id)
-    if ingredient is None:
-        abort(404)
-
-    if current_user.username != ingredient.author:
-        return redirect("/wrongpage")
-
-    if request.method == "GET":
-        if page_type == "edit":
-            recipes = models.Recipe.load_by_ingredient(ingredient.id)
-            return template(
-                "ingredient/edit.html.j2", ingredient=ingredient, recipes=recipes
-            )
-        if page_type is None:
-            recipes = models.Recipe.load_by_ingredient(ingredient.id)
-            return template(
-                "ingredient/show.html.j2", ingredient=ingredient, recipes=recipes
-            )
-    elif request.method == "POST":
-        if page_type == "edit":
-            ingredient.id = ingredient_id
-            ingredient.name = request.form["name"]
-            ingredient.calorie = request.form["calorie"]
-            if not ingredient.is_used:
-                ingredient.protein = request.form["protein"]
-                ingredient.fat = request.form["fat"]
-                ingredient.sugar = request.form["sugar"]
-                ingredient.edit()
-                flash("Surovina byla upravena.", "success")
-                return redirect("/ingredient={}".format(ingredient_id))
-            else:
-                ingredient.edit()
-                flash("Název a kalorická hodnota byly upraveny.", "success")
-                return redirect("/ingredient={}".format(ingredient_id))
-
-        elif page_type == "remove":
-            if not ingredient.is_used:
-                ingredient.remove()
-                flash("Surovina byla smazána", "success")
-                return redirect("/")
-            else:
-                flash("Tato surovina je použita, nelze smazat", "error")
-                return redirect("/ingredient={}".format(ingredient_id))
-
-
-@main_blueprint.route("/allingredients")
-@login_required
-def show_all_ingredients():
-    ingredients = models.Ingredient.load_all_by_author(current_user.username)
-    return template("ingredient/all.html.j2", ingredients=ingredients)
-
-
 # USER PAGES
 @main_blueprint.route("/user")
 @main_blueprint.route("/user/<page_type>", methods=["POST", "GET"])
 @login_required
 def show_user(page_type=None):
-    user = models.User.load(current_user.id)
+    user = User.load(current_user.id)
     if user is None:
         abort(404)
 
