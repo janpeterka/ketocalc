@@ -18,7 +18,7 @@ from flask_dance.consumer import oauth_authorized
 
 from app.models.users import User
 
-from app.email import send_email
+from app.helpers.mail import send_email
 
 from app.auth.forms import LoginForm, RegisterForm, NewPasswordForm, GetNewPasswordForm
 

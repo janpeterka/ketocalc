@@ -1,11 +1,10 @@
 from flask import render_template as template
-from flask import redirect, request, flash
+from flask import redirect, request, flash, url_for
 
 from flask_classful import FlaskView, route
-
 from flask_login import current_user, login_required
 
-from app.email import send_email
+from app.helpers.mail import send_email
 
 from app.controllers.forms.feedback import FeedbackForm
 
@@ -51,7 +50,7 @@ class SupportView(FlaskView):
             )
 
             flash("Vaše připomínka byla zaslána na vyšší místa.", "success")
-            return redirect("/dashboard")
+            return redirect(url_for("DashboardView:index"))
 
     @route("changelog")
     @login_required

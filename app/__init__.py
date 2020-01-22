@@ -35,7 +35,7 @@ def create_app(config_name="default"):
     db.init_app(application)
     migrate.init_app(application, db)
 
-    from app.config_logging import db_handler, gunicorn_logger
+    from app.config.config_logging import db_handler, gunicorn_logger
 
     application.logger.addHandler(gunicorn_logger)
     application.logger.addHandler(db_handler)
