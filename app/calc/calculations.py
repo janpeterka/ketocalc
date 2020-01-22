@@ -112,7 +112,7 @@ def calculate_recipe(ingredients, diet):
         result3 = solvei(poly(in3), ">=")
 
         interval = (result1[0].intersect(result2[0])).intersect(result3[0])
-        if interval.is_EmptySet:
+        if interval.is_empty:
             return None
 
         max_sol = min(100, round(interval.right, 2))
@@ -143,8 +143,8 @@ def calculate_recipe(ingredients, diet):
         ingredients[1].amount = y
         ingredients[2].amount = z
         ingredients[3].amount = sol
-        ingredients[3].min = min_sol * 100
-        ingredients[3].max = max_sol * 100
+        ingredients[3].min = float(min_sol * 100)
+        ingredients[3].max = float(max_sol * 100)
 
     elif len(ingredients) == 5:
         # TODO: 5 ingredients (30)
@@ -163,17 +163,31 @@ def calculate_recipe(ingredients, diet):
     totals.amount = 0
     totals.calorie = 0
 
-    for ing in ingredients:
-        ing.calorie = ing.calorie * ing.amount
-        ing.fat = ing.fat * ing.amount
-        ing.sugar = ing.sugar * ing.amount
-        ing.protein = ing.protein * ing.amount
+    for ingredient in ingredients:
+        ingredient.calorie = ingredient.calorie * ingredient.amount
+        ingredient.fat = ingredient.fat * ingredient.amount
+        ingredient.sugar = ingredient.sugar * ingredient.amount
+        ingredient.protein = ingredient.protein * ingredient.amount
 
-        totals.sugar += ing.sugar
-        totals.fat += ing.fat
-        totals.protein += ing.protein
-        totals.calorie += ing.calorie
-        totals.amount += ing.amount
+        totals.sugar += ingredient.sugar
+        totals.fat += ingredient.fat
+        totals.protein += ingredient.protein
+        totals.calorie += ingredient.calorie
+        totals.amount += ingredient.amount
+
+    # json cannot convert `sympy.Float`, so I convert everything to Python `float`
+    for ingredient in ingredients:
+        ingredient.calorie = float(ingredient.calorie)
+        ingredient.fat = float(ingredient.fat)
+        ingredient.sugar = float(ingredient.sugar)
+        ingredient.protein = float(ingredient.protein)
+        ingredient.amount = float(ingredient.amount)
+
+    totals.sugar = float(totals.sugar)
+    totals.fat = float(totals.fat)
+    totals.protein = float(totals.protein)
+    totals.calorie = float(totals.calorie)
+    totals.amount = float(totals.amount)
 
     diet.expire()
     return {"ingredients": ingredients, "totals": totals}
