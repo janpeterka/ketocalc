@@ -113,7 +113,6 @@ class RecipesView(FlaskView):
 
     @route("/calcRecipeAJAX", methods=["POST"])
     def calcRecipeAJAX(self):
-
         json_ingredients = request.json["ingredients"]
         diet = Diet.load(request.json["dietID"])
         if "trial" in request.json and request.json["trial"] == "True":
@@ -197,4 +196,4 @@ class RecipesView(FlaskView):
 
         last_id = recipe.save(ingredients)
         flash("Recept byl uložen", "success")
-        return "/recipe=" + str(last_id)
+        return url_for("RecipesView:show", id=last_id)

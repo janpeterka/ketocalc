@@ -155,7 +155,6 @@ def calculate_recipe(ingredients, diet):
     for ing in fixed_ingredients:
         ingredients.append(ing)
 
-    # totals = type("", (), {})()
     totals = types.SimpleNamespace()
     totals.sugar = 0
     totals.fat = 0
