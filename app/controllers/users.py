@@ -1,12 +1,8 @@
-# from werkzeug import MultiDict
-
 from flask import render_template as template
-from flask import request, url_for, redirect
-from flask import abort, flash
-
-from flask_login import login_required, current_user
+from flask import request, url_for, redirect, abort, flash
 
 from flask_classful import FlaskView
+from flask_login import login_required, current_user
 
 from app.models.users import User
 

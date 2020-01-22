@@ -1,8 +1,9 @@
 from flask import render_template as template
+
 from flask_classful import FlaskView
 
-from app.models.users import User
 from app.models.ingredients import Ingredient
+from app.models.users import User
 
 
 class TrialRecipesView(FlaskView):

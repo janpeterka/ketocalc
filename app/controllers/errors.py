@@ -1,7 +1,6 @@
-from flask import render_template as template
-from flask import abort
 from flask import current_app as application
-from flask import make_response
+from flask import render_template as template
+from flask import abort, make_response
 
 from flask_classful import FlaskView
 
