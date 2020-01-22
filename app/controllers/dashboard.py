@@ -19,6 +19,8 @@ class DashboardView(FlaskView):
         if selected_diet_id is None:
             if len(self.user.active_diets) > 0:
                 selected_diet = self.user.active_diets[0]
+            else:
+                selected_diet = None
         else:
             selected_diet = Diet.load(selected_diet_id)
 
