@@ -38,4 +38,4 @@
         entry: pipenv run pytest -v tests/
         language: system
         types: [python]
-        stages: [commit]
+        stages: [push]

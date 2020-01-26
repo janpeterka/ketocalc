@@ -11,7 +11,7 @@
     	<ul>
     		<li>
     			<p class="faq-question">Nefunguje mi ketokalkulačka</p>
-    			<p class="faq-answer">Nahlašte problém na <a href="{{ url_for('SupportView:feedback') }}}">této záložce</a>. Než se problém vyřeší, používejte <a href="https://ketocalc.herokuapp.com/">stabilní verzi</a></p>
+    			<p class="faq-answer">Nahlašte problém na <a href="{{ url_for('SupportView:feedback') }}">této záložce</a>. Než se problém vyřeší, používejte <a href="https://ketocalc.herokuapp.com/">stabilní verzi</a></p>
     		</li>
     	</ul>
     	

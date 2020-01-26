@@ -113,7 +113,7 @@ def test_calc(app, client):
                 == dataset["diet"]["protein"]
             )
 
-    print("tested ", len(datasets), "datasets")
+    client.get("/logout")
 
 
 # def test_recalc():

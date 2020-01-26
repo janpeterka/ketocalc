@@ -1,5 +1,5 @@
 from flask import render_template as template
-from flask import request
+from flask import request, redirect, url_for
 
 from flask_classful import FlaskView
 from flask_login import current_user, login_required
@@ -22,6 +22,9 @@ class DashboardView(FlaskView):
             selected_diet=self.selected_diet,
             first_name=current_user.first_name,
         )
+
+    def show(self):
+        return redirect(url_for("DashboardView:index"))
 
     def post(self):
         self.selected_diet = Diet.load(request.form["select_diet"])

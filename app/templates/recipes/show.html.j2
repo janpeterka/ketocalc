@@ -88,8 +88,8 @@
             {% if not is_print %}
             <div class="row">
                 <form action="{{ url_for('RecipesView:delete', id=recipe.id) }}" method="post" class="form col-5"  accept-charset="utf-8" onsubmit="return confirm('{{ texts.recipe_delete_confirm }}');">
-                    <a class="btn btn-warning" href="{{ url_for('RecipesView:edit', id=recipe.id) }}}">{{ texts.edit }} {{ icons.edit }}</a>
-                    <a class="btn btn-secondary" href="{{ url_for('RecipesView:print', id=recipe.id) }}}" target="_blank" rel="noopener noreferrer">{{ texts.print }} {{ icons.print }}</a>
+                    <a class="btn btn-warning" href="{{ url_for('RecipesView:edit', id=recipe.id) }}">{{ texts.edit }} {{ icons.edit }}</a>
+                    <a class="btn btn-secondary" href="{{ url_for('RecipesView:print', id=recipe.id) }}" target="_blank" rel="noopener noreferrer">{{ texts.print }} {{ icons.print }}</a>
                     <button type="submit" class="btn btn-danger">{{ texts.recipe_delete}} {{ icons.delete }}</button>
                 </form>
 
