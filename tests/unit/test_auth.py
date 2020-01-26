@@ -5,6 +5,7 @@ import helpers
 
 
 def test_login(app, client):
+    assert False
     assert client.get("/login") == 200
     # username
     assert do_login("admin", "admin") is False
