@@ -7,10 +7,10 @@ from flask import current_app as application
 from flask_classful import FlaskView, route
 from flask_login import current_user
 
-from app.controllers.forms.password_recovery import NewPasswordForm, GetNewPasswordForm
 from app.auth.routes import generate_new_password_token
-from app.helpers.mail import send_email
 
+from app.controllers.forms.password_recovery import NewPasswordForm, GetNewPasswordForm
+from app.helpers.mail import send_email
 from app.models.users import User
 
 
