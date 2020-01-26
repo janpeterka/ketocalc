@@ -27,7 +27,7 @@
                     </button>
                 </a>
                 <a class="col-sm-2" href="{{ url_for('RegisterView:show') }}">{{ texts.register }}</a>
-                <a class="col-sm-2" style="color: var(--color_info)" href="/get_new_password">{{ texts.forgotten_password }}</a>
+                <a class="col-sm-2" style="color: var(--color_info)" href="{{ url_for('PasswordRecoveryView:show') }}">{{ texts.forgotten_password }}</a>
 
     	    </form>
     	</div>

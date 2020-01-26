@@ -16,7 +16,6 @@ class IngredientsView(FlaskView):
     decorators = [login_required]
 
     def before_request(self, name, id=None):
-        print(id)
         if id is not None:
             self.ingredient = Ingredient.load(id)
 

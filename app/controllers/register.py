@@ -1,6 +1,6 @@
 from werkzeug import MultiDict
 
-from flask import redirect, url_for, request, session
+from flask import redirect, url_for, request, session, flash
 from flask import render_template as template
 from flask import current_app as application
 
@@ -36,17 +36,14 @@ class RegisterView(FlaskView):
 
     def post(self):
         form = RegisterForm(request.form)
-        print(application.config["SQLALCHEMY_DATABASE_URI"])
-        print(request.form)
-        print(form)
-
         if not form.validate_on_submit():
-            print(request.form)
             session["formdata"] = request.form
             return redirect(url_for("RegisterView:show"))
         if not validate_register(form.username.data):
             # TODO: tohle teď nic nedělá - form se nezachová - přepsat jinam?
             form.username.errors = ["Toto jméno nemůžete použít"]
+            # for now...
+            flash("Toto jméno nemůžete použít")
             session["formdata"] = request.form
             return redirect(url_for("RegisterView:show"))
 

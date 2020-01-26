@@ -1,5 +1,5 @@
 from flask import Blueprint
-from flask import render_template as template, request, redirect
+from flask import redirect
 from flask import flash, url_for
 from flask import current_app as application
 
@@ -9,10 +9,6 @@ from flask_dance.contrib.google import google
 from flask_dance.consumer import oauth_authorized
 
 from app.models.users import User
-
-from app.helpers.mail import send_email
-
-from app.auth.forms import NewPasswordForm, GetNewPasswordForm
 
 
 auth_blueprint = Blueprint("auth", __name__, template_folder="templates/auth/")
@@ -147,67 +143,3 @@ def set_new_password_token(user, token):
     user.new_password_token = token
     user.edit()
     return True
-
-
-@auth_blueprint.route("/get_new_password", methods=["GET", "POST"])
-def get_new_password():
-    form = GetNewPasswordForm(request.form)
-    if request.method == "GET":
-        return template("auth/get_new_password.html.j2", form=form)
-    elif request.method == "POST":
-        if not form.validate_on_submit():
-            return template("auth/get_new_password.html.j2", form=form)
-
-        user = User.load(form.username.data, load_type="username")
-        if user is None:
-            form.username.errors = ["Uživatel s tímto emailem neexistuje"]
-            return template("auth/get_new_password.html.j2", form=form)
-
-        html_body = template(
-            "auth/mails/_new_password_email.html.j2",
-            token=generate_new_password_token(user),
-        )
-        send_email(
-            subject="Nové heslo",
-            sender="ketocalc.jmp@gmail.com",
-            recipients=[user.username],
-            text_body="",
-            html_body=html_body,
-        )
-    flash("Nové heslo vám bylo zasláno do emailu", "success")
-    return redirect(url_for("LoginView:show"))
-
-
-@auth_blueprint.route("/new_password", methods=["GET", "POST"])
-@auth_blueprint.route("/new_password/<token>", methods=["GET", "POST"])
-def show_new_password(token=None):
-    form = NewPasswordForm(request.form)
-    user = User.load(token, load_type="new_password_token")
-    if user is None:
-        flash("tento token již není platný", "error")
-        return redirect(url_for("LoginView:show"))
-
-    if request.method == "GET":
-        return template(
-            "auth/new_password.html.j2", form=form, username=user.username, token=token
-        )
-    elif request.method == "POST":
-        if not form.validate_on_submit():
-            return template(
-                "auth/new_password.html.j2",
-                form=form,
-                username=user.username,
-                token=token,
-            )
-
-        # print(user.username)
-        if user is None:
-            flash("nemůžete změnit heslo", "error")
-        else:
-            user.set_password_hash(form.password.data.encode("utf-8"))
-            user.password_version = application.config["PASSWORD_VERSION"]
-            user.new_password_token = None
-            user.edit()
-            flash("heslo bylo změněno", "success")
-
-        return redirect("/login")
