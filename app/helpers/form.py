@@ -10,18 +10,16 @@ from app.controllers.forms.password_recovery import *
 from app.controllers.forms.register import *
 
 
-def create_form(form_name):
+def create_form(form_class):
     form_data = None
     if session.get("formdata") is not None:
         form_data = MultiDict(session.get("formdata"))
         session.pop("formdata")
 
     if form_data:
-        klass = globals()[str(form_name)]
-        form = klass(form_data)
+        form = form_class(form_data)
         form.validate()
     else:
-        klass = globals()[str(form_name)]
-        form = klass()
+        form = form_class()
 
     return form

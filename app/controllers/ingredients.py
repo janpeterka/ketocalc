@@ -1,5 +1,3 @@
-from werkzeug import MultiDict
-
 from flask import render_template as template
 from flask import request, redirect, url_for, session, abort, flash
 
@@ -18,9 +16,6 @@ class IngredientsView(FlaskView):
     decorators = [login_required]
 
     def before_request(self, name, id=None):
-        if "id" in request.args:
-            id = request.args["id"]
-
         if id is not None:
             self.ingredient = Ingredient.load(id)
 
@@ -42,7 +37,7 @@ class IngredientsView(FlaskView):
         return template("ingredients/all.html.j2", ingredients=self.ingredients)
 
     def new(self):
-        form = create_form("IngredientsForm")
+        form = create_form(IngredientsForm)
         return template("ingredients/new.html.j2", form=form)
 
     def post(self, id=None):
@@ -92,16 +87,7 @@ class IngredientsView(FlaskView):
         )
 
     def edit(self, id):
-        form_data = None
-        if session.get("formdata") is not None:
-            form_data = MultiDict(session.get("formdata"))
-            session.pop("formdata")
-
-        if form_data:
-            form = IngredientsForm(form_data)
-            form.validate()
-        else:
-            form = IngredientsForm()
+        form = create_form(IngredientsForm)
 
         return template(
             "ingredients/edit.html.j2",

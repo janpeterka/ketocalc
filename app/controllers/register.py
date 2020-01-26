@@ -1,5 +1,3 @@
-from werkzeug import MultiDict
-
 from flask import redirect, url_for, request, session, flash
 from flask import render_template as template
 from flask import current_app as application
@@ -9,6 +7,8 @@ from flask_login import current_user
 
 from app.controllers.forms.register import RegisterForm
 from app.auth.routes import validate_register, do_register
+
+from app.helpers.form import create_form
 
 from app.models.users import User
 
@@ -22,16 +22,7 @@ class RegisterView(FlaskView):
 
     @route("")
     def show(self):
-        form_data = None
-        if session.get("formdata") is not None:
-            form_data = MultiDict(session.get("formdata"))
-            session.pop("formdata")
-        if form_data:
-            form = RegisterForm(form_data)
-            form.validate()
-        else:
-            form = RegisterForm()
-
+        form = create_form(RegisterForm)
         return template("auth/register.html.j2", form=form)
 
     def post(self):

@@ -1,5 +1,3 @@
-from werkzeug import MultiDict
-
 from flask import render_template as template
 from flask import request, redirect, url_for, session
 from flask import abort, flash
@@ -7,6 +5,8 @@ from flask import abort, flash
 from flask_login import login_required, current_user
 
 from flask_classful import FlaskView, route
+
+from app.helpers.form import create_form
 
 from app.models.diets import Diet
 from app.models.users import User
@@ -18,9 +18,6 @@ class DietsView(FlaskView):
     decorators = [login_required]
 
     def before_request(self, name, id=None):
-        if "id" in request.args:
-            id = request.args["id"]
-
         if id is not None:
             self.diet = Diet.load(id)
 
@@ -37,13 +34,7 @@ class DietsView(FlaskView):
         return template("diets/all.html.j2", diets=self.diets)
 
     def new(self):
-        if session.get("formdata") is not None:
-            data = MultiDict(session.get("formdata"))
-            session.pop("formdata")
-            form = DietsForm(data)
-            form.validate()
-        else:
-            form = DietsForm()
+        form = create_form(DietsForm)
         return template("diets/new.html.j2", form=form)
 
     def post(self):
@@ -92,15 +83,7 @@ class DietsView(FlaskView):
         )
 
     def edit(self, id):
-        form_data = None
-        if session.get("formdata") is not None:
-            form_data = MultiDict(session.get("formdata"))
-            session.pop("formdata")
-        if form_data:
-            form = DietsForm(form_data)
-            form.validate()
-        else:
-            form = DietsForm()
+        form = create_form(DietsForm)
 
         return template(
             "diets/edit.html.j2",

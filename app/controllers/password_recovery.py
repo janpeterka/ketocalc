@@ -1,5 +1,3 @@
-from werkzeug import MultiDict
-
 from flask import redirect, url_for, request, session, flash
 from flask import render_template as template
 from flask import current_app as application
@@ -11,6 +9,7 @@ from app.auth.routes import generate_new_password_token
 
 from app.controllers.forms.password_recovery import NewPasswordForm, GetNewPasswordForm
 from app.helpers.mail import send_email
+from app.helpers.form import create_form
 from app.models.users import User
 
 
@@ -20,15 +19,7 @@ class PasswordRecoveryView(FlaskView):
             return redirect(url_for("IndexView:index"))
 
     def show(self):
-        form_data = None
-        if session.get("formdata") is not None:
-            form_data = MultiDict(session.get("formdata"))
-            session.pop("formdata")
-        if form_data:
-            form = GetNewPasswordForm(form_data)
-            form.validate()
-        else:
-            form = GetNewPasswordForm()
+        form = create_form(GetNewPasswordForm)
         return template("auth/get_new_password.html.j2", form=form)
 
     def post(self):
@@ -63,15 +54,7 @@ class PasswordRecoveryView(FlaskView):
 
     def show_token(self):
         token = request.args["token"]
-        form_data = None
-        if session.get("formdata") is not None:
-            form_data = MultiDict(session.get("formdata"))
-            session.pop("formdata")
-        if form_data:
-            form = NewPasswordForm(form_data)
-            form.validate()
-        else:
-            form = NewPasswordForm()
+        form = create_form(NewPasswordForm)
 
         user = User.load(token, load_type="new_password_token")
         if user is None:
