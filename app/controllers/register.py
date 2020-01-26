@@ -7,7 +7,7 @@ from flask import current_app as application
 from flask_classful import FlaskView, route
 from flask_login import current_user
 
-from app.auth.forms import RegisterForm
+from app.controllers.forms.register import RegisterForm
 from app.auth.routes import validate_register, do_register
 
 from app.models.users import User

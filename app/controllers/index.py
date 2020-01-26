@@ -8,7 +8,7 @@ class IndexView(FlaskView):
     route_base = "/"
 
     def index(self):
-        if hasattr(current_user, "id"):
+        if not current_user.is_anonymous:
             return redirect(url_for("DashboardView:index"))
         else:
             return redirect(url_for("LoginView:show"))

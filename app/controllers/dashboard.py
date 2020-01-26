@@ -10,9 +10,6 @@ from app.models.diets import Diet
 class DashboardView(FlaskView):
     decorators = [login_required]
 
-    def before_request(self, name):
-        self.selected_diet = None
-
     def index(self, selected_diet_id=None):
         if selected_diet_id is None and len(current_user.active_diets) > 0:
             self.selected_diet = current_user.active_diets[0]

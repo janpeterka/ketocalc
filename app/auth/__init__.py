@@ -1,6 +1,6 @@
-# from flask import flash
 from functools import wraps
-from flask import redirect, url_for
+
+from flask import abort
 
 from flask_login import LoginManager
 from flask_login import current_user
@@ -14,9 +14,10 @@ login = LoginManager()
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if current_user.username != "admin":
-            return redirect("support/wrongpage")
-        return f(*args, **kwargs)
+        if current_user.is_authenticated and current_user.is_admin:
+            return f(*args, **kwargs)
+        else:
+            abort(403)
 
     return decorated_function
 

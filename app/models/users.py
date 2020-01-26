@@ -3,6 +3,7 @@ import bcrypt
 import hashlib
 import unidecode
 
+from flask import current_app as application
 
 from flask_login import UserMixin
 
@@ -132,12 +133,28 @@ class User(db.Model, UserMixin, BaseMixin):
             else:
                 return False
 
+    def log_login(self):
+        if application.config["APP_STATE"] == "production":
+            self.last_logged_in = datetime.datetime.now()
+            if self.login_count is None:
+                self.login_count = 1
+            else:
+                self.login_count += 1
+            self.edit()
+
     def add_default_ingredients(self):
         ingredients = Ingredient.load_all_by_author("default")
         for ingredient in ingredients:
             new_ingredient = ingredient.duplicate()
             new_ingredient.author = self.username
             new_ingredient.save()
+
+    @property
+    def is_admin(self):
+        if self.username == "admin":
+            return True
+        else:
+            return False
 
     @property
     def recipes(self, ordered=True):
