@@ -39,6 +39,15 @@ def create_app(config_name="default"):
 
     application.logger.addHandler(gunicorn_logger)
     application.logger.addHandler(db_handler)
+
+    from app.controllers import register_all_controllers  # noqa: F401
+
+    register_all_controllers(application)
+
+    from app.controllers import register_error_handlers  # noqa: F401
+
+    register_error_handlers(application)
+
     # MODULES
 
     # Auth module
@@ -50,13 +59,5 @@ def create_app(config_name="default"):
     from app.calc import create_module as calc_create_module
 
     calc_create_module(application)
-
-    from app.controllers import register_all_controllers  # noqa: F401
-
-    register_all_controllers(application)
-
-    from app.controllers import register_error_handlers  # noqa: F401
-
-    register_error_handlers(application)
 
     return application

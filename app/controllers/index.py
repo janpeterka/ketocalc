@@ -11,4 +11,4 @@ class IndexView(FlaskView):
         if hasattr(current_user, "id"):
             return redirect(url_for("DashboardView:index"))
         else:
-            return redirect("login")
+            return redirect(url_for("LoginView:show"))

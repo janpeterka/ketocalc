@@ -8,7 +8,7 @@ import datetime
 
 from flask import Blueprint
 from flask import render_template as template, request, redirect
-from flask import flash
+from flask import flash, url_for
 from flask import current_app as application
 
 from flask_login import login_user, logout_user, current_user, login_required
@@ -20,7 +20,7 @@ from app.models.users import User
 
 from app.helpers.mail import send_email
 
-from app.auth.forms import LoginForm, RegisterForm, NewPasswordForm, GetNewPasswordForm
+from app.auth.forms import NewPasswordForm, GetNewPasswordForm
 
 
 auth_blueprint = Blueprint("auth", __name__, template_folder="templates/auth/")
@@ -36,22 +36,9 @@ def admin_required(f):
     return decorated_function
 
 
-@auth_blueprint.route("/login", methods=["GET", "POST"])
+@auth_blueprint.route("/auth_login")
 def show_login():
-    if current_user.is_authenticated:
-        return redirect("/dashboard")
-    form = LoginForm(request.form)
-    if request.method == "GET":
-        return template("auth/login.html.j2", form=form)
-    elif request.method == "POST":
-        if not form.validate_on_submit():
-            return template("auth/login.html.j2", form=form)
-        if do_login(
-            username=form.username.data, password=form.password.data.encode("utf-8")
-        ):
-            return redirect("/dashboard")
-        else:
-            return template("auth/login.html.j2", form=form)
+    return redirect(url_for("LoginView:show"))
 
 
 @oauth_authorized.connect
@@ -149,38 +136,15 @@ def do_logout():
     if current_user.is_authenticated:
         logout_user()
         flash("Byl jste úspěšně odhlášen.", "info")
-    return redirect("/login")
-
-
-@auth_blueprint.route("/register", methods=["GET", "POST"])
-def show_register():
-    form = RegisterForm(request.form)
-    if request.method == "GET":
-        return template("auth/register.html.j2", form=form)
-    elif request.method == "POST":
-        if not form.validate_on_submit():
-            return template("auth/register.html.j2", form=form)
-        if not validate_register(form.username.data):
-            form.username.errors = ["Toto jméno nemůžete použít"]
-            return template("auth/register.html.j2", form=form)
-
-        user = User()
-        form.populate_obj(user)
-        user.set_password_hash(form.password.data.encode("utf-8"))
-        user.password_version = application.config["PASSWORD_VERSION"]
-
-        if do_register(user):
-            return redirect("/dashboard")
-        else:
-            return template("auth/register.html.j2", form=form)
+    return redirect(url_for("LoginView:show"))
 
 
 def do_register(user, source=None):
-    if not validate_register(user.username):
-        # user with same username
-        flash("Toto uživatelské jméno nemůžete použít", "error")
-        return False
-    elif user.save() is True:
+    # if not validate_register(user.username):
+    # user with same username
+    # flash("Toto uživatelské jméno nemůžete použít", "error")
+    # return False
+    if user.save() is True:
         user.add_default_ingredients()
         if source == "google_oauth":
             do_login(user=user)
@@ -252,7 +216,7 @@ def get_new_password():
             html_body=html_body,
         )
     flash("Nové heslo vám bylo zasláno do emailu", "success")
-    return redirect("/login")
+    return redirect(url_for("LoginView:show"))
 
 
 @auth_blueprint.route("/new_password", methods=["GET", "POST"])
@@ -262,7 +226,7 @@ def show_new_password(token=None):
     user = User.load(token, load_type="new_password_token")
     if user is None:
         flash("tento token již není platný", "error")
-        return redirect("/login")
+        return redirect(url_for("LoginView:show"))
 
     if request.method == "GET":
         return template(
