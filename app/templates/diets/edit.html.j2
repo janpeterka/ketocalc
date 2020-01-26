@@ -20,46 +20,35 @@
     <div class="container">
         <div class="row">
             <div class="col-8">
-                <form action="{{ url_for('DietsView:edit', id=diet.id) }}" class="edit__form form-group" method="post" accept-charset="utf-8">
+                <form action="{{ url_for('DietsView:post_edit', id=diet.id) }}" class="edit__form form-group" method="post" accept-charset="utf-8">
+                    {{ form.csrf_token }}
+                    {% from "_form_element.html.j2" import render_field %}
                     <table class="table">
+                        <thead>
+                            <tr>
+                                <th>{{ texts.title }}</th>
+                                <th>{{ texts.energy_simple }}</th>
+                                <th>{{ texts.protein_simple }}</th>
+                                <th>{{ texts.fat_simple }}</th>
+                                <th>{{ texts.sugar_simple }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                         <tr>
-                            <th scope="col">{{ texts.title }}</th>
-                            <th scope="col">{{ texts.energy_simple }}</th>
-                            <th scope="col">{{ texts.protein_simple }}</th>
-                            <th scope="col">{{ texts.fat_simple }}</th>
-                            <th scope="col">{{ texts.sugar_simple }}</th>
-                        </tr>
-                        <tr>
-                            <td class="col-1">
-                                <input type="text" class="form-control" name="name" size="12" value="{{ diet.name }}" />
+                            <td>
+                                {{ render_field(form.name, "form-control", label=False, value=diet.name) }}
                             </td>
-                            <td class="col-2">
-                                {% if diet.is_used == False %}
-                                    <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="calorie" value="{{ diet.calorie }}"/>
-                                {% else %}
-                                    {{ diet.calorie }}
-                                {% endif %}
+                            <td>
+                                {{ render_field(form.calorie, "form-control", label=False, value=diet.calorie, disabled=diet.is_user) }}
                             </td>
-                            <td class="col-2">
-                                {% if diet.is_used == False %}
-                                    <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="protein" value="{{ diet.protein }}"/>
-                                {% else %}
-                                    {{ diet.protein }}
-                                {% endif %}
+                            <td>
+                                {{ render_field(form.protein, "form-control", label=False, value=diet.protein, disabled=diet.is_user) }}
                             </td>
-                            <td class="col-2">
-                                {% if diet.is_used == False %}
-                                    <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="fat" value="{{ diet.fat }}"/>
-                                {% else %}
-                                    {{ diet.fat }}
-                                {% endif %}
+                            <td>
+                                {{ render_field(form.fat, "form-control", label=False, value=diet.fat, disabled=diet.is_user) }}
                             </td>
-                            <td class="col-2">
-                                {% if diet.is_used == False %}
-                                    <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="sugar" value="{{ diet.sugar }}"/>
-                                {% else %}
-                                    {{ diet.sugar }}
-                                {% endif %}
+                            <td>
+                                {{ render_field(form.sugar, "form-control", label=False, value=diet.sugar, disabled=diet.is_user) }}
                             </td>
                         </tr>
                     </table>
@@ -72,17 +61,18 @@
                         <tr>
                             <td>{{ texts.meal_size_big }}</td>
                             <td>
-                                <input type="text" class="form-control" name="big_size" value="{{ diet.big_size }}" />
+                                {{ render_field(form.big_size, "form-control", label=False, value=diet.big_size) }}
                             </td>
                         </tr>
                         <tr>
                             <td>{{ texts.meal_size_small }}</td>
                             <td>
-                                <input type="text" class="form-control" name="small_size"  value="{{ diet.small_size }}" /> 
+                                {{ render_field(form.small_size, "form-control", label=False, value=diet.small_size) }}
                             </td>
                         </tr>
+                    </tbody>
                     </table>
-                    <input type="submit" class="btn btn-warning" value="{{ texts.edit_confirm }}" />
+                    {{ render_field(form.submit, "btn btn-warning", label=False, value=texts.edit_confirm) }}
                 </form>
 
                 <form action="{{ url_for('DietsView:delete', id=diet.id) }}" method="post" accept-charset="utf-8">

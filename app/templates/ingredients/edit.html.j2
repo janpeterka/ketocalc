@@ -11,8 +11,11 @@
     <div class="container">
         <div class="row">
             <div class="col-md-8 col-sm-12"  style="margin-bottom:30px">
-                <form action="{{ url_for('IngredientsView:post', id=ingredient.id) }}" class="form-group" method="post" accept-charset="utf-8">
+                <form action="{{ url_for('IngredientsView:post_edit', id=ingredient.id) }}" class="form-group" method="post" accept-charset="utf-8">
+                    {{ form.csrf_token }}
+                    {% from "_form_element.html.j2" import render_field %}
                     <table class="table">
+
                         <tr>
                             <th>{{ texts.title }}</th>
                             <th>{{ texts.energy_100 }}</th>
@@ -22,28 +25,33 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="text" class="form-control" name="name" value="{{ ingredient.name }}" />
+                                {{ render_field(form.name, "form-control", label=False, value=ingredient.name) }}
+                                {# <input type="text" class="form-control" name="name" value="{{ ingredient.name }}" /> #}
                             </td>
                             <td>
-                                <input type="text" class="form-control" name="calorie" value="{{ ingredient.calorie }}" />
+                                {{ render_field(form.calorie, "form-control", label=False, value=ingredient.calorie) }}
+                                {# <input type="text" class="form-control" name="calorie" value="{{ ingredient.calorie }}" /> #}
                             </td>
                             <td>
                                 {% if ingredient.is_used == False %}
-                                    <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="protein" value="{{ ingredient.protein }}"/>
+                                    {{ render_field(form.protein, "form-control", label=False, value=ingredient.protein) }}
+                                    {# <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="protein" value="{{ ingredient.protein }}"/> #}
                                 {% else %}
                                     {{ ingredient.protein }}
                                 {% endif %}
                             </td>
                             <td>
                                 {% if ingredient.is_used == False %}
-                                    <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="fat" value="{{ ingredient.fat }}"/>
+                                    {{ render_field(form.fat, "form-control", label=False, value=ingredient.fat) }}
+                                    {# <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="fat" value="{{ ingredient.fat }}"/> #}
                                 {% else %}
                                     {{ ingredient.fat }}
                                 {% endif %}
                             </td>
                             <td>
                                 {% if ingredient.is_used == False %}
-                                    <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="sugar" value="{{ ingredient.sugar }}"/>
+                                    {{ render_field(form.sugar, "form-control", label=False, value=ingredient.sugar) }}
+                                    {# <input type="text" class="form-control" pattern="[0-9]+([\.][0-9]+)?" name="sugar" value="{{ ingredient.sugar }}"/> #}
                                 {% else %}
                                     {{ ingredient.sugar }}
                                 {% endif %}
@@ -51,8 +59,8 @@
                         </tr>
                     </table>
 
-
-                        <button type="submit" class="btn btn-warning">{{ texts.edit_confirm }} {{ icons.edit }}</button>
+                        {{ render_field(form.submit, "btn btn-warning", False, value=texts.edit_confirm+icons.edit) }}
+                        {# <button type="submit" class="btn btn-warning">{{ texts.edit_confirm }} {{ icons.edit }}</button> #}
                         <a class="btn btn-secondary" href="{{ url_for('IngredientsView:show', id=ingredient.id) }}">{{ texts.edit_cancel }} {{ icons.edit }}</a>
                     
 

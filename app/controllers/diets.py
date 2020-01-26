@@ -11,17 +11,16 @@ from flask_classful import FlaskView, route
 from app.models.diets import Diet
 from app.models.users import User
 
-from app.controllers.forms.diets import NewDietsForm
+from app.controllers.forms.diets import DietsForm
 
 
 class DietsView(FlaskView):
     decorators = [login_required]
 
-    def before_index(self):
-        self.diets = User.load(current_user.id).diets
-        self.diets.sort(key=lambda x: (-x.active, x.name))
-
     def before_request(self, name, id=None):
+        if "id" in request.args:
+            id = request.args["id"]
+
         if id is not None:
             self.diet = Diet.load(id)
 
@@ -30,6 +29,10 @@ class DietsView(FlaskView):
             elif self.diet.author.username != current_user.username:
                 abort(405)
 
+    def before_index(self):
+        self.diets = User.load(current_user.id).diets
+        self.diets.sort(key=lambda x: (-x.active, x.name))
+
     def index(self):
         return template("diets/all.html.j2", diets=self.diets)
 
@@ -37,40 +40,18 @@ class DietsView(FlaskView):
         if session.get("formdata") is not None:
             data = MultiDict(session.get("formdata"))
             session.pop("formdata")
-            form = NewDietsForm(data)
+            form = DietsForm(data)
             form.validate()
         else:
-            form = NewDietsForm()
-        session["form_type"] = "new"
+            form = DietsForm()
         return template("diets/new.html.j2", form=form)
 
-    def post(self, id=None):
-        form = NewDietsForm(request.form)
-        form_type = session["form_type"]
-        session.pop("form_type")
+    def post(self):
+        form = DietsForm(request.form)
 
         if not form.validate_on_submit():
             session["formdata"] = request.form
-            if form_type == "edit":
-                return redirect(url_for("DietsView:edit", id=self.diet.id))
-            elif form_type == "new":
-                return redirect(url_for("DietsView:new"))
-            else:
-                return redirect(url_for("DietsView:new"))
-
-        if form_type == "edit":
-            self.diet.name = request.form["name"]
-            self.diet.id = id
-            self.diet.small_size = request.form["small_size"]
-            self.diet.big_size = request.form["big_size"]
-
-            if not self.diet.is_used:
-                self.diet.protein = request.form["protein"]
-                self.diet.fat = request.form["fat"]
-                self.diet.sugar = request.form["sugar"]
-
-            self.diet.save()
-            return redirect(url_for("DietsView:show", id=self.diet.id))
+            return redirect(url_for("DietsView:new"))
 
         diet = Diet()
         form.populate_obj(diet)
@@ -84,6 +65,24 @@ class DietsView(FlaskView):
             flash("Nepodařilo se vytvořit dietu", "error")
             return redirect(url_for("DietsView:new"))
 
+    @route("<id>/edit", methods=["POST"])
+    def post_edit(self, id):
+        form = DietsForm(request.form)
+
+        if self.diet.is_used:
+            del form.calorie
+            del form.protein
+            del form.fat
+            del form.sugar
+
+        if not form.validate_on_submit():
+            session["formdata"] = request.form
+            return redirect(url_for("DietsView:edit", id=self.diet.id))
+
+        form.populate_obj(self.diet)
+        self.diet.edit()
+        return redirect(url_for("DietsView:show", id=self.diet.id))
+
     def show(self, id):
         return template(
             "diets/show.html.j2",
@@ -93,11 +92,22 @@ class DietsView(FlaskView):
         )
 
     def edit(self, id):
+        form_data = None
+        if session.get("formdata") is not None:
+            form_data = MultiDict(session.get("formdata"))
+            session.pop("formdata")
+        if form_data:
+            form = DietsForm(form_data)
+            form.validate()
+        else:
+            form = DietsForm()
+
         return template(
             "diets/edit.html.j2",
             diet=self.diet,
             recipes=self.diet.recipes,
             diets=self.diet.author.diets,
+            form=form,
         )
 
     @route("/<id>/delete", methods=["POST"])
@@ -105,7 +115,7 @@ class DietsView(FlaskView):
         if not self.diet.is_used:
             self.diet.remove()
             flash("Dieta byla smazána", "success")
-            return redirect("/alldiets")
+            return redirect(url_for("DietsView:index"))
         else:
             flash("Tato dieta má recepty, nelze smazat", "error")
             return redirect(url_for("DietsView:show", id=id))
@@ -121,6 +131,3 @@ class DietsView(FlaskView):
             flash("Dieta byla archivována", "success")
 
         return redirect(url_for("DietsView:show", id=id))
-
-    def print(self, id):
-        return None

@@ -44,16 +44,17 @@ class RecipesView(FlaskView):
         )
 
     def post(self):
-        form_type = session["form_type"]
-        session.pop("form_type")
+        # TODO: implemented with ajax not, will change
+        pass
 
-        if form_type == "edit":
-            self.recipe.name = request.form["name"]
-            self.recipe.type = request.form["size"]
-            self.recipe.edit()
-            self.recipe.refresh()
-            flash("Recept byl upraven.", "success")
-            return redirect(url_for("RecipesView:show", id=self.recipe.id))
+    @route("<id>/edit", methods=["POST"])
+    def post_edit(self, id):
+        self.recipe.name = request.form["name"]
+        self.recipe.type = request.form["size"]
+        self.recipe.edit()
+        self.recipe.refresh()
+        flash("Recept byl upraven.", "success")
+        return redirect(url_for("RecipesView:show", id=self.recipe.id))
 
     def show(self, id):
         if application.config["APP_STATE"] == "production":
@@ -90,11 +91,11 @@ class RecipesView(FlaskView):
         return template("recipes/print_all.html.j2", recipes=recipes)
 
     def edit(self, id):
-        session["form_type"] = "edit"
         return template(
             "recipes/edit.html.j2", recipe=self.recipe, totals=self.recipe.totals
         )
 
+    @route("/delete/<id>", methods=["POST"])
     def delete(self, id):
         self.recipe.remove()
         flash("Recept byl smazán.", "success")

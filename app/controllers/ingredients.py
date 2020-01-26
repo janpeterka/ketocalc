@@ -6,16 +6,21 @@ from flask import request, redirect, url_for, session, abort, flash
 from flask_classful import FlaskView, route
 from flask_login import login_required, current_user
 
+from app.helpers.form import create_form
+
 from app.models.ingredients import Ingredient
 from app.models.recipes import Recipe
 
-from app.controllers.forms.ingredients import NewIngredientsForm
+from app.controllers.forms.ingredients import IngredientsForm
 
 
 class IngredientsView(FlaskView):
     decorators = [login_required]
 
     def before_request(self, name, id=None):
+        if "id" in request.args:
+            id = request.args["id"]
+
         if id is not None:
             self.ingredient = Ingredient.load(id)
 
@@ -37,48 +42,15 @@ class IngredientsView(FlaskView):
         return template("ingredients/all.html.j2", ingredients=self.ingredients)
 
     def new(self):
-        form_data = None
-        if session.get("formdata") is not None:
-            form_data = MultiDict(session.get("formdata"))
-            session.pop("formdata")
-
-        if form_data:
-            form = NewIngredientsForm(form_data)
-            form.validate()
-        else:
-            form = NewIngredientsForm()
-        session["form_type"] = "new"
+        form = create_form("IngredientsForm")
         return template("ingredients/new.html.j2", form=form)
 
     def post(self, id=None):
-        form_type = session["form_type"]
-        session.pop("form_type")
-        form = NewIngredientsForm(request.form)
+        form = IngredientsForm(request.form)
 
         if not form.validate_on_submit():
             session["formdata"] = request.form
-            if form_type == "edit":
-                return redirect(url_for("IngredientsView:edit", id=self.ingredient.id))
-            elif form_type == "new":
-                return redirect(url_for("IngredientsView:new"))
-            else:
-                return redirect(url_for("IngredientsView:new"))
-
-        if form_type == "edit":
-            self.ingredient.id = id
-            self.ingredient.name = request.form["name"]
-            self.ingredient.calorie = request.form["calorie"]
-            if not self.ingredient.is_used:
-                self.ingredient.protein = request.form["protein"]
-                self.ingredient.fat = request.form["fat"]
-                self.ingredient.sugar = request.form["sugar"]
-                self.ingredient.edit()
-                flash("Surovina byla upravena.", "success")
-                return redirect(url_for("IngredientsView:show", id=self.ingredient.id))
-            else:
-                self.ingredient.edit()
-                flash("Název a kalorická hodnota byly upraveny.", "success")
-                return redirect(url_for("IngredientsView:show", id=self.ingredient.id))
+            return redirect(url_for("IngredientsView:new"))
 
         ingredient = Ingredient()
         form.populate_obj(ingredient)
@@ -93,6 +65,25 @@ class IngredientsView(FlaskView):
 
         return None
 
+    @route("<id>/edit", methods=["POST"])
+    def post_edit(self, id):
+        form = IngredientsForm(request.form)
+
+        if self.ingredient.is_used:
+            del form.calorie
+            del form.protein
+            del form.fat
+            del form.sugar
+
+        if not form.validate_on_submit():
+            session["formdata"] = request.form
+            return redirect(url_for("IngredientsView:edit", id=self.ingredient.id))
+
+        form.populate_obj(self.ingredient)
+        self.ingredient.edit()
+        flash("Surovina byla upravena.", "success")
+        return redirect(url_for("IngredientsView:show", id=self.ingredient.id))
+
     def show(self, id):
         return template(
             "ingredients/show.html.j2",
@@ -101,11 +92,22 @@ class IngredientsView(FlaskView):
         )
 
     def edit(self, id):
-        session["form_type"] = "edit"
+        form_data = None
+        if session.get("formdata") is not None:
+            form_data = MultiDict(session.get("formdata"))
+            session.pop("formdata")
+
+        if form_data:
+            form = IngredientsForm(form_data)
+            form.validate()
+        else:
+            form = IngredientsForm()
+
         return template(
             "ingredients/edit.html.j2",
             ingredient=self.ingredient,
             recipes=self.ingredient.recipes,
+            form=form,
         )
 
     @route("/ingredients/<id>", methods=["POST"])

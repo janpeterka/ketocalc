@@ -67,7 +67,6 @@
                     {% else %}
                         <button type="submit" class="btn btn-danger" disabled>{{ texts.delete_error }} {{ icons.delete }}</button>
                     {% endif %}
-                    <a class="btn btn-secondary" href="{{ url_for('DietsView:print', id=diet.id) }}" target="_blank" rel="noopener noreferrer">{{ texts.print }} {{ icons.print }}</a>
                 </form>
                 <form action="{{ url_for('DietsView:archive', id=diet.id) }}" method="post" accept-charset="utf-8">
                     {% if diet.active == True %}
