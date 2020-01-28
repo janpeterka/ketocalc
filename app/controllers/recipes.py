@@ -2,19 +2,19 @@ import json
 
 from flask import current_app as application
 from flask import render_template as template
-from flask import request, redirect, url_for, session, flash, abort, jsonify
+from flask import request, redirect, url_for, flash, abort, jsonify
 
 from flask_login import login_required, current_user
 
 from flask_classful import FlaskView, route
+
+from app.helpers import calculations
 
 from app.models.recipes import Recipe
 from app.models.diets import Diet
 from app.models.users import User
 from app.models.ingredients import Ingredient
 from app.models.recipes_has_ingredients import RecipesHasIngredient
-
-from app.calc import calculations
 
 
 class RecipesView(FlaskView):

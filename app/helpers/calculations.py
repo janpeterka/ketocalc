@@ -4,10 +4,6 @@ import sympy as sp
 from sympy import solve_poly_inequality as solvei
 from sympy import poly
 
-from flask import Blueprint
-
-calc_blueprint = Blueprint("calc", __name__)
-
 
 # CALCULATE RECIPE
 def calculate_recipe(ingredients, diet):

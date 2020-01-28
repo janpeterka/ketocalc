@@ -50,8 +50,4 @@ def create_app(config_name="default"):
 
     auth_create_module(application)
 
-    from app.calc import create_module as calc_create_module
-
-    calc_create_module(application)
-
     return application
