@@ -29,13 +29,6 @@ class PasswordRecoveryView(FlaskView):
             return redirect(url_for("PasswordRecoveryView:show"))
 
         user = User.load(form.username.data, load_type="username")
-        if user is None:
-            save_form_to_session(request.form)
-            # TODO: This does nothing - form is not saved
-            form.username.errors = ["Uživatel s tímto emailem neexistuje"]
-            # for now...
-            flash("Uživatel s tímto emailem neexistuje", "error")
-            return redirect(url_for("PasswordRecoveryView:show"))
 
         html_body = template(
             "auth/mails/_new_password_email.html.j2",

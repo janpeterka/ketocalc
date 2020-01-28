@@ -46,7 +46,6 @@ class BaseMixin(object):
     def expire(self, **kw):
         """Dumps database changes
         """
-
         try:
             db.session.expire(self)
             return True

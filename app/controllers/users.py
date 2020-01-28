@@ -1,5 +1,6 @@
 from flask import render_template as template
 from flask import request, url_for, redirect, abort, flash
+from flask import current_app as application
 
 from flask_classful import FlaskView
 from flask_login import login_required, current_user
@@ -18,7 +19,7 @@ class UsersView(FlaskView):
     def post(self, page_type=None):
         if page_type == "change_password":
             self.user.set_password_hash(request.form["password"].encode("utf-8"))
-            self.user.password_version = "bcrypt"
+            self.user.password_version = application.config["PASSWORD_VERSION"]
 
             if self.user.edit():
                 flash("Heslo bylo změněno", "success")

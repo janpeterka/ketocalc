@@ -41,15 +41,14 @@ class Diet(db.Model, BaseMixin):
     recipes = db.relationship(
         "Recipe", secondary="diets_has_recipes", order_by="Recipe.name"
     )
-    author = db.relationship(
-        "User", secondary="users_has_diets", uselist=False, backref="diets"
-    )
+    author = db.relationship("User", secondary="users_has_diets", uselist=False)
 
     @staticmethod
     def load(diet_id):
         diet = db.session.query(Diet).filter(Diet.id == diet_id).first()
         return diet
 
+    # TODO: only used for testing
     @staticmethod
     def load_by_name(diet_name):
         diet = db.session.query(Diet).filter(Diet.name == diet_name).first()
@@ -61,6 +60,3 @@ class Diet(db.Model, BaseMixin):
             return False
         else:
             return True
-
-    # def refresh(self):
-    #     super()

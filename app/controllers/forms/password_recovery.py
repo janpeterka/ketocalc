@@ -1,8 +1,10 @@
 from wtforms import StringField, PasswordField, SubmitField
-from wtforms import validators
+from wtforms import validators, ValidationError
 
 from flask_wtf import FlaskForm
 from flask_wtf import RecaptchaField
+
+from app.models.users import User
 
 
 class NewPasswordForm(FlaskForm):
@@ -26,3 +28,8 @@ class GetNewPasswordForm(FlaskForm):
         ],
     )
     submit = SubmitField("Získat nové heslo")
+
+    def validate_username(form, field):
+        user = User.load(field.data, load_type="username")
+        if user is None:
+            raise ValidationError("Uživatel s tímto emailem neexistuje")

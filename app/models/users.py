@@ -13,8 +13,6 @@ from app.auth import login
 from app.models.base_mixin import BaseMixin
 from app.models.ingredients import Ingredient
 
-# from app.models.diets import Diet
-
 
 class User(db.Model, UserMixin, BaseMixin):
     """User class
@@ -52,12 +50,8 @@ class User(db.Model, UserMixin, BaseMixin):
     new_password_token = db.Column(db.String(255), nullable=True)
 
     diets = db.relationship(
-        "Diet",
-        secondary="users_has_diets",
-        backref=db.backref("authors"),
-        order_by="desc(Diet.active)",
+        "Diet", secondary="users_has_diets", order_by="desc(Diet.active)",
     )
-    diets = []
 
     @staticmethod
     @login.user_loader
@@ -78,9 +72,6 @@ class User(db.Model, UserMixin, BaseMixin):
         Returns:
             [type] -- [description]
         """
-        if user_identifier is None:
-            return None
-
         if load_type == "id":
             user = db.session.query(User).filter(User.id == user_identifier).first()
         elif load_type == "username":
@@ -149,6 +140,7 @@ class User(db.Model, UserMixin, BaseMixin):
             new_ingredient.author = self.username
             new_ingredient.save()
 
+    # TODO: tohle fakt neni hezký
     @property
     def is_admin(self):
         if self.username == "admin":

@@ -54,6 +54,7 @@ class Ingredient(db.Model, BaseMixin):
         )
         return ingredient
 
+    # TODO: only used for testing
     @staticmethod
     def load_by_name(ingredient_name):
         ingredient = (
@@ -65,19 +66,6 @@ class Ingredient(db.Model, BaseMixin):
 
     @staticmethod
     def load_all_by_author(username, ordered=True):
-        """Load Ingredient objects by author
-
-        used for loading all ingredients for user
-
-        Arguments:
-            username {string} -- [description]
-
-        Keyword Arguments:
-            ordered {bool} -- if ingredients ordered alphabetically (default: {True})
-
-        Returns:
-            list -- list of Ingredient objects
-        """
         ingredients = (
             db.session.query(Ingredient).filter(Ingredient.author == username).all()
         )
@@ -88,14 +76,6 @@ class Ingredient(db.Model, BaseMixin):
         return ingredients
 
     def load_amount_by_recipe(self, recipe_id):
-        """Load amount of Ingredient in Recipe
-
-        Arguments:
-            recipe_id {int} -- Recipe database ID
-
-        Returns:
-            int -- amount
-        """
         rhi = (
             db.session.query(RecipesHasIngredient)
             .filter(RecipesHasIngredient.recipes_id == recipe_id)
@@ -128,11 +108,13 @@ class Ingredient(db.Model, BaseMixin):
         if "max" in json_ing:
             self.max = float(json_ing["max"])
 
+    # TODO: only used for testing
     def set_fixed(self, value=True, amount=0):
         self.fixed = value
         self.amount = amount
         return self
 
+    # TODO: only used for testing
     def set_main(self, value=True):
         self.main = value
         return self
