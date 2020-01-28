@@ -45,18 +45,18 @@ def oauth_login(blueprint, token):
 
 def do_oauth_register(*, user_info, oauth_type):
     user = User()
-    user.username = user_info["username"]
+    user.username = user_info["email"]
     user.password = None
     user.google_id = user_info["id"]
 
-    try:
+    if "given_name" in user_info:
         user.first_name = user_info["given_name"]
-    except Exception:
+    else:
         user.first_name = "-"
 
-    try:
+    if "family_name" in user_info:
         user.last_name = user_info["family_name"]
-    except Exception:
+    else:
         user.last_name = "-"
 
     do_register(user, source="google_oauth")
@@ -67,6 +67,7 @@ def do_oauth_login(*, user, oauth_type=None):
         if user.google_id is not None:
             login_user(user)
             user.log_login()
+            return True
 
 
 def do_login(username=None, password=None, from_register=False):
@@ -102,7 +103,7 @@ def do_register(user, source=None):
     if user.save() is True:
         user.add_default_ingredients()
         if source == "google_oauth":
-            do_login(user=user)
+            do_oauth_login(user=user, oauth_type="google")
         else:
             do_login(
                 username=user.username,
