@@ -1,8 +1,8 @@
-from flask_wtf import FlaskForm
-
-from flask_wtf import RecaptchaField
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms import validators
+
+from flask_wtf import FlaskForm
+from flask_wtf import RecaptchaField
 
 
 class NewPasswordForm(FlaskForm):

@@ -14,7 +14,7 @@ class ErrorsView(FlaskView):
     def shutdown(self):
         return template("errors/shutdown.tpl")
 
-    # REFACTOR only for testing
+    # only for testing
     @admin_required
     def err404(self):
         return template("errors/err404.tpl")

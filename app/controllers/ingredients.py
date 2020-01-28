@@ -1,10 +1,10 @@
 from flask import render_template as template
-from flask import request, redirect, url_for, session, abort, flash
+from flask import request, redirect, url_for, abort, flash
 
 from flask_classful import FlaskView, route
 from flask_login import login_required, current_user
 
-from app.helpers.form import create_form
+from app.helpers.form import create_form, save_form_to_session
 
 from app.models.ingredients import Ingredient
 from app.models.recipes import Recipe
@@ -24,10 +24,10 @@ class IngredientsView(FlaskView):
             if current_user.username != self.ingredient.author:
                 abort(403)
 
-    def before_edit(self, id=None):
+    def before_edit(self, id):
         self.ingredient.recipes = Recipe.load_by_ingredient(self.ingredient.id)
 
-    def before_show(self, id=None):
+    def before_show(self, id):
         self.ingredient.recipes = Recipe.load_by_ingredient(self.ingredient.id)
 
     def before_index(self):
@@ -40,11 +40,11 @@ class IngredientsView(FlaskView):
         form = create_form(IngredientsForm)
         return template("ingredients/new.html.j2", form=form)
 
-    def post(self, id=None):
+    def post(self):
         form = IngredientsForm(request.form)
 
         if not form.validate_on_submit():
-            session["formdata"] = request.form
+            save_form_to_session(request.form)
             return redirect(url_for("IngredientsView:new"))
 
         ingredient = Ingredient()
@@ -60,7 +60,7 @@ class IngredientsView(FlaskView):
 
         return None
 
-    @route("<id>/edit", methods=["POST"])
+    @route("edit/<id>", methods=["POST"])
     def post_edit(self, id):
         form = IngredientsForm(request.form)
 
@@ -71,7 +71,7 @@ class IngredientsView(FlaskView):
             del form.sugar
 
         if not form.validate_on_submit():
-            session["formdata"] = request.form
+            save_form_to_session(request.form)
             return redirect(url_for("IngredientsView:edit", id=self.ingredient.id))
 
         form.populate_obj(self.ingredient)
@@ -96,12 +96,12 @@ class IngredientsView(FlaskView):
             form=form,
         )
 
-    @route("/ingredients/<id>", methods=["POST"])
+    @route("delete/<id>", methods=["POST"])
     def delete(self, id):
         if not self.ingredient.is_used:
             self.ingredient.remove()
             flash("Surovina byla smazána", "success")
-            return redirect("/")
+            return redirect(url_for("DashboardView:show"))
         else:
             flash("Tato surovina je použita, nelze smazat", "error")
             return redirect(url_for("IngredientsView:show", id=self.ingredient.id))

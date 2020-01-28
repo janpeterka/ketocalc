@@ -1,6 +1,5 @@
 import json
 
-from flask import current_app as application
 from flask import render_template as template
 from flask import request, redirect, url_for, flash, abort, jsonify
 
@@ -57,12 +56,7 @@ class RecipesView(FlaskView):
         return redirect(url_for("RecipesView:show", id=self.recipe.id))
 
     def show(self, id):
-        if application.config["APP_STATE"] == "production":
-            if self.recipe.view_count is not None:
-                self.recipe.view_count += 1
-            else:
-                self.recipe.view_count = 1
-            self.recipe.edit()
+        self.recipe.log_view()
 
         return template(
             "recipes/show.html.j2",

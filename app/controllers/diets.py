@@ -1,12 +1,12 @@
 from flask import render_template as template
-from flask import request, redirect, url_for, session
+from flask import request, redirect, url_for
 from flask import abort, flash
 
 from flask_login import login_required, current_user
 
 from flask_classful import FlaskView, route
 
-from app.helpers.form import create_form
+from app.helpers.form import create_form, save_form_to_session
 
 from app.models.diets import Diet
 from app.models.users import User
@@ -41,7 +41,7 @@ class DietsView(FlaskView):
         form = DietsForm(request.form)
 
         if not form.validate_on_submit():
-            session["formdata"] = request.form
+            save_form_to_session(request.form)
             return redirect(url_for("DietsView:new"))
 
         diet = Diet()
@@ -67,7 +67,7 @@ class DietsView(FlaskView):
             del form.sugar
 
         if not form.validate_on_submit():
-            session["formdata"] = request.form
+            save_form_to_session(request.form)
             return redirect(url_for("DietsView:edit", id=self.diet.id))
 
         form.populate_obj(self.diet)

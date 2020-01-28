@@ -23,3 +23,7 @@ def create_form(form_class):
         form = form_class()
 
     return form
+
+
+def save_form_to_session(form_data):
+    session["formdata"] = form_data

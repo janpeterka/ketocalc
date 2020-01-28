@@ -1,8 +1,10 @@
-from flask_wtf import FlaskForm
-
-from flask_wtf import RecaptchaField
 from wtforms import StringField, PasswordField, SubmitField
-from wtforms import validators
+from wtforms import validators, ValidationError
+
+from flask_wtf import FlaskForm
+from flask_wtf import RecaptchaField
+
+from app.auth.routes import validate_register
 
 
 class RegisterForm(FlaskForm):
@@ -28,3 +30,7 @@ class RegisterForm(FlaskForm):
     )
     recaptcha = RecaptchaField()
     submit = SubmitField("Registrovat")
+
+    def validate_username(form, field):
+        if not validate_register(field.data):
+            raise ValidationError("Toto jméno nemůžete použít")

@@ -1,4 +1,4 @@
-from flask import redirect, url_for, request, session, flash
+from flask import redirect, url_for, request, flash
 from flask import render_template as template
 from flask import current_app as application
 
@@ -9,7 +9,7 @@ from app.auth.routes import generate_new_password_token
 
 from app.controllers.forms.password_recovery import NewPasswordForm, GetNewPasswordForm
 from app.helpers.mail import send_email
-from app.helpers.form import create_form
+from app.helpers.form import create_form, save_form_to_session
 from app.models.users import User
 
 
@@ -25,12 +25,12 @@ class PasswordRecoveryView(FlaskView):
     def post(self):
         form = GetNewPasswordForm(request.form)
         if not form.validate_on_submit():
-            session["formdata"] = request.form
+            save_form_to_session(request.form)
             return redirect(url_for("PasswordRecoveryView:show"))
 
         user = User.load(form.username.data, load_type="username")
         if user is None:
-            session["formdata"] = request.form
+            save_form_to_session(request.form)
             # TODO: This does nothing - form is not saved
             form.username.errors = ["Uživatel s tímto emailem neexistuje"]
             # for now...
@@ -73,7 +73,7 @@ class PasswordRecoveryView(FlaskView):
 
         print(user)
         if not form.validate_on_submit():
-            session["formdata"] = request.form
+            save_form_to_session(request.form)
             return redirect(url_for("PasswordRecoveryView:show_token", token=token))
 
         if user is None:

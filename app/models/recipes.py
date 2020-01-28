@@ -145,6 +145,13 @@ class Recipe(db.Model, BaseMixin):
         db.session.commit()
         return True
 
+    def log_view(self):
+        if self.view_count is not None:
+            self.view_count += 1
+        else:
+            self.view_count = 1
+        self.edit()
+
     @property
     def totals(self):
         totals = types.SimpleNamespace()

@@ -1,4 +1,4 @@
-from flask import redirect, url_for, request, session, flash
+from flask import redirect, url_for, request
 from flask import render_template as template
 from flask import current_app as application
 
@@ -6,9 +6,9 @@ from flask_classful import FlaskView, route
 from flask_login import current_user
 
 from app.controllers.forms.register import RegisterForm
-from app.auth.routes import validate_register, do_register
+from app.auth.routes import do_register
 
-from app.helpers.form import create_form
+from app.helpers.form import create_form, save_form_to_session
 
 from app.models.users import User
 
@@ -28,14 +28,7 @@ class RegisterView(FlaskView):
     def post(self):
         form = RegisterForm(request.form)
         if not form.validate_on_submit():
-            session["formdata"] = request.form
-            return redirect(url_for("RegisterView:show"))
-        if not validate_register(form.username.data):
-            # TODO: tohle teď nic nedělá - form se nezachová - přepsat jinam?
-            form.username.errors = ["Toto jméno nemůžete použít"]
-            # for now...
-            flash("Toto jméno nemůžete použít")
-            session["formdata"] = request.form
+            save_form_to_session(request.form)
             return redirect(url_for("RegisterView:show"))
 
         user = User()
@@ -46,5 +39,5 @@ class RegisterView(FlaskView):
         if do_register(user):
             return redirect(url_for("IndexView:index"))
         else:
-            session["formdata"] = request.form
+            save_form_to_session(request.form)
             return redirect(url_for("RegisterView:show"))

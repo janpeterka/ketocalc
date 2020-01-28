@@ -10,16 +10,21 @@ from app.models.diets import Diet
 class DashboardView(FlaskView):
     decorators = [login_required]
 
-    def index(self, selected_diet_id=None):
-        if selected_diet_id is None and len(current_user.active_diets) > 0:
-            self.selected_diet = current_user.active_diets[0]
+    def before_index(self):
+        self.selected_diet_id = None
+        if "selected_diet_id" in request.args:
+            self.selected_diet_id = request.args["selected_diet_id"]
+
+    def index(self):
+        if self.selected_diet_id is None and len(current_user.active_diets) > 0:
+            selected_diet = current_user.active_diets[0]
         else:
-            self.selected_diet = Diet.load(selected_diet_id)
+            selected_diet = Diet.load(self.selected_diet_id)
 
         return template(
             "dashboard/dashboard.html.j2",
             diets=current_user.active_diets,
-            selected_diet=self.selected_diet,
+            selected_diet=selected_diet,
             first_name=current_user.first_name,
         )
 
@@ -27,10 +32,7 @@ class DashboardView(FlaskView):
         return redirect(url_for("DashboardView:index"))
 
     def post(self):
-        self.selected_diet = Diet.load(request.form["select_diet"])
-        return template(
-            "dashboard/dashboard.html.j2",
-            diets=current_user.active_diets,
-            selected_diet=self.selected_diet,
-            first_name=current_user.first_name,
+        selected_diet_id = request.form["select_diet"]
+        return redirect(
+            url_for("DashboardView:index", selected_diet_id=selected_diet_id)
         )

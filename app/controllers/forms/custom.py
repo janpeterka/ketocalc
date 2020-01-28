@@ -1,7 +1,7 @@
 from wtforms import FloatField
 
 
-class MyFloatField(FloatField):
+class ComaFloatField(FloatField):
     def process_formdata(self, valuelist):
         if valuelist:
             try:
