@@ -94,6 +94,9 @@ class User(db.Model, UserMixin, BaseMixin):
         return user
 
     def set_password_hash(self, password):
+        if not isinstance(password, bytes) and password is not None:
+            password = password.encode("utf-8")
+
         self.pwdhash = bcrypt.hashpw(password, bcrypt.gensalt())
         return self
 

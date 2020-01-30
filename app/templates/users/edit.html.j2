@@ -6,35 +6,7 @@
 {% block style %}{% endblock %}
 
 {% block script %}
-    <script type="text/javascript">
-        function validateRegister(){
-            if ($(".password").val().length < 8){
-                bootbox.alert("Heslo je příliš krátké!");
-                return false
-            }
-            else {
-              return true  
-            }
-        }
-
-        $(document).on('blur','.password',function(){
-            if ($(this).val().length > 8){
-                $(".wrongPassword").empty();
-            } else {
-                $(".wrongPassword").empty();
-                $(".wrongPassword").append("<small class='form-text'>Heslo je příliš krátké!</small>");
-            }
-
-        });
-
-        function toggleVisibility() {
-            var x = $('#password')
-            if (x.attr("type") === "password"){
-                x.attr("type", 'text');
-            } else {
-                x.attr("type", 'password');
-            }
-        }
+    <script type="text/javascript" src="{{ url_for('static', filename='toggle_visibility.js') }}"></script>
 
     </script>
 {% endblock %}
@@ -42,14 +14,16 @@
 {% block content %}
     <div class="container">
         <div class="col-12">
-            <form action="{{ url_for('UsersView:post', page_type='edit') }}" class="form-group" method="post" accept-charset="utf-8">
+            <form action="{{ url_for('UsersView:post') }}" class="form-group" method="post" accept-charset="utf-8">
+                {{ user_form.csrf_token }}
+                {% from "_form_element.html.j2" import render_field %}
                 <table class="table">
                     <thead>
                         <tr>
-                            <th scope="col">{{ texts.user_username}}</th>
-                            <th scope="col">{{ texts.user_firstname}}</th>
-                            <th scope="col">{{ texts.user_lastname}}</th>
-                            <th scope="col"></th>
+                            <th>{{ texts.user_username}}</th>
+                            <th>{{ texts.user_firstname}}</th>
+                            <th>{{ texts.user_lastname}}</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -58,30 +32,30 @@
                                 {{ user.username }}
                             </td>
                             <td>
-                                <input name="firstname" type="text" class="form-control" value="{{ user.first_name }}"/>
+                                {{ render_field(user_form.first_name, "form-control", label=False, value=user.first_name) }}
                             </td>
                             <td>
-                                <input name="lastname" type="text" class="form-control" value="{{ user.last_name }}"/>
+                                {{ render_field(user_form.last_name, "form-control", label=False, value=user.last_name) }}
                             </td>
                             <td>
-                                <input type="submit" class="btn btn-warning float-right" value="{{ texts.edit_confirm }}" />
+                                {{ render_field(user_form.submit, "btn btn-warning", label=False, value=texts.edit_confirm) }}
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </form>
 
-            <form action="{{ url_for('UsersView:post', page_type='change_password')}}" method="post" onsubmit="return validateRegister()" >
+            <form action="{{ url_for('UsersView:post_password_edit') }}" method="post">
+                {{ password_form.csrf_token }}
                 <table class="table">
                     <td>
-                        <input id="password" name="password" type="password" class="form-control password" placeholder="{{ texts.password_new }}" />
-                        <span class="wrongPassword" style="color: var(--color_warning);"></span>
+                        <div class="form-group">
+                            {{ render_field(password_form.password, class="form-control")}}
+                            <span class="fa fa-fw fa-eye field-icon" onmouseover="turnOnVisibility()", onmouseout="turnOffVisibility()"></span>
+                        </div>
                     </td>
                     <td>
-                        <input type="button" class="btn" onclick="toggleVisibility()" value="{{ texts.password_show }}">
-                    </td>
-                    <td>
-                        <input type="submit" class="btn btn-warning float-right" value="{{ texts.password_change }}">
+                        {{ render_field(password_form.submit, "btn btn-warning float-right", label=False, value=texts.password_change) }}
                     </td>
                 </table>
             </form>

@@ -2,9 +2,12 @@ from flask import render_template as template
 from flask import request, url_for, redirect, abort, flash
 from flask import current_app as application
 
-from flask_classful import FlaskView
+from flask_classful import FlaskView, route
 from flask_login import login_required, current_user
 
+from app.helpers.form import create_form, save_form_to_session
+
+from app.controllers.forms.users import UserForm, PasswordForm
 from app.models.users import User
 
 
@@ -17,26 +20,51 @@ class UsersView(FlaskView):
             abort(404)
 
     def post(self, page_type=None):
-        if page_type == "change_password":
-            self.user.set_password_hash(request.form["password"].encode("utf-8"))
-            self.user.password_version = application.config["PASSWORD_VERSION"]
+        form = UserForm(request.form)
+        del form.username
 
-            if self.user.edit():
-                flash("Heslo bylo změněno", "success")
-            else:
-                flash("Nepovedlo se změnit heslo", "error")
-            return redirect(url_for("UsersView:show"))
+        if not form.validate_on_submit():
+            print("no validate")
+            save_form_to_session(request.form)
+            return redirect(url_for("UsersView:edit"))
+
+        self.user.first_name = form.first_name.data
+        self.user.last_name = form.last_name.data
+
+        if self.user.edit() is not None:
+            flash("Uživatel byl upraven", "success")
         else:
-            self.user.first_name = request.form["firstname"]
-            self.user.last_name = request.form["lastname"]
-            if self.user.edit() is not None:
-                flash("Uživatel byl upraven", "success")
-            else:
-                flash("Nepovedlo se změnit uživatele", "error")
-            return redirect(url_for("UsersView:show"))
+            flash("Nepovedlo se změnit uživatele", "error")
+
+        return redirect(url_for("UsersView:show"))
+
+    @route("edit_password", methods=["POST"])
+    def post_password_edit(self):
+        form = PasswordForm(request.form)
+
+        if not form.validate_on_submit():
+            save_form_to_session(request.form)
+            return redirect(url_for("UsersView:edit"))
+
+        self.user.set_password_hash(form.password.data)
+        self.user.password_version = application.config["PASSWORD_VERSION"]
+
+        if self.user.edit():
+            flash("Heslo bylo změněno", "success")
+        else:
+            flash("Nepovedlo se změnit heslo", "error")
+
+        return redirect(url_for("UsersView:show"))
 
     def show(self):
         return template("users/show.html.j2", user=self.user)
 
     def edit(self):
-        return template("users/edit.html.j2", user=self.user)
+        user_form = create_form(UserForm)
+        password_form = create_form(PasswordForm)
+        return template(
+            "users/edit.html.j2",
+            user=self.user,
+            user_form=user_form,
+            password_form=password_form,
+        )
