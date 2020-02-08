@@ -43,11 +43,6 @@ class Diet(db.Model, BaseMixin):
     )
     author = db.relationship("User", secondary="users_has_diets", uselist=False)
 
-    @staticmethod
-    def load(diet_id):
-        diet = db.session.query(Diet).filter(Diet.id == diet_id).first()
-        return diet
-
     # TODO: only used for testing
     @staticmethod
     def load_by_name(diet_name):

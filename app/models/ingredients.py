@@ -47,13 +47,6 @@ class Ingredient(db.Model, BaseMixin):
         order_by="Recipe.name",
     )
 
-    @staticmethod
-    def load(ingredient_id):
-        ingredient = (
-            db.session.query(Ingredient).filter(Ingredient.id == ingredient_id).first()
-        )
-        return ingredient
-
     # TODO: only used for testing
     @staticmethod
     def load_by_name(ingredient_name):

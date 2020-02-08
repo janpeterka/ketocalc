@@ -28,9 +28,7 @@ class LoginView(FlaskView):
             save_form_to_session(request.form)
             return redirect(url_for("LoginView:show"))
 
-        if do_login(
-            username=form.username.data, password=form.password.data.encode("utf-8")
-        ):
+        if do_login(username=form.username.data, password=form.password.data):
             return redirect(url_for("IndexView:index"))
         else:
             return redirect(url_for("LoginView:show"))
