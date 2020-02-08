@@ -26,7 +26,7 @@ def create_module(app, **kwargs):
     from app.auth.routes import auth_blueprint
 
     login.init_app(app)
-    login.login_view = "auth.show_login"
+    login.login_view = "/login"
     login.login_message = "Prosím přihlašte se."
 
     google_blueprint = make_google_blueprint(

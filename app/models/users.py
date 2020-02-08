@@ -146,10 +146,7 @@ class User(db.Model, UserMixin, BaseMixin):
     # TODO: tohle fakt neni hezký
     @property
     def is_admin(self):
-        if self.username == "admin":
-            return True
-        else:
-            return False
+        return self.username == "admin"
 
     @property
     def recipes(self, ordered=True):
@@ -164,9 +161,4 @@ class User(db.Model, UserMixin, BaseMixin):
 
     @property
     def active_diets(self):
-        active_diets = []
-        for diet in self.diets:
-            if diet.active == 1:
-                active_diets.append(diet)
-
-        return active_diets
+        return list(filter(lambda diet: diet.active, self.diets))

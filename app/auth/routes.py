@@ -14,12 +14,6 @@ from app.models.users import User
 auth_blueprint = Blueprint("auth", __name__, template_folder="templates/auth/")
 
 
-@auth_blueprint.route("/auth_login")
-def show_login():
-    """ This exist only for login_manager """
-    return redirect(url_for("LoginView:show"))
-
-
 @oauth_authorized.connect
 def oauth_login(blueprint, token):
     # TODO: rewrite for multiple oaths @TEST (30)
