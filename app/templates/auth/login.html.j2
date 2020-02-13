@@ -10,7 +10,7 @@
 {% block content %}
     <div class="container">
     	<div class="col-12">
-    		<form action="/login" method="post" class="form-group form-control" >
+    		<form action="{{ url_for('LoginView:post') }}" method="post" class="form-group form-control" >
                 {{ form.csrf_token }}
                 {% from "_form_element.html.j2" import render_field %}
                 {{ render_field(form.username, class="form-control") }}
@@ -21,13 +21,13 @@
                 </div>
 
                 {{ form.submit(class_='btn btn-primary col-sm-3') }}
-                <a href="{{ url_for('google.login')}}" style="text-decoration: none;">
+                <a href="{{ url_for('google.login') }}" style="text-decoration: none;">
                     <button type="button" class="btn btn-social btn-google">
                         <span class="fab fa-google"></span> {{ texts.login_google }}
                     </button>
                 </a>
-                <a class="col-sm-2" href="/register">{{ texts.register }}</a>
-                <a class="col-sm-2" style="color: var(--color_info)" href="/get_new_password">{{ texts.forgotten_password }}</a>
+                <a class="col-sm-2" href="{{ url_for('RegisterView:show') }}">{{ texts.register }}</a>
+                <a class="col-sm-2" style="color: var(--color_info)" href="{{ url_for('PasswordRecoveryView:show') }}">{{ texts.forgotten_password }}</a>
 
     	    </form>
     	</div>

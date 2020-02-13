@@ -3,17 +3,15 @@
 __pycache__/
 ketocalc.egg-info/
 
-# migrations/
-
 *.sublime-project
 *.sublime-workspace
 
 
-todo/
 scripts/
 db/
 tmp/
 
+todo/
 *.todo
 
 *.env*

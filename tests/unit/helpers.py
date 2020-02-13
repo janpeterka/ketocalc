@@ -1,4 +1,4 @@
-from app.models import User
+from app.models.users import User
 
 
 def create_user(username="test", password="testtest"):
@@ -10,3 +10,9 @@ def create_user(username="test", password="testtest"):
     user.password_version = "bcrypt"
 
     return user
+
+
+def test_with_authenticated_user(app):
+    @app.login_manager.request_loader
+    def load_user_from_request(request):
+        return User.query.first()

@@ -10,7 +10,7 @@
 {% block content %}
     <div class="container">
         <div class="col-10">
-           <form action="/register" method="post" class="form-group form-control" accept-charset="UTF-8">
+           <form action="{{ url_for('RegisterView:post') }}" method="post" class="form-group form-control" accept-charset="UTF-8">
                 <div class="mx-auto" style="width: 200px;">
                     <a href="{{ url_for('google.login')}}" >
                         <button type="button" class="btn btn-social btn-google">
@@ -44,7 +44,7 @@
                 {{ render_field(form.recaptcha) }}
                 {{ form.submit(class_='btn btn-primary')}}
 
-                <a class="col-sm-2" href="/login">{{ texts.login }}</a><br>
+                <a class="col-sm-2" href="{{ url_for('LoginView:show') }}">{{ texts.login }}</a><br>
             </form>
         </div>
     </div>
