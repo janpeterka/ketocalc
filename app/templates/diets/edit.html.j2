@@ -72,7 +72,7 @@
                         </tr>
                     </tbody>
                     </table>
-                    {{ render_field(form.submit, "btn btn-warning", label=False, value=texts.edit_confirm) }}
+                    <button type="submit" class="btn btn-warning">{{ texts.edit_confirm }} {{ icons.edit }}</button>
                 </form>
 
                 <form action="{{ url_for('DietsView:delete', id=diet.id) }}" method="post" accept-charset="utf-8">
