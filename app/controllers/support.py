@@ -12,11 +12,11 @@ from app.controllers.forms.feedback import FeedbackForm
 class SupportView(FlaskView):
     @route("/terms")
     def showTerms(self):
-        return template("support/terms.tpl")
+        return template("support/terms.html.j2")
 
     @route("/privacy")
     def showPrivacy(self):
-        return template("support/privacy.tpl")
+        return template("support/privacy.html.j2")
 
     @route("/google3748bc0390347e56.html")
     def googleVerification(self):
@@ -29,10 +29,10 @@ class SupportView(FlaskView):
 
         form = FeedbackForm(CombinedMultiDict((request.files, request.form)))
         if request.method == "GET":
-            return template("support/feedback.tpl", form=form)
+            return template("support/feedback.html.j2", form=form)
         elif request.method == "POST":
             if not form.validate_on_submit():
-                return template("support/feedback.tpl", form=form)
+                return template("support/feedback.html.j2", form=form)
 
             attachments = []
             if form.feedback_file.data:
@@ -55,8 +55,8 @@ class SupportView(FlaskView):
     @route("changelog")
     @login_required
     def changelog(self):
-        return template("support/changelog.tpl")
+        return template("support/changelog.html.j2")
 
     @route("help")
     def help(self):
-        return template("support/help.tpl")
+        return template("support/help.html.j2")
