@@ -39,16 +39,16 @@
                                 {{ render_field(form.name, "form-control", label=False, value=diet.name) }}
                             </td>
                             <td>
-                                {{ render_field(form.calorie, "form-control", label=False, value=diet.calorie, disabled=diet.is_user) }}
+                                {{ render_field(form.calorie, "form-control", label=False, value=diet.calorie, disabled=diet.is_used) }}
                             </td>
                             <td>
-                                {{ render_field(form.protein, "form-control", label=False, value=diet.protein, disabled=diet.is_user) }}
+                                {{ render_field(form.protein, "form-control", label=False, value=diet.protein, disabled=diet.is_used) }}
                             </td>
                             <td>
-                                {{ render_field(form.fat, "form-control", label=False, value=diet.fat, disabled=diet.is_user) }}
+                                {{ render_field(form.fat, "form-control", label=False, value=diet.fat, disabled=diet.is_used) }}
                             </td>
                             <td>
-                                {{ render_field(form.sugar, "form-control", label=False, value=diet.sugar, disabled=diet.is_user) }}
+                                {{ render_field(form.sugar, "form-control", label=False, value=diet.sugar, disabled=diet.is_used) }}
                             </td>
                         </tr>
                     </table>
