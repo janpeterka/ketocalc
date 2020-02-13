@@ -1,4 +1,4 @@
-from werkzeug import MultiDict
+from werkzeug.utils import MultiDict
 
 from flask import session
 
