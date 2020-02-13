@@ -29,24 +29,24 @@ def create_app(config_name="default"):
     migrate.init_app(application, db)
 
     # LOGGING
-    from app.config.config_logging import db_handler, gunicorn_logger
+    from .config.config_logging import db_handler, gunicorn_logger
 
     application.logger.addHandler(gunicorn_logger)
     application.logger.addHandler(db_handler)
 
     # CONTROLLERS
 
-    from app.controllers import register_all_controllers  # noqa: F401
+    from .controllers import register_all_controllers  # noqa: F401
 
     register_all_controllers(application)
 
-    from app.controllers import register_error_handlers  # noqa: F401
+    from .controllers import register_error_handlers  # noqa: F401
 
     register_error_handlers(application)
 
     # MODULES
 
-    from app.auth import create_module as auth_create_module
+    from .auth import create_module as auth_create_module
 
     auth_create_module(application)
 

@@ -18,15 +18,15 @@ def inject_globals():
     return dict(icons=template_data.icons, texts=template_data.texts)
 
 
-# @application.before_request
-# def session_management():
-#     if application.config["APP_STATE"] == "shutdown" and request.path not in [
-#         "/shutdown",
-#         "/static/style.css",
-#     ]:
-#         return redirect("/shutdown")
-#     elif request.path == "/shutdown" and application.config["APP_STATE"] != "shutdown":
-#         return redirect("/")
+@application.before_request
+def session_management():
+    if application.config["APP_STATE"] == "shutdown" and request.path not in [
+        "/shutdown",
+        "/static/style.css",
+    ]:
+        return redirect("/shutdown")
+    elif request.path == "/shutdown" and application.config["APP_STATE"] != "shutdown":
+        return redirect("/")
 
 
 # @application.shell_context_processor

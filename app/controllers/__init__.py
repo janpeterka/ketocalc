@@ -1,16 +1,16 @@
 def register_all_controllers(application):
-    from app.controllers.dashboard import DashboardView
-    from app.controllers.diets import DietsView
-    from app.controllers.errors import ErrorsView
-    from app.controllers.index import IndexView
-    from app.controllers.ingredients import IngredientsView
-    from app.controllers.login import LoginView
-    from app.controllers.password_recovery import PasswordRecoveryView
-    from app.controllers.recipes import RecipesView
-    from app.controllers.register import RegisterView
-    from app.controllers.support import SupportView
-    from app.controllers.trial_recipes import TrialRecipesView
-    from app.controllers.users import UsersView
+    from .dashboard import DashboardView
+    from .diets import DietsView
+    from .errors import ErrorsView
+    from .index import IndexView
+    from .ingredients import IngredientsView
+    from .login import LoginView
+    from .password_recovery import PasswordRecoveryView
+    from .recipes import RecipesView
+    from .register import RegisterView
+    from .support import SupportView
+    from .trial_recipes import TrialRecipesView
+    from .users import UsersView
 
     DashboardView.register(application)
     DietsView.register(application)
@@ -27,9 +27,9 @@ def register_all_controllers(application):
 
 
 def register_error_handlers(application):
-    from app.controllers.errors import error404
-    from app.controllers.errors import error405
-    from app.controllers.errors import error500
+    from .errors import error404
+    from .errors import error405
+    from .errors import error500
 
     application.register_error_handler(403, error404)
     application.register_error_handler(404, error404)

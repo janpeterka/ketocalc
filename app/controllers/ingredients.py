@@ -58,8 +58,6 @@ class IngredientsView(FlaskView):
             flash("Nepodařilo se vytvořit surovinu", "error")
             return redirect(url_for("IngredientsView:new"))
 
-        return None
-
     @route("edit/<id>", methods=["POST"])
     def post_edit(self, id):
         form = IngredientsForm(request.form)
@@ -105,4 +103,3 @@ class IngredientsView(FlaskView):
         else:
             flash("Tato surovina je použita, nelze smazat", "error")
             return redirect(url_for("IngredientsView:show", id=self.ingredient.id))
-        return None
