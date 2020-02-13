@@ -1,5 +1,5 @@
 from app.auth.routes import do_login, do_register
-from app.models import Ingredient
+from app.models.ingredients import Ingredient
 
 import helpers
 

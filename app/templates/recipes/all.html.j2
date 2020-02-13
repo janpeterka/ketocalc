@@ -1,0 +1,41 @@
+{% extends "base.html.j2" %}
+{% block title %}
+    {{ texts.recipe_all }}
+{% endblock %}
+
+{% block style %}{% endblock %}
+
+{% block script %}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="col-12">
+            <table id="diets" class="table">
+
+                {% for diet in diets: %}
+                    <tr>
+                        <th class='diet'><a href="{{ url_for('DietsView:show', id=diet.id) }}">{{ diet.name }}</a></th>
+                    </tr>
+
+                    {% for recipe in diet.recipes: %}
+                        <tr>
+                            <td><a href="{{ url_for('RecipesView:show', id=recipe.id) }}">{{ recipe.name }}</a></td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}       
+
+            </table>
+            <div style="margin-left: 15px">
+                <div class="row">
+                    <a href="{{ url_for('RecipesView:new') }}" target="_blank" class="btn btn-secondary">{{ texts.recipe_new }}</a>
+                </div>
+
+                <div class="row" style="margin-top: 5px">
+                    <a href="{{ url_for('RecipesView:print_all') }}" target="_black" class="btn btn-secondary"> {{ texts.recipe_print_all }} {{ icons.print }}</a>
+                </div>
+            </div>
+            
+        </div>    
+    </div>
+{% endblock %}
+

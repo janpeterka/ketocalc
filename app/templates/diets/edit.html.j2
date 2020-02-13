@@ -1,0 +1,91 @@
+{% extends "base.html.j2" %}
+{% block title %}
+    {{ texts.diet }}: {{ diet.name }}
+{% endblock %}
+
+{% block style %}{% endblock %}
+
+{% block script %}
+{# 	<script type="text/javascript">
+
+        // $(document).on("click", ".export__button", function() {
+        //     $('.row').hide();
+        //     $('.loader').show();
+        // });
+   
+    </script> #}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-8">
+                <form action="{{ url_for('DietsView:post_edit', id=diet.id) }}" class="edit__form form-group" method="post" accept-charset="utf-8">
+                    {{ form.csrf_token }}
+                    {% from "_form_element.html.j2" import render_field %}
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>{{ texts.title }}</th>
+                                <th>{{ texts.energy_simple }}</th>
+                                <th>{{ texts.protein_simple }}</th>
+                                <th>{{ texts.fat_simple }}</th>
+                                <th>{{ texts.sugar_simple }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>
+                                {{ render_field(form.name, "form-control", label=False, value=diet.name) }}
+                            </td>
+                            <td>
+                                {{ render_field(form.calorie, "form-control", label=False, value=diet.calorie, disabled=diet.is_user) }}
+                            </td>
+                            <td>
+                                {{ render_field(form.protein, "form-control", label=False, value=diet.protein, disabled=diet.is_user) }}
+                            </td>
+                            <td>
+                                {{ render_field(form.fat, "form-control", label=False, value=diet.fat, disabled=diet.is_user) }}
+                            </td>
+                            <td>
+                                {{ render_field(form.sugar, "form-control", label=False, value=diet.sugar, disabled=diet.is_user) }}
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table class="table edit__form">
+                        <tr>
+                            <th>{{ texts.meal_size }}</th>
+                            <th>{{ texts.meal_portion }}</th>
+                        </tr>
+                        <tr>
+                            <td>{{ texts.meal_size_big }}</td>
+                            <td>
+                                {{ render_field(form.big_size, "form-control", label=False, value=diet.big_size) }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{ texts.meal_size_small }}</td>
+                            <td>
+                                {{ render_field(form.small_size, "form-control", label=False, value=diet.small_size) }}
+                            </td>
+                        </tr>
+                    </tbody>
+                    </table>
+                    <button type="submit" class="btn btn-warning">{{ texts.edit_confirm }} {{ icons.edit }}</button>
+                </form>
+
+                <form action="{{ url_for('DietsView:delete', id=diet.id) }}" method="post" accept-charset="utf-8">
+                    <a href="{{ url_for('DietsView:show', id=diet.id) }}" class="btn btn-secondary">{{ texts.edit_cancel }} {{ icons.edit }}</a>
+                    {% if diet.is_used == False %}
+                        <button type="submit" class="btn btn-danger">{{ texts.diet_delete }} {{ icons.delete }}</button>
+                    {% else %}
+                        <button type="submit" class="btn btn-danger" disabled>{{ texts.delete_error }} {{ icons.delete }}</button>
+                    {% endif %}
+                </form>
+            </div>  
+        {% include ('recipes/_recipe_list.html.j2') %}
+        </div>  
+    </div> 
+{% endblock %}
+

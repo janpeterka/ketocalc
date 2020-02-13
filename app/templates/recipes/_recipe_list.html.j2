@@ -1,0 +1,8 @@
+<div class="col">
+    <label for="recipes"><h3>{{ texts.recipe_list }}</h3></label>
+    <ul name="recipes">
+        {% for recipe in recipes %}
+            <li><a href="{{ url_for('RecipesView:show', id=recipe.id) }}">{{ recipe.name }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
