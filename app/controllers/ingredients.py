@@ -85,7 +85,7 @@ class IngredientsView(FlaskView):
         )
 
     def edit(self, id):
-        form = create_form(IngredientsForm)
+        form = create_form(IngredientsForm, obj=self.ingredient)
 
         return template(
             "ingredients/edit.html.j2",

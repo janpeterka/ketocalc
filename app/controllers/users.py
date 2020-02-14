@@ -60,7 +60,7 @@ class UsersView(FlaskView):
         return template("users/show.html.j2", user=self.user)
 
     def edit(self):
-        user_form = create_form(UserForm)
+        user_form = create_form(UserForm, obj=self.user)
         password_form = create_form(PasswordForm)
         return template(
             "users/edit.html.j2",

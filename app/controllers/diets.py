@@ -83,7 +83,7 @@ class DietsView(FlaskView):
         )
 
     def edit(self, id):
-        form = create_form(DietsForm)
+        form = create_form(DietsForm, obj=self.diet)
 
         return template(
             "diets/edit.html.j2",
