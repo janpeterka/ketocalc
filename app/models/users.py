@@ -111,12 +111,18 @@ class User(db.Model, UserMixin, BaseMixin):
         Returns:
             bool -- verification
         """
-        db_password_hash = self.pwdhash.encode("utf-8")
+        if not isinstance(password, bytes) and password is not None:
+            password = password.encode("utf-8")
+
+        db_password_hash = self.pwdhash
+        if not isinstance(db_password_hash, bytes):
+            db_password_hash = db_password_hash.encode("utf-8")
+
         if self.password_version == "SHA256":
             if hashlib.sha256(password).hexdigest() == self.pwdhash:
-                # changing from sha256 to bcrypt
+                # changing from sha256 to current
                 self.set_password_hash(password)
-                self.password_version = "bcrypt"
+                self.password_version = application.config["PASSWORD_VERSION"]
                 self.edit()
                 return True
             else:
@@ -143,7 +149,7 @@ class User(db.Model, UserMixin, BaseMixin):
             new_ingredient.author = self.username
             new_ingredient.save()
 
-    # TODO: tohle fakt neni hezký
+    # TODO: tohle není ideální
     @property
     def is_admin(self):
         return self.username == "admin"

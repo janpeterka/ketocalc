@@ -7,6 +7,8 @@ from app.data import template_data
 from app.models.ingredients import Ingredient
 from app.models.diets import Diet
 
+from tests.unit.helpers import create_user
+
 
 @pytest.fixture
 def app(scope="session"):
@@ -21,11 +23,15 @@ def app(scope="session"):
 
 @pytest.fixture
 def db(app):
+    _db.init_app(app)
     # _db.drop_all()
     _db.create_all()
 
     # insert default data
-    # calc
+    # with app.app_context():
+    #     _db.drop_all()
+    #     _db.create_all()
+
     db_fill_calc()
 
     return _db
@@ -104,3 +110,6 @@ def db_fill_calc():
         protein=1,
         author="default",
     ).save()
+
+    user = create_user(username="calc", password="calc_clack")
+    user.save()
