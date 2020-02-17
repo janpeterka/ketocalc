@@ -36,19 +36,19 @@
                         <tbody>
                         <tr>
                             <td>
-                                {{ render_field(form.name, "form-control", label=False, value=diet.name) }}
+                                {{ render_field(form.name, "form-control", label=False) }}
                             </td>
                             <td>
-                                {{ render_field(form.calorie, "form-control", label=False, value=diet.calorie, disabled=diet.is_used) }}
+                                {{ render_field(form.calorie, "form-control", label=False, disabled=diet.is_used) }}
                             </td>
                             <td>
-                                {{ render_field(form.protein, "form-control", label=False, value=diet.protein, disabled=diet.is_used) }}
+                                {{ render_field(form.protein, "form-control", label=False, disabled=diet.is_used) }}
                             </td>
                             <td>
-                                {{ render_field(form.fat, "form-control", label=False, value=diet.fat, disabled=diet.is_used) }}
+                                {{ render_field(form.fat, "form-control", label=False, disabled=diet.is_used) }}
                             </td>
                             <td>
-                                {{ render_field(form.sugar, "form-control", label=False, value=diet.sugar, disabled=diet.is_used) }}
+                                {{ render_field(form.sugar, "form-control", label=False, disabled=diet.is_used) }}
                             </td>
                         </tr>
                     </table>
@@ -61,13 +61,13 @@
                         <tr>
                             <td>{{ texts.meal_size_big }}</td>
                             <td>
-                                {{ render_field(form.big_size, "form-control", label=False, value=diet.big_size) }}
+                                {{ render_field(form.big_size, "form-control", label=False) }}
                             </td>
                         </tr>
                         <tr>
                             <td>{{ texts.meal_size_small }}</td>
                             <td>
-                                {{ render_field(form.small_size, "form-control", label=False, value=diet.small_size) }}
+                                {{ render_field(form.small_size, "form-control", label=False) }}
                             </td>
                         </tr>
                     </tbody>

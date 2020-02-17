@@ -30,10 +30,10 @@
                                 {{ user.username }}
                             </td>
                             <td>
-                                {{ render_field(user_form.first_name, "form-control", label=False, value=user.first_name) }}
+                                {{ render_field(user_form.first_name, "form-control", label=False) }}
                             </td>
                             <td>
-                                {{ render_field(user_form.last_name, "form-control", label=False, value=user.last_name) }}
+                                {{ render_field(user_form.last_name, "form-control", label=False) }}
                             </td>
                             <td>
                                 {{ render_field(user_form.submit, "btn btn-warning", label=False, value=texts.edit_confirm) }}

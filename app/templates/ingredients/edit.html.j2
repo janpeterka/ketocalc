@@ -25,28 +25,28 @@
                         </tr>
                         <tr>
                             <td>
-                                {{ render_field(form.name, "form-control", label=False, value=ingredient.name) }}
+                                {{ render_field(form.name, "form-control", label=False) }}
                             </td>
                             <td>
-                                {{ render_field(form.calorie, "form-control", label=False, value=ingredient.calorie) }}
+                                {{ render_field(form.calorie, "form-control", label=False) }}
                             </td>
                             <td>
                                 {% if ingredient.is_used == False %}
-                                    {{ render_field(form.protein, "form-control", label=False, value=ingredient.protein) }}
+                                    {{ render_field(form.protein, "form-control", label=False) }}
                                 {% else %}
                                     {{ ingredient.protein }}
                                 {% endif %}
                             </td>
                             <td>
                                 {% if ingredient.is_used == False %}
-                                    {{ render_field(form.fat, "form-control", label=False, value=ingredient.fat) }}
+                                    {{ render_field(form.fat, "form-control", label=False) }}
                                 {% else %}
                                     {{ ingredient.fat }}
                                 {% endif %}
                             </td>
                             <td>
                                 {% if ingredient.is_used == False %}
-                                    {{ render_field(form.sugar, "form-control", label=False, value=ingredient.sugar) }}
+                                    {{ render_field(form.sugar, "form-control", label=False) }}
                                 {% else %}
                                     {{ ingredient.sugar }}
                                 {% endif %}
