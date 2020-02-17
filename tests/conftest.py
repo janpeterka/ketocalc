@@ -29,7 +29,7 @@ def db(app):
 
     # insert default data
     with app.app_context():
-        _db.drop_all()
+        # _db.drop_all()
         _db.create_all()
 
     db_fill_calc()
