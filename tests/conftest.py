@@ -21,7 +21,7 @@ def app(scope="session"):
 
 @pytest.fixture
 def db(app):
-    _db.drop_all()
+    # _db.drop_all()
     _db.create_all()
 
     # insert default data
