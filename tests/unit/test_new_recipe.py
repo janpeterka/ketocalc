@@ -22,7 +22,6 @@ def load_datasets_calc():
     test_dataset = {
         "ingredients": ingredients,
         "dietID": diet.id,
-        "test": "True",
         "diet": diet.json,
         "none": "False",
     }
@@ -42,7 +41,6 @@ def load_datasets_calc():
     test_dataset = {
         "ingredients": ingredients,
         "dietID": diet.id,
-        "test": "True",
         "diet": diet.json,
         "none": "False",
     }
@@ -57,7 +55,6 @@ def load_datasets_calc():
     test_dataset = {
         "ingredients": ingredients,
         "dietID": diet.id,
-        "test": "True",
         "diet": diet.json,
         "none": "True",
     }
@@ -74,7 +71,6 @@ def load_datasets_calc():
     test_dataset = {
         "ingredients": ingredients,
         "dietID": diet.id,
-        "test": "True",
         "diet": diet.json,
         "none": "True",
     }
@@ -83,7 +79,7 @@ def load_datasets_calc():
     return datasets
 
 
-def test_calc(app, client):
+def test_calc(app, db, client):
     url = url_for("RecipesView:calcRecipeAJAX")
     # test calculate_recipe_AJAX (json dataset)
 
@@ -92,7 +88,7 @@ def test_calc(app, client):
     helpers.test_with_authenticated_user(app)
 
     for dataset in datasets:
-        response = client.post(url, json=dataset, follow_redirects=True)
+        response = client.post(url, json=dataset, follow_redirects=False)
 
         assert response == 200
         if dataset["none"] == "True":

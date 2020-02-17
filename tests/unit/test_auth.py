@@ -4,7 +4,7 @@ from app.models.ingredients import Ingredient
 import helpers
 
 
-def test_login(app, client):
+def test_login(app, db, client):
     assert client.get("/login") == 200
     # username
     assert do_login("admin", "admin") is False
@@ -17,7 +17,7 @@ def test_logout(app, client):
     assert client.get("/logout") == 302
 
 
-def test_register(db):
+def test_register(app, db):
     user = helpers.create_user("test", "testtest")
 
     assert do_register(user) is True
