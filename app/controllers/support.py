@@ -60,3 +60,11 @@ class SupportView(FlaskView):
     @route("help")
     def help(self):
         return template("support/help.html.j2")
+
+    @route("terms")
+    def terms(self):
+        return template("support/terms.html.j2")
+
+    @route("privacy")
+    def privacy(self):
+        return template("support/privacy.html.j2")
