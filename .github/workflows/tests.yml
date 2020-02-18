@@ -20,6 +20,13 @@ jobs:
         python -m pip install --upgrade pip
         pip install pipenv
         pipenv install
+
     - name: Test with pytest
+      env:
+          TESTING_SECRET_KEY: "justtesting"
+          TESTING_DB_STRING: "sqlite://"
+
+          SECRET_KEY: "justtesting"
+          SQLALCHEMY_DATABASE_URI: "sqlite://"
       run: |
-        #pipenv run pytest
+        pipenv run pytest
