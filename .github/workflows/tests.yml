@@ -17,7 +17,6 @@ jobs:
         python-version: 3.7
       env:
         TESTING_SECRET_KEY: "justtesting"
-        TESTING_APP_STATE: "test"
         TESTING_DB_STRING: "sqlite://"
 
         SECRET_KEY: "justtesting"
@@ -29,5 +28,11 @@ jobs:
         pipenv install
 
     - name: Test with pytest
+      env:
+          TESTING_SECRET_KEY: "justtesting"
+          TESTING_DB_STRING: "sqlite://"
+
+          SECRET_KEY: "justtesting"
+          SQLALCHEMY_DATABASE_URI: "sqlite://"
       run: |
         pipenv run pytest
