@@ -43,16 +43,12 @@
       </ul>
 
       <ul class="nav navbar-nav navbar-right ml-auto">
-
-{#           <li class="nav-item">
-          <a class="nav-link small" href="/changelog">Změny</a>
-        </li> #}
         <li class="nav-item">
           <a class="nav-link small" href="{{ url_for('SupportView:feedback') }}">Připomínky</a>
         </li>
-{#           <li class="nav-item">
-          <a class="nav-link small" href="/help">Nápověda</a>
-        </li> #}
+        <li class="nav-item">
+          <a class="nav-link small" href="{{ url_for('SupportView:help')}}">Nápověda</a>
+        </li>
         <li class="nav-item">
           <a class="nav-link" href="/logout">Odhlásit se</a>
         </li>

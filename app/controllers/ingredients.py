@@ -52,7 +52,6 @@ class IngredientsView(FlaskView):
         ingredient.author = current_user.username
 
         if ingredient.save():
-            flash("Nová surovina byla vytvořena", "success")
             return redirect(url_for("IngredientsView:show", id=ingredient.id))
         else:
             flash("Nepodařilo se vytvořit surovinu", "error")

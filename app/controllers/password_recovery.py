@@ -64,20 +64,17 @@ class PasswordRecoveryView(FlaskView):
         form = NewPasswordForm(request.form)
         user = User.load(token, load_type="new_password_token")
 
-        print(user)
         if not form.validate_on_submit():
             save_form_to_session(request.form)
             return redirect(url_for("PasswordRecoveryView:show_token", token=token))
 
         if user is None:
             flash("nemůžete změnit heslo", "error")
-            print("nemůžete změnit heslo")
         else:
             user.set_password_hash(form.password.data.encode("utf-8"))
             user.password_version = application.config["PASSWORD_VERSION"]
             user.new_password_token = None
             user.edit()
             flash("heslo bylo změněno", "success")
-            print("heslo bylo změněno")
 
         return redirect(url_for("LoginView:show"))

@@ -74,10 +74,13 @@ def do_login(username=None, password=None, from_register=False):
         login_user(user, remember=True)
         user.log_login()
 
-        if not from_register:
-            flash("Byl jste úspěšně přihlášen.", "success")
-        else:
-            flash("Byl jste úspěšně zaregistrován.", "success")
+        if from_register:
+            flash(
+                "Byl jste úspěšně zaregistrován. Protože jste v aplikaci nově, může vám pomoci <a href={}>Nápověda</a>".format(
+                    url_for("SupportView:help")
+                ),
+                "success",
+            )
         return True
     else:
         flash("Přihlášení se nezdařilo.", "error")
@@ -89,7 +92,6 @@ def do_login(username=None, password=None, from_register=False):
 def do_logout():
     if current_user.is_authenticated:
         logout_user()
-        flash("Byl jste úspěšně odhlášen.", "info")
     return redirect(url_for("LoginView:show"))
 
 
