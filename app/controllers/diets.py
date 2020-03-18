@@ -50,7 +50,6 @@ class DietsView(FlaskView):
         diet.author = User.load(current_user.id)
 
         if diet.save():
-            flash("Nová dieta byla vytvořena", "success")
             return redirect(url_for("DietsView:show", id=diet.id))
         else:
             flash("Nepodařilo se vytvořit dietu", "error")

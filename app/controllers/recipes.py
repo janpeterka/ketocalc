@@ -188,5 +188,4 @@ class RecipesView(FlaskView):
         recipe.diet = Diet.load(diet_id)
 
         last_id = recipe.save(ingredients)
-        flash("Recept byl uložen", "success")
         return url_for("RecipesView:show", id=last_id)

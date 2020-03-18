@@ -6,29 +6,21 @@
 {% block style %}{% endblock %}
 
 {% block content %}
-    <div>
-    	<h1>FAQ</h1>
-    	<ul>
-    		<li>
-    			<p class="faq-question">Nefunguje mi ketokalkulačka</p>
-    			<p class="faq-answer">Nahlašte problém na <a href="{{ url_for('SupportView:feedback') }}">této záložce</a>. Než se problém vyřeší, používejte <a href="https://ketocalc.herokuapp.com/">stabilní verzi</a></p>
-    		</li>
-    	</ul>
-    	
-    </div>
+<div class="container">
+    <h1> Začínám s aplikací </h1>
 	<div name="newrecipe">
-		<h1> Nový recept </h1>
-		Typy surovin:
+		<h2> Nový recept </h2>
+		<h3>Typy surovin:</h3>
 		<ul>
 			<li class="tr-mainIngredient">Hlavní surovina <i class="fa fa-hospital-symbol"></i></li>
 				<ul>
-					<li>Hlavní surovina může být maximálně jedna</li>
-					<li>Množství hlavní suroviny bude možné upravovat na stránce výpočtu</li>
+					<li>Hlavní surovina může být <strong>maximálně jedna</strong></li>
+					<li>Množství hlavní suroviny bude možné <storong> upravovat </storong> na stránce výpočtu</li>
 				</ul>
 			<li class="tr-fixedIngredient">Fixní surovina <i class="fa fa-thumbtack"></i></li>
 				<ul>
 					<li>Fixních surovin může být libovolné množství</li>
-					<li>Množství fixních surovin zůstává pořád stejné</li>
+					<li>Množství (gramy) fixních surovin zůstává pořád stejné</li>
 				</ul>
 			<li>Počítaná surovina</li>
 				<ul>
@@ -38,6 +30,16 @@
 		</ul>
 		Surovinu je možné odebrat kliknutím na ikonu <i class="fa fa-times fa-2x"></i>
 
-
+		<h3>Výsledek výpočtu a ukládání receptu</h3>
+		<p>Při vypočtení možného receptu se ukáže množství pro celou dietu.<br>
+			Při ukládání receptu se množství změní podle velikosti vybraného receptu.
+		</p>
 	</div>	
+
+    <h1>Mám jiný problém</h1>
+	<div>
+		<p class="faq-question">Nefunguje mi ketokalkulačka</p>
+    			<p class="faq-answer">Nahlašte problém na <a href="{{ url_for('SupportView:feedback') }}">této záložce</a>. Než se problém vyřeší, zkuste použít <a href="https://ketocalc.herokuapp.com/">stabilní verzi</a></p>
+    </div>
+</div>
 {% endblock %}
