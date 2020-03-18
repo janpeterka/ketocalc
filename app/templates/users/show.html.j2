@@ -29,42 +29,6 @@
         <div>
             <a href="{{ url_for('UsersView:edit') }}" class="btn btn-secondary">{{ texts.edit }} {{ icons.edit }}</a>
         </div>
-
-        {% if current_user.is_admin %}
-        <div class="row admin_field">
-            <div class="col">
-                <h2>Recepty ({{ user.diets|length }} | {{ user.recipes|length }})</h2>
-                <table id="diets" class="table">
-                {% for diet in user.diets: %}
-                    <tr>
-                        <th class='diet'><a href="{{ url_for('DietsView:show', id=diet.id) }}">{{ diet.name }}</a></th>
-                    </tr>
-
-                    {% for recipe in diet.recipes: %}
-                        <tr>
-                            <td><a href="{{ url_for('RecipesView:show', id=recipe.id) }}">{{ recipe.name }}</a></td>
-                        </tr>
-                    {% endfor %}
-                {% endfor %}       
-                </table>
-            </div>
-
-            <div class="col">
-                <h2>Suroviny ({{ user.ingredients|length }})</h2>
-                <table class="table">
-                {% for ingredient in user.ingredients: %}
-                    <tr>
-                        <td><a href="{{ url_for('IngredientsView:show', id=ingredient.id) }}">{{ ingredient.name }}</a></td>
-                        <td>{{ ingredient.calorie }}</td>
-                        <td>{{ ingredient.protein }}</td>
-                        <td>{{ ingredient.fat }}</td>
-                        <td>{{ ingredient.sugar }}</td>
-                    </tr>
-                {% endfor %}
-                </table>
-            </div>         
-        </div>
-        {% endif %}
     </div>
 {% endblock %}
 
