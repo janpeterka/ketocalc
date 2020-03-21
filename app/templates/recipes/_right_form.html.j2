@@ -13,11 +13,11 @@
 
         {% for ingredient in ingredients %}
             {% if ingredient.main %}
-                <tr class="tr-mainIngredient" data-main="true" data-id="{{ ingredient.id }}" data-amount="{{ ingredient.amount }}">
+                <tr data-main="true" data-id="{{ ingredient.id }}" data-amount="{{ ingredient.amount }}">
             {% elif ingredient.fixed %}
-                <tr class="tr-fixedIngredient" data-id="{{ ingredient.id }}" data-amount="{{ ingredient.amount }}">
+                <tr data-fixed="true" data-id="{{ ingredient.id }}" data-amount="{{ ingredient.amount }}">
             {% else %}
-                <tr class="tr-variableIngredient" data-id="{{ ingredient.id }}" data-amount="{{ ingredient.amount }}">
+                <tr data-id="{{ ingredient.id }}" data-amount="{{ ingredient.amount }}">
             {% endif %}
 
                     <td>{{ ingredient.name }} </td>
@@ -73,7 +73,7 @@
 
         <span class="col-4" data-target="new-recipe.recipeDiet" data-new-recipe-diet-id="{{ diet.id }}">Dieta: {{ diet.name }}</span>
         {% if not is_trialrecipe %}
-            <input type="button" data-action="submit->new-recipe#save_recipe" class="btn btn-primary col-4 " value="{{ texts.recipe_save }}" />
+            <input type="button" data-action="click->new-recipe#save_recipe" class="btn btn-primary col-4 " value="{{ texts.recipe_save }}" />
         {% else %}
             <input type="button" onclick='trialSaveConfirm()' class="btn btn-primary col-4 " value="{{ texts.recipe_save }}" />
         {% endif %}

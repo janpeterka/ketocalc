@@ -29,6 +29,8 @@
       }
 
       add_ingredient(e){
+        e.preventDefault();
+
         if (this.selectTarget.value == false){return false;}
         else{
           fetch("{{ url_for('RecipesView:addIngredientAJAX') }}",{
@@ -48,7 +50,6 @@
 
           });
         }
-        e.preventDefault();
       }
 
       _check_if_first_ingredient(){
@@ -152,6 +153,7 @@
 
       calculate_recipe(e){
         e.preventDefault();
+
         this.recipe__loader__show()
 
         var main_count = 0;
@@ -200,10 +202,9 @@
           }
         }
 
-        var url = "{{ url_for('RecipesView:calcRecipeAJAX') }}"
         var dietID = this.selectDietTarget.value
 
-        this._calculate_core(url, selected_ingredients, dietID)
+        this._calculate_core(selected_ingredients, dietID)
       }
 
       recalculate_recipe(e){
@@ -221,14 +222,13 @@
           }
         })
 
-        var url = "{{ url_for('RecipesView:calcRecipeAJAX') }}"
         var dietID = this.recipeDietTarget.dataset.newRecipeDietId
 
-        this._calculate_core(url, calculated_ingredients, dietID)
+        this._calculate_core(calculated_ingredients, dietID)
       }
 
-      _calculate_core(url, ingredients, dietID){
-        fetch(url,{
+      _calculate_core(ingredients, dietID){
+        fetch("{{ url_for('RecipesView:calcRecipeAJAX') }}", {
           method: 'POST',
           body: JSON.stringify({
               'ingredients' : ingredients,
@@ -262,35 +262,26 @@
       }
 
       save_recipe(e){
-        var recipeNameTarget = this.recipeNameTarget
-        var recipeSizeTarget = this.recipeSizeTarget
-        var recipeDietTarget = this.recipeDietTarget
-
-        // Save recipe AJAX
-        $.ajax({
-                type: 'POST',
-                url: "{{ url_for('RecipesView:saveRecipeAJAX') }}",
-                data: JSON.stringify({
-                    'ingredients' : recipe__ingredient_array,
-                    'dietID' : recipeDietTarget.dataset.newRecipeDietId,
-                    'name' : recipeNameTarget.value,
-                    'size' : recipeSizeTarget.value
-                }),
-                contentType: 'application/json;charset=UTF-8',
-                success: function(response){
-                    var pathname = window.location.pathname.split("/")[0];
-                    window.location.replace(pathname + response);
-                },
-                error: function(error) {
-                    // console.log(error);
-                }
-        });
         e.preventDefault();
-      }
 
-        //       $(this.recipeTarget).hide();
-        // $(this.wrongRecipeTarget).hide();
-        // $(this.loaderTarget).hide();
+        fetch("{{ url_for('RecipesView:saveRecipeAJAX') }}", {
+          method: 'POST',
+          body: JSON.stringify({
+            'ingredients' : this._get_currently_calculated(),
+            'dietID' : this.recipeDietTarget.dataset.newRecipeDietId,
+            'name' : this.recipeNameTarget.value,
+            'size' : this.recipeSizeTarget.value
+          }),
+          headers: {'Content-Type': 'application/json,charset=UTF-8'},
+        })
+        .then((response) => { return response.text(); })
+        .then((response) => {
+          var pathname = window.location.pathname.split("/")[0];
+          window.location.replace(pathname + response);
+        })
+        .catch((error) => {console.log(error)})
+
+      }
 
       _hide_loader(){
         $(this.loaderTarget).hide();
