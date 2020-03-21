@@ -1,7 +1,7 @@
-<form method="post" class="recipe__right__form form-group">
+<form method="post" class="form-group">
     <label>Název receptu</label>
     <input type="text" data-target="new-recipe.recipeName" required class="form-control"/>
-    <table class="recipe__right__form__ingredient-table table">
+    <table class="table" data-target="new-recipe.recipeIngredientTable">
         <tr>
             <th>{{ texts.title }}</th>
             <th>{{ texts.energy_simple }}</th>
@@ -13,11 +13,11 @@
 
         {% for ingredient in ingredients %}
             {% if ingredient.main %}
-                <tr class="tr-mainIngredient">
+                <tr class="tr-mainIngredient" data-main="true" data-id="{{ ingredient.id }}" data-amount="{{ ingredient.amount }}">
             {% elif ingredient.fixed %}
-                <tr class="tr-fixedIngredient">
+                <tr class="tr-fixedIngredient" data-id="{{ ingredient.id }}" data-amount="{{ ingredient.amount }}">
             {% else %}
-                <tr class="tr-variableIngredient">
+                <tr class="tr-variableIngredient" data-id="{{ ingredient.id }}" data-amount="{{ ingredient.amount }}">
             {% endif %}
 
                     <td>{{ ingredient.name }} </td>
@@ -29,15 +29,20 @@
                 </tr>
 
             {% if ingredient.main %}
-                <tr class="tr-slider">
-                    <td> 
-                        <input type="text" class="col" id="slider" data-slider-id="slider_data" name="slider" data-provide="slider" data-slider-min="{{ ingredient.min }}" data-slider-max="{{ ingredient.max }}" data-slider-step="0.1" data-slider-value="{{ ingredient.amount }}" data-slider-tooltip="show">
+                <tr class="tr-slider" >
+                    <td data-action="click->new-recipe#recalculate_recipe" >
+                        <input
+                        class="col" id="slider"  name="slider"
+                        data-provide="slider"
+                        data-slider-id="slider_data"
+                        data-slider-min="{{ ingredient.min }}"
+                        data-slider-max="{{ ingredient.max }}"
+                        data-slider-step="0.1"
+                        data-slider-value="{{ ingredient.amount }}"
+                        data-slider-tooltip="show">
                     </td>
 
-                    <td colspan=5>
-                        {{ingredient.name}}
-                    </td>
-
+                    <td colspan=5>{{ingredient.name}}</td>
                 </tr>
             {% endif %}
         {% endfor %}
@@ -68,7 +73,7 @@
 
         <span class="col-4" data-target="new-recipe.recipeDiet" data-new-recipe-diet-id="{{ diet.id }}">Dieta: {{ diet.name }}</span>
         {% if not is_trialrecipe %}
-            <input type="button" data-action="click->new-recipe#save_recipe" class="btn btn-primary col-4 " value="{{ texts.recipe_save }}" />
+            <input type="button" data-action="submit->new-recipe#save_recipe" class="btn btn-primary col-4 " value="{{ texts.recipe_save }}" />
         {% else %}
             <input type="button" onclick='trialSaveConfirm()' class="btn btn-primary col-4 " value="{{ texts.recipe_save }}" />
         {% endif %}

@@ -4,11 +4,11 @@
 {% endblock %}
 
 {% block script %}
-    {% include 'recipes/new_recipe.js' %}
+    {% include 'javascript/new_recipe.js' %}
 {% endblock %}
 
 {% block content %}
-    <div class="container-fluid container__main" data-controller="new-recipe">
+    <div class="container-fluid" data-controller="new-recipe">
         <div class="row">
             <div class="hidden" style="display: none">
                 <select data-target="new-recipe.baseSelect">
@@ -18,25 +18,22 @@
                 </select>
             </div>
 
-            <div class="prerecipe col-lg-6 col-md-12" >
-
-                <div class="prerecipe__add-ingredient col-12">
-                    <form class="prerecipe__add-ingredient__form form-inline" data-action="submit->new-recipe#add_ingredient">
-                        <select class="prerecipe__add-ingredient__form__select form-control"
-                        name="prerecipe__add-ingredient__form__select" id="prerecipe__add-ingredient__form__select" data-target="new-recipe.select">
+            <div class="col-lg-6 col-md-12" >
+                <div class="col-12">
+                    <form class="form-inline" data-action="submit->new-recipe#add_ingredient">
+                        <select class="form-control" data-target="new-recipe.select">
                         {% for ingredient in ingredients: %}
                             <option name='{{ingredient.name}}' value="{{ingredient.id}}">{{ingredient.name}}</option>
                         {% endfor %}
                         </select>
 
-
-                        <input type="submit" class="btn btn-primary add-ingredient-btn" value="Přidat surovinu" />
+                        <input type="submit" class="btn btn-primary" value="Přidat surovinu" />
                     </form>
                 </div>
 
-                <div class="prerecipe__selected-ingredients col-11">
+                <div class="col-11">
                     <form class="form-group">
-                        <table class="prerecipe__selected-ingredients__table table" data-target="new-recipe.ingredientTable">
+                        <table class="table" data-target="new-recipe.ingredientTable">
                             <tr>
                                 <th>{{ texts.title }}</th>
                                 <th>{{ texts.energy_100 }}</th>
@@ -49,29 +46,29 @@
                     </form>
                 </div>
 
-                <div class="prerecipe__calc col-12">
-                    <form class="prerecipe__calc__form form-inline">
-                        <label for="select-diet">{{ texts.diet_name}}</label>
-                        <select name="select-diet" class="select-diet form-control">
+                <div class="col-12">
+                    <form class="form-inline" data-action="submit->new-recipe#calculate_recipe">
+                        <label >{{ texts.diet_name}}</label>
+                        <select class="form-control" data-target="new-recipe.selectDiet">
                         {% for diet in diets: %}
                             <option value="{{diet.id}}">{{ diet.name }}</option>
                         {% endfor %}
                         </select>
-                        <input type="submit" class=" prerecipe__calc__form__submit btn btn-primary" value="{{ texts.calc_amount }}" />
+                        <input type="submit" class="btn btn-primary"  value="{{ texts.calc_amount }}" />
                     </form>
                 </div>
 
             </div>
 
-            <div class="recipe col-lg-6 col-md-12">
+            <div class="col-lg-6 col-md-12">
 
-                <div class="recipe__loader"></div>
+                <div class="recipe__loader" data-target="new-recipe.loader"></div>
 
-                <div class="recipe__wrong">
+                <div class="recipe__wrong" data-target="new-recipe.wrongRecipe">
                     <span>{{ texts.recipe_impossible}}</span>
                 </div>
 
-                <div class="recipe__right" id="recipe__right">
+                <div class="recipe__right" data-target="new-recipe.recipe">
                 </div>
             </div>
         </div>

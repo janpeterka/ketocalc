@@ -21,22 +21,26 @@ def calculate_recipe(ingredients, diet):
 
     # remove fixed ingredient values from diet
     fixed_ingredients = []
-    for i in range(len(ingredients)):
-        if hasattr(ingredients[i], "fixed") and ingredients[i].fixed is True:
+    for ingredient in ingredients:
+        if hasattr(ingredient, "fixed") and ingredient.fixed is True:
 
-            diet.sugar -= ingredients[i].amount * ingredients[i].sugar
-            diet.protein -= ingredients[i].amount * ingredients[i].protein
-            diet.fat -= ingredients[i].amount * ingredients[i].fat
+            diet.sugar -= ingredient.amount * ingredient.sugar
+            diet.protein -= ingredient.amount * ingredient.protein
+            diet.fat -= ingredient.amount * ingredient.fat
 
-            fixed_ingredients.append(ingredients[i])
+            fixed_ingredients.append(ingredient)
 
     # remove fixed ingredients from list of ingredients
     for ing in fixed_ingredients:
         ingredients.remove(ing)
 
     # move main ingredient to end of list
+    # TODO: .main by mělo být typově konzistentní
     for i in range(len(ingredients)):
-        if hasattr(ingredients[i], "main") and ingredients[i].main is True:
+        if (
+            hasattr(ingredients[i], "main")
+            and (ingredients[i].main is True or ingredients[i].main) == "true"
+        ):
             mainIngredient = ingredients[i]
             ingredients.pop(i)
             ingredients.append(mainIngredient)
@@ -139,8 +143,8 @@ def calculate_recipe(ingredients, diet):
         ingredients[1].amount = y
         ingredients[2].amount = z
         ingredients[3].amount = sol
-        ingredients[3].min = float(min_sol * 100)
-        ingredients[3].max = float(max_sol * 100)
+        ingredients[3].min = float(min_sol * 100) + 0.1
+        ingredients[3].max = float(max_sol * 100) - 0.1
 
     elif len(ingredients) == 5:
         # TODO: 5 ingredients (30)
@@ -185,4 +189,5 @@ def calculate_recipe(ingredients, diet):
     totals.amount = float(totals.amount)
 
     diet.expire()
+
     return {"ingredients": ingredients, "totals": totals}
