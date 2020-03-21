@@ -1,4 +1,4 @@
-<form method="post" class="form-group">
+<form class="form-group" data-action="submit->new-recipe#save_recipe">
     <label>Název receptu</label>
     <input type="text" data-target="new-recipe.recipeName" required class="form-control"/>
     <table class="table" data-target="new-recipe.recipeIngredientTable">
@@ -73,7 +73,7 @@
 
         <span class="col-4" data-target="new-recipe.recipeDiet" data-new-recipe-diet-id="{{ diet.id }}">Dieta: {{ diet.name }}</span>
         {% if not is_trialrecipe %}
-            <input type="button" data-action="click->new-recipe#save_recipe" class="btn btn-primary col-4 " value="{{ texts.recipe_save }}" />
+            <input type="submit" class="btn btn-primary col-4 " value="{{ texts.recipe_save }}" />
         {% else %}
             <input type="button" onclick='trialSaveConfirm()' class="btn btn-primary col-4 " value="{{ texts.recipe_save }}" />
         {% endif %}
