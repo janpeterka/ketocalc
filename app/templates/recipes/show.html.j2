@@ -44,9 +44,9 @@
                 <h2>{{ recipe.name }}</h2>
 
             {% if recipe.type == "small" %}
-                <h5>{{ texts.meal_size_small }} ({{ recipe.diet.small_size }}%)</h5>
+                <h5>{{ recipe.diet.name }} | {{ texts.meal_size_small }} ({{ recipe.diet.small_size }}%)</h5> 
             {% elif recipe.type == "big" %}
-                <h5>{{ texts.meal_size_big }} ({{ recipe.diet.big_size }}%)</h5> 
+                <h5>{{ recipe.diet.name }} | {{ texts.meal_size_big }} ({{ recipe.diet.big_size }}%)</h5>
             {% endif %}
 
                  </span>

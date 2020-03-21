@@ -20,12 +20,12 @@
                 <tr data-id="{{ ingredient.id }}" data-amount="{{ ingredient.amount }}">
             {% endif %}
 
-                    <td>{{ ingredient.name }} </td>
-                    <td><span>{{ ingredient.calorie }}</span></td>
-                    <td><span>{{ ingredient.protein }}</span></td>
-                    <td><span>{{ ingredient.fat }}</span></td>
-                    <td><span>{{ ingredient.sugar }}</span></td>
-                    <td><span>{{ ingredient.amount }} g</span></td>
+                    <td>{{ ingredient.name }}    </td>
+                    <td>{{ ingredient.calorie }} </td>
+                    <td>{{ ingredient.protein }} </td>
+                    <td>{{ ingredient.fat }}     </td>
+                    <td>{{ ingredient.sugar }}   </td>
+                    <td>{{ ingredient.amount }} g</td>
                 </tr>
 
             {% if ingredient.main %}
@@ -48,12 +48,12 @@
         {% endfor %}
 
         <tr>
-            <td><strong>Součet</strong></td>
-            <td><span id="totalCalorie">{{ totals.calorie }}</span></td>
-            <td><span id="totalProtein">{{ totals.protein }}</span></td>
-            <td><span id="totalFat">{{ totals.fat }}</span></td>
-            <td><span id="totalSugar">{{ totals.sugar }}</span></td>
-            <td><span id="totalWeight">{{ totals.amount }}</span> g</td>
+            <td><strong>Součet</strong> </td>
+            <td>{{ totals.calorie }}    </td>
+            <td>{{ totals.protein }}    </td>
+            <td>{{ totals.fat }}        </td>
+            <td>{{ totals.sugar }}      </td>
+            <td>{{ totals.amount }} g   </td>
         </tr>
         <tr>
             <td></td>
