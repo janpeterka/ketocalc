@@ -116,6 +116,7 @@
           ingredient['main'] = row.dataset.main
           ingredient['fixed'] = row.dataset.fixed
           ingredient['amount'] = row.dataset.amount
+          ingredient['name'] = row.dataset.name
 
           selected_ingredients.push(ingredient);
         }
@@ -144,7 +145,7 @@
 
       _get_main_ingredient(){
         for (let i = 0, ingredient; ingredient = this._get_currently_selected()[i]; i++) {
-          if (ingredient.dataset.main){
+          if (ingredient.main){
             return ingredient;
           }
         }
@@ -196,11 +197,11 @@
         }
 
         // values for fixed
-        for (let i = 0, ingredient; ingredient = this._get_currently_selected()[i]; i++) {
+        selected_ingredients.forEach(function(ingredient, i){
           if (ingredient.fixed){
             ingredient.amount = parseFloat(prompt("Množství suroviny " + ingredient.name + " v gramech :","").replace(",","."));
           }
-        }
+        })
 
         var dietID = this.selectDietTarget.value
 
@@ -236,29 +237,31 @@
               'trial' : '{{ is_trialrecipe|safe }}'
           }),
           headers: {'Content-Type': 'application/json,charset=UTF-8'},
-        }
-        ).then((response) => { return response.json(); }
-        ).then((response) => {
-        var ingredients = response.ingredients;
-            var template_data = response.template_data;
-            var diet = response.diet
+        })
+        .then((response) => {
+          if (!response.ok){
+            this.recipe__wrong__show();
+            throw new Error(response);
+          }
+          return response.json();
+        })
+        .then((response) => {
+          var template_data = response.template_data;
 
-            if (response == "False"){
-                this.recipe__wrong__show();
-                return;
-            }
+          if (response == "False"){
+              this.recipe__wrong__show();
+              return;
+          }
 
-            // fill with html
-            this.recipeTarget.innerHTML = template_data
+          // fill with html
+          this.recipeTarget.innerHTML = template_data
 
-            var mySlider = $("#slider").slider();
+          var mySlider = $("#slider").slider();
 
-            // change visibility
-            this.recipe__right__show();
+          // change visibility
+          this.recipe__right__show();
 
-        });
-
-        
+        })
       }
 
       save_recipe(e){
@@ -274,13 +277,12 @@
           }),
           headers: {'Content-Type': 'application/json,charset=UTF-8'},
         })
-        .then((response) => { return response.text(); })
+        .then((response) => {
+          return response.text(); })
         .then((response) => {
           var pathname = window.location.pathname.split("/")[0];
           window.location.replace(pathname + response);
         })
-        .catch((error) => {console.log(error)})
-
       }
 
       _hide_loader(){
