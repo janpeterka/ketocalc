@@ -118,7 +118,15 @@ table#diets tr th.diet{
     background-color: var(--bgcolor_mainIngredient);
 }
 
+tr[data-main="true"] {
+    background-color: var(--bgcolor_mainIngredient);
+}
+
 .tr-fixedIngredient {
+    background-color: var(--bgcolor_fixedIngredient);
+}
+
+tr[data-fixed="true"] {
     background-color: var(--bgcolor_fixedIngredient);
 }
 
