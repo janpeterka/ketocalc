@@ -138,7 +138,7 @@ class RecipesView(FlaskView):
             ing.fat = round(ing.fat, 2)
             ing.sugar = round(ing.sugar, 2)
             ing.protein = round(ing.protein, 2)
-            ing.amount = round(ing.amount, 2)
+            ing.amount = round(ing.amount * 100, 2)
 
             json_ingredients.append(ing.json)
 
@@ -146,7 +146,7 @@ class RecipesView(FlaskView):
         totals.sugar = round(totals.sugar, 2)
         totals.fat = round(totals.fat, 2)
         totals.protein = round(totals.protein, 2)
-        totals.amount = round(totals.amount, 2)
+        totals.amount = round(totals.amount * 100, 2)
         totals.ratio = round((totals.fat / (totals.protein + totals.sugar)), 2)
 
         template_data = template(

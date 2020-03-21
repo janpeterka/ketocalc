@@ -94,7 +94,7 @@ class Ingredient(db.Model, BaseMixin):
         if "main" in json_ing:
             self.main = json_ing["main"]
         if "amount" in json_ing:
-            self.amount = float(json_ing["amount"])
+            self.amount = float(json_ing["amount"]) / 100  # from grams per 100g
 
         if "min" in json_ing:
             self.min = float(json_ing["min"])
