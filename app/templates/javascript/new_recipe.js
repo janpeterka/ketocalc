@@ -5,11 +5,13 @@
     application.register("new-recipe", class extends Stimulus.Controller {
       static get targets() {
         return [
-          "name", "select", "baseSelect", "selectDiet",
-          "ingredientTable",
+          "baseSelect",
+          "select", "ingredientTable", "selectDiet",
+
+          "loader", "wrongRecipe",
+
           "recipeName", "recipeSize", "recipeDiet",
-          "recipe", "recipeIngredientTable",
-          "loader", "wrongRecipe"
+          "recipe", "recipeIngredientTable"
           ]
       }
 
@@ -18,14 +20,12 @@
       }
 
       _refresh_select(){
-          this.selectTarget.innerHTML = this.baseSelectTarget.innerHTML;
+        this.selectTarget.innerHTML = this.baseSelectTarget.innerHTML;
 
-          var selected_ingredients = this._get_currently_selected();
-
-          for (let i = 0, ingredient; ingredient = this._get_currently_selected()[i]; i++) {
-            let option = this.selectTarget.querySelector("option[value='" + ingredient.id + "']")
-            option.remove();
-          }
+        for (let i = 0, ingredient; ingredient = this._get_currently_selected()[i]; i++) {
+          let option = this.selectTarget.querySelector("option[value='" + ingredient.id + "']");
+          option.remove();
+        }
       }
 
       add_ingredient(e){
@@ -34,30 +34,41 @@
         if (this.selectTarget.value == false){return false;}
         else{
           fetch("{{ url_for('RecipesView:addIngredientAJAX') }}",{
-                method: 'POST',
-                body: JSON.stringify({'ingredient_id' : this.selectTarget.value}),
-                headers: {'Content-Type': 'application/json,charset=UTF-8'},
-          }
+            method: 'POST',
+            body: JSON.stringify({'ingredient_id' : this.selectTarget.value}),
+            headers: {'Content-Type': 'application/json,charset=UTF-8'}}
           ).then((response) => { return response.json(); }
           ).then((response) => {
-            var template_data = response['template_data'];
-
-            $(this.ingredientTableTarget).append(template_data);
+            $(this.ingredientTableTarget).append(response['template_data']);
             this._check_if_first_ingredient();
             this._refresh_select();
             
             this.recipe__hideAll();
-
           });
         }
       }
 
       _check_if_first_ingredient(){
         if (this._get_currently_selected().length == 1){
-          this.set_main_ingredient(this._get_currently_selected()[0].id)
+          this._set_main_ingredient(this._get_currently_selected()[0].id)
         }
       }
 
+      set_main_ingredient(event){
+        var id = event.target.parentNode.dataset.id
+        this._set_main_ingredient(id)
+      }
+      
+      _set_main_ingredient(id){
+        for (let i = 0, row; row = this.ingredientTableTarget.rows[i]; i++) {
+            row.removeAttribute("data-main");
+
+            if (row.dataset.id == id){
+                row.dataset.main = "true";
+                row.removeAttribute("data-fixed");
+            }
+        }
+      }
 
       remove_ingredient(event){
         var id = event.target.parentNode.dataset.id
@@ -68,26 +79,7 @@
             }
         }
         this._refresh_select();
-
-        //TODO: if deleted main ingredient, select new one
-        //
         $(".recipe__right").hide();
-      }
-      
-      set_main_ingredient(event){
-        if (isNaN(arguments[0])) {
-          var id = event.target.parentNode.dataset.id
-        } else {
-          var id = arguments[0]
-        }
-        for (let i = 0, row; row = this.ingredientTableTarget.rows[i]; i++) {
-            row.removeAttribute("data-main");
-
-            if (row.dataset.id == id){
-                row.dataset.main = "true";
-                row.removeAttribute("data-fixed");
-            }
-        }
       }
 
       toggle_fixed_ingredient(event){
@@ -104,47 +96,42 @@
         }
       }
 
+      _row_to_ingredient(row){
+        var ingredient = {}
+        ingredient['id'] = row.dataset.id
+        ingredient['name'] = row.dataset.name
+
+        // optional
+        ingredient['main'] = row.dataset.main
+        ingredient['fixed'] = row.dataset.fixed
+        ingredient['amount'] = row.dataset.amount
+
+        return ingredient
+      }
+
       _get_currently_selected(){
-        var selected_ingredients = [];
-
-        for (let i = 1, row; row = this.ingredientTableTarget.rows[i]; i++) {
-
-          var ingredient = {}
-          ingredient['id'] = row.dataset.id
-
-          // optional
-          ingredient['main'] = row.dataset.main
-          ingredient['fixed'] = row.dataset.fixed
-          ingredient['amount'] = row.dataset.amount
-          ingredient['name'] = row.dataset.name
-
-          selected_ingredients.push(ingredient);
-        }
-        return selected_ingredients;
+        return this._get_ingredients_from_table(this.ingredientTableTarget)
       }
 
       _get_currently_calculated(){
+        return this._get_ingredients_from_table(this.recipeIngredientTableTarget)
+      }
+
+      _get_ingredients_from_table(table){
         var ingredients = [];
 
-        for (let i = 1, row; row = this.recipeIngredientTableTarget.rows[i]; i++) {
+        for (let i = 1, row; row = table.rows[i]; i++) {
           if ("id" in row.dataset){
-            var ingredient = {}
-            ingredient['id'] = row.dataset.id
-
-            // optional
-            ingredient['main'] = row.dataset.main
-            ingredient['amount'] = row.dataset.amount
-
+            let ingredient = this._row_to_ingredient(row)
             ingredients.push(ingredient);
           }
 
         }
         return ingredients;
-
       }
 
-      _get_main_ingredient(){
-        for (let i = 0, ingredient; ingredient = this._get_currently_selected()[i]; i++) {
+      _get_main_ingredient(ingredients){
+        for (let i = 0, ingredient; ingredient = ingredients[i]; i++) {
           if (ingredient.main){
             return ingredient;
           }
@@ -157,27 +144,17 @@
 
         this.recipe__loader__show()
 
-        var main_count = 0;
-        var fixed_count = 0;
-        var variable_count = 0;
-
         var selected_ingredients = this._get_currently_selected()
 
-        for (let i = 0, ingredient; ingredient = selected_ingredients[i]; i++) {
-          if (ingredient.main){
-            main_count++;
-          } else if (ingredient.fixed){
-            fixed_count++;
-          } else {
-            variable_count++;
-          }
-        }
+        var main_count = selected_ingredients.filter((x) => x.main).length
+        var fixed_count = selected_ingredients.filter((x) => x.fixed).length
+        var variable_count = selected_ingredients.length - (main_count + fixed_count)
 
         // main to variable if necessary
         if (variable_count == 2 && main_count == 1){
-          var main_ingredient = this._get_main_ingredient()
+          var main_ingredient = this._get_main_ingredient(selected_ingredients)
           if (! main_ingredient === null ){
-              ingredient.removeAttribute("data-main");
+              main_ingredient.removeAttribute("data-main");
               main_count--;
               variable_count++;
           }
@@ -213,15 +190,12 @@
         this.recipe__loader__show()
 
         var calculated_ingredients = this._get_currently_calculated()
+        var main_ingredient = this._get_main_ingredient(calculated_ingredients)
 
-        calculated_ingredients.forEach(function(ingredient, i){
-          if (ingredient.main == "true"){
-            ingredient.amount = $("#slider").val();
-            ingredient.fixed = true
-            ingredient.min = $('#slider')[0].dataset.sliderMin;
-            ingredient.max = $('#slider')[0].dataset.sliderMax;
-          }
-        })
+        main_ingredient.amount = $("#slider").val();
+        main_ingredient.fixed = true
+        main_ingredient.min = $('#slider')[0].dataset.sliderMin;
+        main_ingredient.max = $('#slider')[0].dataset.sliderMax;
 
         var dietID = this.recipeDietTarget.dataset.newRecipeDietId
 
@@ -253,12 +227,9 @@
               return;
           }
 
-          // fill with html
           this.recipeTarget.innerHTML = template_data
-
           var mySlider = $("#slider").slider();
 
-          // change visibility
           this.recipe__right__show();
 
         })
