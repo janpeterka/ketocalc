@@ -6,7 +6,7 @@
 {% block style %}{% endblock %}
 
 {% block script %}
-    <script type="text/javascript" src="{{ url_for('static', filename='toggle_visibility.js') }}"></script>
+    {% include 'javascript/toggle_visibility.js' %}
 {% endblock %}
 
 {% block content %}
@@ -47,9 +47,8 @@
                 {{ password_form.csrf_token }}
                 <table class="table">
                     <td>
-                        <div class="form-group">
+                        <div class="form-group" data-controller="password-visibility" data-target="password-visibility.password">
                             {{ render_field(password_form.password, class="form-control")}}
-                            <span class="fa fa-fw fa-eye field-icon" onmouseover="turnOnVisibility()", onmouseout="turnOffVisibility()"></span>
                         </div>
                     </td>
                     <td>
