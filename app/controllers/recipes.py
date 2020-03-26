@@ -114,7 +114,7 @@ class RecipesView(FlaskView):
             is_trialrecipe = False
 
         if diet is None:
-            return "False"
+            abort(400, "no diet")
 
         ingredients = []
         for json_i in json_ingredients:
@@ -124,7 +124,7 @@ class RecipesView(FlaskView):
 
         result = calculations.calculate_recipe(ingredients, diet)
         if result is None:
-            return "False"
+            abort(400, "cannot be calculated")
 
         ingredients = result["ingredients"]
         totals = result["totals"]
@@ -132,7 +132,7 @@ class RecipesView(FlaskView):
         json_ingredients = []
         for ing in ingredients:
             if ing.amount < 0:
-                return "False"
+                abort(400, "ingredient with negative amount")
 
             ing.calorie = round(ing.calorie * ing.amount, 2)
             ing.fat = round(ing.fat, 2)
@@ -146,7 +146,7 @@ class RecipesView(FlaskView):
         totals.sugar = round(totals.sugar, 2)
         totals.fat = round(totals.fat, 2)
         totals.protein = round(totals.protein, 2)
-        totals.amount = round(totals.amount, 2)
+        totals.amount = round(totals.amount * 100, 2)
         totals.ratio = round((totals.fat / (totals.protein + totals.sugar)), 2)
 
         template_data = template(

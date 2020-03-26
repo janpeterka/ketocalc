@@ -36,6 +36,14 @@ input{
 
 /* New recipe */
 
+tr[data-main="true"] {
+    background-color: var(--bgcolor_mainIngredient);
+}
+tr[data-fixed="true"] {
+    background-color: var(--bgcolor_fixedIngredient);
+}
+
+
 i.remove {
     cursor: pointer;
 }
@@ -114,13 +122,17 @@ table#diets tr th.diet{
 
 /* Help */
 
+
+
 .tr-mainIngredient {
     background-color: var(--bgcolor_mainIngredient);
 }
 
+
 .tr-fixedIngredient {
     background-color: var(--bgcolor_fixedIngredient);
 }
+
 
 /* Error */
 
