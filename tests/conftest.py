@@ -38,6 +38,9 @@ def db(app):
 
 
 def db_fill_calc():
+    user = create_user(username="calc", password="calc_clack")
+    user.save()
+
     Diet(
         name="3.5",
         calorie=0,
@@ -47,6 +50,7 @@ def db_fill_calc():
         small_size=10,
         big_size=20,
         active=1,
+        user_id=1,
     ).save()
 
     Ingredient(
@@ -110,6 +114,3 @@ def db_fill_calc():
         protein=1,
         author="default",
     ).save()
-
-    user = create_user(username="calc", password="calc_clack")
-    user.save()

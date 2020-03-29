@@ -50,7 +50,7 @@ class User(db.Model, UserMixin, BaseMixin):
     new_password_token = db.Column(db.String(255), nullable=True)
 
     diets = db.relationship(
-        "Diet", secondary="users_has_diets", order_by="desc(Diet.active)",
+        "Diet", order_by="desc(Diet.active)", back_populates="author"
     )
 
     @staticmethod
