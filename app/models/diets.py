@@ -38,10 +38,12 @@ class Diet(db.Model, BaseMixin):
     created = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
     last_updated = db.Column(db.DateTime, nullable=True, onupdate=datetime.datetime.now)
 
+    user_id = db.Column(db.ForeignKey(("users.id")), nullable=False, index=True)
+
     recipes = db.relationship(
         "Recipe", secondary="diets_has_recipes", order_by="Recipe.name"
     )
-    author = db.relationship("User", secondary="users_has_diets", uselist=False)
+    author = db.relationship("User", uselist=False, back_populates="diets")
 
     # TODO: only used for testing
     @staticmethod
