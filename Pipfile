@@ -28,7 +28,6 @@ Flask-Migrate = "*"
 Unidecode = "*"
 flask-classful = "*"
 simplejson = "*"
-mysqlclient = "*"
 
 [requires]
 python_version = "3.7"
