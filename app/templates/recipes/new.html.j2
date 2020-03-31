@@ -5,7 +5,7 @@
 
 {% block script %}
     {% include 'javascript/stimulus.js.html' %}
-    {% include 'javascript/new_recipe.js' %}
+    {% include 'javascript/new_recipe.js.html' %}
     {% include 'javascript/new_recipe_help.js.html' %}
 {% endblock %}
 
@@ -30,7 +30,7 @@
                         </select>
 
                         <input type="submit" class="btn btn-primary" value="Přidat surovinu" />
-                        <i style="font-size: 1.4rem; margin-left: 1rem;" class="fa fa-info-circle" data-action="mouseover->new-recipe-help#show_help mouseout->new-recipe-help#hide_help"></i>
+                        <i style="font-size: 1.4rem; margin-left: 1.7rem;" class="fa fa-info-circle" data-action="mouseover->new-recipe-help#show_help mouseout->new-recipe-help#hide_help"></i>
                     </form>
                 </div>
 
@@ -63,7 +63,9 @@
 
             </div>
 
+            
             <div class="col-lg-6 col-md-12">
+                <div data-target="new-recipe-help.help"></div>
 
                 <div class="recipe__loader" data-target="new-recipe.loader"></div>
 
@@ -73,7 +75,6 @@
 
                 <div class="recipe__right" data-target="new-recipe.recipe"></div>
 
-                <div data-target="new-recipe-help.help"></div>
             </div>
         </div>
     </div>
