@@ -1,7 +1,4 @@
-<script src="https://unpkg.com/stimulus/dist/stimulus.umd.js"></script>
 <script type="text/javascript">
-    const application = Stimulus.Application.start()
-
     application.register("new-recipe", class extends Stimulus.Controller {
       static get targets() {
         return [
