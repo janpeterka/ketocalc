@@ -97,7 +97,6 @@ def do_logout():
 
 def do_register(user, source=None):
     if user.save() is True:
-        user.add_default_ingredients()
         if source == "google_oauth":
             do_oauth_login(user=user, oauth_type="google")
         else:

@@ -11,7 +11,6 @@ from app import db
 from app.auth import login
 
 from app.models.base_mixin import BaseMixin
-from app.models.ingredients import Ingredient
 
 
 class User(db.Model, UserMixin, BaseMixin):
@@ -141,13 +140,6 @@ class User(db.Model, UserMixin, BaseMixin):
             else:
                 self.login_count += 1
             self.edit()
-
-    def add_default_ingredients(self):
-        ingredients = Ingredient.load_all_by_author("default")
-        for ingredient in ingredients:
-            new_ingredient = ingredient.duplicate()
-            new_ingredient.author = self.username
-            new_ingredient.save()
 
     # TODO: tohle není ideální
     @property
