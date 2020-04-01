@@ -11,7 +11,7 @@
     <div class="container">
         <div class="col-12">
             {% if current_user.is_admin %}
-                <h1>Sdílené suroviny ke schválení</h1>
+                <h1>Sdílené suroviny ke schválení ({{ unverified_shared_ingredients|length }})</h1>
                 <table id="unverified_shared_ingredients" class="table">
                 <tr>
                     <th>{{ texts.title }}</th>
