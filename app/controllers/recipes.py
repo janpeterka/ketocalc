@@ -19,6 +19,7 @@ from app.models.recipes_has_ingredients import RecipesHasIngredient
 class RecipesView(FlaskView):
     decorators = [login_required]
 
+    @login_required
     def before_request(self, name, id=None):
         if id is not None:
             self.recipe = Recipe.load(id)

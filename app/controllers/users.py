@@ -14,6 +14,7 @@ from app.models.users import User
 class UsersView(FlaskView):
     decorators = [login_required]
 
+    @login_required
     def before_request(self, name):
         self.user = User.load(current_user.id)
         if self.user is None:

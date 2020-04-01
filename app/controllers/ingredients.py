@@ -15,6 +15,7 @@ from app.controllers.forms.ingredients import IngredientsForm
 class IngredientsView(FlaskView):
     decorators = [login_required]
 
+    @login_required
     def before_request(self, name, id=None):
         if id is not None:
             self.ingredient = Ingredient.load(id)
@@ -23,6 +24,7 @@ class IngredientsView(FlaskView):
                 abort(404)
             if not (
                 self.ingredient.is_shared
+                or current_user.is_admin
                 or current_user.username == self.ingredient.author
             ):
                 abort(403)
