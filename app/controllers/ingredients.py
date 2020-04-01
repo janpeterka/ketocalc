@@ -122,6 +122,7 @@ class IngredientsView(FlaskView):
         ingredient = Ingredient()
         form.populate_obj(ingredient)
         ingredient.is_shared = True
+        ingredient.source = current_user.username
 
         if ingredient.save():
             flash(
