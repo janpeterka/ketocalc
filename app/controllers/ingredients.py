@@ -46,7 +46,7 @@ class IngredientsView(FlaskView):
 
     def before_shared(self):
         self.shared_ingredients = Ingredient.load_all_shared()
-        self.unverified_shared_ingredients = Ingredient.load_all_unverified_shared()
+        self.unapproved_ingredients = Ingredient.load_all_unapproved()
 
     def index(self):
         return template(
@@ -59,7 +59,7 @@ class IngredientsView(FlaskView):
         return template(
             "ingredients/all_shared.html.j2",
             shared_ingredients=self.shared_ingredients,
-            unverified_shared_ingredients=self.unverified_shared_ingredients,
+            unapproved_ingredients=self.unapproved_ingredients,
         )
 
     def new(self):

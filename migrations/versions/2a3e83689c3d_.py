@@ -26,6 +26,21 @@ def upgrade():
     op.alter_column(
         "ingredients", "author", existing_type=mysql.VARCHAR(length=255), nullable=True
     )
+
+    op.execute(
+        """
+        UPDATE
+          ingredients
+        SET
+          ingredients.is_shared = 1,
+          ingredients.is_approved = 1,
+          ingredients.source = "user"
+        WHERE
+          ingredients.author = "basic"
+          AND ingredients.is_shared IS NULL
+        """
+    )
+
     # ### end Alembic commands ###
 
 

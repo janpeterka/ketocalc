@@ -1,6 +1,8 @@
 import datetime
 import unidecode
 
+from sqlalchemy import and_
+
 from app import db
 
 from app.models.base_mixin import BaseMixin
@@ -37,8 +39,8 @@ class Ingredient(db.Model, BaseMixin):
     fat = db.Column(db.Float, nullable=False, server_default=db.text("'0'"))
     protein = db.Column(db.Float, nullable=False, server_default=db.text("'0'"))
     author = db.Column(db.String(255))
-    created = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
-    last_updated = db.Column(db.DateTime, nullable=True, onupdate=datetime.datetime.now)
+    created = db.Column(db.DateTime, default=datetime.datetime.now)
+    last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
 
     is_shared = db.Column(db.Boolean)
     is_approved = db.Column(db.Boolean, default=False)
@@ -63,8 +65,15 @@ class Ingredient(db.Model, BaseMixin):
         return ingredients
 
     @staticmethod
-    def load_all_shared(renamed=False):
-        ingredients = Ingredient.load_all_by_author("basic")
+    def load_all_shared(renamed=False, ordered=True):
+        ingredients = (
+            db.session.query(Ingredient).filter(Ingredient.is_shared == True).all()
+        )
+
+        if ordered:
+            ingredients.sort(
+                key=lambda x: unidecode.unidecode(x.name.lower()), reverse=False
+            )
 
         if renamed:
             for ingredient in ingredients:
@@ -73,8 +82,16 @@ class Ingredient(db.Model, BaseMixin):
         return ingredients
 
     @staticmethod
-    def load_all_unverified_shared():
+    def load_all_unapproved():
         ingredients = Ingredient.load_all_by_author("basic_unverified")
+        ingredients = (
+            db.session.query(Ingredient)
+            .filter(and_(Ingredient.is_shared == True, Ingredient.is_approved == False))
+            .all()
+        )
+        ingredients.sort(
+            key=lambda x: unidecode.unidecode(x.name.lower()), reverse=False
+        )
         return ingredients
 
     def load_amount_by_recipe(self, recipe_id):
