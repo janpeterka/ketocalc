@@ -66,8 +66,10 @@ texts = {
     "diet_recipes_count": "Receptů:",
     # Ingredient
     "ingredient_add": "Přidat surovinu",
+    "ingredient_add_shared": "Přidat sdílenou surovinu",
     "ingredient_new": "Nová surovina",
     "ingredient_all": "Všechny suroviny",
+    "ingredient_all_shared": "Všechny sdílené suroviny",
     "ingredient_delete": "Smazat surovinu",
     "ingredient_delete_confirm": "Opravdu chcete smazat surovinu?",
     # Calc

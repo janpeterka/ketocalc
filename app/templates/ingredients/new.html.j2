@@ -9,7 +9,11 @@
 
 {% block content %}
     <div class="container">
-        <form method="post" action="{{ url_for('IngredientsView:post') }}" class="form-group col-6" accept-charset="UTF-8">
+        {% if shared %}
+            <form method="post" action="{{ url_for('IngredientsView:post_shared') }}" class="form-group col-6" accept-charset="UTF-8">
+        {% else %}    
+            <form method="post" action="{{ url_for('IngredientsView:post') }}" class="form-group col-6" accept-charset="UTF-8">
+        {% endif %}
             {{ form.csrf_token }}
             {% from "_form_element.html.j2" import render_field %}
             {{ render_field(form.name, "form-control") }}

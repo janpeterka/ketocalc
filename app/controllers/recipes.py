@@ -19,6 +19,7 @@ from app.models.recipes_has_ingredients import RecipesHasIngredient
 class RecipesView(FlaskView):
     decorators = [login_required]
 
+    @login_required
     def before_request(self, name, id=None):
         if id is not None:
             self.recipe = Recipe.load(id)
@@ -35,9 +36,12 @@ class RecipesView(FlaskView):
     def new(self):
         active_diets = User.load(current_user.id).active_diets
         ingredients = Ingredient.load_all_by_author(current_user.username)
+        shared_ingredients = Ingredient.load_all_shared(renamed=True)
+
+        all_ingredients = ingredients + shared_ingredients
         return template(
             "recipes/new.html.j2",
-            ingredients=ingredients,
+            ingredients=all_ingredients,
             diets=active_diets,
             is_trialrecipe=False,
         )

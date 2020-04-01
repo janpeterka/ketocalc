@@ -1,6 +1,6 @@
 {% extends "base.html.j2" %}
 {% block title %}
-    {{ texts.ingredient_all }}	
+    {{ texts.ingredient_all_shared }}	
 {% endblock %}
 
 {% block style %}{% endblock %}
@@ -10,26 +10,29 @@
 {% block content %}
     <div class="container">
         <div class="col-12">
-            <h1>Moje suroviny</h1>
-            <table id="ingredients" class="table">
+            {% if current_user.is_admin %}
+                <h1>Sdílené suroviny ke schválení</h1>
+                <table id="unverified_shared_ingredients" class="table">
                 <tr>
                     <th>{{ texts.title }}</th>
                     <th>{{ texts.energy_100 }}</th>
                     <th>{{ texts.protein_100 }}</th>
                     <th>{{ texts.fat_100 }}</th>       
                     <th>{{ texts.sugar_100 }}</th>
+                    <th>Schválit</th>
                 </tr>
-                {% for ingredient in ingredients: %}
+                {% for ingredient in unverified_shared_ingredients: %}
                     <tr>
                         <td><a href="{{ url_for('IngredientsView:show', id=ingredient.id) }}">{{ ingredient.name }}</a></td>
                         <td>{{ ingredient.calorie }}</td>
                         <td>{{ ingredient.protein }}</td>
                         <td>{{ ingredient.fat }}</td>
                         <td>{{ ingredient.sugar }}</td>
+                        <td><a href="{{ url_for('IngredientsView:approve', id=ingredient.id) }}"><i class="fa fa-check fa-2x "></i></a></td>
                     </tr>
                 {% endfor %}
-            </table>
-            <a href="{{ url_for('IngredientsView:new') }}"><button class="btn btn-secondary" style="margin-left: 5px">{{ texts.ingredient_add }}</button></a>
+                </table>
+            {% endif %}
 
             <h1>Sdílené suroviny</h1>
             <table id="shared_ingredients" class="table">

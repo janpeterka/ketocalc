@@ -11,6 +11,8 @@
     <div class="container">
         <div class="row">
             <div class="col-md-8 col-sm-12" style="margin-bottom:30px">
+                <h2>{{ ingredient.name }} {% if ingredient.is_shared %}(sdílená surovina){% endif %}</h2>
+
                 <table class="table">
                     <tr>
                         <th>{{ texts.title }}</th>
@@ -26,16 +28,20 @@
                         <td>{{ ingredient.fat }}</td>
                         <td>{{ ingredient.sugar }}</td>
                     </tr>
-                 </table>
+                </table>
 
-                <form action="{{ url_for('IngredientsView:delete', id=ingredient.id) }}" onsubmit="return confirm('{{ texts.ingredient_delete_confirm }}');" method="post" accept-charset="utf-8">
-                    <a class="btn btn-secondary" href="{{ url_for('IngredientsView:edit', id=ingredient.id) }}">{{ texts.edit }} {{ icons.edit }}</a>
-                    {% if ingredient.is_used == False %}
-                        <button type="submit" class="btn btn-danger">{{ texts.ingredient_delete }} {{ icons.delete }}</button>
-                    {% else %}
-                        <button type="submit" class="btn btn-danger" disabled>{{ texts.delete_error }} {{ icons.delete }}</button>
-                    {% endif %}
-                </form>
+                {% if (not ingredient.is_shared or current_user.is_admin)%}
+                    <form action="{{ url_for('IngredientsView:delete', id=ingredient.id) }}" onsubmit="return confirm('{{ texts.ingredient_delete_confirm }}');" method="post" accept-charset="utf-8">
+                        <a class="btn btn-secondary" href="{{ url_for('IngredientsView:edit', id=ingredient.id) }}">{{ texts.edit }} {{ icons.edit }}</a>
+                        {% if ingredient.is_used == False %}
+                            <button type="submit" class="btn btn-danger">{{ texts.ingredient_delete }} {{ icons.delete }}</button>
+                        {% else %}
+                            <button type="submit" class="btn btn-danger" disabled>{{ texts.delete_error }} {{ icons.delete }}</button>
+                        {% endif %}
+                    </form>
+                     
+                {% endif %}
+
             </div>
 
             {% include ('recipes/_recipe_list.html.j2') %}

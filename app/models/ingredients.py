@@ -58,6 +58,21 @@ class Ingredient(db.Model, BaseMixin):
             )
         return ingredients
 
+    @staticmethod
+    def load_all_shared(renamed=False):
+        ingredients = Ingredient.load_all_by_author("basic")
+
+        if renamed:
+            for ingredient in ingredients:
+                ingredient.name = ingredient.name + " (sdílené)"
+
+        return ingredients
+
+    @staticmethod
+    def load_all_unverified_shared():
+        ingredients = Ingredient.load_all_by_author("basic_unverified")
+        return ingredients
+
     def load_amount_by_recipe(self, recipe_id):
         rhi = (
             db.session.query(RecipesHasIngredient)
@@ -97,6 +112,17 @@ class Ingredient(db.Model, BaseMixin):
             return False
         else:
             return True
+
+    @property
+    def is_shared(self):
+        return self.author == "basic"
+
+    def set_shared(self, approved=False):
+        if approved:
+            self.author = "basic"
+        else:
+            self.author = "basic_unverified"
+        return True
 
     # TODO: only used for testing
     def set_fixed(self, value=True, amount=0):
