@@ -36,9 +36,13 @@ class Ingredient(db.Model, BaseMixin):
     sugar = db.Column(db.Float, nullable=False, server_default=db.text("'0'"))
     fat = db.Column(db.Float, nullable=False, server_default=db.text("'0'"))
     protein = db.Column(db.Float, nullable=False, server_default=db.text("'0'"))
-    author = db.Column(db.String(255), nullable=False)
+    author = db.Column(db.String(255))
     created = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
     last_updated = db.Column(db.DateTime, nullable=True, onupdate=datetime.datetime.now)
+
+    is_shared = db.Column(db.Boolean)
+    is_approved = db.Column(db.Boolean, default=False)
+    source = db.Column(db.String(255), default="user")
 
     recipes = db.relationship(
         "Recipe",
@@ -82,17 +86,6 @@ class Ingredient(db.Model, BaseMixin):
         )
         return rhi.amount
 
-    def duplicate(self):
-        new_ingredient = Ingredient()
-
-        new_ingredient.name = self.name
-        new_ingredient.calorie = self.calorie
-        new_ingredient.sugar = self.sugar
-        new_ingredient.fat = self.fat
-        new_ingredient.protein = self.protein
-
-        return new_ingredient
-
     def fill_from_json(self, json_ing):
         if "fixed" in json_ing:
             self.fixed = json_ing["fixed"]
@@ -112,17 +105,6 @@ class Ingredient(db.Model, BaseMixin):
             return False
         else:
             return True
-
-    @property
-    def is_shared(self):
-        return self.author == "basic"
-
-    def set_shared(self, approved=False):
-        if approved:
-            self.author = "basic"
-        else:
-            self.author = "basic_unverified"
-        return True
 
     # TODO: only used for testing
     def set_fixed(self, value=True, amount=0):

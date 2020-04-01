@@ -121,7 +121,7 @@ class IngredientsView(FlaskView):
 
         ingredient = Ingredient()
         form.populate_obj(ingredient)
-        ingredient.set_shared()
+        ingredient.is_shared = True
 
         if ingredient.save():
             flash(
@@ -163,7 +163,7 @@ class IngredientsView(FlaskView):
 
     @route("approve/<id>", methods=["GET"])
     def approve(self, id):
-        self.ingredient.set_shared(approved=True)
-        self.ingredient.save()
+        self.ingredient.is_approved = True
+        self.ingredient.edit()
         flash("Surovina schválena", "success")
         return redirect(url_for("IngredientsView:shared"))
