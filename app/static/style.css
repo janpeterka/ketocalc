@@ -215,9 +215,16 @@ form ul.errors li.warning{
     bottom: 0;
     width: 100%;
     color: var(--color_info);
-    font-size: 10px;
+    font-size: 0.7rem;
     text-align: center;
     opacity: 0.7;
+}
+
+.data-source-aknowledgement {
+    color: var(--color_info);
+    font-size: 0.8rem;
+    text-align: left;
+    opacity: 0.9;
 }
 
 /* Loader */
