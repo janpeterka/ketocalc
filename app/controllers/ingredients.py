@@ -114,7 +114,7 @@ class IngredientsView(FlaskView):
 
         ingredient = Ingredient()
         form.populate_obj(ingredient)
-        ingredient.author = "basic_unverified"
+        ingredient.set_shared()
 
         if ingredient.save():
             flash(
