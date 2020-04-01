@@ -1,5 +1,4 @@
 from app.auth.routes import do_login, do_register
-from app.models.ingredients import Ingredient
 
 import helpers
 
@@ -41,17 +40,3 @@ def test_new_password(app, client, db):
 
     # TODO: try already used token @TEST (20)
     pass
-
-
-def test_default_ingredients_on_register(app, client, db):
-    # Test that valid default ingredients are added on new register
-    user = helpers.create_user("new_defaults")
-    do_register(user)
-
-    ingredients = Ingredient.load_all_by_author(user.username)
-    assert len(ingredients) == 3
-
-    assert ingredients[0].calorie == 100
-    assert ingredients[0].author == user.username
-    assert ingredients[1].sugar == 100
-    assert ingredients[2].fat == 100
