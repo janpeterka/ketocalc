@@ -4,6 +4,8 @@ from flask import request, redirect, url_for, abort, flash
 from flask_classful import FlaskView, route
 from flask_login import login_required, current_user
 
+from app.auth import admin_required
+
 from app.helpers.form import create_form, save_form_to_session
 
 from app.models.ingredients import Ingredient
@@ -46,7 +48,7 @@ class IngredientsView(FlaskView):
 
     def before_shared(self):
         self.shared_ingredients = Ingredient.load_all_shared()
-        self.unverified_shared_ingredients = Ingredient.load_all_unverified_shared()
+        self.unapproved_ingredients = Ingredient.load_all_unapproved()
 
     def index(self):
         return template(
@@ -59,7 +61,7 @@ class IngredientsView(FlaskView):
         return template(
             "ingredients/all_shared.html.j2",
             shared_ingredients=self.shared_ingredients,
-            unverified_shared_ingredients=self.unverified_shared_ingredients,
+            unapproved_ingredients=self.unapproved_ingredients,
         )
 
     def new(self):
@@ -121,7 +123,8 @@ class IngredientsView(FlaskView):
 
         ingredient = Ingredient()
         form.populate_obj(ingredient)
-        ingredient.set_shared()
+        ingredient.is_shared = True
+        ingredient.source = current_user.username
 
         if ingredient.save():
             flash(
@@ -161,9 +164,18 @@ class IngredientsView(FlaskView):
             flash("Tato surovina je použita, nelze smazat", "error")
             return redirect(url_for("IngredientsView:show", id=self.ingredient.id))
 
+    @admin_required
     @route("approve/<id>", methods=["GET"])
     def approve(self, id):
-        self.ingredient.set_shared(approved=True)
-        self.ingredient.save()
+        self.ingredient.is_approved = True
+        self.ingredient.edit()
         flash("Surovina schválena", "success")
+        return redirect(url_for("IngredientsView:shared"))
+
+    @admin_required
+    @route("disapprove/<id>", methods=["GET"])
+    def disapprove(self, id):
+        self.ingredient.is_approved = None
+        self.ingredient.edit()
+        flash("Surovina neschválena", "info")
         return redirect(url_for("IngredientsView:shared"))

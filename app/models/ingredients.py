@@ -1,6 +1,8 @@
 import datetime
 import unidecode
 
+from sqlalchemy import and_
+
 from app import db
 
 from app.models.base_mixin import BaseMixin
@@ -36,9 +38,13 @@ class Ingredient(db.Model, BaseMixin):
     sugar = db.Column(db.Float, nullable=False, server_default=db.text("'0'"))
     fat = db.Column(db.Float, nullable=False, server_default=db.text("'0'"))
     protein = db.Column(db.Float, nullable=False, server_default=db.text("'0'"))
-    author = db.Column(db.String(255), nullable=False)
-    created = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
-    last_updated = db.Column(db.DateTime, nullable=True, onupdate=datetime.datetime.now)
+    author = db.Column(db.String(255))
+    created = db.Column(db.DateTime, default=datetime.datetime.now)
+    last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
+
+    is_shared = db.Column(db.Boolean)
+    is_approved = db.Column(db.Boolean, default=False)
+    source = db.Column(db.String(255), default="user")
 
     recipes = db.relationship(
         "Recipe",
@@ -59,8 +65,17 @@ class Ingredient(db.Model, BaseMixin):
         return ingredients
 
     @staticmethod
-    def load_all_shared(renamed=False):
-        ingredients = Ingredient.load_all_by_author("basic")
+    def load_all_shared(renamed=False, ordered=True):
+        ingredients = (
+            db.session.query(Ingredient)
+            .filter(and_(Ingredient.is_shared == True, Ingredient.is_approved == True))
+            .all()
+        )
+
+        if ordered:
+            ingredients.sort(
+                key=lambda x: unidecode.unidecode(x.name.lower()), reverse=False
+            )
 
         if renamed:
             for ingredient in ingredients:
@@ -69,8 +84,15 @@ class Ingredient(db.Model, BaseMixin):
         return ingredients
 
     @staticmethod
-    def load_all_unverified_shared():
-        ingredients = Ingredient.load_all_by_author("basic_unverified")
+    def load_all_unapproved():
+        ingredients = (
+            db.session.query(Ingredient)
+            .filter(and_(Ingredient.is_shared == True, Ingredient.is_approved == False))
+            .all()
+        )
+        ingredients.sort(
+            key=lambda x: unidecode.unidecode(x.name.lower()), reverse=False
+        )
         return ingredients
 
     def load_amount_by_recipe(self, recipe_id):
@@ -81,17 +103,6 @@ class Ingredient(db.Model, BaseMixin):
             .first()
         )
         return rhi.amount
-
-    def duplicate(self):
-        new_ingredient = Ingredient()
-
-        new_ingredient.name = self.name
-        new_ingredient.calorie = self.calorie
-        new_ingredient.sugar = self.sugar
-        new_ingredient.fat = self.fat
-        new_ingredient.protein = self.protein
-
-        return new_ingredient
 
     def fill_from_json(self, json_ing):
         if "fixed" in json_ing:
@@ -112,17 +123,6 @@ class Ingredient(db.Model, BaseMixin):
             return False
         else:
             return True
-
-    @property
-    def is_shared(self):
-        return self.author == "basic"
-
-    def set_shared(self, approved=False):
-        if approved:
-            self.author = "basic"
-        else:
-            self.author = "basic_unverified"
-        return True
 
     # TODO: only used for testing
     def set_fixed(self, value=True, amount=0):

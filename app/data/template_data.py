@@ -6,7 +6,7 @@ icons = {
     "archive": '<i class="fas fa-archive"></i>',
     "unarchive": '<i class="fas fa-archive"></i>',
     "ingredient_main": '<i class="set_main fas fa-hospital-symbol"></i>',
-    "ingredient_remove": '<i class="remove fa fa-times fa-2x"></i>',
+    "ingredient_remove": '<i class="remove fa fa-times"></i>',
     "ingredient_fixed": '<i class="set_fixed fas fa-thumbtack"></i>',
     "google": '<i class="fab fa-google"></i>',
 }
