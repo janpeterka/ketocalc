@@ -54,7 +54,9 @@
                 {% endfor %}
             </table>
 
-            <a href="{{ url_for('IngredientsView:new_shared') }}"><button class="btn btn-secondary" style="margin-left: 5px">{{ texts.ingredient_add_shared }}</button></a>
+            {% if current_user.is_admin %}
+                <a href="{{ url_for('IngredientsView:new_shared') }}"><button class="btn btn-secondary" style="margin-left: 5px">{{ texts.ingredient_add_shared }}</button></a>
+            {% endif %}
 
         </div> 
     </div>
