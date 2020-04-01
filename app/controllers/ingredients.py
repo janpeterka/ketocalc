@@ -4,6 +4,8 @@ from flask import request, redirect, url_for, abort, flash
 from flask_classful import FlaskView, route
 from flask_login import login_required, current_user
 
+from app.auth import admin_required
+
 from app.helpers.form import create_form, save_form_to_session
 
 from app.models.ingredients import Ingredient
@@ -162,9 +164,18 @@ class IngredientsView(FlaskView):
             flash("Tato surovina je použita, nelze smazat", "error")
             return redirect(url_for("IngredientsView:show", id=self.ingredient.id))
 
+    @admin_required
     @route("approve/<id>", methods=["GET"])
     def approve(self, id):
         self.ingredient.is_approved = True
         self.ingredient.edit()
         flash("Surovina schválena", "success")
+        return redirect(url_for("IngredientsView:shared"))
+
+    @admin_required
+    @route("disapprove/<id>", methods=["GET"])
+    def disapprove(self, id):
+        self.ingredient.is_approved = None
+        self.ingredient.edit()
+        flash("Surovina neschválena", "info")
         return redirect(url_for("IngredientsView:shared"))

@@ -17,7 +17,7 @@ class TrialRecipesView(FlaskView):
         active_diets = User.load(
             "ketocalc.jmp@gmail.com", load_type="username"
         ).active_diets
-        ingredients = Ingredient.load_all_by_author("basic")
+        ingredients = Ingredient.load_all_shared()
         return template(
             "recipes/new.html.j2",
             ingredients=ingredients,

@@ -67,7 +67,9 @@ class Ingredient(db.Model, BaseMixin):
     @staticmethod
     def load_all_shared(renamed=False, ordered=True):
         ingredients = (
-            db.session.query(Ingredient).filter(Ingredient.is_shared == True).all()
+            db.session.query(Ingredient)
+            .filter(and_(Ingredient.is_shared == True, Ingredient.is_approved == True))
+            .all()
         )
 
         if ordered:
@@ -83,7 +85,6 @@ class Ingredient(db.Model, BaseMixin):
 
     @staticmethod
     def load_all_unapproved():
-        ingredients = Ingredient.load_all_by_author("basic_unverified")
         ingredients = (
             db.session.query(Ingredient)
             .filter(and_(Ingredient.is_shared == True, Ingredient.is_approved == False))

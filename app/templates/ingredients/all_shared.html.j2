@@ -28,7 +28,13 @@
                         <td>{{ ingredient.protein }}</td>
                         <td>{{ ingredient.fat }}</td>
                         <td>{{ ingredient.sugar }}</td>
-                        <td><a href="{{ url_for('IngredientsView:approve', id=ingredient.id) }}"><i class="fa fa-check fa-2x "></i></a></td>
+                        <td>
+                            <a href="{{ url_for('IngredientsView:approve', id=ingredient.id) }}"><i class="approve fa fa-check"></i></a>
+
+                            <a href="{{ url_for('IngredientsView:disapprove', id=ingredient.id) }}"><i class="disapprove fa fa-times"></i></a>
+
+
+                        </td>
                     </tr>
                 {% endfor %}
                 </table>

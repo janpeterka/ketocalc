@@ -12,6 +12,9 @@
     --bgcolor_fixedIngredient: grey; /* Grey */
 
     --color_icon_remove: #8b0000; /* Dark Red */
+    
+    --color_icon_disapprove: #8b0000;
+    --color_icon_approve: #00C851;
 
     --color_inactive: grey;
     --bgcolor_inactive: lightgrey;
@@ -98,9 +101,19 @@ div.recipe__wrong{
     margin-right: 1em;
 }
 
-.fa-times {
+i.remove.fa-times {
     color: var(--color_icon_remove);
-    font-size: 12pt;
+    font-size: 1rem;
+}
+
+i.disapprove.fa-times {
+  color: var(--color_icon_disapprove);
+  font-size: 2rem;
+}
+
+i.approve.fa-check {
+  color: var(--color_icon_approve);
+  font-size: 2rem;
 }
 
 #sliderVal{
