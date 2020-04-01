@@ -45,15 +45,15 @@ class Diet(db.Model, BaseMixin):
     )
     author = db.relationship("User", uselist=False, back_populates="diets")
 
-    # TODO: only used for testing
-    @staticmethod
-    def load_by_name(diet_name):
-        diet = db.session.query(Diet).filter(Diet.name == diet_name).first()
-        return diet
-
     @property
     def is_used(self):
         if len(self.recipes) == 0:
             return False
         else:
             return True
+
+    # TODO: only used for testing, probably want to remove (move to helper)
+    @staticmethod
+    def load_by_name(diet_name):
+        diet = db.session.query(Diet).filter(Diet.name == diet_name).first()
+        return diet

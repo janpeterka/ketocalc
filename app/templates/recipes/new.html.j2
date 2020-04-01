@@ -4,11 +4,13 @@
 {% endblock %}
 
 {% block script %}
-    {% include 'javascript/new_recipe.js' %}
+    {% include 'javascript/stimulus.js.html' %}
+    {% include 'javascript/new_recipe.js.html' %}
+    {% include 'javascript/new_recipe_help.js.html' %}
 {% endblock %}
 
 {% block content %}
-    <div class="container-fluid" data-controller="new-recipe">
+    <div class="container-fluid" data-controller="new-recipe new-recipe-help">
         <div class="row">
             <div class="hidden" style="display: none">
                 <select data-target="new-recipe.baseSelect">
@@ -28,6 +30,7 @@
                         </select>
 
                         <input type="submit" class="btn btn-primary" value="Přidat surovinu" />
+                        <i style="font-size: 1.4rem; margin-left: 1.7rem;" class="fa fa-info-circle" data-action="mouseover->new-recipe-help#show_help mouseout->new-recipe-help#hide_help"></i>
                     </form>
                 </div>
 
@@ -60,7 +63,9 @@
 
             </div>
 
+            
             <div class="col-lg-6 col-md-12">
+                <div data-target="new-recipe-help.help"></div>
 
                 <div class="recipe__loader" data-target="new-recipe.loader"></div>
 
@@ -68,8 +73,8 @@
                     <span>{{ texts.recipe_impossible }}</span>
                 </div>
 
-                <div class="recipe__right" data-target="new-recipe.recipe">
-                </div>
+                <div class="recipe__right" data-target="new-recipe.recipe"></div>
+
             </div>
         </div>
     </div>
