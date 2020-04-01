@@ -10,6 +10,22 @@
 {% block content %}
     <div class="container">
         {% if shared %}
+            <div class="alert alert-info" role="alert">
+                Přidáváte sdílenou surovinu.<br>
+                Jste si jisti, že by tato surovina měla být použitelná pro všechny? <br>
+                Pokud ano, zadejte její název tak, aby byl produkt:
+                <ul>
+                    <li>jasně identifikovatelný (podle značky, typu)</li>
+                    <li>snadno dohledatelný</li>
+                </ul>
+                <br>
+                Tato surovina musí projít schválením a poté se zobrazí všem uživatelům.<br>
+                Do té doby ji nebudete moct používat ani vy.<br>
+            </div>
+        {% endif %}
+
+
+        {% if shared %}
             <form method="post" action="{{ url_for('IngredientsView:post_shared') }}" class="form-group col-6" accept-charset="UTF-8">
         {% else %}    
             <form method="post" action="{{ url_for('IngredientsView:post') }}" class="form-group col-6" accept-charset="UTF-8">
