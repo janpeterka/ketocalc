@@ -30,10 +30,15 @@ class IngredientsView(FlaskView):
                 abort(403)
 
     def before_edit(self, id):
-        self.ingredient.recipes = Recipe.load_by_ingredient(self.ingredient.id)
+        self.ingredient.recipes = Recipe.load_by_ingredient_and_username(
+            self.ingredient.id, current_user.username
+        )
 
     def before_show(self, id):
-        self.ingredient.recipes = Recipe.load_by_ingredient(self.ingredient.id)
+        self.ingredient.recipes = Recipe.load_by_ingredient_and_username(
+            self.ingredient.id, current_user.username
+        )
+        self.ingredient.all_recipes = Recipe.load_by_ingredient(self.ingredient.id)
 
     def before_index(self):
         self.ingredients = Ingredient.load_all_by_author(current_user.username)
@@ -133,6 +138,7 @@ class IngredientsView(FlaskView):
             "ingredients/show.html.j2",
             ingredient=self.ingredient,
             recipes=self.ingredient.recipes,
+            all_recipes=self.ingredient.all_recipes,
         )
 
     def edit(self, id):
