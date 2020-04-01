@@ -103,7 +103,7 @@ class IngredientsView(FlaskView):
 
         form.populate_obj(self.ingredient)
 
-        if not self.ingredient.is_shared:
+        if not self.ingredient.is_shared or current_user.is_admin:
             self.ingredient.edit()
             flash("Surovina byla upravena.", "success")
         else:
