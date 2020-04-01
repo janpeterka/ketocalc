@@ -40,6 +40,19 @@
           </div>
         </li>
 
+        {% if current_user.is_admin %}
+          <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Admin
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="{{ url_for('IngredientsView:shared') }}">Sdílené suroviny</a>
+            {# <div class="dropdown-divider"></div> #}
+          </div>
+        </li>
+        {% endif %}
+
       </ul>
 
       <ul class="nav navbar-nav navbar-right ml-auto">

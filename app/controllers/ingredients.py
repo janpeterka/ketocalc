@@ -39,6 +39,7 @@ class IngredientsView(FlaskView):
 
     def before_shared(self):
         self.shared_ingredients = Ingredient.load_all_shared()
+        self.unverified_shared_ingredients = Ingredient.load_all_unverified_shared()
 
     def index(self):
         return template(
@@ -49,7 +50,9 @@ class IngredientsView(FlaskView):
 
     def shared(self):
         return template(
-            "ingredients/all_shared.html.j2", shared_ingredients=self.shared_ingredients
+            "ingredients/all_shared.html.j2",
+            shared_ingredients=self.shared_ingredients,
+            unverified_shared_ingredients=self.unverified_shared_ingredients,
         )
 
     def new(self):
@@ -149,3 +152,10 @@ class IngredientsView(FlaskView):
         else:
             flash("Tato surovina je použita, nelze smazat", "error")
             return redirect(url_for("IngredientsView:show", id=self.ingredient.id))
+
+    @route("approve/<id>", methods=["GET"])
+    def approve(self, id):
+        self.ingredient.set_shared(approved=True)
+        self.ingredient.save()
+        flash("Surovina schválena", "success")
+        return redirect(url_for("IngredientsView:shared"))

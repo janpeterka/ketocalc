@@ -30,7 +30,7 @@
                     </tr>
                 </table>
 
-                {% if not ingredient.is_shared %}
+                {% if (not ingredient.is_shared or current_user.is_admin)%}
                     <form action="{{ url_for('IngredientsView:delete', id=ingredient.id) }}" onsubmit="return confirm('{{ texts.ingredient_delete_confirm }}');" method="post" accept-charset="utf-8">
                         <a class="btn btn-secondary" href="{{ url_for('IngredientsView:edit', id=ingredient.id) }}">{{ texts.edit }} {{ icons.edit }}</a>
                         {% if ingredient.is_used == False %}
