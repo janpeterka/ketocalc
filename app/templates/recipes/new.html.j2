@@ -23,7 +23,7 @@
             <div class="col-lg-6 col-md-12" >
                 <div class="col-12">
                     <form class="form-inline" data-action="submit->new-recipe#add_ingredient">
-                        <select class="form-control" data-target="new-recipe.select">
+                        <select class="form-control" id="ingredient_select" data-target="new-recipe.select">
                         {% for ingredient in ingredients: %}
                             <option name='{{ingredient.name}}' value="{{ingredient.id}}">{{ingredient.name}}</option>
                         {% endfor %}
