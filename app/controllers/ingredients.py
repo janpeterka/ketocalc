@@ -92,8 +92,13 @@ class IngredientsView(FlaskView):
             return redirect(url_for("IngredientsView:edit", id=self.ingredient.id))
 
         form.populate_obj(self.ingredient)
-        self.ingredient.edit()
-        flash("Surovina byla upravena.", "success")
+
+        if not self.ingredient.is_shared:
+            self.ingredient.edit()
+            flash("Surovina byla upravena.", "success")
+        else:
+            self.ingredient.refresh()
+            flash("Sdílenou surovinu nelze upravit", "error")
         return redirect(url_for("IngredientsView:show", id=self.ingredient.id))
 
     @route("post/shared", methods=["POST"])
