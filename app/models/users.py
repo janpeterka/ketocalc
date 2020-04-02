@@ -11,6 +11,7 @@ from app import db
 from app.auth import login
 
 from app.models.base_mixin import BaseMixin
+from app.models.ingredients import Ingredient
 
 
 class User(db.Model, UserMixin, BaseMixin):
@@ -160,3 +161,16 @@ class User(db.Model, UserMixin, BaseMixin):
     @property
     def active_diets(self):
         return list(filter(lambda diet: diet.active, self.diets))
+
+    @property
+    def ingredients(self, ordered=True):
+        ingredients = (
+            db.session.query(Ingredient)
+            .filter(Ingredient.author == self.username)
+            .all()
+        )
+        if ordered:
+            ingredients.sort(
+                key=lambda x: unidecode.unidecode(x.name.lower()), reverse=False
+            )
+        return ingredients

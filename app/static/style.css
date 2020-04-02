@@ -1,3 +1,5 @@
+/*root*/
+
 :root{
     --color_error: #CC0000; /* Red */
     --color_success: #007E33; /* Green */
@@ -9,10 +11,10 @@
     --color_loader_inner: #4285F4; /* Blue */
 
     --bgcolor_mainIngredient: #00C851; /* Light Green */
-    --bgcolor_fixedIngredient: grey; /* Grey */
+    --bgcolor_fixedIngredient: #CFBDA3; /* Grey */
 
     --color_icon_remove: #8b0000; /* Dark Red */
-    
+
     --color_icon_disapprove: #8b0000;
     --color_icon_approve: #00C851;
 
@@ -23,6 +25,35 @@
 }
 
 
+/* icons */
+
+i:not(.disabled) {
+  cursor: pointer;
+}
+
+i.fa-file-pdf {
+  color: red;
+  font-size: 1.5rem;
+  margin-left: 0.5rem;
+}
+
+i.remove {
+    color: var(--color_icon_remove);
+    font-size: 1rem;
+}
+
+i.disapprove {
+  color: var(--color_icon_disapprove);
+  font-size: 2rem;
+}
+
+i.approve {
+  color: var(--color_icon_approve);
+  font-size: 2rem;
+}
+
+/* forms */
+
 input{
 	margin-top: 5px;
 	margin-bottom: 5px;
@@ -32,9 +63,12 @@ input{
    margin: 5px 3px;
 }
 
+form ul.errors{
+    /*padding-left: 0px; */
+}
 
-.changelog{
-    margin: 10px;
+form ul.errors li.warning{
+    color: var(--color_warning);
 }
 
 /* New recipe */
@@ -44,25 +78,6 @@ tr[data-main="true"] {
 }
 tr[data-fixed="true"] {
     background-color: var(--bgcolor_fixedIngredient);
-}
-
-
-i.remove {
-  cursor: pointer;
-}
-
-i.set_fixed {
-  cursor: pointer;
-}
-
-i.set_main {
-  cursor: pointer;
-}
-
-i.fa-file-pdf {
-  color: red;
-  font-size: 1.5rem;
-  margin-left: 0.5rem;
 }
 
 div.recipe__wrong{
@@ -98,29 +113,6 @@ div.recipe__wrong{
     100% { transform: rotate(360deg); }
 }
 
-.prerecipe__selected-ingredients__table tr {
-    transition: background-color 0.5s ease;
-
-}
-
-.prerecipe__selected-ingredients__table tr td i {
-    margin-right: 1em;
-}
-
-i.remove.fa-times {
-    color: var(--color_icon_remove);
-    font-size: 1rem;
-}
-
-i.disapprove.fa-times {
-  color: var(--color_icon_disapprove);
-  font-size: 2rem;
-}
-
-i.approve.fa-check {
-  color: var(--color_icon_approve);
-  font-size: 2rem;
-}
 
 #sliderVal{
     font-weight: bold;
@@ -140,9 +132,6 @@ table#diets tr th.diet{
 }
 
 /* Help */
-
-
-
 .tr-mainIngredient {
     background-color: var(--bgcolor_mainIngredient);
 }
@@ -202,15 +191,6 @@ div.flashes ul li.warning{
 
 div.flashes ul li.debug{
     color: var(--color_debug);
-}
-
-/* Form */
-form ul.errors{
-    /*padding-left: 0px; */
-}
-
-form ul.errors li.warning{
-    color: var(--color_warning);
 }
 
 /* Footer */
@@ -302,4 +282,16 @@ form ul.errors li.warning{
   margin-top: -2rem;
   position: relative;
   z-index: 2;
+}
+
+/* other */
+
+.changelog{
+    margin: 10px;
+}
+
+.admin_field {
+  background-color: #FFE766;
+  margin-top: 2rem;
+  padding: 0.5rem;
 }
