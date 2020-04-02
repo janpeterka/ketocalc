@@ -1,4 +1,5 @@
 def register_all_controllers(application):
+    from .base_recipes import BaseRecipesView
     from .dashboard import DashboardView
     from .diets import DietsView
     from .errors import ErrorsView
@@ -12,6 +13,7 @@ def register_all_controllers(application):
     from .trial_recipes import TrialRecipesView
     from .users import UsersView
 
+    BaseRecipesView.register(application)
     DashboardView.register(application)
     DietsView.register(application)
     ErrorsView.register(application)
