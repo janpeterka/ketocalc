@@ -30,7 +30,7 @@
 
         if (this.selectTarget.value == false){return false;}
         else{
-          fetch("{{ url_for('RecipesView:addIngredientAJAX') }}",{
+          fetch("{{ url_for('BaseRecipesView:addIngredientAJAX') }}",{
             method: 'POST',
             body: JSON.stringify({'ingredient_id' : this.selectTarget.value}),
             headers: {'Content-Type': 'application/json,charset=UTF-8'}}
@@ -200,7 +200,7 @@
       }
 
       _calculate_core(ingredients, dietID){
-        fetch("{{ url_for('RecipesView:calcRecipeAJAX') }}", {
+        fetch("{{ url_for('BaseRecipesView:calcRecipeAJAX') }}", {
           method: 'POST',
           body: JSON.stringify({
               'ingredients' : ingredients,

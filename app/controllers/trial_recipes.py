@@ -2,13 +2,14 @@ from flask import render_template as template
 from flask import redirect, url_for
 
 from flask_login import current_user
-from flask_classful import FlaskView
 
 from app.models.ingredients import Ingredient
 from app.models.users import User
 
+from app.controllers.base_recipes import BaseRecipesView
 
-class TrialRecipesView(FlaskView):
+
+class TrialRecipesView(BaseRecipesView):
     def before_show(self):
         if current_user.is_authenticated:
             return redirect(url_for("IndexView:index"))
