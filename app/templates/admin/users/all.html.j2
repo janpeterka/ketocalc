@@ -1,0 +1,40 @@
+{% extends "base.html.j2" %}
+{% block title %}
+    admin | all users 	
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="col-12">
+            <h1>Uživatelé</h1>
+            <table class="table">
+                <thead class="thead-dark">
+                <tr>
+                    <th>email</th>
+                    <th>name</th>
+                    <th>registered at</th>
+                    <th>last login at</th>
+                    <th>login count</th>
+
+                    <th>diet count</th>
+                    
+                    <th>recipe count</th>
+                </tr>
+                </thead>
+
+                {% for user in users: %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.first_name +  " " + user.last_name }}</td>
+                    <td>{{ user.created }}</td>
+                    <td>{{ user.last_logged_in }}</td>
+                    <td>{{ user.login_count }}</td>
+                    <td>{{ user.diets|length }}</td>
+                    <td>{{ user.recipes|length }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div> 
+    </div>
+{% endblock %}
+
