@@ -16,6 +16,11 @@ class BaseMixin(object):
         my_object = db.session.query(cls).filter(cls.id == cls_id).first()
         return my_object
 
+    @classmethod
+    def load_all(cls):
+        my_objects = db.session.query(cls)
+        return my_objects
+
     def edit(self, **kw):
         try:
             db.session.commit()

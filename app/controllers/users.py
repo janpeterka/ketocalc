@@ -5,6 +5,8 @@ from flask import current_app as application
 from flask_classful import FlaskView, route
 from flask_login import login_required, current_user
 
+from app.auth import admin_required
+
 from app.helpers.form import create_form, save_form_to_session
 
 from app.controllers.forms.users import UserForm, PasswordForm
@@ -69,3 +71,9 @@ class UsersView(FlaskView):
             user_form=user_form,
             password_form=password_form,
         )
+
+    @admin_required
+    def show_all(self):
+        users = User.load_all()
+
+        return template("admin/users/all.html.j2", users=users)
