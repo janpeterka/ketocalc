@@ -17,7 +17,7 @@ class UsersView(FlaskView):
     decorators = [login_required]
 
     @login_required
-    def before_request(self, name):
+    def before_request(self, name, *args, **kwargs):
         self.user = User.load(current_user.id)
         if self.user is None:
             abort(404)
@@ -73,7 +73,11 @@ class UsersView(FlaskView):
         )
 
     @admin_required
+    def show_by_id(self, id):
+        user = User.load(id)
+        return template("users/show.html.j2", user=user)
+
+    @admin_required
     def show_all(self):
         users = User.load_all()
-
         return template("admin/users/all.html.j2", users=users)
