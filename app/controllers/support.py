@@ -1,5 +1,7 @@
+import os
+
 from flask import render_template as template
-from flask import redirect, request, flash, url_for
+from flask import redirect, request, flash, url_for, send_file
 
 from flask_classful import FlaskView, route
 from flask_login import current_user, login_required
@@ -60,6 +62,19 @@ class SupportView(FlaskView):
     @route("help")
     def help(self):
         return template("support/help.html.j2")
+
+    @route("download/<filename>/", methods=["GET"])
+    def download(self, filename):
+        print("getting file")
+        # print(args)
+        # print(kwargs)
+        PATH = os.path.dirname(os.path.realpath(__file__))
+        FILES_PATH = os.path.join(PATH, "../public/files/")
+        print(FILES_PATH)
+        print(os.path.join(FILES_PATH, filename))
+        return send_file(
+            os.path.join(FILES_PATH, filename), attachment_filename=filename,
+        )
 
     @route("terms")
     def terms(self):

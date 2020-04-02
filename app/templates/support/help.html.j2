@@ -34,6 +34,13 @@
 		<p>Při vypočtení možného receptu se ukáže množství pro celou dietu.<br>
 			Při ukládání receptu se množství změní podle velikosti vybraného receptu.
 		</p>
+
+		<p> Zde si můžete
+			<a href="{{ url_for('SupportView:download', filename='manual.pdf')}}">zobrazit</a>
+			nebo stáhnout manuál ke kalkulačce:
+			<span class="download">
+                <a href="{{ url_for('SupportView:download', filename='manual.pdf')}}" download> <i class="fas fa-file-pdf"></i></a>
+            </span>
 	</div>	
 
     <h1>Mám jiný problém</h1>

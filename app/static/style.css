@@ -48,15 +48,21 @@ tr[data-fixed="true"] {
 
 
 i.remove {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 i.set_fixed {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 i.set_main {
-    cursor: pointer;
+  cursor: pointer;
+}
+
+i.fa-file-pdf {
+  color: red;
+  font-size: 1.5rem;
+  margin-left: 0.5rem;
 }
 
 div.recipe__wrong{
