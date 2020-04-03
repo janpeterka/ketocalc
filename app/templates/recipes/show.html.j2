@@ -51,6 +51,12 @@
 
                  </span>
 
+            {% if current_user.is_admin %}
+                <div class="admin_field">
+                    Autor: <a href="{{ url_for('UsersView:show_by_id', id=recipe.author.id) }}">{{ recipe.author.username }}</a>
+                </div>
+            {% endif %}
+
             <table id="ingredients" class="table">
                 <tr>
                     <th>{{ texts.title }}</th>

@@ -70,6 +70,13 @@
         {% endif %}
     {% endblock %}
 
+    {% block top %}
+        {% if current_user.is_admin %}
+            {% include('_admin_warning.html.j2') %}
+        {% endif %}
+        {% include('_flashing.html.j2') %}
+    {% endblock %}
+
     {% if config.APP_STATE == "development" %}
         <span class="alert alert-success" role="alert" style="margin-left: 2rem; border-radius: 0.5rem"><strong>DEV</strong></span>
     {% endif %}

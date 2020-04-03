@@ -13,6 +13,12 @@
             <div class="col-md-8 col-sm-12" style="margin-bottom:30px">
                 <h2>{{ ingredient.name }} {% if ingredient.is_shared %}(sdílená surovina){% endif %}</h2>
 
+                {% if current_user.is_admin %}
+                    <div class="admin_field">
+                        Autor: <a href="{{ url_for('UsersView:show_by_id', id=ingredient.author_user.id) }}">{{ ingredient.author }}</a>
+                    </div>
+                {% endif %}
+
                 <table class="table">
                     <tr>
                         <th>{{ texts.title }}</th>
@@ -39,13 +45,11 @@
                             <button type="submit" class="btn btn-danger" disabled>{{ texts.delete_error }} {{ icons.delete }}</button>
                         {% endif %}
                     </form>
-                     
                 {% endif %}
 
             </div>
 
             {% include ('recipes/_recipe_list.html.j2') %}
-
         </div>
     </div>
 {% endblock %}
