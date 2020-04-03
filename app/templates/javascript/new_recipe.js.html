@@ -37,7 +37,7 @@
           ).then((response) => { return response.json(); }
           ).then((response) => {
             $(this.ingredientTableTarget).append(response['template_data']);
-            this._check_if_first_ingredient();
+            this._set_main_ingredient_if_missing();
             this._refresh_select();
             
             this.recipe__hideAll();
@@ -45,15 +45,22 @@
         }
       }
 
-      _check_if_first_ingredient(){
+      _set_main_ingredient_if_missing(){
+        if (this._get_main_ingredient_from_table(this.ingredientTableTarget) != null){
+          return true;
+        }
+
         if (this._get_currently_selected().length == 1){
+          this._set_main_ingredient(this._get_currently_selected()[0].id)
+        } else {
+          // TODO: Set first, which is not fixed
           this._set_main_ingredient(this._get_currently_selected()[0].id)
         }
       }
 
       set_main_ingredient(event){
-        var id = event.target.parentNode.dataset.id
-        this._set_main_ingredient(id)
+        var id = event.target.parentNode.dataset.id;
+        this._set_main_ingredient(id);
       }
       
       _set_main_ingredient(id){
@@ -76,6 +83,7 @@
             }
         }
         this._refresh_select();
+        this._set_main_ingredient_if_missing();
         $(".recipe__right").hide();
       }
 
@@ -134,6 +142,18 @@
           }
         }
         return null;  
+      }
+
+      _get_main_ingredient_from_table(table){
+        if (table.rows.length == 0){
+          return null;
+        }
+        for (let i = 0, row; row = table.rows[i]; i++) {
+          if (row.dataset.main == "true"){
+            return this._row_to_ingredient(row);
+          }
+        }
+        return null;
       }
 
       calculate_recipe(e){
