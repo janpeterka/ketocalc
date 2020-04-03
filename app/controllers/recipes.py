@@ -24,7 +24,7 @@ class RecipesView(BaseRecipesView):
             if self.recipe is None:
                 abort(404)
             if not (
-                current_user.username != self.recipe.author.username
+                current_user.username == self.recipe.author.username
                 or current_user.is_admin
             ):
                 abort(403)
