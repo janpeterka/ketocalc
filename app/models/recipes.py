@@ -125,11 +125,12 @@ class Recipe(db.Model, BaseMixin):
     @staticmethod
     def load_by_ingredient_and_username(ingredient_id, username):
         recipes = Recipe.load_by_ingredient(ingredient_id)
+        private_recipes = []
         for recipe in recipes:
-            if recipe.author.username != username:
-                recipes.remove(recipe)
+            if recipe.author.username == username:
+                private_recipes.append(recipe)
 
-        return recipes
+        return private_recipes
 
     def save(self, ingredients):
         db.session.add(self)
