@@ -3,11 +3,15 @@ import unidecode
 
 from sqlalchemy import and_
 
+
 from app import db
 
 from app.models.base_mixin import BaseMixin
 
+import app.models as models
 from app.models.recipes_has_ingredients import RecipesHasIngredient
+
+# from app.models.users import User
 
 
 class Ingredient(db.Model, BaseMixin):
@@ -116,6 +120,11 @@ class Ingredient(db.Model, BaseMixin):
             self.min = float(json_ing["min"])
         if "max" in json_ing:
             self.max = float(json_ing["max"])
+
+    @property
+    def author_user(self):
+        user = models.users.User.load(self.author, load_type="username")
+        return user
 
     @property
     def is_used(self):
