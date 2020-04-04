@@ -21,6 +21,15 @@ class BaseRecipesView(FlaskView):
         result = {"ingredient": ingredient.json, "template_data": template_data}
         return jsonify(result)
 
+    @route("addIngredientWithAmount", methods=["POST"])
+    def addIngredientWithAmount(self):
+        ingredient = Ingredient.load(request.json["ingredient_id"])
+        template_data = template(
+            "recipes/_add_ingredient_with_amount.html.j2", ingredient=ingredient
+        )
+        result = {"ingredient": ingredient.json, "template_data": template_data}
+        return jsonify(result)
+
     @route("/calcRecipeAJAX", methods=["POST"])
     def calcRecipeAJAX(self):
         json_ingredients = request.json["ingredients"]
