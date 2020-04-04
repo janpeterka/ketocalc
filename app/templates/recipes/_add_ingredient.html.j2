@@ -5,14 +5,13 @@
     <td>{{ ingredient.fat }}</td>
     <td>{{ ingredient.sugar }}</td>
     <td>
-        <span data-action="click->new-recipe#toggle_fixed_ingredient" data-id="{{ ingredient.id }}">
-            {{ icons.ingredient_fixed }}
-        </span> 
-        <span data-action="click->new-recipe#set_main_ingredient" data-id="{{ ingredient.id }}">
-            {{ icons.ingredient_main }}
-        </span> 
-        <span data-action="click->new-recipe#remove_ingredient" data-id="{{ ingredient.id }}">
-            {{ icons.ingredient_remove }} 
-        </span>
+        <i data-action="click->new-recipe#toggle_fixed_ingredient" data-id="{{ ingredient.id }}"
+           class="set_fixed fas fa-thumbtack"></i>
+
+        <i data-action="click->new-recipe#set_main_ingredient" data-id="{{ ingredient.id }}"
+           class="set_main fas fa-hospital-symbol"></i>
+
+        <i data-action="click->new-recipe#remove_ingredient" data-id="{{ ingredient.id }}"
+           class="remove fa fa-times"></i>
     </td>
 </tr>

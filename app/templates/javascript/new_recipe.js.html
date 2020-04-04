@@ -50,55 +50,71 @@
           return true;
         }
 
-        if (this._get_currently_selected().length == 1){
-          this._set_main_ingredient(this._get_currently_selected()[0].id)
-        } else {
-          // TODO: Set first, which is not fixed
-          this._set_main_ingredient(this._get_currently_selected()[0].id)
+        if (this._get_currently_selected().length < 1){
+          return false;
+        }
+        else if (this._get_currently_selected().length == 1){
+          this._set_main_ingredient(this._get_currently_selected()[0].id);
+        }
+        else {
+          for (let i = 1, row; row = this.ingredientTableTarget.rows[i]; i++) {
+            if (row.dataset.fixed != "true"){
+              this._set_main_ingredient(row.dataset.id);
+              return true;
+            }
+          }
+          this._set_main_ingredient(this._get_currently_selected()[0].id);
+          return true;
         }
       }
 
       set_main_ingredient(event){
-        var id = event.target.parentNode.dataset.id;
+        var id = event.target.dataset.id;
         this._set_main_ingredient(id);
       }
       
       _set_main_ingredient(id){
         for (let i = 0, row; row = this.ingredientTableTarget.rows[i]; i++) {
             row.removeAttribute("data-main");
-
-            if (row.dataset.id == id){
-                row.dataset.main = "true";
-                row.removeAttribute("data-fixed");
-            }
         }
+
+        var row = this._get_ingredient_row_by_id(id, this.ingredientTableTarget);
+        row.dataset.main = "true";
+        row.removeAttribute("data-fixed");
       }
 
       remove_ingredient(event){
-        var id = event.target.parentNode.dataset.id
+        var id = event.target.dataset.id
+        var row = this._get_ingredient_row_by_id(id, this.ingredientTableTarget);
+        row.remove()
 
-        for (let i = 0, row; row = this.ingredientTableTarget.rows[i]; i++) {
-            if (row.dataset.id == id){
-                row.remove()
-            }
-        }
         this._refresh_select();
         this._set_main_ingredient_if_missing();
         $(".recipe__right").hide();
       }
 
       toggle_fixed_ingredient(event){
-        var id = event.target.parentNode.dataset.id
-        for (let i = 0, row; row = this.ingredientTableTarget.rows[i]; i++) {
-            if (row.dataset.id == id){
-                if (row.dataset.fixed != "true"){
-                    row.dataset.fixed = "true";
-                    row.removeAttribute("data-main");
-                } else {
-                    row.removeAttribute("data-fixed");
-                }
-            }
+        var id = event.target.dataset.id;
+        var row = this._get_ingredient_row_by_id(id, this.ingredientTableTarget);
+
+        if (row.dataset.fixed != "true"){
+            row.dataset.fixed = "true";
+            row.removeAttribute("data-main");
+        } else {
+            row.removeAttribute("data-fixed");
         }
+
+        this._set_main_ingredient_if_missing();
+      }
+
+      _get_ingredient_row_by_id(id, table){
+        for (let i = 0, row; row = table.rows[i]; i++) {
+          if (row.dataset.id == id){
+            return row;
+          }
+        }
+        // else
+        return null;
       }
 
       _row_to_ingredient(row){
