@@ -14,11 +14,18 @@ from app.helpers import calculations
 class BaseRecipesView(FlaskView):
     @route("/addIngredientAJAX", methods=["POST"])
     def addIngredientAJAX(self):
-        print("add_ingredient")
-        print(request.json)
         ingredient = Ingredient.load(request.json["ingredient_id"])
         template_data = template(
             "recipes/_add_ingredient.html.j2", ingredient=ingredient
+        )
+        result = {"ingredient": ingredient.json, "template_data": template_data}
+        return jsonify(result)
+
+    @route("addIngredientWithAmount", methods=["POST"])
+    def addIngredientWithAmount(self):
+        ingredient = Ingredient.load(request.json["ingredient_id"])
+        template_data = template(
+            "recipes/_add_ingredient_with_amount.html.j2", ingredient=ingredient
         )
         result = {"ingredient": ingredient.json, "template_data": template_data}
         return jsonify(result)

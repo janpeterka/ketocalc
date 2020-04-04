@@ -5,37 +5,35 @@
 
 {% block script %}
     {% include 'javascript/stimulus.js.html' %}
-    {% include 'javascript/new_recipe.js.html' %}
-    {% include 'javascript/new_recipe_help.js.html' %}
+    {% include 'javascript/simple_calculator.js.html' %}
 {% endblock %}
 
 {% block content %}
-    <div class="container-fluid" data-controller="new-recipe new-recipe-help">
+    <div class="container" data-controller="simple-calculator">
         <div class="row">
             <div class="hidden" style="display: none">
-                <select data-target="new-recipe.baseSelect">
+                <select data-target="simple-calculator.baseSelect">
                     {% for ingredient in ingredients: %}
                         <option name='{{ingredient.name}}' value="{{ingredient.id}}">{{ingredient.name}}</option>
                     {% endfor %}
                 </select>
             </div>
 
-            <div class="col-lg-6 col-md-12" >
-                <div class="col-12">
-                    <form class="form-inline" data-action="submit->new-recipe#add_ingredient">
-                        <select class="form-control" id="ingredient_select" data-target="new-recipe.select">
+            <div class="col">
+                <div>
+                    <form class="form-inline" data-action="submit->simple-calculator#add_ingredient">
+                        <select class="form-control" id="ingredient_select" data-target="simple-calculator.select">
                         {% for ingredient in ingredients: %}
                             <option name='{{ingredient.name}}' value="{{ingredient.id}}">{{ingredient.name}}</option>
                         {% endfor %}
                         </select>
 
                         <input type="submit" class="btn btn-primary" value="Přidat surovinu" />
-                        <i style="font-size: 1.4rem; margin-left: 1.7rem;" class="fa fa-info-circle" data-action="mouseover->new-recipe-help#show_help mouseout->new-recipe-help#hide_help"></i>
                     </form>
                 </div>
 
-                <div class="col-11">
-                    <table class="table" data-target="new-recipe.ingredientTable">
+                <div>
+                    <table class="table" data-target="simple-calculator.ingredientTable">
                         <tr>
                             <th>{{ texts.title }}</th>
                             <th>{{ texts.energy_100 }}</th>
@@ -45,18 +43,25 @@
                             <th></th>
                         </tr>
                     </table>
-                </div>
 
-                <div class="col-12">
-                    <form class="form-inline" data-action="submit->new-recipe#calculate_recipe">
-                        <label >{{ texts.diet_name}}</label>
-                        <select class="form-control" data-target="new-recipe.selectDiet">
-                        {% for diet in diets: %}
-                            <option value="{{diet.id}}">{{ diet.name }}</option>
-                        {% endfor %}
-                        </select>
+                    <table class="table">
+                        <tr>
+                            <th>{{ texts.energy_simple }}</th>
+                            <th>{{ texts.protein_simple }}</th>
+                            <th>{{ texts.fat_simple }}</th>
+                            <th>{{ texts.sugar_simple }}</th> 
+                            <th>{{ texts.amount_simple }}</th> 
+                        </tr>
+                        <tr data-target="simple-calculator.totals"></tr>
+                    </table>
+
+
+                    <form class="form-inline" data-action="submit->simple-calculator#calculate_recipe">
                         <input type="submit" class="btn btn-primary"  value="{{ texts.calc_amount }}" />
                     </form>
+                </div>
+
+                <div>
                     <div class="data-source-aknowledgement">
                         Zdroje některých sdílených surovin:
                         <ul>
@@ -64,24 +69,8 @@
                             Na základě dat z NutriDatabaze.cz, verze 7.16, ÚZEI, Praha, www.nutridatabaze.cz/.
                             </li>
                         </ul>
-
                     </div>
                 </div>
-            </div>
-
-            
-            <div class="col-lg-6 col-md-12">
-                <div data-target="new-recipe-help.help"></div>
-
-                <div class="recipe__loader" data-target="new-recipe.loader"></div>
-
-                <div class="recipe__wrong" data-target="new-recipe.wrongRecipe">
-                    <span>{{ texts.recipe_impossible }}</span>
-                </div>
-
-                <div class="recipe__right" data-target="new-recipe.recipe"></div>
 
             </div>
-        </div>
-    </div>
 {% endblock %}
