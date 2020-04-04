@@ -8,7 +8,11 @@ from app.models.ingredients import Ingredient
 
 class SimpleCalculatorView(FlaskView):
     def show(self):
-        ingredients = Ingredient.load_all_by_author(current_user.username)
         shared_ingredients = Ingredient.load_all_shared(renamed=True)
-        all_ingredients = ingredients + shared_ingredients
+
+        if current_user.is_authenticated:
+            ingredients = Ingredient.load_all_by_author(current_user.username)
+            all_ingredients = ingredients + shared_ingredients
+        else:
+            all_ingredients = shared_ingredients
         return template("simple_calculator/show.html.j2", ingredients=all_ingredients)
