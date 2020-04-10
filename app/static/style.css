@@ -1,74 +1,8 @@
-/*root*/
-
-:root{
-    --color_error: #CC0000; /* Red */
-    --color_success: #007E33; /* Green */
-    --color_warning: #FF8800; /* Orange */
-    --color_info: grey; /* Grey */
-    --color_debug: pink; /* Pink */
-
-    --color_loader_outer: #f3f3f3; /* Light Grey */
-    --color_loader_inner: #4285F4; /* Blue */
-
-    --bgcolor_mainIngredient: #00C851; /* Light Green */
-    --bgcolor_fixedIngredient: #CFBDA3; /* Grey */
-
-    --color_icon_remove: #8b0000; /* Dark Red */
-
-    --color_icon_disapprove: #8b0000;
-    --color_icon_approve: #00C851;
-
-    --color_inactive: grey;
-    --bgcolor_inactive: lightgrey;
-
-    --bgcolor_totals: lightgrey;
-
-    --logo-dark-blue: #0177EA;
-    --logo-light-blue: #ABF2FD;
-    --logo-light-grey: #F8FEFF;
-    --logo-white: #F8FEFF;
-    --logo-light-green: #D0E3D6;
-
-}
-
+/* root */
+@import "colors.css";
 
 /* icons */
-
-i:not(.disabled) {
-  cursor: pointer;
-}
-
-i.fa-file-pdf {
-  color: red;
-  font-size: 1.5rem;
-  margin-left: 0.5rem;
-}
-
-i.remove {
-    color: var(--color_icon_remove);
-    font-size: 1rem;
-}
-
-i.disapprove {
-  color: var(--color_icon_disapprove);
-  font-size: 2rem;
-}
-
-i.approve {
-  color: var(--color_icon_approve);
-  font-size: 2rem;
-}
-
-i.fa-question-circle {
-  font-size: 1.3rem;
-  margin-top: 0.1rem;
-}
-
-i.user {
-  font-size: 1.4rem;
-  margin-top: 0.1rem;
-  /*margin-left: 1rem;*/
-}
+@import "icons.css";
 
 /* images */
 img.logo {
@@ -81,8 +15,8 @@ img.logo {
 /* forms */
 
 input{
-	margin-top: 5px;
-	margin-bottom: 5px;
+	margin-top: 0.3rem;
+	margin-bottom: 0.3rem;
 }
 
 .form-inline > * {
@@ -94,16 +28,17 @@ form ul.errors{
 }
 
 form ul.errors li.warning{
-    color: var(--color_warning);
+    color: var(--palette-orange);
+    font-weight: bold;
 }
 
 /* New recipe */
 
-tr[data-main="true"] {
-    background-color: var(--bgcolor_mainIngredient);
+[data-main="true"] {
+    background-color: var(--logo-light-green);
 }
-tr[data-fixed="true"] {
-    background-color: var(--bgcolor_fixedIngredient);
+[data-fixed="true"] {
+    background-color: var(--color-grey);
 }
 
 div.recipe__wrong{
@@ -125,13 +60,13 @@ div.recipe__wrong{
 
 .recipe__loader {
     display: none;
-    border: 16px solid var(--color_loader_outer); 
-    border-top: 16px solid var(--color_loader_inner); 
+    border: 16px solid var(--logo-light-grey);
+    border-top: 16px solid var(--logo-dark-blue);
     border-radius: 50%;
-    width: 200px;
-    height: 200px;
+    width: 15rem;
+    height: 15rem;
     animation: spin 2s linear infinite;
-    margin: 40px auto;
+    margin: 5rem auto;
 }
 
 @keyframes spin {
@@ -152,20 +87,10 @@ div.recipe__wrong{
 /* All diets */
 
 table#diets tr th.diet{
-    background-color: var(--bgcolor_mainIngredient);
-    margin-right: 0px;
+    background-color: var(--logo-light-green);
+    margin-right: 0rem;
     padding-right: 0px;
     border-radius: 4px;
-}
-
-/* Help */
-.tr-mainIngredient {
-    background-color: var(--bgcolor_mainIngredient);
-}
-
-
-.tr-fixedIngredient {
-    background-color: var(--bgcolor_fixedIngredient);
 }
 
 
@@ -201,23 +126,23 @@ div.flashes ul li{
 }
 
 div.flashes ul li.error{
-    color: var(--color_error);
+    color: var(--error);
 }
 
 div.flashes ul li.success{
-    color: var(--color_success);
+    color: var(--success);
 }
 
 div.flashes ul li.info{
-    color: var(--color_info);
+    color: var(--info);
 }
 
 div.flashes ul li.warning{
-    color: var(--color_warning);
+    color: var(--warning);
 }
 
 div.flashes ul li.debug{
-    color: var(--color_debug);
+    color: var(--debug);
 }
 
 /* Footer */
@@ -227,14 +152,14 @@ div.flashes ul li.debug{
     left: 0;
     bottom: 0;
     width: 100%;
-    color: var(--color_info);
+    color: var(--info);
     font-size: 0.7rem;
     text-align: center;
     opacity: 0.7;
 }
 
 .data-source-aknowledgement {
-    color: var(--color_info);
+    color: var(--info);
     font-size: 0.8rem;
     text-align: left;
     opacity: 0.9;
@@ -326,4 +251,52 @@ div.flashes ul li.debug{
 
 .admin_warning {
   text-align: center;
+}
+
+.totals {
+    background-color: var(--color-grey);
+}
+
+a.info {
+  color: var(--color-grey);
+}
+
+a.info:hover {
+  color: var(--logo-dark-blue);
+}
+
+.no-decoration:hover {
+  text-decoration: none;
+}
+
+.no-list {
+  list-style: none
+}
+
+.hidden {
+  display: none;
+}
+
+tr.inactive {
+  background-color: var(--inactive-bg);
+  color: var(--inactive);
+}
+
+tr.inactive a.inactive {
+  color: var(--inactive);
+}
+
+.dev-badge {
+  margin-left: 2rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: var(--logo-light-green);
+}
+
+.navbar div.navbar-divider {
+  width: 2rem;
+}
+
+.btn-float-right{
+  float: right;
 }

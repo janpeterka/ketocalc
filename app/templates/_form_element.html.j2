@@ -14,7 +14,7 @@
   {% if errors and field.errors %}
     <ul class=errors>
     {% for error in field.errors %}
-      <li style="list-style: none" class="warning">{{ error }}</li>
+      <li class="warning no-list">{{ error }}</li>
     {% endfor %}
     </ul>
   {% endif %}

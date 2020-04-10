@@ -12,12 +12,12 @@
 		<h2> Nový recept </h2>
 		<h3>Typy surovin:</h3>
 		<ul>
-			<li class="tr-mainIngredient">Hlavní surovina <i class="fa fa-hospital-symbol disabled"></i></li>
+			<li data-main="true">Hlavní surovina <i class="fa fa-hospital-symbol disabled"></i></li>
 				<ul>
 					<li>Hlavní surovina může být <strong>maximálně jedna</strong></li>
 					<li>Množství hlavní suroviny bude možné <storong> upravovat </storong> na stránce výpočtu</li>
 				</ul>
-			<li class="tr-fixedIngredient">Fixní surovina <i class="fa fa-thumbtack disabled"></i></li>
+			<li data-fixed="true">Fixní surovina <i class="fa fa-thumbtack disabled"></i></li>
 				<ul>
 					<li>Fixních surovin může být libovolné množství</li>
 					<li>Množství (gramy) fixních surovin zůstává pořád stejné</li>
@@ -28,7 +28,7 @@
 					<li>Množství se přepočítává podle množství hlavní suroviny</li>
 				</ul>
 		</ul>
-		Surovinu je možné odebrat kliknutím na ikonu <i class="fa fa-times disabled"></i>
+		Surovinu je možné odebrat kliknutím na ikonu <i class="remove fa fa-times disabled"></i>
 
 		<h3>Výsledek výpočtu a ukládání receptu</h3>
 		<p>Při vypočtení možného receptu se ukáže množství pro celou dietu.<br>

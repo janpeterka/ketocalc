@@ -5,11 +5,11 @@
     <td>{{ ingredient.fat }}</td>
     <td>{{ ingredient.sugar }}</td>
     <td>
-        <i data-action="click->new-recipe#toggle_fixed_ingredient" data-id="{{ ingredient.id }}"
-           class="set_fixed fas fa-thumbtack"></i>
-
         <i data-action="click->new-recipe#set_main_ingredient" data-id="{{ ingredient.id }}"
            class="set_main fas fa-hospital-symbol"></i>
+        
+        <i data-action="click->new-recipe#toggle_fixed_ingredient" data-id="{{ ingredient.id }}"
+           class="set_fixed fas fa-thumbtack"></i>
 
         <i data-action="click->new-recipe#remove_ingredient" data-id="{{ ingredient.id }}"
            class="remove fa fa-times"></i>

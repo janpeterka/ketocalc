@@ -1,0 +1,32 @@
+:root{
+    /* Old colors */
+    --error: #CC0000;
+    --success: #007E33;
+    --warning: #FF8800; 
+    --info: grey;
+    --debug: pink;
+
+    --icon_remove: #8b0000;
+    --icon_disapprove: #8b0000;
+    --icon_approve: #00C851;
+
+    --inactive: grey;
+    --inactive-bg: lightgrey;
+
+    /*New colors*/
+    /* From logo */
+    --logo-dark-blue: #0177EA;
+    --logo-light-blue: #ABF2FD;
+    --logo-light-green: #D0E3D6;
+    --logo-light-grey: #F8FEFF;
+    --logo-white: #F8FEFF;
+
+    /* Added based on logo-dark-blue*/
+    --palette-orange: #EA7401;
+    --palette-middle-blue: #2090FE;
+    --palette-purple: #0103EA;
+    --palette-cyan: #01EAE9;
+
+    /* Other */
+    --color-grey: #C1C2C4;
+}
