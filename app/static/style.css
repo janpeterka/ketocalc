@@ -22,6 +22,13 @@
     --bgcolor_inactive: lightgrey;
 
     --bgcolor_totals: lightgrey;
+
+    --logo-dark-blue: #0177EA;
+    --logo-light-blue: #ABF2FD;
+    --logo-light-grey: #F8FEFF;
+    --logo-white: #F8FEFF;
+    --logo-light-green: #D0E3D6;
+
 }
 
 
@@ -50,6 +57,25 @@ i.disapprove {
 i.approve {
   color: var(--color_icon_approve);
   font-size: 2rem;
+}
+
+i.fa-question-circle {
+  font-size: 1.3rem;
+  margin-top: 0.1rem;
+}
+
+i.user {
+  font-size: 1.4rem;
+  margin-top: 0.1rem;
+  /*margin-left: 1rem;*/
+}
+
+/* images */
+img.logo {
+  height: 3.1rem;
+  width: auto;
+  padding: 0px;
+  margin-right: 1rem;
 }
 
 /* forms */
@@ -113,6 +139,7 @@ div.recipe__wrong{
     100% { transform: rotate(360deg); }
 }
 
+/* New recipe sliders */
 
 #sliderVal{
     font-weight: bold;
