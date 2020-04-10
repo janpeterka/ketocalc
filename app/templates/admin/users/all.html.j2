@@ -17,8 +17,10 @@
                     <th>login count</th>
 
                     <th>diet count</th>
-                    
+                
                     <th>recipe count</th>
+                
+                    <th>ingredient count</th>
                 </tr>
                 </thead>
 
@@ -35,6 +37,7 @@
                     <td>{{ user.login_count }}</td>
                     <td>{{ user.diets|length }}</td>
                     <td>{{ user.recipes|length }}</td>
+                    <td>{{ user.ingredients|length }}</td>
                 </tr>
                 {% endfor %}
             </table>
