@@ -1,14 +1,15 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container">
-    {% include '_navbar_brand.html.j2' %}
-
     <button class="navbar-toggler" type="button"
             data-toggle="collapse"data-target=".navbar-collapse"
-            aria-controls="navbar_main" aria-expanded="false" aria-label="Toggle navigation">
+            aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
+    
 
-    <div id="navbar_main" class="collapse navbar-collapse">
+    {% include '_navbar_brand.html.j2' %}
+
+    <div id="navbar" class="collapse navbar-collapse">
 
       <ul class="nav navbar-nav navbar-center">
         <li class="nav-item">
@@ -49,18 +50,21 @@
       </ul>
 
       <ul class="nav navbar-nav navbar-right ml-auto">
-        <li class="nav-item">
-          <a class="nav-link small" href="{{ url_for('SupportView:feedback') }}">Připomínky</a>
+        <li class="nav-item dropdown">
+          <a class="nav-link" href="#" id="navbarDropdown" role="button"
+             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+             <i class="fa fa-question-circle"></i>
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="{{ url_for('SupportView:help')}}">Nápověda</a>
+            <a class="dropdown-item" href="{{ url_for('SupportView:feedback') }}">Připomínky</a>
+          </div>
         </li>
-        <li class="nav-item">
-          <a class="nav-link small" href="{{ url_for('SupportView:help')}}">Nápověda</a>
-        </li>
+
         <li class="nav-item">
           <a class="nav-link" href="/logout">Odhlásit se</a>
         </li>
       </ul>
-
     </div>
-
   </div>
 </nav>
