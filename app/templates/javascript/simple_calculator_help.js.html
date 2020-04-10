@@ -1,0 +1,34 @@
+<script type="text/javascript">
+    application.register("simple-calculator-help", class extends Stimulus.Controller {
+      static get targets() {
+        return ["help"]
+      }
+
+      connect() {
+      	$(this.helpTarget).hide()
+      	this.helpTarget.innerHTML = `
+      	<div name="newrecipe">
+		<h2> Jak funguje tato kalkulačka recept? </h2>
+		<ol>
+			<li> Přidejte suroviny </li>
+			<li> Nastavte jejich množství </li>
+			<li> Klikněte na tlačítko "Spočítat množství!" </li>
+			<li> Zobrazí se vám celkové množství jednotlivých složek </li>
+		</ol>
+		<ul>
+			<li> Pokud můžete vybírat pouze sdílené suroviny, nejspíš jste se zapomněli přihlásit. </li>
+		</ul>
+		</div>
+	`
+      }
+
+      show_help() {
+      	$(this.helpTarget).show()
+      }
+
+      hide_help() {
+      	$(this.helpTarget).hide()
+      }
+    })
+
+</script>

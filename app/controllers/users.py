@@ -75,7 +75,11 @@ class UsersView(FlaskView):
     @admin_required
     def show_by_id(self, id):
         user = User.load(id)
-        return template("users/show.html.j2", user=user)
+        if user:
+            return template("users/show.html.j2", user=user)
+        else:
+            flash("Uživatel neexistuje", "error")
+            return redirect(url_for("UsersView:show_all"))
 
     @admin_required
     def show_all(self):
