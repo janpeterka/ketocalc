@@ -6,10 +6,11 @@
 {% block script %}
     {% include 'javascript/stimulus.js.html' %}
     {% include 'javascript/simple_calculator.js.html' %}
+    {% include 'javascript/simple_calculator_help.js.html' %}
 {% endblock %}
 
 {% block content %}
-    <div class="container" data-controller="simple-calculator">
+    <div class="container" data-controller="simple-calculator simple-calculator-help">
         <div class="row">
             <div class="hidden" style="display: none">
                 <select data-target="simple-calculator.baseSelect">
@@ -29,6 +30,7 @@
                         </select>
 
                         <input type="submit" class="btn btn-primary" value="Přidat surovinu" />
+                        <i style="font-size: 1.4rem; margin-left: 1.7rem;" class="fa fa-info-circle" data-action="mouseover->simple-calculator-help#show_help mouseout->simple-calculator-help#hide_help"></i>
                     </form>
                 </div>
 
@@ -62,15 +64,12 @@
                 </div>
 
                 <div>
-                    <div class="data-source-aknowledgement">
-                        Zdroje některých sdílených surovin:
-                        <ul>
-                            <li>
-                            Na základě dat z NutriDatabaze.cz, verze 7.16, ÚZEI, Praha, www.nutridatabaze.cz/.
-                            </li>
-                        </ul>
-                    </div>
+                    {% include 'ingredients/_data_source_aknowledgement.html.j2' %}
                 </div>
 
+                <div data-target="simple-calculator-help.help"></div>
+
             </div>
+        </div>
+    </div>
 {% endblock %}

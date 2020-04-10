@@ -57,15 +57,8 @@
                         </select>
                         <input type="submit" class="btn btn-primary"  value="{{ texts.calc_amount }}" />
                     </form>
-                    <div class="data-source-aknowledgement">
-                        Zdroje některých sdílených surovin:
-                        <ul>
-                            <li>
-                            Na základě dat z NutriDatabaze.cz, verze 7.16, ÚZEI, Praha, www.nutridatabaze.cz/.
-                            </li>
-                        </ul>
 
-                    </div>
+                    {% include 'ingredients/_data_source_aknowledgement.html.j2' %}
                 </div>
             </div>
 
