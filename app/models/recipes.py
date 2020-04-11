@@ -31,7 +31,7 @@ class Recipe(db.Model, BaseMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
-    type = db.Column(db.Enum("small", "big"), nullable=False)
+    type = db.Column(db.Enum("small", "big", "full"), nullable=False, default="full")
 
     created = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
     last_updated = db.Column(db.DateTime, nullable=True, onupdate=datetime.datetime.now)
