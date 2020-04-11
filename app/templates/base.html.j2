@@ -78,7 +78,7 @@
     {% endblock %}
 
     {% if config.APP_STATE == "development" %}
-        <span class="alert alert-success" role="alert" style="margin-left: 2rem; border-radius: 0.5rem"><strong>DEV</strong></span>
+        <span class="dev-badge"><strong>DEV</strong></span>
     {% endif %}
     <div id="content">{% block content %}{% endblock %}</div>
     <div class="footer">

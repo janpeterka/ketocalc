@@ -10,15 +10,8 @@
 {% block style %}
     {% if is_print %}
         <style type="text/css" media="screen">
-            .totals {
-                background-color: var(--bgcolor_totals);
-            }      
-
             @media print {
                 body {-webkit-print-color-adjust: exact;}
-                .totals {
-                    background-color: var(--bgcolor_totals);
-                }
             } 
         </style>
     {% endif %}

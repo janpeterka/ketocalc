@@ -1,5 +1,5 @@
 icons = {
-    "user": '<i class="material-icons">account_circle</i>',
+    "user": '<i class="material-icons user">account_circle</i>',
     "edit": '<i class="fas fa-pencil-alt"></i>',
     "delete": '<i class="fas fa-trash"></i>',
     "print": '<i class="fas fa-print"></i>',

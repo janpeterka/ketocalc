@@ -43,7 +43,7 @@
                 </tr>
 
                 {% for log in logs: %}
-                    <tr style="border: 1px solid black" class="{{ log.level }}">
+                    <tr class="{{ log.level }}">
                         <td>{{ log.timestamp }}</td>
                         <td>{{ log.level }} </td>
                         <td>{{ log.module }}</td>
