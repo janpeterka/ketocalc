@@ -7,7 +7,7 @@ from app import db
 from app.models.base_mixin import BaseMixin
 
 from app.models.ingredients import Ingredient
-from app.models.recipes_has_ingredients import RecipesHasIngredient
+from app.models.recipes_has_ingredients import RecipeHasIngredients
 
 
 class Recipe(db.Model, BaseMixin):
@@ -41,7 +41,7 @@ class Recipe(db.Model, BaseMixin):
     diet = db.relationship("Diet", secondary="diets_has_recipes", uselist=False)
     ingredients = db.relationship(
         "Ingredient",
-        primaryjoin="and_(Recipe.id == remote(RecipesHasIngredient.recipes_id), foreign(Ingredient.id) == RecipesHasIngredient.ingredients_id)",
+        primaryjoin="and_(Recipe.id == remote(RecipeHasIngredients.recipes_id), foreign(Ingredient.id) == RecipeHasIngredients.ingredients_id)",
         viewonly=True,
         order_by="Ingredient.name",
     )
@@ -145,8 +145,8 @@ class Recipe(db.Model, BaseMixin):
 
     def remove(self):
         # TODO: - to improve w/ orphan cascade (80)
-        ingredients = db.session.query(RecipesHasIngredient).filter(
-            RecipesHasIngredient.recipes_id == self.id
+        ingredients = db.session.query(RecipeHasIngredients).filter(
+            RecipeHasIngredients.recipes_id == self.id
         )
         for i in ingredients:
             db.session.delete(i)
