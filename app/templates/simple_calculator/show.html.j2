@@ -56,9 +56,24 @@
                     <tr data-target="simple-calculator.totals"></tr>
                 </table>
 
-                <form class="form-inline" data-action="submit->simple-calculator#save_recipe">
-                    <input type="submit" class="btn btn-primary"  value="{{ texts.recipe_save }}" />
-                </form>
+                <div class="col-12">
+                    {% if current_user.is_authenticated %}
+                        <form class="form-inline" data-action="submit->simple-calculator#save_recipe">
+                            <select class="form-control" data-target="simple-calculator.recipeDiet">
+                            {% for diet in diets: %}
+                                <option value="{{diet.id}}">{{ diet.name }}</option>
+                            {% endfor %}
+                            </select>
+
+                            <label>Název receptu</label>
+                            <input type="text" class="form-control" data-target="simple-calculator.recipeName" required />
+                            <input type="submit" class="btn btn-primary" value="{{ texts.recipe_save }}" />
+                        </form>
+                    {% endif %}
+
+                    {% include 'ingredients/_data_source_aknowledgement.html.j2' %}
+                </div>
+
             </div>
 
             {% include 'ingredients/_data_source_aknowledgement.html.j2' %}

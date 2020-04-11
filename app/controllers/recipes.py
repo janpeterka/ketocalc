@@ -53,7 +53,8 @@ class RecipesView(BaseRecipesView):
     @route("<id>/edit", methods=["POST"])
     def post_edit(self, id):
         self.recipe.name = request.form["name"]
-        self.recipe.type = request.form["size"]
+        if "size" in request.form:
+            self.recipe.type = request.form["size"]
         self.recipe.edit()
         self.recipe.refresh()
         flash("Recept byl upraven.", "success")

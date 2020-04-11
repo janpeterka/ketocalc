@@ -3,7 +3,7 @@
       static get targets() {
         return [
           "baseSelect",
-          "select", "ingredientTable",
+          "select", "ingredientTable", "recipeDiet", "recipeName",
           "totals"
           ]
       }
@@ -104,6 +104,29 @@
         $(this.totalsTarget).empty();
         this._set_totals(totals)
       }
+
+    save_recipe(e){
+      e.preventDefault();
+      console.log(this.recipeDietTarget)
+      console.log(this.recipeDietTarget.dataset)
+
+      fetch("{{ url_for('RecipesView:saveRecipeAJAX') }}", {
+        method: 'POST',
+        body: JSON.stringify({
+          'ingredients' : this._get_currently_selected(),
+          'dietID' : this.recipeDietTarget.value,
+          'name' : this.recipeNameTarget.value,
+          'size' : "full"
+        }),
+        headers: {'Content-Type': 'application/json,charset=UTF-8'},
+      })
+      .then((response) => {
+        return response.text(); })
+      .then((response) => {
+        var pathname = window.location.pathname.split("/")[0];
+        window.location.replace(pathname + response);
+      })
+    }
 
     _set_totals(totals){
       var html =
