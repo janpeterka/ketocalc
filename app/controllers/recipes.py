@@ -9,7 +9,7 @@ from app.models.recipes import Recipe
 from app.models.diets import Diet
 from app.models.users import User
 from app.models.ingredients import Ingredient
-from app.models.recipes_has_ingredients import RecipesHasIngredient
+from app.models.recipes_has_ingredients import RecipeHasIngredients
 from app.controllers.base_recipes import BaseRecipesView
 
 
@@ -53,7 +53,8 @@ class RecipesView(BaseRecipesView):
     @route("<id>/edit", methods=["POST"])
     def post_edit(self, id):
         self.recipe.name = request.form["name"]
-        self.recipe.type = request.form["size"]
+        if "size" in request.form:
+            self.recipe.type = request.form["size"]
         self.recipe.edit()
         self.recipe.refresh()
         flash("Recept byl upraven.", "success")
@@ -106,7 +107,7 @@ class RecipesView(BaseRecipesView):
 
         ingredients = []
         for temp_i in temp_ingredients:
-            rhi = RecipesHasIngredient()
+            rhi = RecipeHasIngredients()
             rhi.ingredients_id = temp_i["id"]
             rhi.amount = temp_i["amount"]
             ingredients.append(rhi)

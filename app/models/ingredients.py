@@ -9,7 +9,7 @@ from app import db
 from app.models.base_mixin import BaseMixin
 
 import app.models as models
-from app.models.recipes_has_ingredients import RecipesHasIngredient
+from app.models.recipes_has_ingredients import RecipeHasIngredients
 
 # from app.models.users import User
 
@@ -52,7 +52,7 @@ class Ingredient(db.Model, BaseMixin):
 
     recipes = db.relationship(
         "Recipe",
-        primaryjoin="and_(Ingredient.id == remote(RecipesHasIngredient.ingredients_id), foreign(Recipe.id) == RecipesHasIngredient.recipes_id)",
+        primaryjoin="and_(Ingredient.id == remote(RecipeHasIngredients.ingredients_id), foreign(Recipe.id) == RecipeHasIngredients.recipes_id)",
         viewonly=True,
         order_by="Recipe.name",
     )
@@ -101,9 +101,9 @@ class Ingredient(db.Model, BaseMixin):
 
     def load_amount_by_recipe(self, recipe_id):
         rhi = (
-            db.session.query(RecipesHasIngredient)
-            .filter(RecipesHasIngredient.recipes_id == recipe_id)
-            .filter(RecipesHasIngredient.ingredients_id == self.id)
+            db.session.query(RecipeHasIngredients)
+            .filter(RecipeHasIngredients.recipes_id == recipe_id)
+            .filter(RecipeHasIngredients.ingredients_id == self.id)
             .first()
         )
         return rhi.amount

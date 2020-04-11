@@ -11,65 +11,74 @@
 
 {% block content %}
     <div class="container" data-controller="simple-calculator simple-calculator-help">
-        <div class="row">
-            <div class="hidden">
-                <select data-target="simple-calculator.baseSelect">
+        <div class="hidden">
+            <select data-target="simple-calculator.baseSelect">
+                {% for ingredient in ingredients: %}
+                    <option name='{{ingredient.name}}' value="{{ingredient.id}}">{{ingredient.name}}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col">
+            <div>
+                <form class="form-inline" data-action="submit->simple-calculator#add_ingredient">
+                    <select class="form-control" id="ingredient_select" data-target="simple-calculator.select">
                     {% for ingredient in ingredients: %}
                         <option name='{{ingredient.name}}' value="{{ingredient.id}}">{{ingredient.name}}</option>
                     {% endfor %}
-                </select>
+                    </select>
+
+                    <input type="submit" class="btn btn-primary" value="Přidat surovinu" />
+                    <i class="help fa fa-info-circle" data-action="mouseover->simple-calculator-help#show_help mouseout->simple-calculator-help#hide_help"></i>
+                </form>
             </div>
 
-            <div class="col">
-                <div>
-                    <form class="form-inline" data-action="submit->simple-calculator#add_ingredient">
-                        <select class="form-control" id="ingredient_select" data-target="simple-calculator.select">
-                        {% for ingredient in ingredients: %}
-                            <option name='{{ingredient.name}}' value="{{ingredient.id}}">{{ingredient.name}}</option>
-                        {% endfor %}
-                        </select>
+            <div>
+                <table class="table" data-target="simple-calculator.ingredientTable">
+                    <tr>
+                        <th>{{ texts.title }}</th>
+                        <th>{{ texts.energy_100 }}</th>
+                        <th>{{ texts.protein_100 }}</th>
+                        <th>{{ texts.fat_100 }}</th>
+                        <th>{{ texts.sugar_100}}</th>
+                        <th></th>
+                    </tr>
+                </table>
 
-                        <input type="submit" class="btn btn-primary" value="Přidat surovinu" />
-                        <i class="help fa fa-info-circle" data-action="mouseover->simple-calculator-help#show_help mouseout->simple-calculator-help#hide_help"></i>
-                    </form>
-                </div>
+                <table class="table">
+                    <tr>
+                        <th>{{ texts.energy_simple }}</th>
+                        <th>{{ texts.protein_simple }}</th>
+                        <th>{{ texts.fat_simple }}</th>
+                        <th>{{ texts.sugar_simple }}</th> 
+                        <th>{{ texts.amount_simple }}</th> 
+                    </tr>
+                    <tr data-target="simple-calculator.totals"></tr>
+                </table>
 
-                <div>
-                    <table class="table" data-target="simple-calculator.ingredientTable">
-                        <tr>
-                            <th>{{ texts.title }}</th>
-                            <th>{{ texts.energy_100 }}</th>
-                            <th>{{ texts.protein_100 }}</th>
-                            <th>{{ texts.fat_100 }}</th>
-                            <th>{{ texts.sugar_100}}</th>
-                            <th></th>
-                        </tr>
-                    </table>
+                <div class="col-12">
+                    {% if current_user.is_authenticated %}
+                        <form class="form-inline" data-action="submit->simple-calculator#save_recipe">
+                            <select class="form-control" data-target="simple-calculator.recipeDiet">
+                            {% for diet in diets: %}
+                                <option value="{{diet.id}}">{{ diet.name }}</option>
+                            {% endfor %}
+                            </select>
 
-                    <table class="table">
-                        <tr>
-                            <th>{{ texts.energy_simple }}</th>
-                            <th>{{ texts.protein_simple }}</th>
-                            <th>{{ texts.fat_simple }}</th>
-                            <th>{{ texts.sugar_simple }}</th> 
-                            <th>{{ texts.amount_simple }}</th> 
-                        </tr>
-                        <tr data-target="simple-calculator.totals"></tr>
-                    </table>
+                            <label>Název receptu</label>
+                            <input type="text" class="form-control" data-target="simple-calculator.recipeName" required />
+                            <input type="submit" class="btn btn-primary" value="{{ texts.recipe_save }}" />
+                        </form>
+                    {% endif %}
 
-
-                    <form class="form-inline" data-action="submit->simple-calculator#calculate_recipe">
-                        <input type="submit" class="btn btn-primary"  value="{{ texts.calc_amount }}" />
-                    </form>
-                </div>
-
-                <div>
                     {% include 'ingredients/_data_source_aknowledgement.html.j2' %}
                 </div>
 
-                <div data-target="simple-calculator-help.help"></div>
-
             </div>
+
+            {% include 'ingredients/_data_source_aknowledgement.html.j2' %}
+
+            <div data-target="simple-calculator-help.help"></div>
         </div>
     </div>
 {% endblock %}

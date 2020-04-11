@@ -16,6 +16,10 @@ class SimpleCalculatorView(FlaskView):
         if current_user.is_authenticated:
             ingredients = Ingredient.load_all_by_author(current_user.username)
             all_ingredients = ingredients + shared_ingredients
+            diets = current_user.diets
         else:
             all_ingredients = shared_ingredients
-        return template("simple_calculator/show.html.j2", ingredients=all_ingredients)
+            diets = None
+        return template(
+            "simple_calculator/show.html.j2", ingredients=all_ingredients, diets=diets
+        )

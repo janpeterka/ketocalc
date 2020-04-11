@@ -7,7 +7,7 @@ from app import db
 from app.models.base_mixin import BaseMixin
 
 from app.models.ingredients import Ingredient
-from app.models.recipes_has_ingredients import RecipesHasIngredient
+from app.models.recipes_has_ingredients import RecipeHasIngredients
 
 
 class Recipe(db.Model, BaseMixin):
@@ -31,7 +31,7 @@ class Recipe(db.Model, BaseMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
-    type = db.Column(db.Enum("small", "big"), nullable=False)
+    type = db.Column(db.Enum("small", "big", "full"), nullable=False, default="full")
 
     created = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
     last_updated = db.Column(db.DateTime, nullable=True, onupdate=datetime.datetime.now)
@@ -41,7 +41,7 @@ class Recipe(db.Model, BaseMixin):
     diet = db.relationship("Diet", secondary="diets_has_recipes", uselist=False)
     ingredients = db.relationship(
         "Ingredient",
-        primaryjoin="and_(Recipe.id == remote(RecipesHasIngredient.recipes_id), foreign(Ingredient.id) == RecipesHasIngredient.ingredients_id)",
+        primaryjoin="and_(Recipe.id == remote(RecipeHasIngredients.recipes_id), foreign(Ingredient.id) == RecipeHasIngredients.ingredients_id)",
         viewonly=True,
         order_by="Ingredient.name",
     )
@@ -50,12 +50,15 @@ class Recipe(db.Model, BaseMixin):
     def load(recipe_id):
         recipe = db.session.query(Recipe).filter(Recipe.id == recipe_id).first()
 
+        coef = 1
+
         if recipe.type == "big":
             coef = float(recipe.diet.big_size / 100)
-        else:
+        elif recipe.type == "small":
             coef = float(recipe.diet.small_size / 100)
 
         for ingredient in recipe.ingredients:
+            ingredient.amount = ingredient.load_amount_by_recipe(recipe.id)
             ingredient.amount = (
                 float(
                     math.floor(
@@ -73,9 +76,10 @@ class Recipe(db.Model, BaseMixin):
         Returns:
             json -- recipe, totals
         """
+        coef = 1
         if self.type == "big":
             coef = float(self.diet.big_size / 100)
-        else:
+        elif self.type == "small":
             coef = float(self.diet.small_size / 100)
 
         for ingredient in self.ingredients:
@@ -145,8 +149,8 @@ class Recipe(db.Model, BaseMixin):
 
     def remove(self):
         # TODO: - to improve w/ orphan cascade (80)
-        ingredients = db.session.query(RecipesHasIngredient).filter(
-            RecipesHasIngredient.recipes_id == self.id
+        ingredients = db.session.query(RecipeHasIngredients).filter(
+            RecipeHasIngredients.recipes_id == self.id
         )
         for i in ingredients:
             db.session.delete(i)
@@ -171,9 +175,10 @@ class Recipe(db.Model, BaseMixin):
         totals.sugar = 0
         totals.amount = 0
 
+        coef = 1
         if self.type == "big":
             coef = float(self.diet.big_size / 100)
-        else:
+        elif self.type == "small":
             coef = float(self.diet.small_size / 100)
 
         for ingredient in self.ingredients:
