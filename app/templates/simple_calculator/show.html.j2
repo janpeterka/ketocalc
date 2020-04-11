@@ -56,18 +56,14 @@
                     <tr data-target="simple-calculator.totals"></tr>
                 </table>
 
-
-                <form class="form-inline" data-action="submit->simple-calculator#calculate_recipe">
-                    <input type="submit" class="btn btn-primary"  value="{{ texts.calc_amount }}" />
+                <form class="form-inline" data-action="submit->simple-calculator#save_recipe">
+                    <input type="submit" class="btn btn-primary"  value="{{ texts.recipe_save }}" />
                 </form>
             </div>
 
-            <div>
-                {% include 'ingredients/_data_source_aknowledgement.html.j2' %}
-            </div>
+            {% include 'ingredients/_data_source_aknowledgement.html.j2' %}
 
             <div data-target="simple-calculator-help.help"></div>
-
         </div>
     </div>
 {% endblock %}
