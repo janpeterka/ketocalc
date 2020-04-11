@@ -50,12 +50,15 @@ class Recipe(db.Model, BaseMixin):
     def load(recipe_id):
         recipe = db.session.query(Recipe).filter(Recipe.id == recipe_id).first()
 
+        coef = 1
+
         if recipe.type == "big":
             coef = float(recipe.diet.big_size / 100)
-        else:
+        elif recipe.type == "small":
             coef = float(recipe.diet.small_size / 100)
 
         for ingredient in recipe.ingredients:
+            ingredient.amount = ingredient.load_amount_by_recipe(recipe.id)
             ingredient.amount = (
                 float(
                     math.floor(
@@ -73,9 +76,10 @@ class Recipe(db.Model, BaseMixin):
         Returns:
             json -- recipe, totals
         """
+        coef = 1
         if self.type == "big":
             coef = float(self.diet.big_size / 100)
-        else:
+        elif self.type == "small":
             coef = float(self.diet.small_size / 100)
 
         for ingredient in self.ingredients:
@@ -171,9 +175,10 @@ class Recipe(db.Model, BaseMixin):
         totals.sugar = 0
         totals.amount = 0
 
+        coef = 1
         if self.type == "big":
             coef = float(self.diet.big_size / 100)
-        else:
+        elif self.type == "small":
             coef = float(self.diet.small_size / 100)
 
         for ingredient in self.ingredients:
