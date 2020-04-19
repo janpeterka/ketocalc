@@ -13,60 +13,43 @@ img.logo {
 }
 
 /* forms */
-
 input{
 	margin-top: 0.3rem;
 	margin-bottom: 0.3rem;
 }
 
 .form-inline > * {
-   margin: 5px 3px;
-}
-
-form ul.errors{
-    /*padding-left: 0px; */
+ margin: 5px 3px;
 }
 
 form ul.errors li.warning{
-    color: var(--palette-orange);
-    font-weight: bold;
+  color: var(--palette-orange);
+  font-weight: bold;
+}
+
+/* text */
+.text-center{
+  text-align: center;
 }
 
 /* New recipe */
 
 [data-main="true"] {
-    background-color: var(--logo-light-green);
+  background-color: var(--logo-light-green);
 }
 [data-fixed="true"] {
-    background-color: var(--color-grey);
+  background-color: var(--color-grey);
 }
 
-div.recipe__wrong{
-	color: red;
-  text-align: center;
-}
-
-.recipe__wrong{
-    display: none;
-}
-
-.recipe__right{
-    display: none;
-}
-
-.container__main {
-    margin-top: 40px;
-}
-
-.recipe__loader {
-    display: none;
-    border: 16px solid var(--logo-light-grey);
-    border-top: 16px solid var(--logo-dark-blue);
-    border-radius: 50%;
-    width: 15rem;
-    height: 15rem;
-    animation: spin 2s linear infinite;
-    margin: 5rem auto;
+.loader_circular {
+  display: none;
+  border: 16px solid var(--logo-light-grey);
+  border-top: 16px solid var(--logo-dark-blue);
+  border-radius: 50%;
+  width: 15rem;
+  height: 15rem;
+  animation: spin 2s linear infinite;
+  margin: 5rem auto;
 }
 
 @keyframes spin {
@@ -75,10 +58,6 @@ div.recipe__wrong{
 }
 
 /* New recipe sliders */
-
-#sliderVal{
-    font-weight: bold;
-}
 
 .in{
     opacity: .9;
