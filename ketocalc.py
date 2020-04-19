@@ -35,8 +35,8 @@ def session_management():
 
 @application.before_request
 def log_request():
-    pattern = re.compile("^/static/([A-Za-z0-9])*$")
-    if not pattern.match(request.path):
+    pattern = re.compile("/static/")
+    if not pattern.search(request.path):
         url = request.path
         remote_addr = request.environ["REMOTE_ADDR"]
         if hasattr(current_user, "id"):
