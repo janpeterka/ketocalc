@@ -22,7 +22,7 @@ def inject_globals():
 def session_management():
     if application.config["APP_STATE"] == "shutdown" and request.path not in [
         "/shutdown",
-        "/static/style.css",
+        "/static/css/style.css",
     ]:
         return redirect("/shutdown")
     elif request.path == "/shutdown" and application.config["APP_STATE"] != "shutdown":

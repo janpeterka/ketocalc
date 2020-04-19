@@ -13,7 +13,7 @@
     --inactive: grey;
     --inactive-bg: lightgrey;
 
-    /*New colors*/
+    /* New colors */
     /* From logo */
     --logo-dark-blue: #0177EA;
     --logo-light-blue: #ABF2FD;
@@ -29,4 +29,8 @@
 
     /* Other */
     --color-grey: #C1C2C4;
+}
+
+.color-red{
+    color: var(--error);
 }
