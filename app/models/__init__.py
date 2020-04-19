@@ -3,3 +3,4 @@
 # imports automatically (because it's __init__.py file)
 
 from .diets_has_recipes import diets_has_recipes  # noqa: F401
+from .request_log import RequestLog  # noqa: F401
