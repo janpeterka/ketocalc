@@ -4,29 +4,13 @@ import types
 
 from app import db
 
-from app.models.base_mixin import BaseMixin
+from app.models.item_mixin import ItemMixin
 
 from app.models.ingredients import Ingredient
 from app.models.recipes_has_ingredients import RecipeHasIngredients
 
 
-class Recipe(db.Model, BaseMixin):
-    """[summary]
-
-    [description]
-
-    Extends:
-        Base
-
-    Variables:
-        __tablename__ {str} -- [description]
-        id {int} -- [description]
-        name {string} -- [description]
-        type {string} -- [description]
-        diet {relationship} -- [description]
-        ingredients {relationship} -- [description]
-    """
-
+class Recipe(db.Model, ItemMixin):
     __tablename__ = "recipes"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -35,8 +19,6 @@ class Recipe(db.Model, BaseMixin):
 
     created = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
     last_updated = db.Column(db.DateTime, nullable=True, onupdate=datetime.datetime.now)
-
-    view_count = db.Column(db.Integer, nullable=True, default=0)
 
     diet = db.relationship("Diet", secondary="diets_has_recipes", uselist=False)
     ingredients = db.relationship(
@@ -158,13 +140,6 @@ class Recipe(db.Model, BaseMixin):
         db.session.delete(self)
         db.session.commit()
         return True
-
-    def log_view(self):
-        if self.view_count is not None:
-            self.view_count += 1
-        else:
-            self.view_count = 1
-        self.edit()
 
     @property
     def totals(self):

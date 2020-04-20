@@ -63,8 +63,6 @@ class RecipesView(BaseRecipesView):
         return redirect(url_for("RecipesView:show", id=self.recipe.id))
 
     def show(self, id):
-        self.recipe.log_view()
-
         return template(
             "recipes/show.html.j2",
             recipe=self.recipe,
