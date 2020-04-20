@@ -1,5 +1,5 @@
 from flask import render_template as template
-from flask import request, redirect, url_for, flash, abort
+from flask import request, redirect, url_for, flash, abort, g
 
 from flask_login import login_required, current_user
 
@@ -18,7 +18,9 @@ class RecipesView(BaseRecipesView):
 
     @login_required
     def before_request(self, name, id=None):
+        g.request_item_type = "recipe"
         if id is not None:
+            g.request_item_id = id
             self.recipe = Recipe.load(id)
 
             if self.recipe is None:
@@ -61,8 +63,6 @@ class RecipesView(BaseRecipesView):
         return redirect(url_for("RecipesView:show", id=self.recipe.id))
 
     def show(self, id):
-        self.recipe.log_view()
-
         return template(
             "recipes/show.html.j2",
             recipe=self.recipe,

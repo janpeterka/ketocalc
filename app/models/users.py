@@ -10,11 +10,11 @@ from flask_login import UserMixin
 from app import db
 from app.auth import login
 
-from app.models.base_mixin import BaseMixin
+from app.models.item_mixin import ItemMixin
 from app.models.ingredients import Ingredient
 
 
-class User(db.Model, UserMixin, BaseMixin):
+class User(db.Model, UserMixin, ItemMixin):
     """User class
 
 

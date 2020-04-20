@@ -45,15 +45,17 @@ def log_request_start():
 def log_request(exception=None):
     pattern = re.compile("/static/")
     if not pattern.search(request.path):
-        duration = time.time() - g.start
-        url = request.path
-        remote_addr = request.environ["REMOTE_ADDR"]
-        if hasattr(current_user, "id"):
-            user_id = current_user.id
-        else:
-            user_id = None
+        user_id = getattr(current_user, "id", None)
+        item_type = getattr(g, "request_item_type", None)
+        item_id = getattr(g, "request_item_id", None)
+
         log = RequestLog(
-            url=url, user_id=user_id, remote_addr=remote_addr, duration=duration
+            url=request.path,
+            user_id=user_id,
+            remote_addr=request.environ["REMOTE_ADDR"],
+            item_type=item_type,
+            item_id=item_id,
+            duration=time.time() - g.start,
         )
         log.save()
 

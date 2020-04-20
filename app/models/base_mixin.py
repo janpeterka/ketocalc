@@ -76,12 +76,3 @@ class BaseMixin(object):
             db.session.rollback()
             application.logger.error("Refresh error: {}".format(e))
             return False
-
-    @property
-    def json(self):
-        attributes = []
-        for attr in self.__dict__.keys():
-            if not attr.startswith("_"):
-                attributes.append(attr)
-
-        return {attr: getattr(self, attr) for attr in attributes}

@@ -3,10 +3,9 @@ import unidecode
 
 from sqlalchemy import and_
 
-
 from app import db
 
-from app.models.base_mixin import BaseMixin
+from app.models.item_mixin import ItemMixin
 
 import app.models as models
 from app.models.recipes_has_ingredients import RecipeHasIngredients
@@ -14,7 +13,7 @@ from app.models.recipes_has_ingredients import RecipeHasIngredients
 # from app.models.users import User
 
 
-class Ingredient(db.Model, BaseMixin):
+class Ingredient(db.Model, ItemMixin):
     """Ingredient class
 
     [description]

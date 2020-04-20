@@ -1,10 +1,10 @@
 import datetime
 from app import db
 
-from app.models.base_mixin import BaseMixin
+from app.models.item_mixin import ItemMixin
 
 
-class Diet(db.Model, BaseMixin):
+class Diet(db.Model, ItemMixin):
     """Diet object
 
     Extends:
