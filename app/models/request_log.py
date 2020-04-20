@@ -13,3 +13,4 @@ class RequestLog(db.Model, BaseMixin):
     user_id = db.Column(db.String(255))
     remote_addr = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=func.now())
+    duration = db.Column(db.Float(precision=4))

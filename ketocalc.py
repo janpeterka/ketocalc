@@ -1,6 +1,9 @@
 import os
 import re
+import time
+
 from flask import request, redirect
+from flask import g
 
 from flask_login import current_user
 
@@ -34,16 +37,24 @@ def session_management():
 
 
 @application.before_request
-def log_request():
+def log_request_start():
+    g.start = time.time()
+
+
+@application.teardown_request
+def log_request(exception=None):
     pattern = re.compile("/static/")
     if not pattern.search(request.path):
+        duration = time.time() - g.start
         url = request.path
         remote_addr = request.environ["REMOTE_ADDR"]
         if hasattr(current_user, "id"):
             user_id = current_user.id
         else:
             user_id = None
-        log = RequestLog(url=url, user_id=user_id, remote_addr=remote_addr)
+        log = RequestLog(
+            url=url, user_id=user_id, remote_addr=remote_addr, duration=duration
+        )
         log.save()
 
 
