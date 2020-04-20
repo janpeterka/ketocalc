@@ -1,6 +1,6 @@
 from flask import render_template as template
 from flask import request, redirect, url_for
-from flask import abort, flash
+from flask import abort, flash, g
 
 from flask_login import login_required, current_user
 
@@ -18,7 +18,9 @@ class DietsView(FlaskView):
     decorators = [login_required]
 
     def before_request(self, name, id=None):
+        g.request_item_type = "diet"
         if id is not None:
+            g.request_item_id = id
             self.diet = Diet.load(id)
 
             if self.diet is None:
