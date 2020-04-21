@@ -5,7 +5,7 @@
 
 {% block content %}
     <div class="container">
-        <div class="col-12">
+        <div class="admin-field">
             <h1>Uživatelé</h1>
             <table class="table">
                 <thead class="thead-dark">
@@ -14,6 +14,7 @@
                     <th>name</th>
                     <th>registered at</th>
                     <th>last login at</th>
+                    <th>last activity</th>
                     <th>login count</th>
 
                     <th>diet count</th>
@@ -31,9 +32,10 @@
                             {{ user.username }}
                         </a>
                     </td>
-                    <td>{{ user.first_name +  " " + user.last_name }}</td>
+                    <td>{{ user.first_name }} {{ user.last_name }}</td>
                     <td>{{ user.created }}</td>
                     <td>{{ user.last_logged_in }}</td>
+                    <td>{{ user.last_request.url }} | {{ user.last_request.created_at }}</td>
                     <td>{{ user.login_count }}</td>
                     <td>{{ user.diets|length }}</td>
                     <td>{{ user.recipes|length }}</td>
