@@ -8,6 +8,25 @@
 
 {% block content %}
     <div class="container">
+        {% if not current_user.diets | length or not current_user.recipes | length or not current_user.ingredients | length %}
+        <div class="row">
+            <div class="col">
+                <h2>Vítejte v kalkulačce!</h2>
+                <p> První kroky:</p>
+                <ul>
+                {% if not current_user.diets | length %}
+                    <li>Vytvořte první <a href="{{ url_for('DietsView:new') }}">dietu</a></li>
+                {% endif %}
+                {% if not current_user.recipes | length %}
+                    <li>Vytvořte první <a href="{{ url_for('RecipesView:new') }}">recept</a></li>
+                {% endif %}
+                {% if not current_user.ingredients | length %}
+                    <li>Přidejte vlastní <a href="{{ url_for('IngredientsView:new') }}">surovinu</a></li>
+                {% endif %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
         <div class="row">
             <div class="col-8">
                 <h4>Seznam receptů:</h4>
