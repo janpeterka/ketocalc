@@ -9,24 +9,6 @@
 {% block content %}
     <div class="container">
         <div class="row">
-            {# {% if not current_user.current_user.diets | length or not current_user.recipes | length or not current_user.ingredients | length %} #}
-            <div class="col">
-                <h2>Vítejte v kalkulačce</h2>
-                <p> První kroky:</p>
-                <ul>
-                {% if not current_user.diets | length %}
-                    <li>Vytvořte první <a href="{{ url_for('DietsView:new') }}">dietu</a></li>
-                {% endif %}
-                {% if not current_user.recipes | length %}
-                    <li>Vytvořte první <a href="{{ url_for('RecipesView:new') }}">recept</a></li>
-                {% endif %}
-                {% if not current_user.ingredients | length %}
-                    <li>Přidejte vlastní <a href="{{ url_for('IngredientsView:new') }}">surovinu</a></li>
-                {% endif %}
-                </ul>
-            </div>
-            {# {% endif %} #}
-
             <div class="col-8">
                 <h4>Seznam receptů:</h4>
                 <ul>
