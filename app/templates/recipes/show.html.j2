@@ -17,8 +17,6 @@
     {% endif %}
 {% endblock %}
 
-{% block script %}{% endblock %}
-
 {% block navbar %}
     {% if not is_print %}
         {{ super() }}
@@ -47,8 +45,9 @@
                  </span>
 
             {% if current_user.is_admin %}
-                <div class="admin_field">
+                <div class="admin-field">
                     Autor: <a href="{{ url_for('UsersView:show_by_id', id=recipe.author.id) }}">{{ recipe.author.username }}</a>
+                    Recipe views: {{ recipe.view_count }}
                 </div>
             {% endif %}
 

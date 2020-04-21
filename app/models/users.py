@@ -12,6 +12,7 @@ from app.auth import login
 
 from app.models.item_mixin import ItemMixin
 from app.models.ingredients import Ingredient
+from app.models.request_log import RequestLog
 
 
 class User(db.Model, UserMixin, ItemMixin):
@@ -174,3 +175,13 @@ class User(db.Model, UserMixin, ItemMixin):
                 key=lambda x: unidecode.unidecode(x.name.lower()), reverse=False
             )
         return ingredients
+
+    @property
+    def last_request(self):
+        request = (
+            db.session.query(RequestLog)
+            .filter(RequestLog.user_id == self.id)
+            .order_by(RequestLog.created_at.desc())
+            .first()
+        )
+        return request
