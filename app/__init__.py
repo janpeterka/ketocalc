@@ -11,7 +11,7 @@ pymysql.converters.conversions = pymysql.converters.encoders.copy()
 pymysql.converters.conversions.update(pymysql.converters.decoders)
 
 mail = Mail()
-db = SQLAlchemy()
+db = SQLAlchemy(session_options={"autoflush": False})
 migrate = Migrate()
 
 
