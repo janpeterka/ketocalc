@@ -33,8 +33,6 @@ class BaseMixin(object):
     def save(self, **kw):
         """Saves (new) object
         """
-        print(db.session.dirty)
-
         try:
             db.session.expire_all()
             db.session.add(self)
