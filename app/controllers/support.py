@@ -65,13 +65,8 @@ class SupportView(FlaskView):
 
     @route("download/<filename>/", methods=["GET"])
     def download(self, filename):
-        print("getting file")
-        # print(args)
-        # print(kwargs)
         PATH = os.path.dirname(os.path.realpath(__file__))
         FILES_PATH = os.path.join(PATH, "../public/files/")
-        print(FILES_PATH)
-        print(os.path.join(FILES_PATH, filename))
         return send_file(
             os.path.join(FILES_PATH, filename), attachment_filename=filename,
         )

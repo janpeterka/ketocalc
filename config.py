@@ -42,7 +42,7 @@ class TestConfig(Config):
 class DevConfig(Config):
     TEMPLATES_AUTO_RELOAD = True
     SQLALCHEMY_DATABASE_URI = os.environ.get("LOCAL_DB_STRING")
-    SQLALCHEMY_ECHO = True
+    # SQLALCHEMY_ECHO = True
     APP_STATE = os.environ.get(
         "LOCAL_APP_STATE"
     )  # production, development, debug, shutdown

@@ -221,14 +221,14 @@ div.flashes ul li.debug{
     margin: 10px;
 }
 
-.admin_field {
+.admin-field {
   background-color: #FFE766;
   margin-top: 2rem;
   padding: 0.5rem;
   border: solid 0.1rem red;
 }
 
-.admin_warning {
+.admin-warning {
   text-align: center;
 }
 

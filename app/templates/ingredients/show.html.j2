@@ -14,7 +14,7 @@
                 <h2>{{ ingredient.name }} {% if ingredient.is_shared %}(sdílená surovina){% endif %}</h2>
 
                 {% if current_user.is_admin %}
-                    <div class="admin_field">
+                    <div class="admin-field">
                         Autor: <a href="{{ url_for('UsersView:show_by_id', id=ingredient.author_user.id) }}">{{ ingredient.author }}</a>
                     </div>
                 {% endif %}

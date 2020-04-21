@@ -9,8 +9,9 @@ from app.auth import admin_required
 
 from app.helpers.form import create_form, save_form_to_session
 
-from app.controllers.forms.users import UserForm, PasswordForm
 from app.models.users import User
+
+from app.controllers.forms.users import UserForm, PasswordForm
 
 
 class UsersView(FlaskView):
@@ -27,7 +28,6 @@ class UsersView(FlaskView):
         del form.username
 
         if not form.validate_on_submit():
-            print("no validate")
             save_form_to_session(request.form)
             return redirect(url_for("UsersView:edit"))
 
