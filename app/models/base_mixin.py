@@ -34,7 +34,6 @@ class BaseMixin(object):
         """Saves (new) object
         """
         try:
-            db.session.expire_all()
             db.session.add(self)
             db.session.commit()
             if self.id is not None:
