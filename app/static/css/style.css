@@ -272,6 +272,14 @@ tr.inactive a.inactive {
   background-color: var(--logo-light-green);
 }
 
+.from-admin-badge {
+  float: right;
+  margin-left: 2rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: var(--logo-light-green);
+}
+
 .navbar div.navbar-divider {
   width: 2rem;
 }

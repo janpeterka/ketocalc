@@ -3,7 +3,7 @@ from flask import request, url_for, redirect, abort, flash
 from flask import current_app as application
 
 from flask_classful import FlaskView, route
-from flask_login import login_required, current_user
+from flask_login import login_required, current_user, login_user
 
 from app.auth import admin_required
 
@@ -85,3 +85,14 @@ class UsersView(FlaskView):
     def show_all(self):
         users = User.load_all()
         return template("admin/users/all.html.j2", users=users)
+
+    @admin_required
+    def login_as(self, user_id):
+        print(current_user)
+        admin_id = current_user.id
+        user = User.load(user_id)
+        login_user(user)
+        user.logged_from_admin = admin_id
+        print(current_user)
+        print(current_user.logged_from_admin)
+        return redirect(url_for("IndexView:index"))

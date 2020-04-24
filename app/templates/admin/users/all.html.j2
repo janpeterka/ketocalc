@@ -22,6 +22,7 @@
                     <th>recipe count</th>
                 
                     <th>ingredient count</th>
+                    <th>login as</th>
                 </tr>
                 </thead>
 
@@ -40,6 +41,11 @@
                     <td>{{ user.diets|length }}</td>
                     <td>{{ user.recipes|length }}</td>
                     <td>{{ user.ingredients|length }}</td>
+                    <td>
+                        <a href="{{ url_for('UsersView:login_as', user_id=user.id) }}">
+                            login as {{ user.username }}
+                        </a>
+                    </td>
                 </tr>
                 {% endfor %}
             </table>
