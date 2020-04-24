@@ -1,5 +1,5 @@
 from flask import render_template as template
-from flask import request, url_for, redirect, abort, flash
+from flask import request, url_for, redirect, abort, flash, session
 from flask import current_app as application
 
 from flask_classful import FlaskView, route
@@ -87,12 +87,9 @@ class UsersView(FlaskView):
         return template("admin/users/all.html.j2", users=users)
 
     @admin_required
-    def login_as(self, user_id):
-        print(current_user)
-        admin_id = current_user.id
-        user = User.load(user_id)
-        login_user(user)
-        user.logged_from_admin = admin_id
-        print(current_user)
-        print(current_user.logged_from_admin)
+    def login_as(self, user_id, back=False):
+        session.pop("logged_from_admin", None)
+        if not back:
+            session["logged_from_admin"] = current_user.id
+        login_user(User.load(user_id))
         return redirect(url_for("IndexView:index"))

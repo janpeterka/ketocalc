@@ -1,1 +1,2 @@
-<span class="from-admin-badge"><strong>logged in from {{ current_user.logged_from_admin }}</strong></span>
+<span class="from-admin-badge">logged in from 
+<a href="{{ url_for('UsersView:login_as', user_id=current_user.logged_from_admin, back=True) }}">{{ current_user.logged_from_admin }}</a></span>

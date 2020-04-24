@@ -274,7 +274,7 @@ tr.inactive a.inactive {
 
 .from-admin-badge {
   float: right;
-  margin-left: 2rem;
+  margin-right: 2rem;
   padding: 1rem;
   border-radius: 0.5rem;
   background-color: var(--logo-light-green);
