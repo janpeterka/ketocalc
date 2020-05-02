@@ -2,8 +2,6 @@ import datetime
 
 from app import db
 
-from app.models.users import User
-
 
 class SentMail(db.Model):
     __tablename__ = "sent_mails"
@@ -22,6 +20,6 @@ class SentMail(db.Model):
     def fill_from_message(self, message, recipient):
         self.subject = message.subject
         self.sender = message.sender
-        self.recipient_id = User.load(message.recipient, load_type="username").id
+        self.recipient_id = message.recipient.id
         self.bcc = str(message.bcc)
         self.template = message.template

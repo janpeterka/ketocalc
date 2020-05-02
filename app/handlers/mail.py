@@ -10,20 +10,25 @@ from app.models.sent_mails import SentMail
 class MailHandler(object):
     def send_email(
         subject,
-        recipients,
+        recipients=None,
+        recipient_mails=None,
         text_body=None,
         html_body=None,
         template=None,
         attachments=None,
         sender="ketocalc.jmp@gmail.com",
     ):
-        if not isinstance(recipients, list):
+        if recipients and not isinstance(recipients, list):
             raise ValueError
+
+        if recipients:
+            for recipient in recipients:
+                recipient_mails.append(recipient.username)
 
         message = Message(
             subject=subject,
             sender=sender,
-            recipients=recipients,
+            recipients=recipient_mails,
             bcc=["ketocalc.jmp+bcc@gmail.com"],
         )
 
