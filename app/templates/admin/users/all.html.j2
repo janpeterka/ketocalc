@@ -22,6 +22,8 @@
                     <th>recipe count</th>
                 
                     <th>ingredient count</th>
+
+                    <th>emails</th>
                 </tr>
                 </thead>
 
@@ -40,6 +42,7 @@
                     <td>{{ user.diets|length }}</td>
                     <td>{{ user.recipes|length }}</td>
                     <td>{{ user.ingredients|length }}</td>
+                    <td><a href="{{ url_for('UsersView:send_mail', user_id=user.id, mail_type='test') }}">send test email!</a>
                 </tr>
                 {% endfor %}
             </table>
