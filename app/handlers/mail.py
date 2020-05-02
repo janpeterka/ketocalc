@@ -1,8 +1,10 @@
-from flask import render_template as template
+from flask import render_template
 
 from flask_mail import Message
 
 from app import mail
+
+from app.models.sent_mails import SentMail
 
 
 class MailHandler(object):
@@ -11,34 +13,45 @@ class MailHandler(object):
         recipients,
         text_body=None,
         html_body=None,
-        sender="ketocalc.jmp@gmail.com",
+        template=None,
         attachments=None,
+        sender="ketocalc.jmp@gmail.com",
     ):
         if not isinstance(recipients, list):
             raise ValueError
 
-        msg = Message(
+        message = Message(
             subject=subject,
             sender=sender,
             recipients=recipients,
             bcc=["ketocalc.jmp+bcc@gmail.com"],
         )
+
+        if template:
+            message.template = template
+            html_body = render_template(template)
+
         if text_body is None and html_body is None:
             raise ValueError
 
-        msg.body = text_body
-        msg.html = html_body
+        message.body = text_body
+        message.html = html_body
 
         if attachments:
             for attachment in attachments:
-                msg.attach(
+                message.attach(
                     attachment.filename, "application/octact-stream", attachment.read()
                 )
-        mail.send(msg)
+        mail.send(message)
+        for recipient in recipients:
+            message.recipient = recipient
+            sent_mail = SentMail()
+            sent_mail.fill_from_message(message)
+            sent_mail.save()
 
     # Specific emails
     def send_onboarding_inactive(self, recipients):
         self.send_email(
             subject="Ketokalkulačka - mohu Vám pomoci?",
-            html_body=template("mails/onboarding/inactive_after_register.html.j2"),
+            template="onboarding/inactive_after_register.html.j2",
         )
