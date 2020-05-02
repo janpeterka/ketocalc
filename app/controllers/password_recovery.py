@@ -35,7 +35,9 @@ class PasswordRecoveryView(FlaskView):
             token=generate_new_password_token(user),
         )
 
-        MailHandler.send_email(
+        handler = MailHandler()
+
+        handler.send_email(
             subject="Nové heslo", recipients=[user], html_body=html_body,
         )
 

@@ -23,5 +23,5 @@ class SentMail(db.Model, BaseMixin):
         self.subject = message.subject
         self.sender = message.sender
         self.recipient_id = message.recipient.id
-        self.bcc = str(message.bcc)
-        self.template = message.template
+        self.bcc = ", ".join(message.bcc)
+        self.template = getattr(message, "template", None)

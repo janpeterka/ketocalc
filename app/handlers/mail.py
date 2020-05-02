@@ -58,12 +58,12 @@ class MailHandler(object):
             sent_mail.save()
 
     # Specific emails
-    # def send_onboarding_inactive(self, recipients):
-    #     self.send_email(
-    #         subject="Ketokalkulačka - mohu Vám pomoci?",
-    #         recipients=recipients,
-    #         template="onboarding/inactive_after_register.html.j2",
-    #     )
+    def send_onboarding_inactive(self, recipients):
+        self.send_email(
+            subject="Ketokalkulačka - mohu Vám pomoci?",
+            recipients=recipients,
+            template="onboarding/inactive_after_register.html.j2",
+        )
 
     def send_test_mail(self, recipients):
         self.send_email(
