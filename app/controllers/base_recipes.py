@@ -48,18 +48,16 @@ class BaseRecipesView(FlaskView):
             ingredient.fill_from_json(json_i)
             ingredients.append(ingredient)
 
-        result = calculations.calculate_recipe(ingredients, diet)
-        if result is None:
-            abort(400, "cannot be calculated")
+        try:
+            result = calculations.calculate_recipe(ingredients, diet)
+        except Exception as e:
+            abort(400, str(e.args[0]))
 
         ingredients = result["ingredients"]
         totals = result["totals"]
 
         json_ingredients = []
         for ing in ingredients:
-            if ing.amount < 0:
-                abort(400, "ingredient with negative amount")
-
             ing.calorie = round(ing.calorie * ing.amount, 2)
             ing.fat = round(ing.fat, 2)
             ing.sugar = round(ing.sugar, 2)

@@ -50,13 +50,13 @@ def calculate_recipe(ingredients, diet):
 
     # calculate
     if len(ingredients) == 0:
-        return None
+        raise ValueError("Nebyly zadané žádné suroviny")
     elif len(ingredients) == 1:
         # TODO: Teoreticky je možné (99)
-        return None
+        raise ValueError("Recept s jednou surovinou neumíme spočítat")
     elif len(ingredients) == 2:
         # TODO: Teoreticky je možné (99)
-        return None
+        raise ValueError("Recept se dvěma surovinami neumíme spočítat")
     elif len(ingredients) == 3:
         a = numpy.array(
             [
@@ -115,44 +115,44 @@ def calculate_recipe(ingredients, diet):
 
         interval = (result1[0].intersect(result2[0])).intersect(result3[0])
         if interval.is_empty:
-            return None
+            raise ValueError("Recept nelze spočítat", "Neexistuje interval")
 
-        max_sol = min(100, round(interval.right, 2))
-        min_sol = max(0, round(interval.left, 2))
+        max_sol = min(100, round(interval.right * 100, 2))
+        min_sol = max(0, round(interval.left * 100, 2))
         if max_sol < min_sol:
-            return None
+            raise ValueError("Recept nelze spočítat", "Neexistuje rozumný interval")
 
         # max_sol = max for e (variable)
         sol = (min_sol + max_sol) / 2
 
         in1_dict = in1.as_coefficients_dict()
-        x = in1_dict[e] * sol + in1_dict[1]
+        x = in1_dict[e] * (sol / 100) + in1_dict[1]
 
         in2_dict = in2.as_coefficients_dict()
-        y = in2_dict[e] * sol + in2_dict[1]
+        y = in2_dict[e] * (sol / 100) + in2_dict[1]
 
         in3_dict = in3.as_coefficients_dict()
-        z = in3_dict[e] * sol + in3_dict[1]
+        z = in3_dict[e] * (sol / 100) + in3_dict[1]
 
         x = round(x, 4)
         y = round(y, 4)
         z = round(z, 4)
 
         if x < 0 or y < 0 or z < 0:
-            return None
+            raise ValueError(
+                "Recept nelze spočítat",
+                "Množství některé suroviny se dostalo do záporu",
+            )
 
         ingredients[0].amount = x
         ingredients[1].amount = y
         ingredients[2].amount = z
-        ingredients[3].amount = sol
-        ingredients[3].min = float(min_sol * 100) + 0.1
-        ingredients[3].max = float(max_sol * 100) - 0.1
+        ingredients[3].amount = float(sol / 100)
+        ingredients[3].min = float(min_sol + 0.1)
+        ingredients[3].max = float(max_sol - 0.1)
 
-    elif len(ingredients) == 5:
-        # TODO: 5 ingredients (30)
-        return None
     else:
-        return None
+        raise ValueError("Recept s pěti a více surovinami ještě neumíme spočítat")
 
     for ing in fixed_ingredients:
         ingredients.append(ing)
