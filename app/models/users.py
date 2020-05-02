@@ -54,6 +54,10 @@ class User(db.Model, UserMixin, ItemMixin):
         "Diet", order_by="desc(Diet.active)", back_populates="author"
     )
 
+    sent_mails = db.relationship(
+        "SentMail", order_by="desc(SentMail.created_at)", back_populates="recipient"
+    )
+
     @staticmethod
     @login.user_loader
     def load(user_identifier, load_type="id"):

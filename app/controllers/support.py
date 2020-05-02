@@ -43,7 +43,7 @@ class SupportView(FlaskView):
             MailHandler.send_email(
                 subject="[ketocalc] [{}]".format(form.option.data),
                 sender="ketocalc",
-                recipients=["ketocalc.jmp+feedback@gmail.com"],
+                recipient_mails=["ketocalc.jmp+feedback@gmail.com"],
                 text_body="Message: {}\n Send by: {} [user: {}]".format(
                     form.message.data, form.email.data, current_user.username
                 ),

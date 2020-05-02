@@ -2,8 +2,10 @@ import datetime
 
 from app import db
 
+from app.models.base_mixin import BaseMixin
 
-class SentMail(db.Model):
+
+class SentMail(db.Model, BaseMixin):
     __tablename__ = "sent_mails"
 
     id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
@@ -17,7 +19,7 @@ class SentMail(db.Model):
 
     recipient = db.relationship("User", uselist=False, back_populates="sent_mails")
 
-    def fill_from_message(self, message, recipient):
+    def fill_from_message(self, message):
         self.subject = message.subject
         self.sender = message.sender
         self.recipient_id = message.recipient.id

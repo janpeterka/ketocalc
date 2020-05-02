@@ -9,9 +9,10 @@ from app.models.sent_mails import SentMail
 
 class MailHandler(object):
     def send_email(
+        self,
         subject,
         recipients=None,
-        recipient_mails=None,
+        recipient_mails=[],
         text_body=None,
         html_body=None,
         template=None,
@@ -33,6 +34,7 @@ class MailHandler(object):
         )
 
         if template:
+            template = "mails/" + template
             message.template = template
             html_body = render_template(template)
 
@@ -48,6 +50,7 @@ class MailHandler(object):
                     attachment.filename, "application/octact-stream", attachment.read()
                 )
         mail.send(message)
+
         for recipient in recipients:
             message.recipient = recipient
             sent_mail = SentMail()
@@ -55,8 +58,16 @@ class MailHandler(object):
             sent_mail.save()
 
     # Specific emails
-    def send_onboarding_inactive(self, recipients):
+    # def send_onboarding_inactive(self, recipients):
+    #     self.send_email(
+    #         subject="Ketokalkulačka - mohu Vám pomoci?",
+    #         recipients=recipients,
+    #         template="onboarding/inactive_after_register.html.j2",
+    #     )
+
+    def send_test_mail(self, recipients):
         self.send_email(
-            subject="Ketokalkulačka - mohu Vám pomoci?",
+            subject="Ketokalkulačka - testovací e-mail",
+            recipients=recipients,
             template="onboarding/inactive_after_register.html.j2",
         )

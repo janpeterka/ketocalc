@@ -34,12 +34,9 @@ class PasswordRecoveryView(FlaskView):
             "auth/mails/_new_password_email.html.j2",
             token=generate_new_password_token(user),
         )
+
         MailHandler.send_email(
-            subject="Nové heslo",
-            sender="ketocalc.jmp@gmail.com",
-            recipients=[user.username],
-            text_body="",
-            html_body=html_body,
+            subject="Nové heslo", recipients=[user], html_body=html_body,
         )
 
         flash("Nové heslo vám bylo zasláno do emailu", "success")
