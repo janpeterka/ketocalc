@@ -7,7 +7,7 @@
     <div class="container">
         <div class="admin-field">
             <h1>Uživatelé</h1>
-            <details open>
+            <details>
             <summary>Souhrn používání</summary>
             <p>
             <table class="table">
@@ -48,7 +48,7 @@
             </details>
 
 
-            <details>
+            <details open>
             <summary>Maily</summary>
             <p>
             <table class="table">
@@ -84,7 +84,7 @@
                     </td>
                     <td>
                         {% if user.onboarding_inactive_mail_sent == None %}
-                            <a href="{{ url_for('UsersView:send_mail', user_id=user.id, mail_type='onboarding_welcome') }}">send!</a>
+                            <a href="{{ url_for('UsersView:send_mail', user_id=user.id, mail_type='onboarding_inactive') }}">send!</a>
                         {% else %}
                             {{ user.onboarding_inactive_mail_sent }}
                         {% endif %}
