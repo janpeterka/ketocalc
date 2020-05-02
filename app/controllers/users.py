@@ -7,6 +7,8 @@ from flask_login import login_required, current_user
 
 from app.auth import admin_required
 
+from app.handlers.mail import MailHandler
+
 from app.helpers.form import create_form, save_form_to_session
 
 from app.models.users import User
@@ -85,3 +87,17 @@ class UsersView(FlaskView):
     def show_all(self):
         users = User.load_all()
         return template("admin/users/all.html.j2", users=users)
+
+    @admin_required
+    def send_mail(self, user_id, mail_type):
+        user = User.load(user_id)
+        handler = MailHandler()
+
+        if mail_type == "onboarding_inactive":
+            handler.send_onboarding_inactive(recipients=[user])
+
+        elif mail_type == "test":
+            handler.send_test_mail(recipients=[current_user])
+
+        flash("email byl odeslán", "success")
+        return redirect(url_for("UsersView:show_all"))
