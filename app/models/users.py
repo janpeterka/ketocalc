@@ -189,3 +189,19 @@ class User(db.Model, UserMixin, ItemMixin):
             .first()
         )
         return request
+
+    @property
+    def onboarding_welcome_mail_sent(self):
+        for mail in self.sent_mails:
+            if mail.template == "mails/onboarding/welcome.html.j2":
+                return mail.created_at
+
+        return None
+
+    @property
+    def onboarding_inactive_mail_sent(self):
+        for mail in self.sent_mails:
+            if mail.template == "mails/onboarding/inactive.html.j2":
+                return mail.created_at
+
+        return None

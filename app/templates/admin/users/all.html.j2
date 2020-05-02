@@ -7,6 +7,9 @@
     <div class="container">
         <div class="admin-field">
             <h1>Uživatelé</h1>
+            <details open>
+            <summary>Souhrn používání</summary>
+            <p>
             <table class="table">
                 <thead class="thead-dark">
                 <tr>
@@ -17,13 +20,9 @@
                     <th>last activity</th>
                     <th>login count</th>
 
-                    <th>diet count</th>
-                
+                    <th>diet count</th>                
                     <th>recipe count</th>
-                
                     <th>ingredient count</th>
-
-                    <th>emails</th>
                 </tr>
                 </thead>
 
@@ -42,10 +41,59 @@
                     <td>{{ user.diets|length }}</td>
                     <td>{{ user.recipes|length }}</td>
                     <td>{{ user.ingredients|length }}</td>
-                    <td><a href="{{ url_for('UsersView:send_mail', user_id=user.id, mail_type='test') }}">send test email!</a>
                 </tr>
                 {% endfor %}
             </table>
+            </p>
+            </details>
+
+
+            <details>
+            <summary>Maily</summary>
+            <p>
+            <table class="table">
+                <thead class="thead-dark">
+                <tr>
+                    <th>email</th>
+                    <th>name</th>
+                    <th>registered at</th>
+                    <th>last activity</th>
+
+                    <th>welcome mail sent</th>
+                    <th>inactive mail sent</th>
+                </tr>
+                </thead>
+
+                {% for user in users: %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('UsersView:show_by_id', id=user.id) }}">
+                            {{ user.username }}
+                        </a>
+                    </td>
+                    <td>{{ user.first_name }} {{ user.last_name }}</td>
+                    <td>{{ user.created }}</td>
+                    <td>{{ user.last_request.url }} | {{ user.last_request.created_at }}</td>
+
+                    <td>
+                        {% if user.onboarding_welcome_mail_sent == None %}
+                            <a href="{{ url_for('UsersView:send_mail', user_id=user.id, mail_type='onboarding_welcome') }}">send!</a>
+                        {% else %}
+                            {{ user.onboarding_welcome_mail_sent }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user.onboarding_inactive_mail_sent == None %}
+                            <a href="{{ url_for('UsersView:send_mail', user_id=user.id, mail_type='onboarding_welcome') }}">send!</a>
+                        {% else %}
+                            {{ user.onboarding_inactive_mail_sent }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            </p>
+            </details>
         </div> 
     </div>
 {% endblock %}

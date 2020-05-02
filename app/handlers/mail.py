@@ -62,12 +62,12 @@ class MailHandler(object):
         self.send_email(
             subject="Ketokalkulačka - mohu Vám pomoci?",
             recipients=recipients,
-            template="onboarding/inactive_after_register.html.j2",
+            template="onboarding/inactive.html.j2",
         )
 
     def send_test_mail(self, recipients):
         self.send_email(
             subject="Ketokalkulačka - testovací e-mail",
             recipients=recipients,
-            template="onboarding/inactive_after_register.html.j2",
+            template="onboarding/inactive.html.j2",
         )
