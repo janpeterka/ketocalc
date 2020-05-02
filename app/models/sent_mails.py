@@ -2,7 +2,7 @@ import datetime
 
 from app import db
 
-from app.models import User
+from app.models.users import User
 
 
 class SentMail(db.Model):
