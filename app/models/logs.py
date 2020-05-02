@@ -19,6 +19,7 @@ class Log(db.Model):
 
     def save(self, **kw):
         try:
+            db.session.expire_all()
             db.session.add(self)
             db.session.commit()
             if self.id is not None:
@@ -26,8 +27,8 @@ class Log(db.Model):
             else:
                 return False
         except DatabaseError:
-            pass
-        pass
+            db.session.rollback()
+            return False
 
     @staticmethod
     def load_by_level(level):
