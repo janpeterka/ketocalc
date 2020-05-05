@@ -101,7 +101,7 @@
             totals["amount"] += parseFloat(ingredient["amount"])
         }
 
-        $(this.totalsTarget).empty();
+        
         this._set_totals(totals)
       }
 
@@ -129,6 +129,7 @@
     }
 
     _set_totals(totals){
+      $(this.totalsTarget).empty();
       var html =
         "<td>" +
         totals["calorie"] +
