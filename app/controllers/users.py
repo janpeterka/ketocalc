@@ -91,13 +91,12 @@ class UsersView(FlaskView):
     @admin_required
     def send_mail(self, user_id, mail_type):
         user = User.load(user_id)
-        handler = MailHandler()
 
         if mail_type == "onboarding_inactive":
-            handler.send_onboarding_inactive(recipients=[user])
+            MailHandler().send_onboarding_inactive(recipients=[user])
             flash("email byl odeslán", "success")
-        if mail_type == "onboarding_welcome":
-            handler.send_onboarding_welcome(recipients=[user])
+        elif mail_type == "onboarding_welcome":
+            MailHandler().send_onboarding_welcome(recipients=[user])
             flash("email byl odeslán", "success")
         else:
             flash("nejspíš neznáme typ mailu", "error")

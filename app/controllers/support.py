@@ -40,9 +40,7 @@ class SupportView(FlaskView):
             if form.feedback_file.data:
                 attachments = [form.feedback_file.data]
 
-            handler = MailHandler()
-
-            handler.send_email(
+            MailHandler().send_email(
                 subject="[ketocalc] [{}]".format(form.option.data),
                 sender="ketocalc",
                 recipient_mails=["ketocalc.jmp+feedback@gmail.com"],
