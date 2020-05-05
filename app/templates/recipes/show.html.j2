@@ -17,6 +17,11 @@
     {% endif %}
 {% endblock %}
 
+{% block script %}
+    {% include 'javascript/stimulus.js.html' %}
+    {% include 'javascript/show_recipe.js.html' %}
+{% endblock %}
+
 {% block navbar %}
     {% if not is_print %}
         {{ super() }}
@@ -25,7 +30,7 @@
 
 {% block content %}
     <div class="container">
-        <div class="col-12">
+        <div class="col-12" data-controller="show-recipe">
             {% if not is_print %}
                 <span class="data__table">
             {% else %}
@@ -44,7 +49,7 @@
                 </div>
             {% endif %}
 
-            <table id="ingredients" class="table">
+            <table id="ingredients" data-target="show-recipe.ingredientTable" class="table">
                 <tr>
                     <th>{{ texts.title }}</th>
                     <th>{{ texts.energy_simple }}</th>
@@ -56,7 +61,13 @@
                 </tr>
 
                 {% for ingredient in recipe.ingredients: %}
-                    <tr>
+                    <tr data-id="{{ ingredient.id }}"
+                        data-name="{{ ingredient.name }}"
+                        data-calorie="{{ ingredient.calorie }}"
+                        data-protein="{{ ingredient.protein }}"
+                        data-fat="{{ ingredient.fat }}"
+                        data-sugar="{{ ingredient.sugar }}"
+                        data-amount="{{ ingredient.amount }}">
                         <td><a href="{{ url_for('IngredientsView:show', id=ingredient.id) }}">{{ ingredient.name }}</a></td>
                         <td>{{ (ingredient.calorie / 100 * ingredient.amount)|round(2,'common') }}</td>
                         <td>{{ (ingredient.protein / 100 * ingredient.amount)|round(2,'common') }}</td>
@@ -67,35 +78,30 @@
                     </tr>
                 {% endfor %}
 
-                <tr class="totals">
-                    <td>Celkem</td>
-                    <td>{{ totals.calorie }}</td>
-                    <td>{{ totals.protein }}</td>
-                    <td>{{ totals.fat }}</td>
-                    <td>{{ totals.sugar }}</td>
-                    <td>{{ totals.amount|round(2,'common')  }}</td>
-                    <td>Poměr: {{ totals.ratio }} : 1</td>
-                </tr>
+                <tr class="totals" data-target="show-recipe.totals"></tr>
             </table>
 
+            <div class="row" data-target="show-recipe.percentage">
+                <div class="col-10">
+                <form class="form-inline" data-action="submit->show-recipe#calculate_recipe">
+                        <span class="btn bg-color-light-blue filter-gs-75" data-percentage=10 data-action="click->show-recipe#calculate_recipe">10%</span>
+                        <span class="btn bg-color-light-blue filter-gs-50" data-percentage=25 data-action="click->show-recipe#calculate_recipe">25%</span>
+                        <span class="btn bg-color-light-blue filter-gs-25" data-percentage=50 data-action="click->show-recipe#calculate_recipe">50%</span>
+                        <span class="btn bg-color-light-blue"  data-percentage=100 data-action="click->show-recipe#calculate_recipe">100%</span>
+                        <input class="form-control" type="number" />
+                        <input class="btn bg-color-dark-blue" type="submit" value="spočítat vlastní">
+                </form>
+                </div>
+                <button type="button col-2" data-target="show-recipe.showPercentage" disabled class="btn ">Baba</button>
+            </div>
+
             {% if not is_print %}
-            <div class="row">
-                <form action="{{ url_for('RecipesView:delete', id=recipe.id) }}" method="post" class="form col-5"  accept-charset="utf-8" onsubmit="return confirm('{{ texts.recipe_delete_confirm }}');">
+            <div class="">
+                <form action="{{ url_for('RecipesView:delete', id=recipe.id) }}" method="post" class="form-inline"  accept-charset="utf-8" onsubmit="return confirm('{{ texts.recipe_delete_confirm }}');">
                     <a class="btn btn-warning" href="{{ url_for('RecipesView:edit', id=recipe.id) }}">{{ texts.edit }} {{ icons.edit }}</a>
                     <a class="btn btn-secondary" href="{{ url_for('RecipesView:print', id=recipe.id) }}" target="_blank" rel="noopener noreferrer">{{ texts.print }} {{ icons.print }}</a>
                     <button type="submit" class="btn btn-danger">{{ texts.recipe_delete}} {{ icons.delete }}</button>
                 </form>
-
-                {# <span class="col-2"></span> #}
-
-{# 				<form action="/recipe={{recipe.id}}/export" class="form-inline col-5" method="post" accept-charset="utf-8">
-                    <input type="submit" class="btn btn-secondary" value="Exportovat recept do diety" />
-                    <select name="diet" class="form-control">
-                            {% for diet in diets %}
-                                <option value="{{ diet.id }}">{{ diet.name }}</option>
-                            {% endfor %}
-                    </select>
-                </form> #}
             </div>
             {% endif %}
         </div>
