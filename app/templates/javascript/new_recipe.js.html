@@ -7,7 +7,7 @@
 
           "loader", "wrongRecipe",
 
-          "recipeName", "recipeSize", "recipeDiet",
+          "recipeName", "recipeDiet",
           "recipe", "recipeIngredientTable"
           ]
       }
@@ -277,7 +277,6 @@
             'ingredients' : this._get_currently_calculated(),
             'dietID' : this.recipeDietTarget.dataset.newRecipeDietId,
             'name' : this.recipeNameTarget.value,
-            'size' : this.recipeSizeTarget.value
           }),
           headers: {'Content-Type': 'application/json,charset=UTF-8'},
         })

@@ -66,11 +66,6 @@
     </table>
 
     <div class="form-inline">
-        <select data-target="new-recipe.recipeSize" class="form-control col-3">
-            <option value="big">{{ texts.meal_size_big }}</option>
-            <option value="small">{{ texts.meal_size_small }}</option>
-        </select>
-
         <span class="col-4" data-target="new-recipe.recipeDiet" data-new-recipe-diet-id="{{ diet.id }}">Dieta: {{ diet.name }}</span>
         {% if not is_trialrecipe %}
             <input type="submit" class="btn btn-primary col-4 " value="{{ texts.recipe_save }}" />
