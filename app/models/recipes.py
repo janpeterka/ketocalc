@@ -32,21 +32,10 @@ class Recipe(db.Model, ItemMixin):
     def load(recipe_id):
         recipe = db.session.query(Recipe).filter(Recipe.id == recipe_id).first()
 
-        coef = 1
-
-        if recipe.type == "big":
-            coef = float(recipe.diet.big_size / 100)
-        elif recipe.type == "small":
-            coef = float(recipe.diet.small_size / 100)
-
         for ingredient in recipe.ingredients:
             ingredient.amount = ingredient.load_amount_by_recipe(recipe.id)
             ingredient.amount = (
-                float(
-                    math.floor(
-                        ingredient.load_amount_by_recipe(recipe.id) * coef * 100000
-                    )
-                )
+                float(math.floor(ingredient.load_amount_by_recipe(recipe.id) * 100000))
                 / 100000
             )
 
@@ -58,19 +47,10 @@ class Recipe(db.Model, ItemMixin):
         Returns:
             json -- recipe, totals
         """
-        coef = 1
-        if self.type == "big":
-            coef = float(self.diet.big_size / 100)
-        elif self.type == "small":
-            coef = float(self.diet.small_size / 100)
 
         for ingredient in self.ingredients:
             ingredient.amount = (
-                float(
-                    math.floor(
-                        ingredient.load_amount_by_recipe(self.id) * coef * 100000
-                    )
-                )
+                float(math.floor(ingredient.load_amount_by_recipe(self.id) * 100000))
                 / 100000
             )
 
@@ -150,19 +130,9 @@ class Recipe(db.Model, ItemMixin):
         totals.sugar = 0
         totals.amount = 0
 
-        coef = 1
-        if self.type == "big":
-            coef = float(self.diet.big_size / 100)
-        elif self.type == "small":
-            coef = float(self.diet.small_size / 100)
-
         for ingredient in self.ingredients:
             ingredient.amount = (
-                float(
-                    math.floor(
-                        ingredient.load_amount_by_recipe(self.id) * coef * 100000
-                    )
-                )
+                float(math.floor(ingredient.load_amount_by_recipe(self.id) * 100000))
                 / 100000
             )
             totals.calorie += ingredient.amount * ingredient.calorie

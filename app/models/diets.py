@@ -5,25 +5,6 @@ from app.models.item_mixin import ItemMixin
 
 
 class Diet(db.Model, ItemMixin):
-    """Diet object
-
-    Extends:
-        Base
-
-    Variables:
-        __tablename__ {str} -- [description]
-        id {int} -- [description]
-        name {string} -- [description]
-        sugar {int} -- sugar amount
-        fat {int} -- fat amount
-        protein {int} -- protein amount
-        small_size {int} -- small size in %
-        big_size {int} -- big size in %
-        active {int} -- int 0 / 1 - works as boolean
-        recipes {relationship} -- [description]
-        author {relationship} -- [description]
-    """
-
     __tablename__ = "diets"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -32,8 +13,6 @@ class Diet(db.Model, ItemMixin):
     sugar = db.Column(db.Float, nullable=False)
     fat = db.Column(db.Float, nullable=False)
     protein = db.Column(db.Float, nullable=False)
-    small_size = db.Column(db.Float, nullable=False)
-    big_size = db.Column(db.Float, nullable=False)
     active = db.Column(db.Boolean, nullable=False)
     created = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
     last_updated = db.Column(db.DateTime, nullable=True, onupdate=datetime.datetime.now)
