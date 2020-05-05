@@ -1,19 +1,21 @@
-<div class="row admin-field">
-	<div class="col">
-		<table class="table">
-			<tr>
-				<th>Last activity</th>
-				<th>Last activity at</th>
-			</tr>
-			<tr>
-				<td>{{ user.last_request.url }}</td>
-	     		<td>{{ user.last_request.created_at }}</td>
-			</tr>
-		</table>
-	</div>
+<div class="admin-field">
+<div>
+	<table class="table">
+		<tr>
+			<th>Last activity</th>
+			<th>Last activity at</th>
+		</tr>
+		<tr>
+			<td>{{ user.last_request.url }}</td>
+     		<td>{{ user.last_request.created_at }}</td>
+		</tr>
+	</table>
 </div>
 
-<div class="row admin-field">
+
+<details>
+<summary>Recepty ({{ user.diets|length }} | {{ user.recipes|length }}) a Suroviny ({{ user.ingredients|length }})</summary>
+<div class="row">
     <div class="col">
         <h2>Recepty ({{ user.diets|length }} | {{ user.recipes|length }})</h2>
         <table id="diets" class="table">
@@ -45,4 +47,18 @@
         {% endfor %}
         </table>
     </div>         
+</div>
+</details>
+
+<details>
+<summary>Mails ({{ user.sent_mails|length }})</summary>
+<div>
+    <ul>
+    {% for mail in user.sent_mails %}
+        <li>{{ mail.subject }} | {{ mail.created_at }} | {{ mail.template }}</li>
+    {% endfor %}
+    </ul>
+</div>
+</details>
+
 </div>
