@@ -205,3 +205,26 @@ class User(db.Model, UserMixin, ItemMixin):
                 return mail.created_at
 
         return None
+
+    def state(self, name=None):
+        if name == "onboarding_welcome":
+            if (
+                self.created
+                and datetime.date.today() - datetime.timedelta(days=7)
+                < self.created.date()
+            ):
+                return True
+            else:
+                return False
+        elif name == "onboarding_inactive":
+            if (
+                self.created
+                and datetime.date.today() - datetime.timedelta(days=30)
+                < self.created.date()
+                and len(self.recipes) == 0
+            ):
+                return True
+            else:
+                return False
+        else:
+            return False

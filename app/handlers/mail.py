@@ -75,8 +75,8 @@ class MailHandler(object):
             raise ValueError("No message body, will not send empty e-mail")
 
         if application.config["APP_STATE"] != "production":
-            recipient = None
-            recipient_mail = "dev"
+            # recipient = None
+            recipient_mail = "ketocalc.jmp+dev@gmail.com"
 
         message = Message(
             subject=subject,
@@ -87,8 +87,8 @@ class MailHandler(object):
             html=html_body,
         )
 
-        # with application.open_resource("static/img/banner.png") as fp:
-        #     message.attach("logo.png", "image/png", fp.read())
+        if template:
+            message.template = template
 
         if attachments:
             for attachment in attachments:
@@ -98,7 +98,7 @@ class MailHandler(object):
 
         mail.send(message)
 
-        if recipient:
+        if application.config["APP_STATE"] != "production" and recipient:
             message.recipient = recipient
             sent_mail = SentMail()
             sent_mail.fill_from_message(message)
@@ -112,9 +112,9 @@ class MailHandler(object):
             template="onboarding/inactive.html.j2",
         )
 
-    def send_test_mail(self, recipients):
+    def send_onboarding_welcome(self, recipients):
         self.send_email(
-            subject="Ketokalkulačka - testovací e-mail",
+            subject="Ketokalkulačka - vítejte!",
             recipients=recipients,
-            template="onboarding/inactive.html.j2",
+            template="onboarding/welcome.html.j2",
         )

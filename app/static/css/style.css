@@ -265,6 +265,10 @@ tr.inactive a.inactive {
   color: var(--inactive);
 }
 
+a.inactive {
+  color: var(--inactive);
+}
+
 .dev-badge {
   margin-left: 2rem;
   padding: 1rem;

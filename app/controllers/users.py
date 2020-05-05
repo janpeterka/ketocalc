@@ -96,10 +96,10 @@ class UsersView(FlaskView):
         if mail_type == "onboarding_inactive":
             handler.send_onboarding_inactive(recipients=[user])
             flash("email byl odeslán", "success")
-        elif mail_type == "test":
-            handler.send_test_mail(recipients=[current_user])
+        if mail_type == "onboarding_welcome":
+            handler.send_onboarding_welcome(recipients=[user])
             flash("email byl odeslán", "success")
         else:
-            flash("něco se nepovedlo", "error")
+            flash("nejspíš neznáme typ mailu", "error")
 
         return redirect(url_for("UsersView:show_all"))

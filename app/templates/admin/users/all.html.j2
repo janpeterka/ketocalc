@@ -7,9 +7,9 @@
     <div class="container">
         <div class="admin-field">
             <h1>Uživatelé</h1>
+
             <details>
             <summary>Souhrn používání</summary>
-            <p>
             <table class="table">
                 <thead class="thead-dark">
                 <tr>
@@ -44,13 +44,11 @@
                 </tr>
                 {% endfor %}
             </table>
-            </p>
             </details>
 
 
             <details open>
             <summary>Maily</summary>
-            <p>
             <table class="table">
                 <thead class="thead-dark">
                 <tr>
@@ -76,15 +74,20 @@
                     <td>{{ user.last_request.url }} | {{ user.last_request.created_at }}</td>
 
                     <td>
-                        {% if user.onboarding_welcome_mail_sent == None %}
-                            <a href="{{ url_for('UsersView:send_mail', user_id=user.id, mail_type='onboarding_welcome') }}">send!</a>
+                        {% if user.onboarding_welcome_mail_sent == None and user.state(name="onboarding_welcome") == True %}
+                            <a href="{{ url_for('UsersView:send_mail', user_id=user.id, mail_type='onboarding_welcome') }}" >send!</a>
+                        {% elif user.onboarding_welcome_mail_sent == None %}
+                            <a class="inactive" href="{{ url_for('UsersView:send_mail', user_id=user.id, mail_type='onboarding_welcome') }}" onclick="return confirm('Are you sure?')">not applicable</a>                     
                         {% else %}
                             {{ user.onboarding_welcome_mail_sent }}
                         {% endif %}
                     </td>
                     <td>
-                        {% if user.onboarding_inactive_mail_sent == None %}
-                            <a href="{{ url_for('UsersView:send_mail', user_id=user.id, mail_type='onboarding_inactive') }}">send!</a>
+                        {% if user.onboarding_inactive_mail_sent == None and user.state(name="onboarding_inactive") == True %}
+                            <a href="{{ url_for('UsersView:send_mail', user_id=user.id, mail_type='onboarding_inactive') }}" >send!</a>
+                        {% elif user.onboarding_inactive_mail_sent == None %}
+                            <a class="inactive" href="{{ url_for('UsersView:send_mail', user_id=user.id, mail_type='onboarding_inactive') }}" onclick="return confirm('Are you sure?')">not applicable</a>
+                            
                         {% else %}
                             {{ user.onboarding_inactive_mail_sent }}
                         {% endif %}
@@ -92,7 +95,6 @@
                 </tr>
                 {% endfor %}
             </table>
-            </p>
             </details>
         </div> 
     </div>
