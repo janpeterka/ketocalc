@@ -60,21 +60,23 @@ def calculate_recipe(ingredients, diet):
     elif len(ingredients) == 3:
         a = numpy.array(
             [
-                [ingredients[0].sugar, ingredients[1].sugar, ingredients[2].sugar],
-                [ingredients[0].fat, ingredients[1].fat, ingredients[2].fat],
-                [
-                    ingredients[0].protein,
-                    ingredients[1].protein,
-                    ingredients[2].protein,
-                ],
+                [ingredient.sugar for ingredient in ingredients],
+                [ingredient.fat for ingredient in ingredients],
+                [ingredient.protein for ingredient in ingredients],
             ]
         )
         b = numpy.array([diet.sugar, diet.fat, diet.protein])
-        x = numpy.linalg.solve(a, b)
+        result = numpy.linalg.solve(a, b)
 
-        ingredients[0].amount = x[0]
-        ingredients[1].amount = x[1]
-        ingredients[2].amount = x[2]
+        if result[0] < 0 or result[1] < 0 or result[2] < 0:
+            raise ValueError(
+                "Recept nelze spočítat",
+                "Množství některé suroviny se dostalo do záporu",
+            )
+
+        ingredients[0].amount = result[0]
+        ingredients[1].amount = result[1]
+        ingredients[2].amount = result[2]
 
     elif len(ingredients) == 4:
         x, y, z = sp.symbols("x, y, z")
@@ -178,10 +180,10 @@ def calculate_recipe(ingredients, diet):
 
     # json cannot convert `sympy.Float`, so I convert everything to Python `float`
     for ingredient in ingredients:
-        ingredient.calorie = float(ingredient.calorie)
-        ingredient.fat = float(ingredient.fat)
         ingredient.sugar = float(ingredient.sugar)
+        ingredient.fat = float(ingredient.fat)
         ingredient.protein = float(ingredient.protein)
+        ingredient.calorie = float(ingredient.calorie)
         ingredient.amount = float(ingredient.amount)
 
     totals.sugar = float(totals.sugar)
