@@ -16,8 +16,11 @@
             {{ render_field(form.protein, "form-control") }}
             {{ render_field(form.fat, "form-control") }}
             {{ render_field(form.sugar, "form-control") }}
-            {{ render_field(form.small_size, "form-control") }}
-            {{ render_field(form.big_size, "form-control") }}
+            <strong>Velikost receptů</strong>
+            <i class="fa fa-question-circle" data-toggle="tooltip" title="Nastavení velikosti receptů slouží k přepočítání množství surovin u receptů. Pokud tedy nastavíte např. velikosti 10% a 25%, budou se vám pak recepty zobrazovat s daným přepočtem - tedy například tak, aby porce vydala za 25% denního množství"></i>
+            <p>
+            {{ render_field(form.small_size, "form-control", data_toggle='tooltip', title="jak velkou část denního množství zaujímá malé jídlo (např. svačina, snídaně)") }}
+            {{ render_field(form.big_size, "form-control", data_toggle='tooltip', title="jak velkou část denního množství zaujímá velké jídlo (např. oběd, večeře)") }}
             {{ render_field(form.submit, "btn btn-primary", False) }}
         </form>
     </div>

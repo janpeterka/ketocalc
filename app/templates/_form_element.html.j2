@@ -2,8 +2,10 @@
 
   {% if label %}
     {{ field.label }}
+    {% if "data_toggle" in kwargs and kwargs["data_toggle"] == "tooltip" %}
+      <i class="fa fa-question-circle" data-toggle="tooltip" title="{{ kwargs['title'] }}"></i>
+    {% endif %}
   {% endif %}
-
 
   {% if class %}
     {{ field(class_=class, **kwargs) }}
