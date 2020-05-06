@@ -38,11 +38,14 @@
         }
 
         for (let i = 0, ingredient; ingredient = selected_ingredients[i]; i++) {
-            totals["sugar"] += ingredient["sugar"] * this._amount(ingredient["amount"]) * coeficient
-            totals["protein"] += ingredient["protein"] * this._amount(ingredient["amount"]) * coeficient
-            totals["fat"] += ingredient["fat"] * this._amount(ingredient["amount"]) * coeficient
-            totals["calorie"] += ingredient["calorie"] * this._amount(ingredient["amount"]) * coeficient
-            totals["amount"] += ingredient["amount"] * coeficient
+            ingredient["amount"] = this._amount(ingredient["amount"]) * coeficient
+            this._ingredient_to_row(ingredient, this.ingredientTableTarget);
+
+            totals["sugar"] += ingredient["sugar"] * ingredient["amount"]
+            totals["protein"] += ingredient["protein"] * ingredient["amount"]
+            totals["fat"] += ingredient["fat"] * ingredient["amount"]
+            totals["calorie"] += ingredient["calorie"] * ingredient["amount"]
+            totals["amount"] += ingredient["amount"]
         }
 
         totals["ratio"] = totals["fat"] / (totals["sugar"] + totals["protein"])
@@ -86,6 +89,22 @@
         ingredient['amount'] = row.dataset.amount
 
         return ingredient
+      }
+
+      _ingredient_to_row(ingredient, table){
+        console.log(ingredient);
+        var row = table.querySelectorAll(`[data-id='` + ingredient.id + `']`)[0]
+        console.log(row)
+
+        // for (let i = 1, row; row = table.rows[i]; i++) {
+          // if (typeof row.querySelectorAll(`[data-type='sugar']`)[0] !== 'undefined'){
+        row.querySelectorAll(`[data-type='sugar']`)[0].innerHTML = this._float_to_fixed(ingredient["sugar"])
+        row.querySelectorAll(`[data-type='amount']`)[0].innerHTML = this._float_to_fixed(ingredient["amount"])
+        row.querySelectorAll(`[data-type='fat']`)[0].innerHTML = this._float_to_fixed(ingredient["fat"])
+        row.querySelectorAll(`[data-type='protein']`)[0].innerHTML = this._float_to_fixed(ingredient["protein"])
+        row.querySelectorAll(`[data-type='calorie']`)[0].innerHTML = this._float_to_fixed(ingredient["calorie"])
+          // }
+        // }
       }
 
       _set_totals(totals){
