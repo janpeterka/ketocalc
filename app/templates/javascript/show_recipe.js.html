@@ -45,7 +45,7 @@
             totals["protein"] += ingredient["protein"] * ingredient["amount"]
             totals["fat"] += ingredient["fat"] * ingredient["amount"]
             totals["calorie"] += ingredient["calorie"] * ingredient["amount"]
-            totals["amount"] += ingredient["amount"]
+            totals["amount"] += ingredient["amount"] * 100
         }
 
         totals["ratio"] = totals["fat"] / (totals["sugar"] + totals["protein"])
@@ -92,19 +92,13 @@
       }
 
       _ingredient_to_row(ingredient, table){
-        console.log(ingredient);
         var row = table.querySelectorAll(`[data-id='` + ingredient.id + `']`)[0]
-        console.log(row)
 
-        // for (let i = 1, row; row = table.rows[i]; i++) {
-          // if (typeof row.querySelectorAll(`[data-type='sugar']`)[0] !== 'undefined'){
-        row.querySelectorAll(`[data-type='sugar']`)[0].innerHTML = this._float_to_fixed(ingredient["sugar"])
-        row.querySelectorAll(`[data-type='amount']`)[0].innerHTML = this._float_to_fixed(ingredient["amount"])
-        row.querySelectorAll(`[data-type='fat']`)[0].innerHTML = this._float_to_fixed(ingredient["fat"])
-        row.querySelectorAll(`[data-type='protein']`)[0].innerHTML = this._float_to_fixed(ingredient["protein"])
-        row.querySelectorAll(`[data-type='calorie']`)[0].innerHTML = this._float_to_fixed(ingredient["calorie"])
-          // }
-        // }
+        row.querySelectorAll(`[data-type='sugar']`)[0].innerHTML = this._float_to_fixed(ingredient["sugar"] * ingredient["amount"])
+        row.querySelectorAll(`[data-type='fat']`)[0].innerHTML = this._float_to_fixed(ingredient["fat"] * ingredient["amount"])
+        row.querySelectorAll(`[data-type='protein']`)[0].innerHTML = this._float_to_fixed(ingredient["protein"] * ingredient["amount"])
+        row.querySelectorAll(`[data-type='calorie']`)[0].innerHTML = this._float_to_fixed(ingredient["calorie"] * ingredient["amount"])
+        row.querySelectorAll(`[data-type='amount']`)[0].innerHTML = this._float_to_fixed(ingredient["amount"] * 100) 
       }
 
       _set_totals(totals){
