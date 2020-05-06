@@ -98,7 +98,7 @@ class MailHandler(object):
 
         mail.send(message)
 
-        if application.config["APP_STATE"] != "production" and recipient:
+        if application.config["APP_STATE"] == "production" and recipient:
             message.recipient = recipient
             sent_mail = SentMail()
             sent_mail.fill_from_message(message)
