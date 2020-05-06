@@ -45,7 +45,7 @@
             totals["amount"] += ingredient["amount"] * coeficient
         }
 
-        totals["ratio"] = totals["protein"] / (totals["sugar"] + totals["fat"])
+        totals["ratio"] = totals["fat"] / (totals["sugar"] + totals["protein"])
 
         this._set_totals(totals)
       }
@@ -103,13 +103,12 @@
         this._float_to_fixed(totals["sugar"]) +
         "</td><td>" +
         this._float_to_fixed(totals["amount"]) +
-        "</td><td> Poměr:" +
+        "</td><td> <em>Poměr: " +
         this._float_to_fixed(totals["ratio"]) + 
-        ": 1 </td>"
+        ": 1 </em></td>"
 
       $(this.totalsTarget).append(html);
     }
   });
-
 
     </script>
