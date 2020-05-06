@@ -33,10 +33,9 @@
             Seznamy
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="{{ url_for('IngredientsView:index') }}">Všechny suroviny</a>
-            <a class="dropdown-item" href="{{ url_for('DietsView:index') }}">Všechny diety</a>
-            <a class="dropdown-item" href="{{ url_for('RecipesView:index') }}">Všechny recepty</a>
-            {# <div class="dropdown-divider"></div> #}
+            <a class="dropdown-item" href="{{ url_for('RecipesView:index') }}">recepty</a>
+            <a class="dropdown-item" href="{{ url_for('IngredientsView:index') }}">suroviny</a>
+            <a class="dropdown-item" href="{{ url_for('DietsView:index') }}">diety</a>
           </div>
         </li>
 
