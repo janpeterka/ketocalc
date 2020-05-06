@@ -54,6 +54,10 @@ class User(db.Model, UserMixin, ItemMixin):
         "Diet", order_by="desc(Diet.active)", back_populates="author"
     )
 
+    sent_mails = db.relationship(
+        "SentMail", order_by="desc(SentMail.created_at)", back_populates="recipient"
+    )
+
     @staticmethod
     @login.user_loader
     def load(user_identifier, load_type="id"):
@@ -185,3 +189,42 @@ class User(db.Model, UserMixin, ItemMixin):
             .first()
         )
         return request
+
+    @property
+    def onboarding_welcome_mail_sent(self):
+        for mail in self.sent_mails:
+            if mail.template == "mails/onboarding/welcome.html.j2":
+                return mail.created_at
+
+        return None
+
+    @property
+    def onboarding_inactive_mail_sent(self):
+        for mail in self.sent_mails:
+            if mail.template == "mails/onboarding/inactive.html.j2":
+                return mail.created_at
+
+        return None
+
+    def state(self, name=None):
+        if name == "onboarding_welcome":
+            if (
+                self.created
+                and datetime.date.today() - datetime.timedelta(days=7)
+                < self.created.date()
+            ):
+                return True
+            else:
+                return False
+        elif name == "onboarding_inactive":
+            if (
+                self.created
+                and datetime.date.today() - datetime.timedelta(days=30)
+                < self.created.date()
+                and len(self.recipes) == 0
+            ):
+                return True
+            else:
+                return False
+        else:
+            return False

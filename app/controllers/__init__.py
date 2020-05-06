@@ -6,6 +6,7 @@ def register_all_controllers(application):
     from .index import IndexView
     from .ingredients import IngredientsView
     from .login import LoginView
+    from .mails import MailsView
     from .password_recovery import PasswordRecoveryView
     from .recipes import RecipesView
     from .register import RegisterView
@@ -21,6 +22,7 @@ def register_all_controllers(application):
     IndexView.register(application)
     IngredientsView.register(application)
     LoginView.register(application)
+    MailsView.register(application)
     PasswordRecoveryView.register(application)
     RecipesView.register(application)
     RegisterView.register(application)
