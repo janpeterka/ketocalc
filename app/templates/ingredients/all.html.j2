@@ -10,7 +10,7 @@
 {% block content %}
     <div class="container">
         <div class="col-12">
-            <h1>Moje suroviny <a href="{{ url_for('IngredientsView:new') }}"><button class="btn btn-secondary btn-float-right">{{ texts.ingredient_add }}</button></a>
+            <h1>Moje suroviny <a href="{{ url_for('IngredientsView:new') }}"><button class="btn btn-secondary float-right">{{ texts.ingredient_add }}</button></a>
             </h1>
             <table id="ingredients" class="table">
                 <tr>
@@ -35,7 +35,7 @@
             <h1>
                 Sdílené suroviny
                 <a href="{{ url_for('IngredientsView:new_shared') }}">
-                    <button class="btn btn-secondary btn-float-right">{{ texts.ingredient_add_shared }}
+                    <button class="btn btn-secondary float-right">{{ texts.ingredient_add_shared }}
                     </button>
                 </a>
             </h1>

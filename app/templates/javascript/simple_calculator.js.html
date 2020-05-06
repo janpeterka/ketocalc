@@ -101,7 +101,7 @@
             totals["amount"] += parseFloat(ingredient["amount"])
         }
 
-        $(this.totalsTarget).empty();
+        
         this._set_totals(totals)
       }
 
@@ -116,7 +116,6 @@
           'ingredients' : this._get_currently_selected(),
           'dietID' : this.recipeDietTarget.value,
           'name' : this.recipeNameTarget.value,
-          'size' : "full"
         }),
         headers: {'Content-Type': 'application/json,charset=UTF-8'},
       })
@@ -129,6 +128,7 @@
     }
 
     _set_totals(totals){
+      $(this.totalsTarget).empty();
       var html =
         "<td>" +
         totals["calorie"] +

@@ -280,10 +280,6 @@ a.inactive {
   width: 2rem;
 }
 
-.btn-float-right{
-  float: right;
-}
-
 .table tr.vertically-centered td {
   vertical-align: middle;
 }
