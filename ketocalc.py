@@ -2,7 +2,7 @@ import os
 import re
 import time
 
-from flask import request, redirect
+from flask import request, redirect, session
 from flask import g
 
 from flask_login import current_user
@@ -27,6 +27,8 @@ def inject_globals():
 
 @application.before_request
 def session_management():
+    current_user.logged_from_admin = session.get("logged_from_admin")
+
     if application.config["APP_STATE"] == "shutdown" and request.path not in [
         "/shutdown",
         "/static/css/style.css",

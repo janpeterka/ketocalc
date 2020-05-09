@@ -80,6 +80,10 @@
     {% if config.APP_STATE == "development" %}
         <span class="dev-badge"><strong>DEV</strong></span>
     {% endif %}
+
+    {% if current_user.logged_from_admin %}
+        {% include 'admin/_from_admin.html.j2'%}        
+    {% endif %}
     <div id="content">{% block content %}{% endblock %}</div>
     <div class="footer">
         {% block footer %}

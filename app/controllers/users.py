@@ -1,9 +1,9 @@
 from flask import render_template as template
-from flask import request, url_for, redirect, abort, flash
+from flask import request, url_for, redirect, abort, flash, session
 from flask import current_app as application
 
 from flask_classful import FlaskView, route
-from flask_login import login_required, current_user
+from flask_login import login_required, current_user, login_user
 
 from app.auth import admin_required
 
@@ -87,6 +87,14 @@ class UsersView(FlaskView):
     def show_all(self):
         users = User.load_all()
         return template("admin/users/all.html.j2", users=users)
+
+    @admin_required
+    def login_as(self, user_id, back=False):
+        session.pop("logged_from_admin", None)
+        if not back:
+            session["logged_from_admin"] = current_user.id
+        login_user(User.load(user_id))
+        return redirect(url_for("IndexView:index"))
 
     @admin_required
     def send_mail(self, user_id, mail_type):
