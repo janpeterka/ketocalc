@@ -90,6 +90,8 @@ class UsersView(FlaskView):
 
     @admin_required
     def login_as(self, user_id, back=False):
+        if "back" in request.args:
+            back = request.args["back"]
         session.pop("logged_from_admin", None)
         if not back:
             session["logged_from_admin"] = current_user.id
