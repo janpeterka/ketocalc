@@ -265,6 +265,10 @@ tr.inactive a.inactive {
   color: var(--inactive);
 }
 
+a.inactive {
+  color: var(--inactive);
+}
+
 .dev-badge {
   margin-left: 2rem;
   padding: 1rem;
@@ -282,10 +286,6 @@ tr.inactive a.inactive {
 
 .navbar div.navbar-divider {
   width: 2rem;
-}
-
-.btn-float-right{
-  float: right;
 }
 
 .table tr.vertically-centered td {

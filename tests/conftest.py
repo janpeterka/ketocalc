@@ -42,15 +42,7 @@ def db_fill_calc():
     user.save()
 
     Diet(
-        name="3.5",
-        calorie=0,
-        sugar=10,
-        fat=81,
-        protein=13,
-        small_size=10,
-        big_size=20,
-        active=1,
-        user_id=1,
+        name="3.5", calorie=0, sugar=10, fat=81, protein=13, active=1, user_id=1,
     ).save()
 
     Ingredient(

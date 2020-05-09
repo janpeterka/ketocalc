@@ -55,8 +55,6 @@ class RecipesView(BaseRecipesView):
     @route("<id>/edit", methods=["POST"])
     def post_edit(self, id):
         self.recipe.name = request.form["name"]
-        if "size" in request.form:
-            self.recipe.type = request.form["size"]
         self.recipe.edit()
         self.recipe.refresh()
         flash("Recept byl upraven.", "success")
@@ -114,7 +112,6 @@ class RecipesView(BaseRecipesView):
 
         recipe = Recipe()
         recipe.name = request.json["name"]
-        recipe.type = request.json["size"]
         recipe.diet = Diet.load(diet_id)
 
         last_id = recipe.save(ingredients)

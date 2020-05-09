@@ -8,9 +8,9 @@ from flask import g
 from flask_login import current_user
 
 from app import create_app
+from app import db
 
 # from app.models import db
-# from app import db
 # from app.models.users import User
 from app.models.request_log import RequestLog
 
@@ -45,6 +45,7 @@ def log_request_start():
 
 @application.teardown_request
 def log_request(exception=None):
+    db.session.expire_all()
     pattern = re.compile("/static/")
     if not pattern.search(request.path):
         user_id = getattr(current_user, "id", None)

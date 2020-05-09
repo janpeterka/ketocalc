@@ -1,0 +1,17 @@
+{% extends "mails/base_mail.html.j2" %}
+{% block content %}
+Dobrý den, <br>
+<p>
+děkuji, že jste si založil{% if gender == "f" %}a{%endif%} účet v mojí aplikaci Ketokalkulačka.
+<p>
+Kalkulačka vznikla s cílem usnadnit život lidem s ketogenní dietou (a těm, kdo se u ně starají). Doufám tedy, že pomůže i Vám.
+<p>
+Aplikace je celkem nově zveřejněná, proto se může stát, že narazíte na nějaké chyby či nejasnosti.
+V takových případech se na mě prosím obraťte (buď přes <a href="{{ url_for('SupportView:feedback') }}">formulář</a> nebo přes <a href="https://facebook.com/ketokalkulacka">facebookovou stránku</a>).<br>
+Snažím se chyby rychle opravovat, a zároveň stále kalkulačku zlepšovat tak, aby co nejvíce pomáhala.
+<p>
+Také se na mě neváhejte obrátit, pokud budete mít nápady, jak kalkulačku zlepšit - jaké funkce přidat, kde něco upravit, kam přidat vysvětlení nebo 
+S pozdravem<br>
+Jan Peterka<br>
+<i>tvůrce kalkulačky</i>
+{% endblock %}
