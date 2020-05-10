@@ -1,14 +1,13 @@
 import json
 
-from flask import render_template as template
 from flask import jsonify, request, abort
+from flask import render_template as template
 
 from flask_classful import FlaskView, route
 
-from app.models.ingredients import Ingredient
-from app.models.diets import Diet
-
 from app.helpers import calculations
+from app.models.diets import Diet
+from app.models.ingredients import Ingredient
 
 
 class BaseRecipesView(FlaskView):

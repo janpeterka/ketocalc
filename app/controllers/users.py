@@ -1,18 +1,14 @@
-from flask import render_template as template
 from flask import request, url_for, redirect, abort, flash
 from flask import current_app as application
+from flask import render_template as template
 
 from flask_classful import FlaskView, route
 from flask_login import login_required, current_user
 
 from app.auth import admin_required
-
 from app.handlers.mail import MailHandler
-
 from app.helpers.form import create_form, save_form_to_session
-
 from app.models.users import User
-
 from app.controllers.forms.users import UserForm, PasswordForm
 
 

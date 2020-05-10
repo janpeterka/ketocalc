@@ -9,10 +9,7 @@ from app import db
 class BaseMixin(object):
     @classmethod
     def load(cls, *args, **kwargs):
-        if "id" in kwargs:
-            cls_id = kwargs["id"]
-        else:
-            cls_id = args[0]
+        cls_id = kwargs.get("id", args[0])
         my_object = db.session.query(cls).filter(cls.id == cls_id).first()
         return my_object
 

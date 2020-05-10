@@ -1,16 +1,12 @@
+from flask import abort, flash, g, redirect, request, url_for
 from flask import render_template as template
-from flask import request, redirect, url_for
-from flask import abort, flash, g
-
-from flask_login import login_required, current_user
 
 from flask_classful import FlaskView, route
+from flask_login import login_required, current_user
 
 from app.helpers.form import create_form, save_form_to_session
-
 from app.models.diets import Diet
 from app.models.users import User
-
 from app.controllers.forms.diets import DietsForm
 
 

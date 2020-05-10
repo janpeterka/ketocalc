@@ -49,7 +49,7 @@ class RecipesView(BaseRecipesView):
         )
 
     def post(self):
-        # TODO: implemented with ajax not, will change
+        # TODO: implemented with ajax now, will change
         pass
 
     @route("<id>/edit", methods=["POST"])

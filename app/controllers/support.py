@@ -1,13 +1,12 @@
 import os
 
-from flask import render_template as template
 from flask import redirect, request, flash, url_for, send_file
+from flask import render_template as template
 
 from flask_classful import FlaskView, route
 from flask_login import current_user, login_required
 
 from app.handlers.mail import MailHandler
-
 from app.controllers.forms.feedback import FeedbackForm
 
 

@@ -6,11 +6,10 @@ from flask_classful import FlaskView, route
 from flask_login import current_user
 
 from app.auth.routes import generate_new_password_token
-
-from app.controllers.forms.password_recovery import NewPasswordForm, GetNewPasswordForm
-from app.handlers.mail import MailHandler
 from app.helpers.form import create_form, save_form_to_session
+from app.handlers.mail import MailHandler
 from app.models.users import User
+from app.controllers.forms.password_recovery import NewPasswordForm, GetNewPasswordForm
 
 
 class PasswordRecoveryView(FlaskView):

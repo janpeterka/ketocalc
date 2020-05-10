@@ -43,15 +43,8 @@ def do_oauth_register(*, user_info, oauth_type):
     user.password = None
     user.google_id = user_info["id"]
 
-    if "given_name" in user_info:
-        user.first_name = user_info["given_name"]
-    else:
-        user.first_name = "-"
-
-    if "family_name" in user_info:
-        user.last_name = user_info["family_name"]
-    else:
-        user.last_name = "-"
+    user.first_name = user_info.get("given_name", "-")
+    user.last_name = user_info.get("family_name", "-")
 
     do_register(user, source="google_oauth")
 
