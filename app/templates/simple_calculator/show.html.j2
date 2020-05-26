@@ -7,6 +7,13 @@
     {% include 'javascript/stimulus.js.html' %}
     {% include 'javascript/simple_calculator.js.html' %}
     {% include 'javascript/simple_calculator_help.js.html' %}
+
+        <!-- Google Charts -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <!-- Bootstrap slider -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.2/css/bootstrap-slider.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.2/bootstrap-slider.min.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -51,7 +58,8 @@
                         <th>{{ texts.protein_simple }}</th>
                         <th>{{ texts.fat_simple }}</th>
                         <th>{{ texts.sugar_simple }}</th> 
-                        <th>{{ texts.amount_simple }}</th> 
+                        <th>{{ texts.amount_simple }}</th>
+                        <th>{{ texts.ratio_full }}</th>
                     </tr>
                     <tr data-target="simple-calculator.totals"></tr>
                 </table>
