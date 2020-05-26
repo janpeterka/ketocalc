@@ -101,6 +101,7 @@
             totals["amount"] += parseFloat(ingredient["amount"])
         }
 
+        totals["ratio"] = parseFloat(totals["fat"] / (totals["protein"] + totals["sugar"]))
         
         this._set_totals(totals)
       }
@@ -140,9 +141,18 @@
         totals["sugar"] +
         "</td><td>" +
         totals["amount"] +
+        "</td><td>" +
+        totals["ratio"] +
         "</td>"
 
       $(this.totalsTarget).append(html);
     }
   });
+</script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  $('#ingredient_select').select2();
+  console.log($('#ingredient_select'))
+});
 </script>
