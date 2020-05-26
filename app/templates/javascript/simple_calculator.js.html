@@ -20,6 +20,10 @@
         }
       }
 
+      _float_to_fixed(data){
+        return parseFloat(data).toFixed(2)
+      }
+
       add_ingredient(e){
         e.preventDefault();
 
@@ -141,9 +145,9 @@
         totals["sugar"] +
         "</td><td>" +
         totals["amount"] +
-        "</td><td>" +
-        totals["ratio"] +
-        "</td>"
+        "</td><td> <em>" +
+        this._float_to_fixed(totals["ratio"]) + 
+        ": 1 </em></td>"
 
       $(this.totalsTarget).append(html);
     }
