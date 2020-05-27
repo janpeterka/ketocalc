@@ -14,6 +14,8 @@ mail = Mail()
 db = SQLAlchemy(session_options={"autoflush": False, "autocommit": False})
 migrate = Migrate()
 
+from .controllers import register_all_controllers  # noqa: F401
+
 
 def create_app(config_name="default"):
     application = Flask(__name__, instance_relative_config=True)
@@ -35,8 +37,6 @@ def create_app(config_name="default"):
     application.logger.addHandler(db_handler)
 
     # CONTROLLERS
-
-    from .controllers import register_all_controllers  # noqa: F401
 
     register_all_controllers(application)
 
