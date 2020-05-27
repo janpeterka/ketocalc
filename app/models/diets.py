@@ -28,8 +28,7 @@ class Diet(db.Model, ItemMixin):
     def is_used(self):
         if len(self.recipes) == 0:
             return False
-        else:
-            return True
+        return True
 
     # TODO: only used for testing, probably want to remove (move to helper)
     @staticmethod
