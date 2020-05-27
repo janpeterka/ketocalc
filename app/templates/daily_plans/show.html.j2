@@ -14,8 +14,7 @@
                 </a>
             </span>
             <span style="font-size: 2rem">
-                {# {{ human_format_date(dates["active"]) }} #}
-                {{ view.something }}
+                {{ human_format_date(dates["active"]) }}
             </span>
             <span class="float-right" style="margin-right: 10rem">
                 <a href="{{ url_for('DailyPlansView:show', date=dates['next']) }}">

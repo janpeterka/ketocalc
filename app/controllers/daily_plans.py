@@ -1,16 +1,14 @@
 import datetime
 from datetime import date
 
-from flask import render_template as template
-
 from flask import redirect, url_for
 
-from flask_classful import FlaskView
+from app.controllers.extended_flask_view import ExtendedFlaskView
 
 from app.models.daily_plans import DailyPlan
 
 
-class DailyPlansView(FlaskView):
+class DailyPlansView(ExtendedFlaskView):
     def index(self):
         return redirect(url_for("DailyPlansView:show", date=date.today()))
 
@@ -18,11 +16,10 @@ class DailyPlansView(FlaskView):
         date = self.__parse_date(date)
         date_before = date + datetime.timedelta(days=-1)
         date_after = date + datetime.timedelta(days=1)
-        dates = {"active": date, "previous": date_before, "next": date_after}
+        self.dates = {"active": date, "previous": date_before, "next": date_after}
 
-        daily_recipes = DailyPlan.load_by_date(date)
-        print(daily_recipes)
-        return template("daily/show.html.j2", dates=dates, view=self)
+        # daily_recipes = DailyPlan.load_by_date(date)
+        return self.template("daily_plans/show.html.j2")
 
     def show_add_recipe(self):
         return None

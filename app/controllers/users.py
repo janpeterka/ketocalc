@@ -1,8 +1,7 @@
-from flask import render_template as template
 from flask import request, url_for, redirect, abort, flash, session
 from flask import current_app as application
 
-from flask_classful import FlaskView, route
+from flask_classful import route
 from flask_login import login_required, current_user, login_user
 
 from app.auth import admin_required
@@ -15,8 +14,10 @@ from app.models.users import User
 
 from app.controllers.forms.users import UserForm, PasswordForm
 
+from app.controllers.extended_flask_view import ExtendedFlaskView
 
-class UsersView(FlaskView):
+
+class UsersView(ExtendedFlaskView):
     decorators = [login_required]
 
     @login_required
@@ -62,23 +63,18 @@ class UsersView(FlaskView):
         return redirect(url_for("UsersView:show"))
 
     def show(self):
-        return template("users/show.html.j2", user=self.user)
+        return self.template()
 
     def edit(self):
-        user_form = create_form(UserForm, obj=self.user)
-        password_form = create_form(PasswordForm)
-        return template(
-            "users/edit.html.j2",
-            user=self.user,
-            user_form=user_form,
-            password_form=password_form,
-        )
+        self.user_form = create_form(UserForm, obj=self.user)
+        self.password_form = create_form(PasswordForm)
+        return self.template()
 
     @admin_required
     def show_by_id(self, id):
         user = User.load(id)
-        if user:
-            return template("users/show.html.j2", user=user)
+        if self.user:
+            return self.template("users/show.html.j2", user=user)
         else:
             flash("Uživatel neexistuje", "error")
             return redirect(url_for("UsersView:show_all"))
@@ -86,7 +82,7 @@ class UsersView(FlaskView):
     @admin_required
     def show_all(self):
         users = User.load_all()
-        return template("admin/users/all.html.j2", users=users)
+        return self.template("admin/users/all.html.j2", users=users)
 
     @admin_required
     def login_as(self, user_id, back=False):

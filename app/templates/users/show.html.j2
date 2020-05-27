@@ -1,6 +1,10 @@
 {% extends "base.html.j2" %}
 {% block title %}
-    Uživatel
+    {% if current_user.is_admin %}
+        Uživatel [{{ user.id }} | {{ user.username }}]   
+    {% else %}
+        Uživatel
+    {% endif %}
 {% endblock %}
 
 {% block content %}
