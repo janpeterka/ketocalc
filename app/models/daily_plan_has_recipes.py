@@ -1,10 +1,13 @@
 import datetime
 from app import db
 
+from app.models.base_mixin import BaseMixin
 
-class DailyPlanHasRecipes(db.Model):
+
+class DailyPlanHasRecipes(db.Model, BaseMixin):
     __tablename__ = "daily_plan_has_recipes"
 
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     recipes_id = db.Column(
         db.ForeignKey("recipes.id"), primary_key=True, nullable=False, index=True
     )

@@ -1,32 +1,69 @@
 import datetime
-from datetime import date
 
-from flask import redirect, url_for
+from flask import redirect, url_for, request, jsonify
+from flask_classful import route
+from flask_login import current_user, login_required
+
+from app.helpers.formaters import parse_date
+
+from app.models.daily_plans import DailyPlan
+from app.models.daily_plan_has_recipes import DailyPlanHasRecipes
+from app.models.diets import Diet
+from app.models.recipes import Recipe
 
 from app.controllers.extended_flask_view import ExtendedFlaskView
 
-from app.models.daily_plans import DailyPlan
-
 
 class DailyPlansView(ExtendedFlaskView):
+    decorators = [login_required]
+
     def index(self):
-        return redirect(url_for("DailyPlansView:show", date=date.today()))
+        return redirect(url_for("DailyPlansView:show", date=datetime.date.today()))
 
     def show(self, date):
-        date = self.__parse_date(date)
+        date = parse_date(date)
         date_before = date + datetime.timedelta(days=-1)
         date_after = date + datetime.timedelta(days=1)
         self.dates = {"active": date, "previous": date_before, "next": date_after}
 
-        # daily_recipes = DailyPlan.load_by_date(date)
-        return self.template("daily_plans/show.html.j2")
+        self.daily_plan = DailyPlan.load_by_date(date, current_user.id)
+        if self.daily_plan is None:
+            self.daily_plan = DailyPlan()
+            self.daily_plan.date = date
+            self.daily_plan.author = current_user
+            self.daily_plan.save()
 
-    def show_add_recipe(self):
-        return None
+        self.diets = current_user.active_diets
+        return self.template()
 
-    def add_recipe_AJAX(self, recipeID):
-        return None
+    # def show_add_recipe(self, date):
+    #     self.date = date
+    #     return self.template()
 
-    # private
-    def __parse_date(self, date):
-        return datetime.datetime.strptime(date, "%Y-%m-%d").date()
+    @route("/add_recipe", methods=["POST"])
+    def add_recipe_AJAX(self,):
+        recipe_id = request.form["recipe_id"]
+        recipe = Recipe.load(recipe_id)
+
+        date = request.form["date"]
+
+        daily_plan = DailyPlan.load_by_date(date, current_user.id)
+
+        dphr = DailyPlanHasRecipes()
+        dphr.recipes_id = recipe.id
+        dphr.daily_plans_id = daily_plan.id
+        dphr.amount = request.form["amount"]
+        dphr.save()
+
+        return redirect(url_for("DailyPlansView:show", date=datetime.date.today()))
+
+    @route("/load_recipes_AJAX", methods=["POST"])
+    def load_recipes_AJAX(self):
+        diet_id = request.json["diet_id"]
+        recipes = Diet.load(diet_id).recipes
+
+        json_recipes = []
+        for recipe in recipes:
+            json_recipes.append(recipe.json)
+
+        return jsonify(json_recipes)

@@ -1,0 +1,34 @@
+<script type="text/javascript">
+application.register("daily-plan", class extends Stimulus.Controller {
+	static get targets() {
+		return ["diets", "recipes"]
+	}
+
+	connect() {
+		this.load_recipes();
+	}
+
+	load_recipes(){
+		fetch("{{ url_for('DailyPlansView:load_recipes_AJAX') }}",{
+			method: 'POST',
+			body: JSON.stringify({'diet_id' : this.dietsTarget.value}),
+			headers: {'Content-Type': 'application/json,charset=UTF-8'}}
+		).then((response) => {
+			return response.json(); }
+		).then((response) => {
+			for (let i = 0, recipe; recipe = response[i]; i++) {
+				this.add_recipe_option(recipe);
+			}
+		}).catch((error) => {
+			console.error('Error:', error);
+		});
+	}
+
+	add_recipe_option(recipe){
+	    var option = document.createElement('option');
+	    option.value = recipe.id;
+	    option.innerHTML = recipe.name;
+	    this.recipesTarget.appendChild(option);
+	}
+});
+</script>

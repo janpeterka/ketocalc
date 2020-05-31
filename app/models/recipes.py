@@ -13,7 +13,7 @@ from app.models.recipes_has_ingredients import RecipeHasIngredients
 class Recipe(db.Model, ItemMixin):
     __tablename__ = "recipes"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(255), nullable=False)
     type = db.Column(db.Enum("small", "big", "full"), nullable=False, default="full")
 

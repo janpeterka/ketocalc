@@ -3,11 +3,14 @@
     Denní přehled
 {% endblock %}
 
-{% block script %}{% endblock %}
+{% block script %}
+    {% include 'javascript/stimulus.js.html' %}
+    {% include 'javascript/daily_plan.js.html' %}
+{% endblock %}
 
 {% block content %}
     <div class="container" data-controller="daily">
-        <div data-target="nav" class="text-center">
+        <div class="text-center">
             <span class="float-left" style="margin-left: 10rem">
                 <a href="{{ url_for('DailyPlansView:show', date=dates['previous']) }}">
                 {{ human_format_date(dates["previous"]) }}
@@ -23,9 +26,26 @@
             </span>
         </div>
 
-        <div data-target="recipes"></div>
-        <div data-target="add">
-            <a href="url_for('DailyPlansView:show_add_recipe')"></a>
+        <div class="row">
+{#             {% for recipe in recipes %}
+                {{ recipe.name }}
+            {% endfor %} #}
         </div>
+        <div data-controller="daily-plan" class="row" style="float:right; margin-top:5rem; margin-right: 8rem;">
+            {# <a href="{{ url_for('DailyPlansView:show_add_recipe', date=dates['active']) }}">Přidat recept</a> #}
+            <form class="form form-inline" action="{{ url_for('DailyPlansView:add_recipe_AJAX') }}" method="post">
+                <select name="recipe_id" class="form-control" data-target="daily-plan.diets">
+                {% for diet in diets: %}
+                    <option data-action="change->daily-plan#load_recipes" value="{{ diet.id }}">{{ diet.name }}</option>
+                {% endfor %}
+                </select>
+            
+                <select class="form-control" data-target="daily-plan.recipes"></select>
+                <input type="number" step="0.01" name="amount" class="form-control">
+                <input type="hidden" name="date" value="{{ dates['active'] }}">
+                <input type="submit" class="form-control btn btn-primary"  name="Přidat recept">
+            </form>
+        </div>
+
     </div>
 {% endblock %}

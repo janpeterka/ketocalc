@@ -8,13 +8,23 @@ class DailyPlan(db.Model, BaseMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, nullable=False)
+
+    user_id = db.Column(db.ForeignKey(("users.id")), nullable=False, index=True)
+    author = db.relationship("User", uselist=False, back_populates="daily_plans")
+
     recipes = db.relationship(
         "Recipe",
-        secondary="daily_plan_has_recipes",
-        # order_by="daily_plan_has_recipes.added_at",
+        primaryjoin="and_(DailyPlan.id == remote(DailyPlanHasRecipes.daily_plans_id), foreign(Recipe.id) == DailyPlanHasRecipes.recipes_id)",
+        viewonly=True,
+        order_by="Recipe.name",
     )
 
     @staticmethod
-    def load_by_date(date):
-        date_plan = db.session.query(DailyPlan).filter(DailyPlan.date == date).first()
+    def load_by_date(date, user_id):
+        date_plan = (
+            db.session.query(DailyPlan)
+            .filter(DailyPlan.date == date)
+            .filter(DailyPlan.user_id == user_id)
+            .first()
+        )
         return date_plan

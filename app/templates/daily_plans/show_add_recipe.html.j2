@@ -1,0 +1,22 @@
+{% extends "base.html.j2" %}
+{% block title %}
+    Denní přehled - přidat recept
+{% endblock %}
+{% block script %}
+    {% include 'javascript/stimulus.js.html' %}
+    {% include 'javascript/daily_plan.js.html' %}
+{% endblock %}
+{% block content %}
+    <div class="container" data-controller="daily-plan">
+        <form class="form form-inline" action="{{ url_for('DailyPlansView:add_recipe_AJAX') }}" method="post">
+            <select class="form-control" data-target="daily-plan.diets">
+                {% for diet in diets: %}
+                    <option data-action="change->daily-plan#load_recipes" value="{{ diet.id }}">{{ diet.name }}</option>
+                {% endfor %}
+            </select>
+            
+        <select class="form-control" data-target="daily-plan.recipes"></select>
+        <input class="form-control btn btn-primary" type="submit" name="Přidat recept">
+    </form>
+</div>
+{% endblock %}

@@ -25,18 +25,19 @@ class ExtendedFlaskView(FlaskView):
         self.model_name = model_name
         # e.g. user
         self.attribute_name = snake_model_name
-        print(self.attribute_name)
 
         # e.g. class <User>
         try:
             self.model_klass = globals()[model_name]
         except KeyError:
-            print("No model named {}".format(model_name))
+            # print("No model named {}".format(model_name))
+            pass
         # e.g. class <UsersForm>
         try:
             self.form_klass = globals()[form_name]
         except KeyError:
-            print("No form model named {}".format(form_name))
+            # print("No form model named {}".format(form_name))
+            pass
 
         if id is not None:
             instance = self.model_klass().load(id)
