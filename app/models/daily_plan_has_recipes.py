@@ -8,11 +8,9 @@ class DailyPlanHasRecipes(db.Model, BaseMixin):
     __tablename__ = "daily_plan_has_recipes"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    recipes_id = db.Column(
-        db.ForeignKey("recipes.id"), primary_key=True, nullable=False, index=True
-    )
+    recipes_id = db.Column(db.ForeignKey("recipes.id"), nullable=False, index=True)
     daily_plans_id = db.Column(
-        db.ForeignKey("daily_plans.id"), primary_key=True, nullable=False, index=True
+        db.ForeignKey("daily_plans.id"), nullable=False, index=True
     )
 
     amount = db.Column(db.Float, nullable=False)
