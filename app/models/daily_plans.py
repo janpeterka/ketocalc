@@ -19,13 +19,6 @@ class DailyPlan(db.Model, BaseMixin):
 
     has_recipes = db.relationship("DailyPlanHasRecipes", back_populates="daily_plan")
 
-    # recipes = db.relationship(
-    #     "Recipe",
-    #     primaryjoin="and_(DailyPlan.id == remote(DailyPlanHasRecipes.daily_plans_id), foreign(Recipe.id) == DailyPlanHasRecipes.recipes_id)",
-    #     viewonly=True,
-    #     order_by="Recipe.name",
-    # )
-
     @staticmethod
     def load_by_date(date):
         date_plan = (

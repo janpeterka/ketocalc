@@ -1,7 +1,7 @@
 <script type="text/javascript">
 application.register("daily-plan", class extends Stimulus.Controller {
 	static get targets() {
-		return ["diets", "recipes"]
+		return ["diets", "recipes", "recipesTable"]
 	}
 
 	connect() {
@@ -30,21 +30,5 @@ application.register("daily-plan", class extends Stimulus.Controller {
 	    option.innerHTML = recipe.name;
 	    this.recipesTarget.appendChild(option);
 	}
-
-	remove_recipe(event){
-        var id = event.target.dataset.id
-        var row = this._get_recipe_row_by_id(id, this.recipesTableTarget);
-        row.remove()
-    }
-
-    _get_recipe_row_by_id(id, table){
-        for (let i = 0, row; row = table.rows[i]; i++) {
-          if (row.dataset.id == id){
-            return row;
-          }
-        }
-        // else
-        return null;
-    }
 });
 </script>
