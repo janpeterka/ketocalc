@@ -1,3 +1,8 @@
+import math
+import types
+
+from flask_login import current_user
+
 from app import db
 
 from app.models.base_mixin import BaseMixin
@@ -12,19 +17,49 @@ class DailyPlan(db.Model, BaseMixin):
     user_id = db.Column(db.ForeignKey(("users.id")), nullable=False, index=True)
     author = db.relationship("User", uselist=False, back_populates="daily_plans")
 
-    recipes = db.relationship(
-        "Recipe",
-        primaryjoin="and_(DailyPlan.id == remote(DailyPlanHasRecipes.daily_plans_id), foreign(Recipe.id) == DailyPlanHasRecipes.recipes_id)",
-        viewonly=True,
-        order_by="Recipe.name",
-    )
+    has_recipes = db.relationship("DailyPlanHasRecipes", back_populates="daily_plan")
+
+    # recipes = db.relationship(
+    #     "Recipe",
+    #     primaryjoin="and_(DailyPlan.id == remote(DailyPlanHasRecipes.daily_plans_id), foreign(Recipe.id) == DailyPlanHasRecipes.recipes_id)",
+    #     viewonly=True,
+    #     order_by="Recipe.name",
+    # )
 
     @staticmethod
-    def load_by_date(date, user_id):
+    def load_by_date(date):
         date_plan = (
             db.session.query(DailyPlan)
             .filter(DailyPlan.date == date)
-            .filter(DailyPlan.user_id == user_id)
+            .filter(DailyPlan.user_id == current_user.id)
             .first()
         )
         return date_plan
+
+    @property
+    def totals(self):
+        totals = types.SimpleNamespace()
+
+        metrics = ["calorie", "sugar", "fat", "protein"]
+        for metric in metrics:
+            setattr(totals, metric, 0)
+
+        totals.amount = 0
+
+        for has_recipe in self.has_recipes:
+            recipe = has_recipe.recipe
+            recipe.amount = has_recipe.amount
+
+            for metric in metrics:
+                value = getattr(totals, metric)
+                recipe_value = getattr(recipe.values, metric)
+                setattr(totals, metric, value + recipe_value)
+            totals.amount += recipe.amount
+
+        try:
+            totals.ratio = (
+                math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
+            )
+        except ZeroDivisionError:
+            totals.ratio = 0
+        return totals

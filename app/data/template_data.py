@@ -24,6 +24,7 @@ texts = {
     "fat_simple": "Tuk (g)",
     "amount_simple": "Množství (g)",
     "ratio_full": "Poměr (tuky: bílkoviny + cukry)",
+    "ratio": "Poměr",
     "energy_100": "Energie (kJ/100g)",
     "sugar_100": "Sacharidy (g/100g)",
     "protein_100": "Bílkovina (g/100g)",

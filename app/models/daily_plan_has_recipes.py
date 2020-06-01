@@ -17,4 +17,4 @@ class DailyPlanHasRecipes(db.Model, BaseMixin):
     added_at = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
 
     daily_plan = db.relationship("DailyPlan")
-    recipes = db.relationship("Recipe")
+    recipe = db.relationship("Recipe")

@@ -26,19 +26,21 @@ class DailyPlansView(ExtendedFlaskView):
         date_after = date + datetime.timedelta(days=1)
         self.dates = {"active": date, "previous": date_before, "next": date_after}
 
-        self.daily_plan = DailyPlan.load_by_date(date, current_user.id)
+        self.daily_plan = DailyPlan.load_by_date(date)
         if self.daily_plan is None:
-            self.daily_plan = DailyPlan()
-            self.daily_plan.date = date
-            self.daily_plan.author = current_user
+            self.daily_plan = DailyPlan(date=date, author=current_user)
             self.daily_plan.save()
 
-        self.diets = current_user.active_diets
-        return self.template()
+        has_recipes = self.daily_plan.has_recipes
 
-    # def show_add_recipe(self, date):
-    #     self.date = date
-    #     return self.template()
+        self.recipes = []
+
+        for has_recipe in has_recipes:
+            recipe = has_recipe.recipe
+            recipe.amount = has_recipe.amount
+            self.recipes.append(recipe)
+
+        return self.template(diets=current_user.active_diets)
 
     @route("/add_recipe", methods=["POST"])
     def add_recipe_AJAX(self,):
@@ -47,7 +49,7 @@ class DailyPlansView(ExtendedFlaskView):
 
         date = request.form["date"]
 
-        daily_plan = DailyPlan.load_by_date(date, current_user.id)
+        daily_plan = DailyPlan.load_by_date(date)
 
         dphr = DailyPlanHasRecipes()
         dphr.recipes_id = recipe.id
@@ -55,7 +57,7 @@ class DailyPlansView(ExtendedFlaskView):
         dphr.amount = request.form["amount"]
         dphr.save()
 
-        return redirect(url_for("DailyPlansView:show", date=datetime.date.today()))
+        return redirect(url_for("DailyPlansView:show", date=date))
 
     @route("/load_recipes_AJAX", methods=["POST"])
     def load_recipes_AJAX(self):

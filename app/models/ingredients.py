@@ -14,25 +14,6 @@ from app.models.recipes_has_ingredients import RecipeHasIngredients
 
 
 class Ingredient(db.Model, ItemMixin):
-    """Ingredient class
-
-    [description]
-
-    Extends:
-        Base
-
-    Variables:
-        __tablename__ {str} -- [description]
-        id {int} -- [description]
-        name {string} -- [description]
-        calorie {int} -- [description]
-        sugar {int} -- [description]
-        fat {int} -- [description]
-        protein {int} -- [description]
-        author {string} -- [description]
-        recipes {relationship} -- [description]
-    """
-
     __tablename__ = "ingredients"
 
     id = db.Column(db.Integer, primary_key=True)
