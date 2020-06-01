@@ -27,7 +27,7 @@
         </div>
 
         <div class="row">
-            <table class="table table-striped " data-target="daily-plan.recipeTable">
+            <table class="table table-striped " data-target="daily-plan.recipesTable">
                 <thead>
                     <tr>
                         <th>{{ texts.title }}</th>
@@ -40,15 +40,17 @@
                     </tr>
                 </thead>
                 <tbody>
-                {% for recipe in recipes %}
+                {% for daily_recipe in daily_recipes %}
                     <tr>
-                        <td><a href="{{ url_for('RecipesView:show', id=recipe.id) }}">{{ recipe.name }}</a></td>
-                        <td>{{ recipe.values.calorie | round(2) }}</td>
-                        <td>{{ recipe.values.protein | round(2) }}</td>
-                        <td>{{ recipe.values.fat | round(2) }}</td>
-                        <td>{{ recipe.values.sugar | round(2) }}</td>
-                        <td>{{ recipe.amount }}</td>
-                        <td></td>
+                        <td><a href="{{ url_for('RecipesView:show', id=daily_recipe.recipe.id) }}">{{ daily_recipe.recipe.name }}</a></td>
+                        <td>{{ daily_recipe.values.calorie | round(2) }}</td>
+                        <td>{{ daily_recipe.values.protein | round(2) }}</td>
+                        <td>{{ daily_recipe.values.fat | round(2) }}</td>
+                        <td>{{ daily_recipe.values.sugar | round(2) }}</td>
+                        <td>{{ daily_recipe.amount }}</td>
+                        <td>
+                            <i data-action="click->daily-plan#remove_ingredient" data-id="{{ daily_recipe.recipe.id }}" class="remove fa fa-times"></i>
+                        </td>
                     </tr>
                 {% endfor %}
                 </tbody>

@@ -159,7 +159,7 @@ class Recipe(db.Model, ItemMixin):
         metrics = ["calorie", "sugar", "fat", "protein"]
         for metric in metrics:
             total = getattr(self.totals, metric)
-            if self.amount is not None:
+            if getattr(self, "amount", None) is not None:
                 value = (total / self.totals.amount) * self.amount
             else:
                 value = total
