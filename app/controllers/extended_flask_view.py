@@ -36,12 +36,13 @@ class ExtendedFlaskView(FlaskView):
 
         if id is not None and self.model_klass is not None:
             instance = self.model_klass().load(id)
-            setattr(self, self.attribute_name, instance)
-            # e.g. self.user
-            self.object = getattr(self, self.attribute_name)
-
-            if self.object is None:
+            if instance is None:
                 abort(404)
+
+            # e.g. self.user
+            setattr(self, self.attribute_name, instance)
+        else:
+            setattr(self, self.attribute_name, None)
 
     def template(self, template_name=None, **kwargs):
         # Template name is given from view and method names if not provided

@@ -9,7 +9,6 @@ from app.helpers.formaters import parse_date
 from app.models.daily_plans import DailyPlan
 from app.models.daily_plan_has_recipes import DailyPlanHasRecipes
 from app.models.diets import Diet
-from app.models.recipes import Recipe
 
 from app.controllers.extended_flask_view import ExtendedFlaskView
 
@@ -41,16 +40,14 @@ class DailyPlansView(ExtendedFlaskView):
         return redirect(url_for("DailyPlansView:show", date=date))
 
     @route("/add_recipe", methods=["POST"])
-    def add_recipe_AJAX(self):
+    def add_recipe(self):
         recipe_id = request.form["recipe_id"]
-        recipe = Recipe.load(recipe_id)
-
         date = request.form["date"]
 
         daily_plan = DailyPlan.load_by_date(date)
 
         dphr = DailyPlanHasRecipes()
-        dphr.recipes_id = recipe.id
+        dphr.recipes_id = recipe_id
         dphr.daily_plans_id = daily_plan.id
         dphr.amount = request.form["amount"]
         dphr.save()

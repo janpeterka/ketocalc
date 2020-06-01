@@ -22,7 +22,7 @@ class UsersView(ExtendedFlaskView):
 
     def before_request(self, name, *args, **kwargs):
         super().before_request(name, *args, **kwargs)
-        if getattr(self, "user", None) is None:
+        if self.user is None:
             self.user = User.load(current_user.id)
 
     def post(self, page_type=None):
@@ -71,11 +71,7 @@ class UsersView(ExtendedFlaskView):
 
     @admin_required
     def show_by_id(self, id):
-        if self.user:
-            return self.template("users/show.html.j2")
-        else:
-            flash("Uživatel neexistuje", "error")
-            return redirect(url_for("UsersView:show_all"))
+        return self.template("users/show.html.j2")
 
     @admin_required
     def show_all(self):
