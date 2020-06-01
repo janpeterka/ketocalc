@@ -7,5 +7,5 @@ from .login import LoginForm  # noqa: F401
 from .password_recovery import NewPasswordForm  # noqa: F401
 from .password_recovery import GetNewPasswordForm  # noqa: F401
 from .register import RegisterForm  # noqa: F401
-from .users import UserForm  # noqa: F401
+from .users import UsersForm  # noqa: F401
 from .users import PasswordForm  # noqa: F401

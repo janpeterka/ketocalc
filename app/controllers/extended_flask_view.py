@@ -39,7 +39,6 @@ class ExtendedFlaskView(FlaskView):
             setattr(self, self.attribute_name, instance)
             # e.g. self.user
             self.object = getattr(self, self.attribute_name)
-            print(self.object)
 
             if self.object is None:
                 abort(404)
