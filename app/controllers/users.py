@@ -1,4 +1,4 @@
-from flask import request, url_for, redirect, abort, flash, session
+from flask import request, url_for, redirect, flash, session
 from flask import current_app as application
 
 from flask_classful import route
@@ -22,9 +22,9 @@ class UsersView(ExtendedFlaskView):
 
     @login_required
     def before_request(self, name, *args, **kwargs):
-        self.user = User.load(current_user.id)
-        if self.user is None:
-            abort(404)
+        super().before_request(name, *args, **kwargs)
+        if getattr(self, "user", None) is None:
+            self.user = User.load(current_user.id)
 
     def post(self, page_type=None):
         form = UserForm(request.form)
@@ -63,6 +63,7 @@ class UsersView(ExtendedFlaskView):
         return redirect(url_for("UsersView:show"))
 
     def show(self):
+        print(self.user)
         return self.template()
 
     def edit(self):
