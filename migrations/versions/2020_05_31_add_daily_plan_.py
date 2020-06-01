@@ -1,4 +1,4 @@
-"""empty message
+"""Adds daily plans
 
 Revision ID: a157327dd8c5
 Revises: a8a0fbdf5043

@@ -1,4 +1,4 @@
-"""empty message
+"""Remove diet sizes
 
 Revision ID: a8a0fbdf5043
 Revises: f5d5e1df41f9
