@@ -78,7 +78,7 @@
 
         </div>
         <div class="row" style="float:right; margin-top:5rem; margin-right: 8rem;">
-            <form class="form form-inline" action="{{ url_for('DailyPlansView:add_recipe_AJAX') }}" method="post">
+            <form class="form form-inline" action="{{ url_for('DailyPlansView:add_recipe') }}" method="post">
                 <select class="form-control" data-target="daily-plan.diets">
                 {% for diet in diets: %}
                     <option data-action="change->daily-plan#load_recipes" value="{{ diet.id }}">{{ diet.name }}</option>
