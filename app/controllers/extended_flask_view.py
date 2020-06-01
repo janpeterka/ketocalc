@@ -19,30 +19,30 @@ class ExtendedFlaskView(FlaskView):
         snake_model_name = re.sub("(?!^)([A-Z]+)", r"_\1", model_name).lower()
 
         # e.g. User
-        self.model_name = model_name
+        # model_name = model_name
         # e.g. user
-        self.attribute_name = snake_model_name
+        attribute_name = snake_model_name
 
         # e.g. class <User>
         try:
-            self.model_klass = globals()[model_name]
+            model_klass = globals()[model_name]
         except KeyError:
-            self.model_klass = None
+            model_klass = None
         # e.g. class <UsersForm>
         try:
-            self.form_klass = globals()[form_name]
+            form_klass = globals()[form_name]
         except KeyError:
-            self.form_klass = None
+            form_klass = None
 
-        if id is not None and self.model_klass is not None:
-            instance = self.model_klass().load(id)
+        if id is not None and model_klass is not None:
+            instance = model_klass().load(id)
             if instance is None:
                 abort(404)
 
             # e.g. self.user
-            setattr(self, self.attribute_name, instance)
+            setattr(self, attribute_name, instance)
         else:
-            setattr(self, self.attribute_name, None)
+            setattr(self, attribute_name, None)
 
     def template(self, template_name=None, **kwargs):
         # Template name is given from view and method names if not provided
