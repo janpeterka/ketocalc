@@ -89,7 +89,6 @@ def upgrade():
             ('Žampiony',98,0.3,1.4,2.9,1,0,'nutridatabaze','admin', '2020-04-30 14:30:00')
         """
     )
-    pass
 
 
 def downgrade():
