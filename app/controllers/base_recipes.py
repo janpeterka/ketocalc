@@ -4,6 +4,7 @@ from flask import render_template as template
 from flask import jsonify, request, abort
 
 from flask_classful import FlaskView, route
+from flask_login import current_user
 
 from app.models.ingredients import Ingredient
 from app.models.diets import Diet
@@ -15,6 +16,8 @@ class BaseRecipesView(FlaskView):
     @route("/addIngredientAJAX", methods=["POST"])
     def addIngredientAJAX(self):
         ingredient = Ingredient.load(request.json["ingredient_id"])
+        if not ingredient.is_author(current_user):
+            abort(403)
         template_data = template(
             "recipes/_add_ingredient.html.j2", ingredient=ingredient
         )
@@ -24,6 +27,8 @@ class BaseRecipesView(FlaskView):
     @route("addIngredientWithAmount", methods=["POST"])
     def addIngredientWithAmount(self):
         ingredient = Ingredient.load(request.json["ingredient_id"])
+        if not ingredient.is_author(current_user):
+            abort(403)
         template_data = template(
             "recipes/_add_ingredient_with_amount.html.j2", ingredient=ingredient
         )

@@ -106,6 +106,9 @@ class Ingredient(db.Model, ItemMixin):
         user = models.users.User.load(self.author, load_type="username")
         return user
 
+    def is_author(self, user) -> bool:
+        return self.author_user == user
+
     @property
     def is_used(self):
         if len(self.recipes) == 0:

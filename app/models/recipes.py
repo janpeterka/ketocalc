@@ -169,3 +169,6 @@ class Recipe(db.Model, ItemMixin):
     @property
     def author(self):
         return self.diet.author
+
+    def is_author(self, user) -> bool:
+        return user == self.author
