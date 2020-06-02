@@ -1,4 +1,4 @@
-"""empty message
+"""Add ingredients from nutridatabaze
 
 Revision ID: 5dd92f141282
 Revises: 118f7bcd451b
@@ -6,7 +6,8 @@ Create Date: 2020-04-30 16:16:43.075213
 
 """
 from alembic import op
-import sqlalchemy as sa
+
+# import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
@@ -88,7 +89,6 @@ def upgrade():
             ('Žampiony',98,0.3,1.4,2.9,1,0,'nutridatabaze','admin', '2020-04-30 14:30:00')
         """
     )
-    pass
 
 
 def downgrade():

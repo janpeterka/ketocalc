@@ -1,4 +1,4 @@
-"""empty message
+"""Improve diet-user relationship
 
 Revision ID: cd8b44186600
 Revises: d6fa11386771

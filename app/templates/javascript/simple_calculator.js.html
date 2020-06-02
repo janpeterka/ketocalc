@@ -112,9 +112,6 @@
 
     save_recipe(e){
       e.preventDefault();
-      console.log(this.recipeDietTarget)
-      console.log(this.recipeDietTarget.dataset)
-
       fetch("{{ url_for('RecipesView:saveRecipeAJAX') }}", {
         method: 'POST',
         body: JSON.stringify({
@@ -157,6 +154,5 @@
 <script type="text/javascript">
 $(document).ready(function() {
   $('#ingredient_select').select2();
-  console.log($('#ingredient_select'))
 });
 </script>
