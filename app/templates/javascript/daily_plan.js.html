@@ -1,7 +1,7 @@
 <script type="text/javascript">
 application.register("daily-plan", class extends Stimulus.Controller {
 	static get targets() {
-		return ["diets", "recipes", "recipesTable"]
+		return ["diets", "recipes", "submit", "recipesTable"]
 	}
 
 	connect() {
@@ -9,6 +9,7 @@ application.register("daily-plan", class extends Stimulus.Controller {
 	}
 
 	load_recipes(){
+		this.submitTarget.disabled=true;
 		fetch("{{ url_for('DailyPlansView:load_recipes_AJAX') }}",{
 			method: 'POST',
 			body: JSON.stringify({'diet_id' : this.dietsTarget.value}),
@@ -16,12 +17,25 @@ application.register("daily-plan", class extends Stimulus.Controller {
 		).then((response) => {
 			return response.json(); }
 		).then((response) => {
+			this.clear_recipe_options();
 			for (let i = 0, recipe; recipe = response[i]; i++) {
 				this.add_recipe_option(recipe);
 			}
+			this.submitTarget.disabled=false;
 		}).catch((error) => {
 			console.error('Error:', error);
 		});
+	}
+
+	_remove_options(selectElement) {
+	   var i, L = selectElement.options.length - 1;
+	   for(i = L; i >= 0; i--) {
+	      selectElement.remove(i);
+	   }
+	}
+
+	clear_recipe_options(){
+		this._remove_options(this.recipesTarget);
 	}
 
 	add_recipe_option(recipe){
@@ -30,5 +44,7 @@ application.register("daily-plan", class extends Stimulus.Controller {
 	    option.innerHTML = recipe.name;
 	    this.recipesTarget.appendChild(option);
 	}
+
+
 });
 </script>
