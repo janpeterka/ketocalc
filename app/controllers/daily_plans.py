@@ -36,8 +36,9 @@ class DailyPlansView(ExtendedFlaskView):
         return self.template(diets=current_user.active_diets)
 
     def remove_daily_recipe(self, id, date):
-        daily_plan = DailyPlanHasRecipes.load(id)
-        daily_plan.remove()
+        daily_recipe = DailyPlanHasRecipes.load(id)
+        if daily_recipe:
+            daily_recipe.remove()
         return redirect(url_for("DailyPlansView:show", date=date))
 
     @route("/add_recipe", methods=["POST"])

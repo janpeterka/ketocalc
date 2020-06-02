@@ -4,7 +4,6 @@ import re
 from flask_classful import FlaskView
 
 from flask import render_template as template
-from flask import abort
 
 from app.models import *  # noqa: F401, F403, F406
 from app.controllers.forms import *  # noqa: F401, F403, F406
@@ -15,7 +14,7 @@ class ExtendedFlaskView(FlaskView):
 
     def before_request(self, name, id=None, *args, **kwargs):
         model_name = type(self).__name__.replace("sView", "")
-        form_name = model_name + "sForm"
+        # form_name = model_name + "sForm"
         snake_model_name = re.sub("(?!^)([A-Z]+)", r"_\1", model_name).lower()
 
         # e.g. User
@@ -29,17 +28,14 @@ class ExtendedFlaskView(FlaskView):
         except KeyError:
             model_klass = None
         # e.g. class <UsersForm>
-        try:
-            form_klass = globals()[form_name]
-        except KeyError:
-            form_klass = None
+        # try:
+        #     form_klass = globals()[form_name]
+        # except KeyError:
+        #     form_klass = None
 
         if id is not None and model_klass is not None:
             instance = model_klass().load(id)
-            if instance is None:
-                abort(404)
-
-            # e.g. self.user
+            # e.g. self.user, or None
             setattr(self, attribute_name, instance)
         else:
             setattr(self, attribute_name, None)
