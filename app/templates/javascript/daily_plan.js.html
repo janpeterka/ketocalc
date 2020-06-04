@@ -1,7 +1,7 @@
 <script type="text/javascript">
 application.register("daily-plan", class extends Stimulus.Controller {
 	static get targets() {
-		return ["diets", "recipes", "submit", "recipesTable"]
+		return ["diets", "recipes", "percentage", "submit", "recipesTable"]
 	}
 
 	connect() {
@@ -25,6 +25,19 @@ application.register("daily-plan", class extends Stimulus.Controller {
 		}).catch((error) => {
 			console.error('Error:', error);
 		});
+	}
+
+	set_amount(){
+	    var percentage = 100;
+
+        if (event != undefined){
+          event.preventDefault();
+          var target = event.target
+          if ("percentage" in target.dataset){
+          	percentage = target.dataset.percentage;
+          	this.percentageTarget.value = percentage
+          }
+        }
 	}
 
 	_remove_options(selectElement) {
