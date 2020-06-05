@@ -1,10 +1,10 @@
 from flask import render_template as template
 from flask import request, redirect, url_for
-from flask import abort, flash, g
+from flask import abort, flash
 
 from flask_login import login_required, current_user
 
-from flask_classful import FlaskView, route
+from flask_classful import route
 
 from app.helpers.form import create_form, save_form_to_session
 
@@ -12,15 +12,15 @@ from app.models.diets import Diet
 from app.models.users import User
 
 from app.controllers.forms.diets import DietsForm
+from app.controllers.extended_flask_view import ExtendedFlaskView
 
 
-class DietsView(FlaskView):
+class DietsView(ExtendedFlaskView):
     decorators = [login_required]
 
-    def before_request(self, name, id=None):
-        g.request_item_type = "diet"
+    def before_request(self, name, id=None, *args, **kwargs):
+        super().before_request(name, id, *args, **kwargs)
         if id is not None:
-            g.request_item_id = id
             self.diet = Diet.load(id)
 
             if self.diet is None:
