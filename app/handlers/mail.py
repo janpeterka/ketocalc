@@ -7,8 +7,27 @@ from app import mail
 
 from app.models.sent_mails import SentMail
 
+DEFAULT_SENDER = "ketocalc.jmp@gmail.com"
+DEFAULT_BCC = "ketocalc.jmp+bcc@gmail.com"
+DEFAULT_DEV = "ketocalc.jmp+dev@gmail.com"
 
-class MailHandler(object):
+
+class MailSender(object):
+    """[summary]
+
+    Class for handling all mail sending
+
+    Usage:
+        MailSender().send_email(subject="Nové heslo", recipients=[user], html_body=html_body)
+
+    Using send_email() is preferrable to using send_single_email()
+
+    When using send_email(), you must provide:
+        - subject
+        - recipients (list of Users) and/or reciptient_mails (list of strings)
+        - text_body or html_body or template
+    """
+
     def send_email(
         self,
         subject,
@@ -19,7 +38,7 @@ class MailHandler(object):
         template=None,
         template_args={},
         attachments=None,
-        sender="ketocalc.jmp@gmail.com",
+        sender=DEFAULT_SENDER,
     ):
         if recipients and not isinstance(recipients, list):
             raise ValueError("Recipients are in wrong format, should be list")
@@ -59,7 +78,7 @@ class MailHandler(object):
         template=None,
         template_args={},
         attachments=None,
-        sender="ketocalc.jmp@gmail.com",
+        sender=DEFAULT_SENDER,
     ):
         if recipient:
             if recipient.last_name.endswith(tuple(("ová", "ova"))):
@@ -75,20 +94,16 @@ class MailHandler(object):
             raise ValueError("No message body, will not send empty e-mail")
 
         if application.config["APP_STATE"] != "production":
-            # recipient = None
-            recipient_mail = "ketocalc.jmp+dev@gmail.com"
+            recipient_mail = DEFAULT_DEV
 
         message = Message(
             subject=subject,
             sender=sender,
             recipients=[recipient_mail],
-            bcc=["ketocalc.jmp+bcc@gmail.com"],
+            bcc=[DEFAULT_BCC],
             body=text_body,
             html=html_body,
         )
-
-        if template:
-            message.template = template
 
         if attachments:
             for attachment in attachments:
@@ -97,6 +112,9 @@ class MailHandler(object):
                 )
 
         mail.send(message)
+
+        if template:
+            message.template = template
 
         if application.config["APP_STATE"] == "production" and recipient:
             message.recipient = recipient
