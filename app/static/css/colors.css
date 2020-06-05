@@ -95,3 +95,7 @@
 .filter-gs-75{
     filter: grayscale(75%);
 }
+
+.filter-gs-90{
+    filter: grayscale(90%);
+}

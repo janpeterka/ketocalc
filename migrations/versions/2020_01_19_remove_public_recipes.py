@@ -1,4 +1,4 @@
-"""empty message
+"""Remove public recipes
 
 Revision ID: d6fa11386771
 Revises: 74dd49bc5c76

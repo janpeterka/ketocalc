@@ -2,7 +2,7 @@ import datetime
 import math
 import types
 
-from app import db
+from app import db, cache
 
 from app.models.item_mixin import ItemMixin
 
@@ -13,7 +13,7 @@ from app.models.recipes_has_ingredients import RecipeHasIngredients
 class Recipe(db.Model, ItemMixin):
     __tablename__ = "recipes"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(255), nullable=False)
     type = db.Column(db.Enum("small", "big", "full"), nullable=False, default="full")
 
@@ -27,6 +27,8 @@ class Recipe(db.Model, ItemMixin):
         viewonly=True,
         order_by="Ingredient.name",
     )
+
+    has_daily_plans = db.relationship("DailyPlanHasRecipes", back_populates="recipe")
 
     @staticmethod
     def load(recipe_id):
@@ -122,12 +124,11 @@ class Recipe(db.Model, ItemMixin):
         return True
 
     @property
+    @cache.cached(timeout=50, key_prefix="recipe_totals")
     def totals(self):
         totals = types.SimpleNamespace()
-        totals.calorie = 0
-        totals.protein = 0
-        totals.fat = 0
-        totals.sugar = 0
+        metrics = ["calorie", "sugar", "fat", "protein"]
+
         totals.amount = 0
 
         for ingredient in self.ingredients:
@@ -135,16 +136,17 @@ class Recipe(db.Model, ItemMixin):
                 float(math.floor(ingredient.load_amount_by_recipe(self.id) * 100000))
                 / 100000
             )
-            totals.calorie += ingredient.amount * ingredient.calorie
-            totals.protein += ingredient.amount * ingredient.protein
-            totals.fat += ingredient.amount * ingredient.fat
-            totals.sugar += ingredient.amount * ingredient.sugar
+            for metric in metrics:
+                value = getattr(totals, metric, 0)
+                ing_value = getattr(ingredient, metric)
+                setattr(totals, metric, value + (ingredient.amount * ing_value))
+
             totals.amount += ingredient.amount
 
-        totals.calorie = math.floor(totals.calorie) / 100
-        totals.protein = math.floor(totals.protein) / 100
-        totals.fat = math.floor(totals.fat) / 100
-        totals.sugar = math.floor(totals.sugar) / 100
+        for metric in metrics:
+            value = getattr(totals, metric)
+            setattr(totals, metric, math.floor(value) / 100)
+
         totals.amount = math.floor(totals.amount)
 
         totals.ratio = (
@@ -153,5 +155,21 @@ class Recipe(db.Model, ItemMixin):
         return totals
 
     @property
+    def values(self):
+        values = types.SimpleNamespace()
+        metrics = ["calorie", "sugar", "fat", "protein"]
+        for metric in metrics:
+            total = getattr(self.totals, metric)
+            if getattr(self, "amount", None) is not None:
+                value = (total / self.totals.amount) * self.amount
+            else:
+                value = total
+            setattr(values, metric, value)
+        return values
+
+    @property
     def author(self):
         return self.diet.author
+
+    def is_author(self, user) -> bool:
+        return user == self.author

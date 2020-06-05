@@ -2,7 +2,8 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms import validators, ValidationError
 
 from flask_wtf import FlaskForm
-from flask_wtf import RecaptchaField
+
+# from flask_wtf import RecaptchaField
 
 from app.models.users import User
 
@@ -15,7 +16,7 @@ class NewPasswordForm(FlaskForm):
             validators.Length(min=8, message="Heslo musí mít alespoň 8 znaků"),
         ],
     )
-    recaptcha = RecaptchaField()
+    # recaptcha = RecaptchaField()
     submit = SubmitField("Změnit heslo")
 
 
