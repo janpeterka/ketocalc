@@ -1,6 +1,6 @@
 ketocalc - web app for ketogenic diet calculation and management
 
-##How to run project
+## How to run project
 
 - Clone repository
 
