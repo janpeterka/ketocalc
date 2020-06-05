@@ -84,16 +84,15 @@
             <div class="row" data-target="show-recipe.percentage">
                 <div class="col-10">
                 <form class="form-inline" data-action="submit->show-recipe#calculate_recipe">
-                        <span class="btn bg-color-light-blue filter-gs-75" data-percentage=10 data-action="click->show-recipe#calculate_recipe">10%</span>
-                        <span class="btn bg-color-light-blue filter-gs-75" data-percentage=12.5 data-action="click->show-recipe#calculate_recipe">12.5%</span>
-                        <span class="btn bg-color-light-blue filter-gs-50" data-percentage=25 data-action="click->show-recipe#calculate_recipe">25%</span>
-                        <span class="btn bg-color-light-blue filter-gs-25" data-percentage=50 data-action="click->show-recipe#calculate_recipe">50%</span>
-                        <span class="btn bg-color-light-blue"  data-percentage=100 data-action="click->show-recipe#calculate_recipe">100%</span>
-                        <input class="form-control" style="width: 15%" type="number" step="0.1" />
-                        <input class="btn bg-color-dark-blue" type="submit" value="spočítat vlastní">
+                    {% from "_percentage_button.html.j2" import percentage_button %}
+                    {% for percentage in [10, 12.5, 25, 50, 100] %}
+                        {{ percentage_button(percentage, controller="show-recipe", action="calculate_recipe") }}
+                    {% endfor %}
+                    <input class="form-control" style="width: 15%" type="number" step="0.1" />
+                    <input class="btn bg-color-dark-blue" type="submit" value="spočítat vlastní">
                 </form>
                 </div>
-                <button type="button col-2" data-target="show-recipe.showPercentage" disabled class="btn ">Baba</button>
+                <button type="button col-2" data-target="show-recipe.showPercentage" disabled class="btn "></button>
             </div>
 
             {% if not is_print %}

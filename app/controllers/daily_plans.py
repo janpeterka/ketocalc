@@ -50,12 +50,15 @@ class DailyPlansView(ExtendedFlaskView):
             abort(403)
         date = request.form["date"]
 
+        recipe_percentage = float(request.form["recipe_percentage"])
+        amount = round(recipe.totals.amount * (recipe_percentage / 100), 2)
+
         daily_plan = DailyPlan.load_by_date(date)
 
         dphr = DailyPlanHasRecipes()
         dphr.recipes_id = recipe_id
         dphr.daily_plans_id = daily_plan.id
-        dphr.amount = request.form["amount"]
+        dphr.amount = amount
         dphr.save()
 
         return redirect(url_for("DailyPlansView:show", date=date))

@@ -1,0 +1,20 @@
+{% macro percentage_button(percentage, controller=None, action=None) %}
+
+{% if percentage <= 15 %}
+	{% set filter=75 %}
+{% elif percentage <= 25%}
+	{% set filter=50 %}
+{% elif percentage <= 50%}
+	{% set filter=25 %}
+{% else %}
+	{% set filter=0%}
+{% endif %}
+
+
+<span class="btn bg-color-light-blue filter-gs-{{ filter }}"
+      data-percentage={{ percentage }}
+      data-action="click->{{ controller }}#{{ action }}">
+        {{ percentage }}%
+</span>
+
+{% endmacro %}
