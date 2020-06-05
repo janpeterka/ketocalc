@@ -35,51 +35,9 @@ class Recipe(db.Model, ItemMixin):
         recipe = db.session.query(Recipe).filter(Recipe.id == recipe_id).first()
 
         for ingredient in recipe.ingredients:
-            ingredient.amount = ingredient.load_amount_by_recipe(recipe.id)
-            ingredient.amount = (
-                float(math.floor(ingredient.load_amount_by_recipe(recipe.id) * 100000))
-                / 100000
-            )
+            ingredient.amount = round(ingredient.load_amount_by_recipe(recipe.id), 2)
 
         return recipe
-
-    def load_recipe_for_show(self):
-        """Load Recipe for print
-
-        Returns:
-            json -- recipe, totals
-        """
-
-        for ingredient in self.ingredients:
-            ingredient.amount = (
-                float(math.floor(ingredient.load_amount_by_recipe(self.id) * 100000))
-                / 100000
-            )
-
-        totals = types.SimpleNamespace()
-        totals.calorie = 0
-        totals.protein = 0
-        totals.fat = 0
-        totals.sugar = 0
-        totals.amount = 0
-
-        for i in self.ingredients:
-            totals.calorie += i.amount * i.calorie
-            totals.protein += i.amount * i.protein
-            totals.fat += i.amount * i.fat
-            totals.sugar += i.amount * i.sugar
-            totals.amount += i.amount
-
-        totals.calorie = math.floor(totals.calorie) / 100
-        totals.protein = math.floor(totals.protein) / 100
-        totals.fat = math.floor(totals.fat) / 100
-        totals.sugar = math.floor(totals.sugar) / 100
-        totals.amount = math.floor(totals.amount)
-
-        totals.ratio = (
-            math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
-        )
-        return {"recipe": self, "totals": totals}
 
     @staticmethod
     def load_by_ingredient(ingredient_id):
@@ -124,7 +82,7 @@ class Recipe(db.Model, ItemMixin):
         return True
 
     @property
-    @cache.cached(timeout=50, key_prefix="recipe_totals")
+    @cache.cached(timeout=100, key_prefix="recipe_totals")
     def totals(self):
         totals = types.SimpleNamespace()
         metrics = ["calorie", "sugar", "fat", "protein"]
@@ -132,10 +90,7 @@ class Recipe(db.Model, ItemMixin):
         totals.amount = 0
 
         for ingredient in self.ingredients:
-            ingredient.amount = (
-                float(math.floor(ingredient.load_amount_by_recipe(self.id) * 100000))
-                / 100000
-            )
+            ingredient.amount = round(ingredient.load_amount_by_recipe(self.id), 2)
             for metric in metrics:
                 value = getattr(totals, metric, 0)
                 ing_value = getattr(ingredient, metric)
