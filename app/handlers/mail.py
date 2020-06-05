@@ -23,9 +23,9 @@ class MailSender(object):
     Using send_email() is preferrable to using send_single_email()
 
     When using send_email(), you must provide:
-        subject
-        receptients (list of Users) and/or reception_mails (list of strings)
-        text_body or html_body or template
+        - subject
+        - recipients (list of Users) and/or reciptient_mails (list of strings)
+        - text_body or html_body or template
     """
 
     def send_email(
