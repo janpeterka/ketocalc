@@ -2,6 +2,7 @@ from flask import Flask
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_caching import Cache
 
 import pymysql
 import numpy as np
@@ -13,6 +14,7 @@ pymysql.converters.conversions.update(pymysql.converters.decoders)
 mail = Mail()
 db = SQLAlchemy(session_options={"autoflush": False, "autocommit": False})
 migrate = Migrate()
+cache = Cache(config={"CACHE_TYPE": "simple"})
 
 
 def create_app(config_name="default"):
@@ -27,6 +29,7 @@ def create_app(config_name="default"):
     mail.init_app(application)
     db.init_app(application)
     migrate.init_app(application, db)
+    cache.init_app(application)
 
     # LOGGING
     from .config.config_logging import db_handler, gunicorn_logger

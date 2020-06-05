@@ -2,7 +2,7 @@ import datetime
 import math
 import types
 
-from app import db
+from app import db, cache
 
 from app.models.item_mixin import ItemMixin
 
@@ -124,6 +124,7 @@ class Recipe(db.Model, ItemMixin):
         return True
 
     @property
+    @cache.cached(timeout=50, key_prefix="recipe_totals")
     def totals(self):
         totals = types.SimpleNamespace()
         metrics = ["calorie", "sugar", "fat", "protein"]
