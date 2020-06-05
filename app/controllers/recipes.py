@@ -49,7 +49,7 @@ class RecipesView(BaseRecipesView):
         )
 
     def post(self):
-        # TODO: implemented with ajax not, will change
+        # TODO: implemented with ajax now, will change
         pass
 
     @route("<id>/edit", methods=["POST"])
@@ -61,20 +61,10 @@ class RecipesView(BaseRecipesView):
         return redirect(url_for("RecipesView:show", id=self.recipe.id))
 
     def show(self, id):
-        return template(
-            "recipes/show.html.j2",
-            recipe=self.recipe,
-            totals=self.recipe.totals,
-            is_print=False,
-        )
+        return template("recipes/show.html.j2", recipe=self.recipe, is_print=False,)
 
     def print(self, id):
-        return template(
-            "recipes/show.html.j2",
-            recipe=self.recipe,
-            totals=self.recipe.totals,
-            is_print=True,
-        )
+        return template("recipes/show.html.j2", recipe=self.recipe, is_print=True,)
 
     def print_all(self, diet_id=None):
         if diet_id is None:
@@ -82,9 +72,6 @@ class RecipesView(BaseRecipesView):
         else:
             recipes = Diet.load(diet_id).recipes
 
-        for recipe in recipes:
-            recipe_data = recipe.load_recipe_for_show()
-            recipe.show_totals = recipe_data["totals"]
         return template("recipes/print_all.html.j2", recipes=recipes)
 
     def edit(self, id):
