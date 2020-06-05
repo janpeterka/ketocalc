@@ -1,12 +1,13 @@
 import inspect
 import re
 
+from flask import render_template as template
+from flask import g
+
 from flask_classful import FlaskView
 
-from flask import render_template as template
-
-from app.models import *  # noqa: F401, F403, F406
 from app.controllers.forms import *  # noqa: F401, F403, F406
+from app.models import *  # noqa: F401, F403, F406
 
 
 class ExtendedFlaskView(FlaskView):
@@ -32,8 +33,10 @@ class ExtendedFlaskView(FlaskView):
         #     form_klass = globals()[form_name]
         # except KeyError:
         #     form_klass = None
+        g.request_item_type = attribute_name
 
         if id is not None and model_klass is not None:
+            g.request_item_id = id
             instance = model_klass().load(id)
             # e.g. self.user, or None
             setattr(self, attribute_name, instance)
