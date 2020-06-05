@@ -2,7 +2,8 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms import validators, ValidationError
 
 from flask_wtf import FlaskForm
-from flask_wtf import RecaptchaField
+
+# from flask_wtf import RecaptchaField
 
 from app.auth.routes import validate_register
 
@@ -28,7 +29,7 @@ class RegisterForm(FlaskForm):
     last_name = StringField(
         "Příjmení", [validators.InputRequired("Jméno musí být vyplněno")]
     )
-    recaptcha = RecaptchaField()
+    # recaptcha = RecaptchaField()
     submit = SubmitField("Registrovat")
 
     def validate_username(form, field):

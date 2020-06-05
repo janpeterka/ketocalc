@@ -1,4 +1,4 @@
-"""empty message
+"""Add option to public recipe
 
 Revision ID: 74dd49bc5c76
 Revises: 6c2c2969ba4f

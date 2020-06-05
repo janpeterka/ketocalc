@@ -12,7 +12,7 @@ from app.controllers.forms.login import LoginForm
 class LoginView(FlaskView):
     route_base = "/login"
 
-    def before_request(self, name):
+    def before_request(self, name, *args, **kwargs):
         if current_user.is_authenticated:
             return redirect(url_for("IndexView:index"))
 

@@ -1,6 +1,5 @@
 from flask import Blueprint
-from flask import redirect
-from flask import flash, url_for
+from flask import redirect, flash, url_for, session
 from flask import current_app as application
 
 from flask_login import login_user, logout_user, current_user, login_required
@@ -83,6 +82,7 @@ def do_login(username=None, password=None, from_register=False):
 @login_required
 @auth_blueprint.route("/logout")
 def do_logout():
+    session.pop("logged_from_admin", None)
     if current_user.is_authenticated:
         logout_user()
     return redirect(url_for("LoginView:show"))

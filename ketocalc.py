@@ -2,7 +2,9 @@ import os
 import re
 import time
 
-from flask import request, redirect
+import datetime
+
+from flask import request, redirect, session
 from flask import g
 
 from flask_login import current_user
@@ -16,6 +18,7 @@ from app.models.request_log import RequestLog
 
 from app.data import template_data
 
+
 env = os.environ.get("FLASK_ENV", "default")
 application = create_app(config_name=env)
 
@@ -25,8 +28,25 @@ def inject_globals():
     return dict(icons=template_data.icons, texts=template_data.texts)
 
 
+@application.context_processor
+def utility_processor():
+    def human_format_date(date):
+        if date == datetime.date.today():
+            return "Dnes"
+        if date == datetime.date.today() + datetime.timedelta(days=-1):
+            return "Včera"
+        if date == datetime.date.today() + datetime.timedelta(days=1):
+            return "Zítra"
+
+        return date.strftime("%d.%m.%Y")
+
+    return dict(human_format_date=human_format_date)
+
+
 @application.before_request
 def session_management():
+    current_user.logged_from_admin = session.get("logged_from_admin")
+
     if application.config["APP_STATE"] == "shutdown" and request.path not in [
         "/shutdown",
         "/static/css/style.css",

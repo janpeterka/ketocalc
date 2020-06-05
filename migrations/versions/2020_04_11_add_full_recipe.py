@@ -1,4 +1,4 @@
-"""empty message
+"""Add full recipe as default (preparing to remove it completely)
 
 Revision ID: d93f1577eeeb
 Revises: efe33eafa19a
@@ -6,7 +6,8 @@ Create Date: 2020-04-11 18:52:56.027140
 
 """
 from alembic import op
-import sqlalchemy as sa
+
+# import sqlalchemy as sa
 from sqlalchemy.dialects import mysql
 
 

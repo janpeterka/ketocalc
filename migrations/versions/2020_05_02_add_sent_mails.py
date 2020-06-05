@@ -1,4 +1,4 @@
-"""empty message
+"""Add sent_mails table
 
 Revision ID: f5d5e1df41f9
 Revises: 5dd92f141282

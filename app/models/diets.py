@@ -28,11 +28,13 @@ class Diet(db.Model, ItemMixin):
     def is_used(self):
         if len(self.recipes) == 0:
             return False
-        else:
-            return True
+        return True
 
     # TODO: only used for testing, probably want to remove (move to helper)
     @staticmethod
     def load_by_name(diet_name):
         diet = db.session.query(Diet).filter(Diet.name == diet_name).first()
         return diet
+
+    def is_author(self, user) -> bool:
+        return user == self.author

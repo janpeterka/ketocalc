@@ -6,7 +6,8 @@ from flask import render_template as template
 from flask_classful import FlaskView, route
 from flask_login import current_user, login_required
 
-from app.handlers.mail import MailHandler
+from app.handlers.mail import MailSender
+
 from app.controllers.forms.feedback import FeedbackForm
 
 
@@ -39,7 +40,7 @@ class SupportView(FlaskView):
             if form.feedback_file.data:
                 attachments = [form.feedback_file.data]
 
-            MailHandler().send_email(
+            MailSender().send_email(
                 subject="[ketocalc] [{}]".format(form.option.data),
                 sender="ketocalc",
                 recipient_mails=["ketocalc.jmp+feedback@gmail.com"],
