@@ -629,11 +629,11 @@
         },
         "wtforms": {
             "hashes": [
-                "sha256:6ff8635f4caeed9f38641d48cfe019d0d3896f41910ab04494143fc027866e1b",
-                "sha256:861a13b3ae521d6700dac3b2771970bd354a63ba7043ecc3a82b5288596a1972"
+                "sha256:43f19879b2a9b8dfd81d2e4e427ce44d3e5c09dbe08f2af8f4be9586b7dfc33d",
+                "sha256:715ebd303f47384bf6468fd9dfff52c6acc400e71204df8acfa6ef7bf40e1c27"
             ],
             "index": "pypi",
-            "version": "==2.3.1"
+            "version": "==2.3.2"
         },
         "zipp": {
             "hashes": [
