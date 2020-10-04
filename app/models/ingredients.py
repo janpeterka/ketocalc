@@ -116,6 +116,17 @@ class Ingredient(db.Model, ItemMixin):
         else:
             return True
 
+    @property
+    def public(self):
+        """public
+
+        alias for is_shared
+
+        Returns:
+            boolean
+        """
+        return self.is_shared
+
     # TODO: only used for testing
     def set_fixed(self, value=True, amount=0):
         self.fixed = value

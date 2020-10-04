@@ -16,7 +16,7 @@ class BaseRecipesView(FlaskView):
     @route("/addIngredientAJAX", methods=["POST"])
     def addIngredientAJAX(self):
         ingredient = Ingredient.load(request.json["ingredient_id"])
-        if not ingredient.is_author(current_user):
+        if not ingredient.is_author(current_user) and not ingredient.public:
             abort(403)
         template_data = template(
             "recipes/_add_ingredient.html.j2", ingredient=ingredient
@@ -24,10 +24,10 @@ class BaseRecipesView(FlaskView):
         result = {"ingredient": ingredient.json, "template_data": template_data}
         return jsonify(result)
 
-    @route("addIngredientWithAmount", methods=["POST"])
+    @route("/addIngredientWithAmount", methods=["POST"])
     def addIngredientWithAmount(self):
         ingredient = Ingredient.load(request.json["ingredient_id"])
-        if not ingredient.is_author(current_user):
+        if not ingredient.is_author(current_user) and not ingredient.public:
             abort(403)
         template_data = template(
             "recipes/_add_ingredient_with_amount.html.j2", ingredient=ingredient
