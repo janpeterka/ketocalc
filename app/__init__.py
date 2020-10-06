@@ -4,6 +4,12 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_caching import Cache
 
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
+
+from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
+
+
 import pymysql
 import numpy as np
 
@@ -15,6 +21,13 @@ mail = Mail()
 db = SQLAlchemy(session_options={"autoflush": False, "autocommit": False})
 migrate = Migrate()
 cache = Cache(config={"CACHE_TYPE": "simple"})
+
+
+sentry_sdk.init(
+    dsn="https://cf0294c7f1784ba2acbe5c9ed2409bef@o457759.ingest.sentry.io/5454190",
+    integrations=[FlaskIntegration(), SqlalchemyIntegration()],
+    traces_sample_rate=1.0,
+)
 
 
 def create_app(config_name="default"):
