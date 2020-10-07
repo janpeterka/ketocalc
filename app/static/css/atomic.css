@@ -1,0 +1,61 @@
+/* general */
+.hidden {
+  display: none;
+}
+
+/* lists */
+.no-list {
+  list-style: none
+}
+
+/* text */
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+	text-align: right;
+}
+
+.text-left {
+	text-align: left;
+}
+
+.text-upper {
+  text-transform: uppercase;
+}
+
+.text-lower {
+  text-transform: lowercase;
+}
+
+/* fonts */
+.font-comfortaa {
+	font-family: 'Comfortaa';
+}
+
+.font-comfortaa-b {
+	font-family: 'Comfortaa';
+	font-weight: bold;
+}
+
+.font-roboto {
+	font-family: 'Roboto';
+}
+
+.font-montserrat {
+	font-family: 'MontSerrat', serif;
+}
+
+/* margins */
+.m-b-1 {
+	margin-bottom: 1rem;
+}
+
+.m-b-2 {
+	margin-bottom: 2rem;
+}
+
+.m-t-05 {
+	margin-top: 0.5rem;
+}

@@ -1,8 +1,11 @@
-/* root */
+/* colors */
 @import "colors.css";
 
 /* icons */
 @import "icons.css";
+
+/* icons */
+@import "atomic.css";
 
 /* images */
 img.logo {
@@ -27,11 +30,6 @@ form ul.errors li.warning{
   font-weight: bold;
 }
 
-/* text */
-.text-center{
-  text-align: center;
-}
-
 /* New recipe */
 
 [data-main="true"] {
@@ -44,7 +42,7 @@ form ul.errors li.warning{
 .loader_circular {
   display: none;
   border: 16px solid var(--logo-light-grey);
-  border-top: 16px solid var(--logo-dark-blue);
+  border-top: 16px solid var(--logo-blue);
   border-radius: 50%;
   width: 15rem;
   height: 15rem;
@@ -241,20 +239,13 @@ a.info {
 }
 
 a.info:hover {
-  color: var(--logo-dark-blue);
+  color: var(--logo-blue);
 }
 
 .no-decoration:hover {
   text-decoration: none;
 }
 
-.no-list {
-  list-style: none
-}
-
-.hidden {
-  display: none;
-}
 
 tr.inactive {
   background-color: var(--inactive-bg);
