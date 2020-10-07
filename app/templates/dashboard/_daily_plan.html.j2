@@ -1,0 +1,47 @@
+<div class="row">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>{{ texts.title }}</th>
+                <th>{{ texts.energy_simple }}</th>
+                <th>{{ texts.protein_simple }}</th>
+                <th>{{ texts.fat_simple }}</th>
+                <th>{{ texts.sugar_simple }}</th>
+                <th>{{ texts.amount_simple }}</th>
+                <th><a class="btn btn-primary" href="{{ url_for('DailyPlansView:show', date=daily_plan.date) }}">Přidat další</a></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for daily_recipe in daily_recipes %}
+            <tr>
+                <td><a href="{{ url_for('RecipesView:show', id=daily_recipe.recipe.id) }}">{{ daily_recipe.recipe.name }}</a></td>
+                <td>{{ daily_recipe.values.calorie | round(2) }}</td>
+                <td>{{ daily_recipe.values.protein | round(2) }}</td>
+                <td>{{ daily_recipe.values.fat | round(2) }}</td>
+                <td>{{ daily_recipe.values.sugar | round(2) }}</td>
+                <td>{{ daily_recipe.amount }}</td>
+                <td></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th data-toggle="tooltip" title="tuky : bílkoviny + cukry">{{ texts.ratio }}</th>
+        </tr>
+        <tr>
+            <th>Celkem:</th>
+            <td>{{ daily_plan.totals.calorie | round(2) }}</td>
+            <td>{{ daily_plan.totals.protein | round(2) }}</td>
+            <td>{{ daily_plan.totals.fat | round(2) }}</td>
+            <td>{{ daily_plan.totals.sugar | round(2) }}</td>
+            <td>{{ daily_plan.totals.amount | round(2) }}</td>
+            <td>{{ daily_plan.totals.ratio }} : 1</td>
+        </tr>
+    </table>
+
+</div>
