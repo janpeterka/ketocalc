@@ -15,13 +15,13 @@
 
     /* New colors */
     /* From logo */
-    --logo-dark-blue: #0177EA;
+    --logo-blue: #0177EA;
     --logo-light-blue: #ABF2FD;
     --logo-light-green: #D0E3D6;
     --logo-light-grey: #F8FEFF;
     --logo-white: #F8FEFF;
 
-    /* Added based on logo-dark-blue*/
+    /* Added based on logo-blue*/
     --palette-orange: #EA7401;
     --palette-middle-blue: #2090FE;
     --palette-purple: #0103EA;
@@ -41,8 +41,8 @@
     color: var(--logo-light-blue);
 }
 
-.color-dark-blue{
-    color: var(--logo-dark-blue);
+.color-blue{
+    color: var(--logo-blue);
 }
 
 .color-light-green{
@@ -66,8 +66,8 @@
     background-color: var(--logo-light-blue);
 }
 
-.bg-color-dark-blue{
-    background-color: var(--logo-dark-blue);
+.bg-color-blue{
+    background-color: var(--logo-blue);
 }
 
 .bg-color-light-green{
