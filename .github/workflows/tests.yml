@@ -28,5 +28,7 @@ jobs:
 
           SECRET_KEY: "justtesting"
           SQLALCHEMY_DATABASE_URI: "sqlite://"
+          
+          SENTRY_MONITORING: False
       run: |
         pipenv run pytest
