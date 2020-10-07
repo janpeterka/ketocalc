@@ -8,6 +8,10 @@ from app.auth import admin_required
 
 
 class ErrorsView(FlaskView):
+    @admin_required
+    def raise_error(self):
+        abort(418)
+
     def wrongpage(self):
         abort(405)
 
