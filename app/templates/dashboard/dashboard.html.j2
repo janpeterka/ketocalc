@@ -22,7 +22,7 @@
                 </ul>
             </div>
 
-            <div class="form-inline col-sm-6 col-md-3" style="display: block;">
+            <div class="form-inline col-sm-6 col-md-3 d-block">
                 <h5>Aktuální dieta:</h5>
                 <form method="POST" action="{{ url_for('DashboardView:post') }}">
                     <select name="select_diet" class="form-control" onchange="this.form.submit()">

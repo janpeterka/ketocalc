@@ -1,16 +1,14 @@
 <div class="row">
     <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>{{ texts.title }}</th>
-                <th>{{ texts.energy_simple }}</th>
-                <th>{{ texts.protein_simple }}</th>
-                <th>{{ texts.fat_simple }}</th>
-                <th>{{ texts.sugar_simple }}</th>
-                <th>{{ texts.amount_simple }}</th>
-                <th><a class="btn btn-primary" href="{{ url_for('DailyPlansView:show', date=daily_plan.date) }}">Přidat další</a></th>
-            </tr>
-        </thead>
+        <thead><tr>
+            <th>{{ texts.title }}</th>
+            <th>{{ texts.energy_simple }}</th>
+            <th>{{ texts.protein_simple }}</th>
+            <th>{{ texts.fat_simple }}</th>
+            <th>{{ texts.sugar_simple }}</th>
+            <th>{{ texts.amount_simple }}</th>
+            <th><a class="btn btn-primary" href="{{ url_for('DailyPlansView:show', date=daily_plan.date) }}">Přidat další</a></th>
+        </tr></thead>
         <tbody>
         {% for daily_recipe in daily_recipes %}
             <tr>
