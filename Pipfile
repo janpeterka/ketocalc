@@ -30,6 +30,7 @@ flask-classful = "*"
 simplejson = "*"
 email-validator = "*"
 flask-caching = "*"
+sentry-sdk = {extras = ["flask"],version = "*"}
 
 [requires]
 python_version = "3.7"

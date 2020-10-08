@@ -40,6 +40,19 @@
     <!-- cookieconsent -->
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.css" />
 
+    <!-- sentry -->
+    {% if config["SENTRY_MONITORING"] %}
+        <script src="https://js.sentry-cdn.com/a3a5a821594d4478874f5915e45247cf.min.js"
+                crossorigin="anonymous">
+        </script>
+    {% else %}
+        <script type="text/javascript">console.log("Sentry not active.")</script>
+    {% endif %}
+
+    <!-- custom fonts -->
+    <link href='https://fonts.googleapis.com/css?family=Comfortaa' rel='stylesheet' type='text/css'>
+
+
     {% block style %}{% endblock %}
     {% block script %}{% endblock %}
 

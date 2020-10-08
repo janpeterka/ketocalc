@@ -28,6 +28,8 @@ class Config(object):
 
     PASSWORD_VERSION = os.environ.get("PASSWORD_VERSION")
 
+    SENTRY_MONITORING = True
+
 
 class TestConfig(Config):
     TESTING = True
@@ -46,6 +48,7 @@ class DevConfig(Config):
     APP_STATE = os.environ.get(
         "LOCAL_APP_STATE"
     )  # production, development, debug, shutdown
+    SENTRY_MONITORING = False
 
 
 class ProdConfig(Config):

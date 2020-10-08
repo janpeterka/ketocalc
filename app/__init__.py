@@ -31,6 +31,19 @@ def create_app(config_name="default"):
     migrate.init_app(application, db)
     cache.init_app(application)
 
+    if application.config["SENTRY_MONITORING"]:
+        import sentry_sdk
+        from sentry_sdk.integrations.flask import FlaskIntegration
+        from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
+
+        sentry_sdk.init(
+            dsn="https://cf0294c7f1784ba2acbe5c9ed2409bef@o457759.ingest.sentry.io/5454190",
+            integrations=[FlaskIntegration(), SqlalchemyIntegration()],
+            traces_sample_rate=1.0,
+        )
+    else:
+        print("No Sentry monitoring.")
+
     # LOGGING
     from .config.config_logging import db_handler, gunicorn_logger
 
