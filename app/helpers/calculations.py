@@ -3,6 +3,7 @@ import numpy
 import sympy as sp
 from sympy import solve_poly_inequality as solvei
 from sympy import poly
+from sympy.solvers import solvers
 
 
 # CALCULATE RECIPE
@@ -108,9 +109,9 @@ def calculate_recipe(ingredients, diet):
         )
 
         # solve equations with args
-        in1 = sp.solvers.solve((f1, f2, f3), (x, y, z))[x]
-        in2 = sp.solvers.solve((f1, f2, f3), (x, y, z))[y]
-        in3 = sp.solvers.solve((f1, f2, f3), (x, y, z))[z]
+        in1 = solvers.solve((f1, f2, f3), (x, y, z))[x]
+        in2 = solvers.solve((f1, f2, f3), (x, y, z))[y]
+        in3 = solvers.solve((f1, f2, f3), (x, y, z))[z]
 
         # solve for positive numbers
         result1 = solvei(poly(in1), ">=")
