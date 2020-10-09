@@ -28,11 +28,7 @@ class DailyPlansView(ExtendedFlaskView):
         date_after = date + datetime.timedelta(days=1)
         self.dates = {"active": date, "previous": date_before, "next": date_after}
 
-        self.daily_plan = DailyPlan.load_by_date(date)
-        if self.daily_plan is None:
-            self.daily_plan = DailyPlan(date=date, author=current_user)
-            self.daily_plan.save()
-
+        self.daily_plan = DailyPlan.load_by_date_or_create(date)
         self.daily_recipes = self.daily_plan.has_recipes
 
         return self.template(diets=current_user.active_diets)

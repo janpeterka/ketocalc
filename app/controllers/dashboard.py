@@ -24,7 +24,7 @@ class DashboardView(ExtendedFlaskView):
             self.selected_diet = None
 
         self.diets = current_user.active_diets
-        self.daily_plan = DailyPlan.load_by_date(date=datetime.date.today())
+        self.daily_plan = DailyPlan.load_by_date_or_create(date=datetime.date.today())
         self.daily_recipes = self.daily_plan.has_recipes
 
         return self.template(

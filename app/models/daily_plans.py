@@ -29,6 +29,15 @@ class DailyPlan(db.Model, BaseMixin):
         )
         return date_plan
 
+    @staticmethod
+    def load_by_date_or_create(date):
+        daily_plan = DailyPlan.load_by_date(date)
+        if daily_plan is None:
+            daily_plan = DailyPlan(date=date, author=current_user)
+            daily_plan.save()
+
+        return daily_plan
+
     @property
     def totals(self):
         totals = types.SimpleNamespace()
