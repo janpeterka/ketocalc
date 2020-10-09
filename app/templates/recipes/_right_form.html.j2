@@ -19,7 +19,6 @@
             {% else %}
                 <tr data-id="{{ ingredient.id }}" data-amount="{{ ingredient.amount }}">
             {% endif %}
-
                     <td>{{ ingredient.name }}    </td>
                     <td>{{ ingredient.calorie }} </td>
                     <td>{{ ingredient.protein }} </td>
@@ -61,7 +60,7 @@
             <td></td>
             <td></td>
             <td></td>
-            <td><span id="totalRatio">{{ totals.ratio }}</span> : 1</td>
+            <td><span>{{ totals.ratio }}</span> : 1</td>
         </tr>
     </table>
 

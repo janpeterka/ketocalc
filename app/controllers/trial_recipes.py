@@ -1,11 +1,10 @@
-from flask import render_template as template
 from flask import redirect, url_for
+from flask import render_template as template
 
 from flask_login import current_user
 
 from app.models.ingredients import Ingredient
 from app.models.users import User
-
 from app.controllers.base_recipes import BaseRecipesView
 
 

@@ -1,16 +1,14 @@
-from flask import redirect, url_for, request
+from flask import redirect, url_for, request, flash
 from flask import render_template as template
 from flask import current_app as application
 
 from flask_classful import FlaskView, route
 from flask_login import current_user
 
-from app.controllers.forms.register import RegisterForm
 from app.auth.routes import do_register
-
 from app.helpers.form import create_form, save_form_to_session
-
 from app.models.users import User
+from app.controllers.forms.register import RegisterForm
 
 
 class RegisterView(FlaskView):
@@ -39,5 +37,6 @@ class RegisterView(FlaskView):
         if do_register(user):
             return redirect(url_for("IndexView:index"))
         else:
+            flash("registrace se nepodařila", "error")
             save_form_to_session(request.form)
             return redirect(url_for("RegisterView:show"))
