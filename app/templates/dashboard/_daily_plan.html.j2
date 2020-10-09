@@ -10,7 +10,7 @@
             <th><a class="btn btn-primary" href="{{ url_for('DailyPlansView:show', date=daily_plan.date) }}">Přidat další</a></th>
         </tr></thead>
         <tbody>
-        {% for daily_recipe in daily_recipes %}
+        {% for daily_recipe in daily_plan.daily_recipes %}
             <tr>
                 <td><a href="{{ url_for('RecipesView:show', id=daily_recipe.recipe.id) }}">{{ daily_recipe.recipe.name }}</a></td>
                 <td>{{ daily_recipe.values.calorie | round(2) }}</td>

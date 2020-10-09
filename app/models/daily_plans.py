@@ -17,7 +17,7 @@ class DailyPlan(db.Model, BaseMixin):
     user_id = db.Column(db.ForeignKey(("users.id")), nullable=False, index=True)
     author = db.relationship("User", uselist=False, back_populates="daily_plans")
 
-    has_recipes = db.relationship("DailyPlanHasRecipes", back_populates="daily_plan")
+    daily_recipes = db.relationship("DailyPlanHasRecipes", back_populates="daily_plan")
 
     @staticmethod
     def load_by_date(date):
@@ -48,9 +48,9 @@ class DailyPlan(db.Model, BaseMixin):
 
         totals.amount = 0
 
-        for has_recipe in self.has_recipes:
-            recipe = has_recipe.recipe
-            recipe.amount = has_recipe.amount
+        for daily_recipe in self.daily_recipes:
+            recipe = daily_recipe.recipe
+            recipe.amount = daily_recipe.amount
 
             for metric in metrics:
                 value = getattr(totals, metric)
