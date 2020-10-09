@@ -15,8 +15,25 @@ class BaseMixin(object):
 
     @classmethod
     def load_all(cls):
-        my_objects = db.session.query(cls)
+        my_objects = db.session.query(cls).all()
         return my_objects
+
+    @classmethod
+    def load_last(cls):
+        last_object = db.session.query(cls).all()[-1]
+        return last_object
+
+    @classmethod
+    def load_by_name(cls, name):
+        first_object = db.session.query(cls).filter(cls.name == name).first()
+        return first_object
+
+    @classmethod
+    def load_by_attribute(cls, attribute, value):
+        first_object = (
+            db.session.query(cls).filter(getattr(cls, attribute) == value).first()
+        )
+        return first_object
 
     def edit(self, **kw):
         try:
