@@ -95,7 +95,6 @@ def test_calc(app, db, client):
             assert response.json is None
             pass
         else:
-            assert response.json is not None
             assert (
                 round(float(json.loads(response.json["totals"])["sugar"]))
                 == dataset["diet"]["sugar"]
