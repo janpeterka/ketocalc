@@ -7,10 +7,8 @@ from app import db
 
 from app.models.item_mixin import ItemMixin
 
-import app.models as models
+from app.models.users import User
 from app.models.recipes_has_ingredients import RecipeHasIngredients
-
-# from app.models.users import User
 
 
 class Ingredient(db.Model, ItemMixin):
@@ -110,7 +108,7 @@ class Ingredient(db.Model, ItemMixin):
 
     @property
     def author_user(self):
-        user = models.users.User.load(self.author, load_type="username")
+        user = User.load(self.author, load_type="username")
         return user
 
     def is_author(self, user) -> bool:
@@ -125,13 +123,7 @@ class Ingredient(db.Model, ItemMixin):
 
     @property
     def public(self):
-        """public
-
-        alias for is_shared
-
-        Returns:
-            boolean
-        """
+        """alias for is_shared"""
         return self.is_shared
 
     # TODO: only used for testing

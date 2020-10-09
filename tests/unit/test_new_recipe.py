@@ -90,7 +90,7 @@ def test_calc(app, db, client):
     for dataset in datasets:
         response = client.post(url, json=dataset, follow_redirects=False)
 
-        assert response in (200, 400)
+        assert response in (200, 204, 400)
         if dataset["none"] == "True":
             assert response.json is None
             pass
