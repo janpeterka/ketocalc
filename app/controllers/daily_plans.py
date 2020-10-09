@@ -21,7 +21,9 @@ class DailyPlansView(ExtendedFlaskView):
         return redirect(url_for("DailyPlansView:show", date=datetime.date.today()))
 
     def show(self, date):
-        date = parse_date(date)
+        if not isinstance(date, datetime.date):
+            date = parse_date(date)
+
         date_before = date + datetime.timedelta(days=-1)
         date_after = date + datetime.timedelta(days=1)
         self.dates = {"active": date, "previous": date_before, "next": date_after}
