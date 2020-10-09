@@ -6,8 +6,6 @@ from sqlalchemy import and_
 from app import db
 
 from app.models.item_mixin import ItemMixin
-
-from app.models.users import User
 from app.models.recipes_has_ingredients import RecipeHasIngredients
 
 
@@ -108,6 +106,8 @@ class Ingredient(db.Model, ItemMixin):
 
     @property
     def author_user(self):
+        from app.models.users import User
+
         user = User.load(self.author, load_type="username")
         return user
 
