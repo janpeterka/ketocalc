@@ -246,25 +246,21 @@
           headers: {'Content-Type': 'application/json,charset=UTF-8'},
         })
         .then((response) => {
-          if (!response.ok){
-            this.recipe__wrong__show();
-            throw new Error(response);
+          if (!response.ok || response.status == 204) {
+            return null;
           }
           return response.json();
         })
         .then((response) => {
-          var template_data = response.template_data;
-
-          if (response == "False"){
+          if (response == null){
               this.recipe__wrong__show();
               return;
           }
 
-          this.recipeTarget.innerHTML = template_data
+          this.recipeTarget.innerHTML = response.template_data
           var mySlider = $("#slider").slider();
 
           this.recipe__right__show();
-
         })
       }
 
