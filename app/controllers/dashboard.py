@@ -21,7 +21,7 @@ class DashboardView(ExtendedFlaskView):
         elif self.selected_diet_id is None and len(current_user.active_diets) > 0:
             self.selected_diet = current_user.active_diets[0]
         else:
-            self.selected_diet = Diet.load(self.selected_diet_id)
+            self.selected_diet = None
 
         self.diets = current_user.active_diets
         self.daily_plan = DailyPlan.load_by_date(date=datetime.date.today())
