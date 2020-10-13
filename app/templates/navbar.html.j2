@@ -39,12 +39,11 @@
           </div>
         </li>
 
-        <a class="nav-link" href="{{ url_for('SimpleCalculatorView:show') }}">Jednoduchá kalkulačka</a>
-        <a class="nav-link" href="{{ url_for('DailyPlansView:index') }}">Denní přehled</a>
+        <a class="nav-link" href="{{ url_for('SimpleCalculatorView:show') }}">Jednoduchá {{ icons.calculator }}</a>
+        <a class="nav-link" href="{{ url_for('DailyPlansView:index') }}">{{ icons.daily }} Denní plán</a>
         <a class="nav-link" href="{{ url_for('CookbookView:index') }}">Veřejné recepty</a>
 
         {% if current_user.is_admin %}{% include '_navbar_admin.html.j2' %}{% endif %}
-
       </ul>
 
       <ul class="nav navbar-nav navbar-right ml-auto">
