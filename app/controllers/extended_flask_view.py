@@ -22,11 +22,11 @@ class ExtendedFlaskView(FlaskView):
         # model_name = model_name
 
         # e.g. user
-        self.attribute_name = self._attribute_name()
+        # self.attribute_name = self._attribute_name
 
         # e.g. class <User>
         try:
-            model_klass = globals()[self._model_name()]
+            model_klass = globals()[self._model_name]
         except KeyError:
             model_klass = None
         # e.g. class <UsersForm>
@@ -34,21 +34,21 @@ class ExtendedFlaskView(FlaskView):
         #     form_klass = globals()[form_name]
         # except KeyError:
         #     form_klass = None
-        g.request_item_type = self.attribute_name
+        g.request_item_type = self._attribute_name
 
         if id is not None and model_klass is not None:
             g.request_item_id = id
             instance = model_klass().load(id)
             # e.g. self.user, or None
-            setattr(self, self.attribute_name, instance)
+            setattr(self, self._attribute_name, instance)
         else:
-            setattr(self, self.attribute_name, None)
+            setattr(self, self._attribute_name, None)
 
     def template(self, template_name=None, **kwargs):
         # Template name is given from view and method names if not provided
         calling_method = inspect.stack()[1].function
         if template_name is None:
-            template_name = self._attribute_name() + "s/" + calling_method + ".html.j2"
+            template_name = self._attribute_name + "s/" + calling_method + ".html.j2"
 
         # All public variables of the view are passed to template
         view_attributes = self.__dict__
@@ -61,6 +61,7 @@ class ExtendedFlaskView(FlaskView):
 
         return template(template_name, **merged_values)
 
+    @property
     def _model_name(self):
         if type(self).__name__.endswith("sView"):
             model_name = type(self).__name__.replace("sView", "")
@@ -71,26 +72,24 @@ class ExtendedFlaskView(FlaskView):
 
         return model_name
 
+    @property
     def _attribute_name(self):
-        model_name = self._model_name()
+        model_name = self._model_name
         snake_model_name = re.sub("(?!^)([A-Z]+)", r"_\1", model_name).lower()
         return snake_model_name
 
+    @property
     def _template_folder(self):
         if hasattr(self, "template_folder"):
             return self.template_folder
         else:
-            self.template_folder = self._attribute_name() + "s"
+            self.template_folder = self._attribute_name + "s"
 
-    def index(self):
-        return self.template("{}/index.html.j2".format(self._template_folder()))
+    def index(self, *args, **kwargs):
+        return self.template("{}/index.html.j2".format(self._template_folder))
 
-    def show(self, id):
-        kwargs_dict = {}
-        kwargs_dict[self.attribute_name] = self.object
-        return self.template(
-            "{}/show.html.j2".format(self._template_folder()), **kwargs_dict
-        )
+    def show(self, *args, **kwargs):
+        return self.template("{}/show.html.j2".format(self._template_folder))
 
     # def new(self):
     #     self.form = create_form(self.form_klass)
