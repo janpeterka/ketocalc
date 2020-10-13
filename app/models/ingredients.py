@@ -86,21 +86,16 @@ class Ingredient(db.Model, ItemMixin):
 
     def fill_from_json(self, json_ing):
         if "fixed" in json_ing:
-            if json_ing["fixed"] == "true":
-                self.fixed = True
-            else:
-                self.fixed = False
+            self.fixed = json_ing["fixed"]
         if "main" in json_ing:
-            if json_ing["main"] == "true":
-                self.main = True
-            else:
-                self.main = False
+            self.main = json_ing["main"]
 
         if "amount" in json_ing:
             self.amount = float(json_ing["amount"]) / 100  # from grams per 100g
 
         if "min" in json_ing and len(json_ing["min"]) > 0:
             self.min = float(json_ing["min"])
+
         if "max" in json_ing and len(json_ing["max"]) > 0:
             self.max = float(json_ing["max"])
 
