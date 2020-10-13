@@ -122,7 +122,7 @@ class Ingredient(db.Model, ItemMixin):
             return True
 
     @property
-    def public(self):
+    def public(self) -> bool:
         """alias for is_shared"""
         return self.is_shared
 
