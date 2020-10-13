@@ -23,7 +23,7 @@ class UsersView(ExtendedFlaskView):
     def before_request(self, name, *args, **kwargs):
         super().before_request(name, *args, **kwargs)
         if self.user is None:
-            self.user = User.load(current_user.id)
+            self.user = current_user
 
     def post(self, page_type=None):
         form = UsersForm(request.form)

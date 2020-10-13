@@ -9,7 +9,6 @@ from flask_classful import route
 from app.helpers.form import create_form, save_form_to_session
 
 from app.models.diets import Diet
-from app.models.users import User
 
 from app.controllers.forms.diets import DietsForm
 from app.controllers.extended_flask_view import ExtendedFlaskView
@@ -29,7 +28,7 @@ class DietsView(ExtendedFlaskView):
                 abort(405)
 
     def before_index(self):
-        self.diets = User.load(current_user.id).diets
+        self.diets = current_user.diets
         self.diets.sort(key=lambda x: (-x.active, x.name))
 
     def index(self):
@@ -49,7 +48,7 @@ class DietsView(ExtendedFlaskView):
         diet = Diet()
         form.populate_obj(diet)
         diet.active = 1
-        diet.author = User.load(current_user.id)
+        diet.author = current_user
 
         if diet.save():
             return redirect(url_for("DietsView:show", id=diet.id))

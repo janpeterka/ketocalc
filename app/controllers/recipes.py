@@ -7,7 +7,6 @@ from flask_classful import route
 
 from app.models.recipes import Recipe
 from app.models.diets import Diet
-from app.models.users import User
 from app.models.ingredients import Ingredient
 from app.models.recipes_has_ingredients import RecipeHasIngredients
 from app.controllers.base_recipes import BaseRecipesView
@@ -32,14 +31,14 @@ class RecipesView(BaseRecipesView):
                 abort(403)
 
     def index(self):
-        user = User.load(current_user.id)
-        return template("recipes/all.html.j2", diets=user.active_diets)
+        return template("recipes/all.html.j2", diets=current_user.active_diets)
 
     def new(self):
-        active_diets = User.load(current_user.id).active_diets
+        active_diets = current_user.active_diets
         ingredients = Ingredient.load_all_by_author(current_user.username)
         shared_ingredients = Ingredient.load_all_shared(renamed=True)
 
+        # TODO - this couses duplication for admin. shouldn't be problem for users.
         all_ingredients = ingredients + shared_ingredients
         return template(
             "recipes/new.html.j2",
@@ -68,7 +67,7 @@ class RecipesView(BaseRecipesView):
 
     def print_all(self, diet_id=None):
         if diet_id is None:
-            recipes = User.load(current_user.id).recipes
+            recipes = current_user.recipes
         else:
             recipes = Diet.load(diet_id).recipes
 

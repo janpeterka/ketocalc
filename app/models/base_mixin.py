@@ -9,14 +9,32 @@ from app import db
 class BaseMixin(object):
     @classmethod
     def load(cls, *args, **kwargs):
-        cls_id = kwargs.get("id", args[0])
-        my_object = db.session.query(cls).filter(cls.id == cls_id).first()
+        object_id = kwargs.get("id", args[0])
+        my_object = db.session.query(cls).filter(cls.id == object_id).first()
         return my_object
 
     @classmethod
     def load_all(cls):
-        my_objects = db.session.query(cls)
+        my_objects = db.session.query(cls).all()
         return my_objects
+
+    @classmethod
+    def load_last(cls):
+        last_object = db.session.query(cls).all()[-1]
+        return last_object
+
+    @classmethod
+    def load_by_name(cls, name):
+        first_object = db.session.query(cls).filter(cls.name == name).first()
+        return first_object
+
+    @classmethod
+    def load_by_attribute(cls, attribute, value):
+        if not hasattr(cls, attribute):
+            raise AttributeError
+
+        obj = db.session.query(cls).filter(getattr(cls, attribute) == value).first()
+        return obj
 
     def edit(self, **kw):
         try:
@@ -33,10 +51,7 @@ class BaseMixin(object):
         try:
             db.session.add(self)
             db.session.commit()
-            if self.id is not None:
-                return True
-            else:
-                return False
+            return self.id is not None
         except DatabaseError as e:
             db.session.rollback()
             application.logger.error("Save error: {}".format(e))

@@ -3,6 +3,7 @@ import numpy
 import sympy as sp
 from sympy import solve_poly_inequality as solvei
 from sympy import poly
+from sympy.solvers import solvers
 
 
 # CALCULATE RECIPE
@@ -36,17 +37,19 @@ def calculate_recipe(ingredients, diet):
     for ing in fixed_ingredients:
         ingredients.remove(ing)
 
-    # move main ingredient to end of list
+    # move main ingredient to end of list IF MORE THEN 3 INGREDIENTS!
     # TODO: .main by mělo být typově konzistentní
-    for i in range(len(ingredients)):
-        if (
-            hasattr(ingredients[i], "main")
-            and (ingredients[i].main is True or ingredients[i].main) == "true"
-        ):
-            mainIngredient = ingredients[i]
-            ingredients.pop(i)
-            ingredients.append(mainIngredient)
-            break
+    if len(ingredients) <= 3:
+        for ingredient in ingredients:
+            ingredient.main = False
+
+    else:
+        for i in range(len(ingredients)):
+            if hasattr(ingredients[i], "main") and ingredients[i].main is True:
+                mainIngredient = ingredients[i]
+                ingredients.pop(i)
+                ingredients.append(mainIngredient)
+                break
 
     # calculate
     if len(ingredients) == 0:
@@ -106,9 +109,9 @@ def calculate_recipe(ingredients, diet):
         )
 
         # solve equations with args
-        in1 = sp.solvers.solve((f1, f2, f3), (x, y, z))[x]
-        in2 = sp.solvers.solve((f1, f2, f3), (x, y, z))[y]
-        in3 = sp.solvers.solve((f1, f2, f3), (x, y, z))[z]
+        in1 = solvers.solve((f1, f2, f3), (x, y, z))[x]
+        in2 = solvers.solve((f1, f2, f3), (x, y, z))[y]
+        in3 = solvers.solve((f1, f2, f3), (x, y, z))[z]
 
         # solve for positive numbers
         result1 = solvei(poly(in1), ">=")

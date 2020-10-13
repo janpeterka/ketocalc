@@ -39,6 +39,7 @@ class TestConfig(Config):
         "TESTING_APP_STATE"
     )  # production, development, debug, shutdown
     SECRET_KEY = os.environ.get("TESTING_SECRET_KEY")
+    SENTRY_MONITORING = False
 
 
 class DevConfig(Config):

@@ -54,8 +54,8 @@ class BaseRecipesView(FlaskView):
 
         try:
             result = calculations.calculate_recipe(ingredients, diet)
-        except Exception as e:
-            abort(400, str(e.args[0]))
+        except ValueError:
+            return ("", 204)
 
         ingredients = result["ingredients"]
         totals = result["totals"]

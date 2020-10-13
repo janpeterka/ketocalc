@@ -14,13 +14,10 @@ class TrialRecipesView(BaseRecipesView):
             return redirect(url_for("IndexView:index"))
 
     def show(self):
-        active_diets = User.load(
-            "ketocalc.jmp@gmail.com", load_type="username"
-        ).active_diets
-        ingredients = Ingredient.load_all_shared()
+        shared_user = User.load_by_attribute("username", "ketocalc.jmp@gmail.com")
         return template(
             "recipes/new.html.j2",
-            ingredients=ingredients,
-            diets=active_diets,
+            ingredients=Ingredient.load_all_shared(),
+            diets=shared_user.active_diets,
             is_trialrecipe=True,
         )

@@ -6,11 +6,7 @@ from sqlalchemy import and_
 from app import db
 
 from app.models.item_mixin import ItemMixin
-
-import app.models as models
 from app.models.recipes_has_ingredients import RecipeHasIngredients
-
-# from app.models.users import User
 
 
 class Ingredient(db.Model, ItemMixin):
@@ -93,17 +89,21 @@ class Ingredient(db.Model, ItemMixin):
             self.fixed = json_ing["fixed"]
         if "main" in json_ing:
             self.main = json_ing["main"]
+
         if "amount" in json_ing:
             self.amount = float(json_ing["amount"]) / 100  # from grams per 100g
 
-        if "min" in json_ing:
+        if "min" in json_ing and len(json_ing["min"]) > 0:
             self.min = float(json_ing["min"])
-        if "max" in json_ing:
+
+        if "max" in json_ing and len(json_ing["max"]) > 0:
             self.max = float(json_ing["max"])
 
     @property
     def author_user(self):
-        user = models.users.User.load(self.author, load_type="username")
+        from app.models.users import User
+
+        user = User.load(self.author, load_type="username")
         return user
 
     def is_author(self, user) -> bool:
@@ -117,14 +117,8 @@ class Ingredient(db.Model, ItemMixin):
             return True
 
     @property
-    def public(self):
-        """public
-
-        alias for is_shared
-
-        Returns:
-            boolean
-        """
+    def public(self) -> bool:
+        """alias for is_shared"""
         return self.is_shared
 
     # TODO: only used for testing
