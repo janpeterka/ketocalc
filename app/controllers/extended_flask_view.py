@@ -4,7 +4,7 @@ import re
 from flask import render_template as template
 from flask import g
 
-from app.helpers.form import create_form
+# from app.helpers.form import create_form
 
 from flask_classful import FlaskView
 
@@ -92,9 +92,9 @@ class ExtendedFlaskView(FlaskView):
             "{}/show.html.j2".format(self._template_folder()), **kwargs_dict
         )
 
-    def new(self):
-        self.form = create_form(self.form_klass)
-        return self.template("{}/new.html.j2".format(self._template_folder()))
+    # def new(self):
+    #     self.form = create_form(self.form_klass)
+    #     return self.template("{}/new.html.j2".format(self._template_folder()))
 
     # def post(self):
     #     form = self.form_klass(request.form)
