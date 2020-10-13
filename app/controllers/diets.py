@@ -32,7 +32,7 @@ class DietsView(ExtendedFlaskView):
         self.diets.sort(key=lambda x: (-x.active, x.name))
 
     def index(self):
-        return template("diets/all.html.j2", diets=self.diets)
+        return self.template("diets/all.html.j2")
 
     def new(self):
         form = create_form(DietsForm)
