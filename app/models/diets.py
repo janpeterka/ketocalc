@@ -24,12 +24,6 @@ class Diet(db.Model, ItemMixin):
     )
     author = db.relationship("User", uselist=False, back_populates="diets")
 
-    @property
-    def is_used(self):
-        if len(self.recipes) == 0:
-            return False
-        return True
-
     # TODO: only used for testing, probably want to remove (move to helper)
     @staticmethod
     def load_by_name(diet_name):
@@ -38,3 +32,14 @@ class Diet(db.Model, ItemMixin):
 
     def is_author(self, user) -> bool:
         return user == self.author
+
+    @property
+    def is_used(self) -> bool:
+        if self.recipes:
+            return True
+        else:
+            return False
+
+    @property
+    def ratio(self) -> float:
+        return round(float(self.fat / (self.sugar + self.protein)), 2)

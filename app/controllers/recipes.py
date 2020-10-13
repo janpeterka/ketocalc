@@ -110,5 +110,5 @@ class RecipesView(BaseRecipesView):
         recipe.name = request.json["name"]
         recipe.diet = Diet.load(diet_id)
 
-        last_id = recipe.save(ingredients)
+        last_id = recipe.create_and_save(ingredients)
         return url_for("RecipesView:show", id=last_id)
