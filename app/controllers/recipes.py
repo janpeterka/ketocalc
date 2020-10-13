@@ -88,6 +88,14 @@ class RecipesView(BaseRecipesView):
             flash("Recept byl skryt před veřejností.", "success")
         return redirect(url_for("RecipesView:show", id=self.recipe.id))
 
+    @route("/make_all_recipes_public")
+    def make_all_public(self):
+        for recipe in current_user.recipes:
+            recipe.is_shared = True
+            recipe.save()
+        flash("Všechny Vaše recepty byly zveřejněny", "success")
+        return redirect(url_for("DashboardView:index"))
+
     @route("/delete/<id>", methods=["POST"])
     def delete(self, id):
         self.recipe.remove()
