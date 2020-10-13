@@ -16,10 +16,11 @@ from app.controllers.extended_flask_view import ExtendedFlaskView
 
 class DietsView(ExtendedFlaskView):
     decorators = [login_required]
+    template_folder = "diets"
 
     def before_request(self, name, id=None, *args, **kwargs):
         super().before_request(name, id, *args, **kwargs)
-        if id is not None:
+        if self.diet is None and id is not None:
             self.diet = Diet.load(id)
 
             if self.diet is None:
@@ -27,12 +28,16 @@ class DietsView(ExtendedFlaskView):
             elif self.diet.author.username != current_user.username:
                 abort(405)
 
+    def before_show(self, id):
+        self.recipes = self.diet.recipes
+        self.diets = self.diet.author.diets
+
+    def show(self, id):
+        return super().show(id)
+
     def before_index(self):
         self.diets = current_user.diets
         self.diets.sort(key=lambda x: (-x.active, x.name))
-
-    def index(self):
-        return template("diets/all.html.j2", diets=self.diets)
 
     def new(self):
         form = create_form(DietsForm)
@@ -73,14 +78,6 @@ class DietsView(ExtendedFlaskView):
         form.populate_obj(self.diet)
         self.diet.edit()
         return redirect(url_for("DietsView:show", id=self.diet.id))
-
-    def show(self, id):
-        return template(
-            "diets/show.html.j2",
-            diet=self.diet,
-            recipes=self.diet.recipes,
-            diets=self.diet.author.diets,
-        )
 
     def edit(self, id):
         form = create_form(DietsForm, obj=self.diet)

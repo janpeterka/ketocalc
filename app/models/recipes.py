@@ -20,6 +20,8 @@ class Recipe(db.Model, ItemMixin):
     created = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
     last_updated = db.Column(db.DateTime, nullable=True, onupdate=datetime.datetime.now)
 
+    is_shared = db.Column(db.Boolean, default=False)
+
     diet = db.relationship("Diet", secondary="diets_has_recipes", uselist=False)
     ingredients = db.relationship(
         "Ingredient",
@@ -58,7 +60,12 @@ class Recipe(db.Model, ItemMixin):
 
         return private_recipes
 
-    def save(self, ingredients):
+    @staticmethod
+    def public_recipes():
+        recipes = db.session.query(Recipe).filter(Recipe.is_shared == True).all()
+        return recipes
+
+    def create_and_save(self, ingredients):
         db.session.add(self)
         db.session.flush()
 
@@ -80,6 +87,11 @@ class Recipe(db.Model, ItemMixin):
         db.session.delete(self)
         db.session.commit()
         return True
+
+    def toggle_shared(self):
+        self.is_shared = not self.is_shared
+        self.edit()
+        return self.is_shared
 
     @property
     @cache.cached(timeout=50, key_prefix="recipe_totals")
@@ -121,6 +133,11 @@ class Recipe(db.Model, ItemMixin):
                 value = total
             setattr(values, metric, value)
         return values
+
+    @property
+    def public(self) -> bool:
+        """alias for is_shared"""
+        return self.is_shared
 
     @property
     def author(self):

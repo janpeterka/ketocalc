@@ -33,12 +33,12 @@ def utility_processor():
     def human_format_date(date):
         if date == datetime.date.today():
             return "Dnes"
-        if date == datetime.date.today() + datetime.timedelta(days=-1):
+        elif date == datetime.date.today() + datetime.timedelta(days=-1):
             return "Včera"
-        if date == datetime.date.today() + datetime.timedelta(days=1):
+        elif date == datetime.date.today() + datetime.timedelta(days=1):
             return "Zítra"
-
-        return date.strftime("%d.%m.%Y")
+        else:
+            return date.strftime("%d.%m.%Y")
 
     return dict(human_format_date=human_format_date)
 
@@ -58,7 +58,7 @@ def session_management():
 
 @application.before_request
 def log_request_start():
-    g.start = time.time()
+    g.log_request_start_time = time.time()
 
 
 @application.teardown_request
@@ -76,7 +76,7 @@ def log_request(exception=None):
             remote_addr=request.environ["REMOTE_ADDR"],
             item_type=item_type,
             item_id=item_id,
-            duration=time.time() - g.start,
+            duration=time.time() - g.log_request_start_time,
         )
         log.save()
 

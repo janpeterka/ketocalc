@@ -31,7 +31,7 @@ class DashboardView(ExtendedFlaskView):
             "dashboard/dashboard.html.j2", first_name=current_user.first_name,
         )
 
-    def show(self):
+    def show(self, **kwargs):
         return redirect(url_for("DashboardView:index"))
 
     def post(self):

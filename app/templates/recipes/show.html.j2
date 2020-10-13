@@ -36,8 +36,15 @@
             {% else %}
                 <span class="data__table d-print-table">
             {% endif %}
-
-                <h2>{{ recipe.name }}</h2>
+            
+                <h2>
+                    {{ recipe.name }}
+                    {% if recipe.public and current_user != recipe.author %}
+                        (vytvořil*a {{ recipe.author.first_name }} {{recipe.author.last_name}})
+                    {% elif recipe.public %}
+                        (zveřejněno)
+                    {% endif %}
+                </h2>
                 <h5>{{ recipe.diet.name }}</h5>
 
                  </span>
@@ -101,6 +108,13 @@
                     <a class="btn btn-warning" href="{{ url_for('RecipesView:edit', id=recipe.id) }}">{{ texts.edit }} {{ icons.edit }}</a>
                     <a class="btn btn-secondary" href="{{ url_for('RecipesView:print', id=recipe.id) }}" target="_blank" rel="noopener noreferrer">{{ texts.print }} {{ icons.print }}</a>
                     <button type="submit" class="btn btn-danger">{{ texts.recipe_delete}} {{ icons.delete }}</button>
+                </form>
+                <form action="{{ url_for('RecipesView:toggle_shared', id=recipe.id) }}" method="post" accept-charset="utf-8">
+                    {% if recipe.public == True %}
+                        <button type="submit" class="btn btn-secondary">{{ texts.recipe_unshare }} {{ icons.unarchive }}</button>
+                    {% else %}
+                        <button type="submit" class="btn btn-secondary">{{ texts.recipe_share }} {{ icons.archive }}</button>
+                    {% endif %}
                 </form>
             </div>
             {% endif %}

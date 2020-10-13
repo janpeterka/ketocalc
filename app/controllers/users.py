@@ -25,6 +25,9 @@ class UsersView(ExtendedFlaskView):
         if self.user is None:
             self.user = current_user
 
+    def show(self, **kwargs):
+        return self.template()
+
     def post(self, page_type=None):
         form = UsersForm(request.form)
         del form.username
@@ -60,9 +63,6 @@ class UsersView(ExtendedFlaskView):
             flash("Nepovedlo se změnit heslo", "error")
 
         return redirect(url_for("UsersView:show"))
-
-    def show(self):
-        return self.template()
 
     def edit(self):
         self.user_form = create_form(UsersForm, obj=self.user)
