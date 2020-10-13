@@ -27,6 +27,7 @@ class RecipesView(BaseRecipesView):
             if not (
                 current_user.username == self.recipe.author.username
                 or current_user.is_admin
+                or self.recipe.public
             ):
                 abort(403)
 
@@ -77,6 +78,15 @@ class RecipesView(BaseRecipesView):
         return template(
             "recipes/edit.html.j2", recipe=self.recipe, totals=self.recipe.totals
         )
+
+    @route("/toggle_shared/<id>", methods=["POST"])
+    def toggle_shared(self, id):
+        toggled = self.recipe.toggle_shared()
+        if toggled is True:
+            flash("Recept byl zveřejněn.", "success")
+        else:
+            flash("Recept byl skryt před veřejností.", "success")
+        return redirect(url_for("RecipesView:show", id=self.recipe.id))
 
     @route("/delete/<id>", methods=["POST"])
     def delete(self, id):
