@@ -1,11 +1,13 @@
 def register_all_controllers(application):
     from .base_recipes import BaseRecipesView
+    from .daily_plans import DailyPlansView
     from .dashboard import DashboardView
     from .diets import DietsView
     from .errors import ErrorsView
     from .index import IndexView
     from .ingredients import IngredientsView
     from .login import LoginView
+    from .mails import MailsView
     from .password_recovery import PasswordRecoveryView
     from .recipes import RecipesView
     from .register import RegisterView
@@ -15,12 +17,14 @@ def register_all_controllers(application):
     from .users import UsersView
 
     BaseRecipesView.register(application)
+    DailyPlansView.register(application)
     DashboardView.register(application)
     DietsView.register(application)
     ErrorsView.register(application)
     IndexView.register(application)
     IngredientsView.register(application)
     LoginView.register(application)
+    MailsView.register(application)
     PasswordRecoveryView.register(application)
     RecipesView.register(application)
     RegisterView.register(application)

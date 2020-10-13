@@ -1,11 +1,10 @@
-from flask import render_template as template
 from flask import redirect, url_for
+from flask import render_template as template
 
 from flask_login import current_user
 
 from app.models.ingredients import Ingredient
 from app.models.users import User
-
 from app.controllers.base_recipes import BaseRecipesView
 
 
@@ -15,13 +14,10 @@ class TrialRecipesView(BaseRecipesView):
             return redirect(url_for("IndexView:index"))
 
     def show(self):
-        active_diets = User.load(
-            "ketocalc.jmp@gmail.com", load_type="username"
-        ).active_diets
-        ingredients = Ingredient.load_all_shared()
+        shared_user = User.load_by_attribute("username", "ketocalc.jmp@gmail.com")
         return template(
             "recipes/new.html.j2",
-            ingredients=ingredients,
-            diets=active_diets,
+            ingredients=Ingredient.load_all_shared(),
+            diets=shared_user.active_diets,
             is_trialrecipe=True,
         )

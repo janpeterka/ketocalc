@@ -4,20 +4,21 @@ from flask import abort, flash
 
 from flask_login import login_required, current_user
 
-from flask_classful import FlaskView, route
+from flask_classful import route
 
 from app.helpers.form import create_form, save_form_to_session
 
 from app.models.diets import Diet
-from app.models.users import User
 
 from app.controllers.forms.diets import DietsForm
+from app.controllers.extended_flask_view import ExtendedFlaskView
 
 
-class DietsView(FlaskView):
+class DietsView(ExtendedFlaskView):
     decorators = [login_required]
 
-    def before_request(self, name, id=None):
+    def before_request(self, name, id=None, *args, **kwargs):
+        super().before_request(name, id, *args, **kwargs)
         if id is not None:
             self.diet = Diet.load(id)
 
@@ -27,7 +28,7 @@ class DietsView(FlaskView):
                 abort(405)
 
     def before_index(self):
-        self.diets = User.load(current_user.id).diets
+        self.diets = current_user.diets
         self.diets.sort(key=lambda x: (-x.active, x.name))
 
     def index(self):
@@ -47,7 +48,7 @@ class DietsView(FlaskView):
         diet = Diet()
         form.populate_obj(diet)
         diet.active = 1
-        diet.author = User.load(current_user.id)
+        diet.author = current_user
 
         if diet.save():
             return redirect(url_for("DietsView:show", id=diet.id))

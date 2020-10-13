@@ -16,18 +16,6 @@
 {% block content %}
     <div class="container">
         <div class="row">
-
-{#                 <form action="{{ url_for('DietsView:show', id=diet.id) }}/export" class="form-inline" method="post">
-                    {% if recipes|length > 0 %}
-                        <!-- <input type="submit" class="btn btn-default export__button" value="Exportovat recepty do diety"> -->
-                        <select name="diet" class="form-control">
-                        {% for diet in diets %}
-                            <option value="{{ diet.id }}">{{ diet.name }}</option>
-                        {% endfor %}
-                        </select>
-                    {% endif %}
-                </form> #}
-
             <div class="col-8">
                 <table id="ingredients" class="table data__table">
                     <tr>
@@ -43,21 +31,6 @@
                         <td>{{ diet.protein }}</td>
                         <td>{{ diet.fat }}</td>
                         <td>{{ diet.sugar }}</td>
-                    </tr>
-                </table>
-
-                <table class="table data__table">
-                    <tr>
-                        <th>{{ texts.meal_size }}</th>
-                        <th>{{ texts.meal_portion }}</th>
-                    </tr>
-                    <tr>
-                        <td>{{ texts.meal_size_big }}</td>
-                        <td>{{ diet.big_size }} %</td>
-                    </tr>
-                    <tr>
-                        <td>{{ texts.meal_size_small }}</td>
-                        <td>{{ diet.small_size }} %</td>
                     </tr>
                 </table>
                 <form action="{{ url_for('DietsView:delete', id=diet.id) }}" method="post" accept-charset="utf-8">

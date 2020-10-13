@@ -1,12 +1,10 @@
 {% extends "base.html.j2" %}
 {% block title %}
-    Uživatel
-{% endblock %}
-
-{% block style %}
-{% endblock %}
-
-{% block script %}
+    {% if current_user.is_admin %}
+        Uživatel [{{ user.id }} | {{ user.username }}]   
+    {% else %}
+        Uživatel
+    {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -29,6 +27,10 @@
         <div>
             <a href="{{ url_for('UsersView:edit') }}" class="btn btn-secondary">{{ texts.edit }} {{ icons.edit }}</a>
         </div>
+
+        {% if current_user.is_admin %}
+            {% include "admin/users/_info.html.j2"%}
+        {% endif %}
     </div>
 {% endblock %}
 

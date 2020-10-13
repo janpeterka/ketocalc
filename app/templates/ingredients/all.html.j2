@@ -10,6 +10,8 @@
 {% block content %}
     <div class="container">
         <div class="col-12">
+            <h1>Moje suroviny <a href="{{ url_for('IngredientsView:new') }}"><button class="btn btn-secondary float-right">{{ texts.ingredient_add }}</button></a>
+            </h1>
             <table id="ingredients" class="table">
                 <tr>
                     <th>{{ texts.title }}</th>
@@ -28,7 +30,33 @@
                     </tr>
                 {% endfor %}
             </table>
-            <a href="{{ url_for('IngredientsView:new') }}"><button class="btn btn-secondary" style="margin-left: 5px">{{ texts.ingredient_add }}</button></a>
+            
+
+            <h1>
+                Sdílené suroviny
+                <a href="{{ url_for('IngredientsView:new_shared') }}">
+                    <button class="btn btn-secondary float-right">{{ texts.ingredient_add_shared }}
+                    </button>
+                </a>
+            </h1>
+            <table id="shared_ingredients" class="table">
+                <tr>
+                    <th>{{ texts.title }}</th>
+                    <th>{{ texts.energy_100 }}</th>
+                    <th>{{ texts.protein_100 }}</th>
+                    <th>{{ texts.fat_100 }}</th>       
+                    <th>{{ texts.sugar_100 }}</th>
+                </tr>
+                {% for ingredient in shared_ingredients: %}
+                    <tr>
+                        <td><a href="{{ url_for('IngredientsView:show', id=ingredient.id) }}">{{ ingredient.name }}</a></td>
+                        <td>{{ ingredient.calorie }}</td>
+                        <td>{{ ingredient.protein }}</td>
+                        <td>{{ ingredient.fat }}</td>
+                        <td>{{ ingredient.sugar }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
         </div> 
     </div>
 {% endblock %}

@@ -1,12 +1,12 @@
 import os
 
-from flask import render_template as template
 from flask import redirect, request, flash, url_for, send_file
+from flask import render_template as template
 
 from flask_classful import FlaskView, route
 from flask_login import current_user, login_required
 
-from app.helpers.mail import send_email
+from app.handlers.mail import MailSender
 
 from app.controllers.forms.feedback import FeedbackForm
 
@@ -40,10 +40,10 @@ class SupportView(FlaskView):
             if form.feedback_file.data:
                 attachments = [form.feedback_file.data]
 
-            send_email(
+            MailSender().send_email(
                 subject="[ketocalc] [{}]".format(form.option.data),
                 sender="ketocalc",
-                recipients=["ketocalc.jmp@gmail.com"],
+                recipient_mails=["ketocalc.jmp+feedback@gmail.com"],
                 text_body="Message: {}\n Send by: {} [user: {}]".format(
                     form.message.data, form.email.data, current_user.username
                 ),
@@ -65,13 +65,8 @@ class SupportView(FlaskView):
 
     @route("download/<filename>/", methods=["GET"])
     def download(self, filename):
-        print("getting file")
-        # print(args)
-        # print(kwargs)
         PATH = os.path.dirname(os.path.realpath(__file__))
         FILES_PATH = os.path.join(PATH, "../public/files/")
-        print(FILES_PATH)
-        print(os.path.join(FILES_PATH, filename))
         return send_file(
             os.path.join(FILES_PATH, filename), attachment_filename=filename,
         )

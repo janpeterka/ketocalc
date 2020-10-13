@@ -1,29 +1,33 @@
 import json
 
-from flask import render_template as template
 from flask import jsonify, request, abort
+from flask import render_template as template
 
 from flask_classful import FlaskView, route
-
-from app.models.ingredients import Ingredient
-from app.models.diets import Diet
+from flask_login import current_user
 
 from app.helpers import calculations
+from app.models.diets import Diet
+from app.models.ingredients import Ingredient
 
 
 class BaseRecipesView(FlaskView):
     @route("/addIngredientAJAX", methods=["POST"])
     def addIngredientAJAX(self):
         ingredient = Ingredient.load(request.json["ingredient_id"])
+        if not ingredient.is_author(current_user) and not ingredient.public:
+            abort(403)
         template_data = template(
             "recipes/_add_ingredient.html.j2", ingredient=ingredient
         )
         result = {"ingredient": ingredient.json, "template_data": template_data}
         return jsonify(result)
 
-    @route("addIngredientWithAmount", methods=["POST"])
+    @route("/addIngredientWithAmount", methods=["POST"])
     def addIngredientWithAmount(self):
         ingredient = Ingredient.load(request.json["ingredient_id"])
+        if not ingredient.is_author(current_user) and not ingredient.public:
+            abort(403)
         template_data = template(
             "recipes/_add_ingredient_with_amount.html.j2", ingredient=ingredient
         )
@@ -48,18 +52,16 @@ class BaseRecipesView(FlaskView):
             ingredient.fill_from_json(json_i)
             ingredients.append(ingredient)
 
-        result = calculations.calculate_recipe(ingredients, diet)
-        if result is None:
-            abort(400, "cannot be calculated")
+        try:
+            result = calculations.calculate_recipe(ingredients, diet)
+        except ValueError:
+            return ("", 204)
 
         ingredients = result["ingredients"]
         totals = result["totals"]
 
         json_ingredients = []
         for ing in ingredients:
-            if ing.amount < 0:
-                abort(400, "ingredient with negative amount")
-
             ing.calorie = round(ing.calorie * ing.amount, 2)
             ing.fat = round(ing.fat, 2)
             ing.sugar = round(ing.sugar, 2)

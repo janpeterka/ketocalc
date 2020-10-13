@@ -3,11 +3,8 @@
       static get targets() {
         return [
           "baseSelect",
-          "select", "ingredientTable",
+          "select", "ingredientTable", "recipeDiet", "recipeName",
           "totals"
-
-
-
           ]
       }
 
@@ -23,6 +20,10 @@
         }
       }
 
+      _float_to_fixed(data){
+        return parseFloat(data).toFixed(2)
+      }
+
       add_ingredient(e){
         e.preventDefault();
 
@@ -36,6 +37,7 @@
           ).then((response) => {
             $(this.ingredientTableTarget).append(response['template_data']);
             this._refresh_select();
+            this.calculate_recipe();
           });
         }
       }
@@ -49,6 +51,7 @@
             }
         }
         this._refresh_select();
+        this.calculate_recipe();
       }
 
       _row_to_ingredient(row){
@@ -82,7 +85,7 @@
       }
 
       calculate_recipe(e){
-        e.preventDefault();
+        if (e != null){e.preventDefault();}
 
         var selected_ingredients = this._get_currently_selected()
 
@@ -102,12 +105,32 @@
             totals["amount"] += parseFloat(ingredient["amount"])
         }
 
-        $(this.totalsTarget).empty();
+        totals["ratio"] = parseFloat(totals["fat"] / (totals["protein"] + totals["sugar"]))
+        
         this._set_totals(totals)
-
       }
 
+    save_recipe(e){
+      e.preventDefault();
+      fetch("{{ url_for('RecipesView:saveRecipeAJAX') }}", {
+        method: 'POST',
+        body: JSON.stringify({
+          'ingredients' : this._get_currently_selected(),
+          'dietID' : this.recipeDietTarget.value,
+          'name' : this.recipeNameTarget.value,
+        }),
+        headers: {'Content-Type': 'application/json,charset=UTF-8'},
+      })
+      .then((response) => {
+        return response.text(); })
+      .then((response) => {
+        var pathname = window.location.pathname.split("/")[0];
+        window.location.replace(pathname + response);
+      })
+    }
+
     _set_totals(totals){
+      $(this.totalsTarget).empty();
       var html =
         "<td>" +
         totals["calorie"] +
@@ -119,9 +142,17 @@
         totals["sugar"] +
         "</td><td>" +
         totals["amount"] +
-        "</td>"
+        "</td><td> <em>" +
+        this._float_to_fixed(totals["ratio"]) + 
+        ": 1 </em></td>"
 
       $(this.totalsTarget).append(html);
     }
-    });
-    </script>
+  });
+</script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  $('#ingredient_select').select2();
+});
+</script>

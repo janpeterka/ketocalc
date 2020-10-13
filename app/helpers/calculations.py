@@ -3,6 +3,7 @@ import numpy
 import sympy as sp
 from sympy import solve_poly_inequality as solvei
 from sympy import poly
+from sympy.solvers import solvers
 
 
 # CALCULATE RECIPE
@@ -36,45 +37,49 @@ def calculate_recipe(ingredients, diet):
     for ing in fixed_ingredients:
         ingredients.remove(ing)
 
-    # move main ingredient to end of list
+    # move main ingredient to end of list IF MORE THEN 3 INGREDIENTS!
     # TODO: .main by mělo být typově konzistentní
-    for i in range(len(ingredients)):
-        if (
-            hasattr(ingredients[i], "main")
-            and (ingredients[i].main is True or ingredients[i].main) == "true"
-        ):
-            mainIngredient = ingredients[i]
-            ingredients.pop(i)
-            ingredients.append(mainIngredient)
-            break
+    if len(ingredients) <= 3:
+        for ingredient in ingredients:
+            ingredient.main = False
+
+    else:
+        for i in range(len(ingredients)):
+            if hasattr(ingredients[i], "main") and ingredients[i].main is True:
+                mainIngredient = ingredients[i]
+                ingredients.pop(i)
+                ingredients.append(mainIngredient)
+                break
 
     # calculate
     if len(ingredients) == 0:
-        return None
+        raise ValueError("Nebyly zadané žádné suroviny")
     elif len(ingredients) == 1:
         # TODO: Teoreticky je možné (99)
-        return None
+        raise ValueError("Recept s jednou surovinou neumíme spočítat")
     elif len(ingredients) == 2:
         # TODO: Teoreticky je možné (99)
-        return None
+        raise ValueError("Recept se dvěma surovinami neumíme spočítat")
     elif len(ingredients) == 3:
         a = numpy.array(
             [
-                [ingredients[0].sugar, ingredients[1].sugar, ingredients[2].sugar],
-                [ingredients[0].fat, ingredients[1].fat, ingredients[2].fat],
-                [
-                    ingredients[0].protein,
-                    ingredients[1].protein,
-                    ingredients[2].protein,
-                ],
+                [ingredient.sugar for ingredient in ingredients],
+                [ingredient.fat for ingredient in ingredients],
+                [ingredient.protein for ingredient in ingredients],
             ]
         )
         b = numpy.array([diet.sugar, diet.fat, diet.protein])
-        x = numpy.linalg.solve(a, b)
+        result = numpy.linalg.solve(a, b)
 
-        ingredients[0].amount = x[0]
-        ingredients[1].amount = x[1]
-        ingredients[2].amount = x[2]
+        if result[0] < 0 or result[1] < 0 or result[2] < 0:
+            raise ValueError(
+                "Recept nelze spočítat",
+                "Množství některé suroviny se dostalo do záporu",
+            )
+
+        ingredients[0].amount = result[0]
+        ingredients[1].amount = result[1]
+        ingredients[2].amount = result[2]
 
     elif len(ingredients) == 4:
         x, y, z = sp.symbols("x, y, z")
@@ -104,9 +109,9 @@ def calculate_recipe(ingredients, diet):
         )
 
         # solve equations with args
-        in1 = sp.solvers.solve((f1, f2, f3), (x, y, z))[x]
-        in2 = sp.solvers.solve((f1, f2, f3), (x, y, z))[y]
-        in3 = sp.solvers.solve((f1, f2, f3), (x, y, z))[z]
+        in1 = solvers.solve((f1, f2, f3), (x, y, z))[x]
+        in2 = solvers.solve((f1, f2, f3), (x, y, z))[y]
+        in3 = solvers.solve((f1, f2, f3), (x, y, z))[z]
 
         # solve for positive numbers
         result1 = solvei(poly(in1), ">=")
@@ -115,44 +120,44 @@ def calculate_recipe(ingredients, diet):
 
         interval = (result1[0].intersect(result2[0])).intersect(result3[0])
         if interval.is_empty:
-            return None
+            raise ValueError("Recept nelze spočítat", "Neexistuje interval")
 
-        max_sol = min(100, round(interval.right, 2))
-        min_sol = max(0, round(interval.left, 2))
+        max_sol = min(100, round(interval.right * 100, 2))
+        min_sol = max(0, round(interval.left * 100, 2))
         if max_sol < min_sol:
-            return None
+            raise ValueError("Recept nelze spočítat", "Neexistuje rozumný interval")
 
         # max_sol = max for e (variable)
         sol = (min_sol + max_sol) / 2
 
         in1_dict = in1.as_coefficients_dict()
-        x = in1_dict[e] * sol + in1_dict[1]
+        x = in1_dict[e] * (sol / 100) + in1_dict[1]
 
         in2_dict = in2.as_coefficients_dict()
-        y = in2_dict[e] * sol + in2_dict[1]
+        y = in2_dict[e] * (sol / 100) + in2_dict[1]
 
         in3_dict = in3.as_coefficients_dict()
-        z = in3_dict[e] * sol + in3_dict[1]
+        z = in3_dict[e] * (sol / 100) + in3_dict[1]
 
         x = round(x, 4)
         y = round(y, 4)
         z = round(z, 4)
 
         if x < 0 or y < 0 or z < 0:
-            return None
+            raise ValueError(
+                "Recept nelze spočítat",
+                "Množství některé suroviny se dostalo do záporu",
+            )
 
         ingredients[0].amount = x
         ingredients[1].amount = y
         ingredients[2].amount = z
-        ingredients[3].amount = sol
-        ingredients[3].min = float(min_sol * 100) + 0.1
-        ingredients[3].max = float(max_sol * 100) - 0.1
+        ingredients[3].amount = float(sol / 100)
+        ingredients[3].min = float(min_sol + 0.1)
+        ingredients[3].max = float(max_sol - 0.1)
 
-    elif len(ingredients) == 5:
-        # TODO: 5 ingredients (30)
-        return None
     else:
-        return None
+        raise ValueError("Recept s pěti a více surovinami ještě neumíme spočítat")
 
     for ing in fixed_ingredients:
         ingredients.append(ing)
@@ -178,10 +183,10 @@ def calculate_recipe(ingredients, diet):
 
     # json cannot convert `sympy.Float`, so I convert everything to Python `float`
     for ingredient in ingredients:
-        ingredient.calorie = float(ingredient.calorie)
-        ingredient.fat = float(ingredient.fat)
         ingredient.sugar = float(ingredient.sugar)
+        ingredient.fat = float(ingredient.fat)
         ingredient.protein = float(ingredient.protein)
+        ingredient.calorie = float(ingredient.calorie)
         ingredient.amount = float(ingredient.amount)
 
     totals.sugar = float(totals.sugar)

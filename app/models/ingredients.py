@@ -3,37 +3,13 @@ import unidecode
 
 from sqlalchemy import and_
 
-
 from app import db
 
-from app.models.base_mixin import BaseMixin
-
-import app.models as models
-from app.models.recipes_has_ingredients import RecipesHasIngredient
-
-# from app.models.users import User
+from app.models.item_mixin import ItemMixin
+from app.models.recipes_has_ingredients import RecipeHasIngredients
 
 
-class Ingredient(db.Model, BaseMixin):
-    """Ingredient class
-
-    [description]
-
-    Extends:
-        Base
-
-    Variables:
-        __tablename__ {str} -- [description]
-        id {int} -- [description]
-        name {string} -- [description]
-        calorie {int} -- [description]
-        sugar {int} -- [description]
-        fat {int} -- [description]
-        protein {int} -- [description]
-        author {string} -- [description]
-        recipes {relationship} -- [description]
-    """
-
+class Ingredient(db.Model, ItemMixin):
     __tablename__ = "ingredients"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -52,7 +28,7 @@ class Ingredient(db.Model, BaseMixin):
 
     recipes = db.relationship(
         "Recipe",
-        primaryjoin="and_(Ingredient.id == remote(RecipesHasIngredient.ingredients_id), foreign(Recipe.id) == RecipesHasIngredient.recipes_id)",
+        primaryjoin="and_(Ingredient.id == remote(RecipeHasIngredients.ingredients_id), foreign(Recipe.id) == RecipeHasIngredients.recipes_id)",
         viewonly=True,
         order_by="Recipe.name",
     )
@@ -101,9 +77,9 @@ class Ingredient(db.Model, BaseMixin):
 
     def load_amount_by_recipe(self, recipe_id):
         rhi = (
-            db.session.query(RecipesHasIngredient)
-            .filter(RecipesHasIngredient.recipes_id == recipe_id)
-            .filter(RecipesHasIngredient.ingredients_id == self.id)
+            db.session.query(RecipeHasIngredients)
+            .filter(RecipeHasIngredients.recipes_id == recipe_id)
+            .filter(RecipeHasIngredients.ingredients_id == self.id)
             .first()
         )
         return rhi.amount
@@ -113,18 +89,25 @@ class Ingredient(db.Model, BaseMixin):
             self.fixed = json_ing["fixed"]
         if "main" in json_ing:
             self.main = json_ing["main"]
+
         if "amount" in json_ing:
             self.amount = float(json_ing["amount"]) / 100  # from grams per 100g
 
-        if "min" in json_ing:
+        if "min" in json_ing and len(json_ing["min"]) > 0:
             self.min = float(json_ing["min"])
-        if "max" in json_ing:
+
+        if "max" in json_ing and len(json_ing["max"]) > 0:
             self.max = float(json_ing["max"])
 
     @property
     def author_user(self):
-        user = models.users.User.load(self.author, load_type="username")
+        from app.models.users import User
+
+        user = User.load(self.author, load_type="username")
         return user
+
+    def is_author(self, user) -> bool:
+        return self.author_user == user
 
     @property
     def is_used(self):
@@ -132,6 +115,11 @@ class Ingredient(db.Model, BaseMixin):
             return False
         else:
             return True
+
+    @property
+    def public(self) -> bool:
+        """alias for is_shared"""
+        return self.is_shared
 
     # TODO: only used for testing
     def set_fixed(self, value=True, amount=0):

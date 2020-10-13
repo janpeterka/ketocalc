@@ -5,8 +5,11 @@
 
 {% block content %}
     <div class="container">
-        <div class="col-12">
+        <div class="admin-field">
             <h1>Uživatelé</h1>
+
+            <details>
+            <summary>Souhrn používání</summary>
             <table class="table">
                 <thead class="thead-dark">
                 <tr>
@@ -14,13 +17,13 @@
                     <th>name</th>
                     <th>registered at</th>
                     <th>last login at</th>
+                    <th>last activity</th>
                     <th>login count</th>
 
-                    <th>diet count</th>
-                
+                    <th>diet count</th>                
                     <th>recipe count</th>
-                
                     <th>ingredient count</th>
+                    <th>login as</th>
                 </tr>
                 </thead>
 
@@ -31,16 +34,74 @@
                             {{ user.username }}
                         </a>
                     </td>
-                    <td>{{ user.first_name +  " " + user.last_name }}</td>
+                    <td>{{ user.first_name }} {{ user.last_name }}</td>
                     <td>{{ user.created }}</td>
                     <td>{{ user.last_logged_in }}</td>
+                    <td>{{ user.last_request.url }} | {{ user.last_request.created_at }}</td>
                     <td>{{ user.login_count }}</td>
                     <td>{{ user.diets|length }}</td>
                     <td>{{ user.recipes|length }}</td>
                     <td>{{ user.ingredients|length }}</td>
+                    <td>
+                        <a href="{{ url_for('UsersView:login_as', user_id=user.id) }}">
+                            login as {{ user.username }}
+                        </a>
+                    </td>
                 </tr>
                 {% endfor %}
             </table>
+            </details>
+
+
+            <details open>
+            <summary>Maily</summary>
+            <table class="table">
+                <thead class="thead-dark">
+                <tr>
+                    <th>email</th>
+                    <th>name</th>
+                    <th>registered at</th>
+                    <th>last activity</th>
+
+                    <th>welcome mail sent</th>
+                    <th>inactive mail sent</th>
+                </tr>
+                </thead>
+
+                {% for user in users: %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('UsersView:show_by_id', id=user.id) }}">
+                            {{ user.username }}
+                        </a>
+                    </td>
+                    <td>{{ user.first_name }} {{ user.last_name }}</td>
+                    <td>{{ user.created }}</td>
+                    <td>{{ user.last_request.url }} | {{ user.last_request.created_at }}</td>
+
+                    <td>
+                        {% if user.onboarding_welcome_mail_sent == None and user.state(name="onboarding_welcome") == True %}
+                            <a href="{{ url_for('UsersView:send_mail', user_id=user.id, mail_type='onboarding_welcome') }}" >send!</a>
+                        {% elif user.onboarding_welcome_mail_sent == None %}
+                            <a class="inactive" href="{{ url_for('UsersView:send_mail', user_id=user.id, mail_type='onboarding_welcome') }}" onclick="return confirm('Are you sure?')">not applicable</a>                     
+                        {% else %}
+                            {{ user.onboarding_welcome_mail_sent }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user.onboarding_inactive_mail_sent == None and user.state(name="onboarding_inactive") == True %}
+                            <a href="{{ url_for('UsersView:send_mail', user_id=user.id, mail_type='onboarding_inactive') }}" >send!</a>
+                        {% elif user.onboarding_inactive_mail_sent == None %}
+                            <a class="inactive" href="{{ url_for('UsersView:send_mail', user_id=user.id, mail_type='onboarding_inactive') }}" onclick="return confirm('Are you sure?')">not applicable</a>
+                            
+                        {% else %}
+                            {{ user.onboarding_inactive_mail_sent }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            </details>
         </div> 
     </div>
 {% endblock %}

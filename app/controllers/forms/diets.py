@@ -26,12 +26,4 @@ class DietsForm(FlaskForm):
         "Množství (g) tuku / den",
         [validators.InputRequired("Množství musí být vyplněno")],
     )
-    small_size = ComaFloatField(
-        "Procentuální velikost malého jídla",
-        [validators.InputRequired("Množství musí být vyplněno")],
-    )
-    big_size = ComaFloatField(
-        "Procentuální velikost velkého jídla",
-        [validators.InputRequired("Množství musí být vyplněno")],
-    )
     submit = SubmitField("Přidat dietu")

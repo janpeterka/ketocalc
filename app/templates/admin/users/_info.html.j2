@@ -1,0 +1,64 @@
+<div class="admin-field">
+<div>
+	<table class="table">
+		<tr>
+			<th>Last activity</th>
+			<th>Last activity at</th>
+		</tr>
+		<tr>
+			<td>{{ user.last_request.url }}</td>
+     		<td>{{ user.last_request.created_at }}</td>
+		</tr>
+	</table>
+</div>
+
+
+<details>
+<summary>Recepty ({{ user.diets|length }} | {{ user.recipes|length }}) a Suroviny ({{ user.ingredients|length }})</summary>
+<div class="row">
+    <div class="col">
+        <h2>Recepty ({{ user.diets|length }} | {{ user.recipes|length }})</h2>
+        <table id="diets" class="table">
+        {% for diet in user.diets: %}
+            <tr>
+                <th class='diet'><a href="{{ url_for('DietsView:show', id=diet.id) }}">{{ diet.name }}</a></th>
+            </tr>
+
+            {% for recipe in diet.recipes: %}
+                <tr>
+                    <td><a href="{{ url_for('RecipesView:show', id=recipe.id) }}">{{ recipe.name }}</a></td>
+                </tr>
+            {% endfor %}
+        {% endfor %}       
+        </table>
+    </div>
+
+    <div class="col">
+        <h2>Suroviny ({{ user.ingredients|length }})</h2>
+        <table class="table">
+        {% for ingredient in user.ingredients: %}
+            <tr>
+                <td><a href="{{ url_for('IngredientsView:show', id=ingredient.id) }}">{{ ingredient.name }}</a></td>
+                <td>{{ ingredient.calorie }}</td>
+                <td>{{ ingredient.protein }}</td>
+                <td>{{ ingredient.fat }}</td>
+                <td>{{ ingredient.sugar }}</td>
+            </tr>
+        {% endfor %}
+        </table>
+    </div>         
+</div>
+</details>
+
+<details>
+<summary>Mails ({{ user.sent_mails|length }})</summary>
+<div>
+    <ul>
+    {% for mail in user.sent_mails %}
+        <li>{{ mail.subject }} | {{ mail.created_at }} | {{ mail.template }}</li>
+    {% endfor %}
+    </ul>
+</div>
+</details>
+
+</div>

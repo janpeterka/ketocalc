@@ -1,7 +1,7 @@
 from app import db
 
 
-class RecipesHasIngredient(db.Model):
+class RecipeHasIngredients(db.Model):
     """Recipe-Ingredient connection class
 
     Extends:

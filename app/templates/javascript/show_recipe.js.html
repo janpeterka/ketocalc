@@ -1,0 +1,127 @@
+<script type="text/javascript">
+    application.register("show-recipe", class extends Stimulus.Controller {
+      static get targets() {
+        return [
+        	"ingredientTable", "totals",
+          "percentage", "showPercentage"
+          ]
+      }
+
+      connect() {
+      	this.calculate_recipe()
+      }
+
+      calculate_recipe(event){
+		    var coeficient = 1;
+
+        if (event != undefined){
+          event.preventDefault();
+          var target = event.target
+          if ("percentage" in target.dataset){
+          	coeficient = target.dataset.percentage / 100;
+          } else {
+          	coeficient = target.getElementsByTagName("input")[0].value / 100;
+          }
+        }
+
+
+        this.showPercentageTarget.innerHTML = "Aktuálně " + (coeficient * 100).toString() + "% diety.";
+
+        var selected_ingredients = this._get_currently_selected()
+
+        var totals = {
+          "sugar": 0,
+          "protein": 0,
+          "fat": 0,
+          "calorie": 0,
+          "amount": 0
+        }
+
+        for (let i = 0, ingredient; ingredient = selected_ingredients[i]; i++) {
+            ingredient["amount"] = this._amount(ingredient["amount"]) * coeficient
+            this._ingredient_to_row(ingredient, this.ingredientTableTarget);
+
+            totals["sugar"] += ingredient["sugar"] * ingredient["amount"]
+            totals["protein"] += ingredient["protein"] * ingredient["amount"]
+            totals["fat"] += ingredient["fat"] * ingredient["amount"]
+            totals["calorie"] += ingredient["calorie"] * ingredient["amount"]
+            totals["amount"] += ingredient["amount"] * 100
+        }
+
+        totals["ratio"] = totals["fat"] / (totals["sugar"] + totals["protein"])
+
+        this._set_totals(totals)
+      }
+
+      _float_to_fixed(data){
+      	return parseFloat(data).toFixed(2)
+      }
+
+      _amount(amount){
+      	return (amount / 100);
+      }
+
+      _get_currently_selected(){
+        return this._get_ingredients_from_table(this.ingredientTableTarget)
+      }
+
+      _get_ingredients_from_table(table){
+        var ingredients = [];
+
+        for (let i = 1, row; row = table.rows[i]; i++) {
+          if ("id" in row.dataset){
+            let ingredient = this._row_to_ingredient(row)
+            ingredients.push(ingredient);
+          }
+
+        }
+        return ingredients;
+      }
+
+      _row_to_ingredient(row){
+        var ingredient = {}
+        ingredient['id'] = row.dataset.id
+        ingredient['name'] = row.dataset.name
+        ingredient['calorie'] = row.dataset.calorie
+        ingredient['fat'] = row.dataset.fat
+        ingredient['protein'] = row.dataset.protein
+        ingredient['sugar'] = row.dataset.sugar
+        ingredient['amount'] = row.dataset.amount
+
+        return ingredient
+      }
+
+      _ingredient_to_row(ingredient, table){
+        var row = table.querySelectorAll(`[data-id='` + ingredient.id + `']`)[0]
+
+        row.querySelectorAll(`[data-type='sugar']`)[0].innerHTML = this._float_to_fixed(ingredient["sugar"] * ingredient["amount"])
+        row.querySelectorAll(`[data-type='fat']`)[0].innerHTML = this._float_to_fixed(ingredient["fat"] * ingredient["amount"])
+        row.querySelectorAll(`[data-type='protein']`)[0].innerHTML = this._float_to_fixed(ingredient["protein"] * ingredient["amount"])
+        row.querySelectorAll(`[data-type='calorie']`)[0].innerHTML = this._float_to_fixed(ingredient["calorie"] * ingredient["amount"])
+        row.querySelectorAll(`[data-type='amount']`)[0].innerHTML = this._float_to_fixed(ingredient["amount"] * 100) 
+      }
+
+      _set_totals(totals){
+      $(this.totalsTarget).empty();
+
+      var html =
+      	"<td> Celkem " +
+        "</td><td>" +
+        this._float_to_fixed(totals["calorie"]) +
+        "</td><td>" +
+        this._float_to_fixed(totals["protein"]) +
+        "</td><td>" +
+        this._float_to_fixed(totals["fat"]) +
+        "</td><td>" +
+        this._float_to_fixed(totals["sugar"]) +
+        "</td><td>" +
+        this._float_to_fixed(totals["amount"]) +
+        "</td><td> <em>Poměr: " +
+        this._float_to_fixed(totals["ratio"]) + 
+        ": 1 </em></td>"
+
+      $(this.totalsTarget).append(html);
+    }
+  });
+
+    </script>

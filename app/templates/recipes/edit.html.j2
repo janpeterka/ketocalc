@@ -14,10 +14,6 @@
         <div class="col-12">
             <form action="{{ url_for('RecipesView:post_edit', id=recipe.id) }}" class="form-inline edit__form" method="post" accept-charset="utf-8">
                 <input type="text" name="name" class="form-control col-4" value="{{ recipe.name }}"><br>
-                <select name="size" class="form-control">
-                    <option value="small">{{ texts.meal_size_small }} ({{ recipe.diet.small_size }})</option>
-                    <option value="big">{{ texts.meal_size_big }} ({{ recipe.diet.big_size }})</option>
-                </select>
                 <input type="submit" value="{{ texts.recipe_edit }}" class="btn btn-warning">
             </form>
 

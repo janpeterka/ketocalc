@@ -3,19 +3,6 @@
     {{ texts.diet }}: {{ diet.name }}
 {% endblock %}
 
-{% block style %}{% endblock %}
-
-{% block script %}
-{# 	<script type="text/javascript">
-
-        // $(document).on("click", ".export__button", function() {
-        //     $('.row').hide();
-        //     $('.loader').show();
-        // });
-   
-    </script> #}
-{% endblock %}
-
 {% block content %}
     <div class="container">
         <div class="row">
@@ -51,26 +38,6 @@
                                 {{ render_field(form.sugar, "form-control", label=False, disabled=diet.is_used) }}
                             </td>
                         </tr>
-                    </table>
-
-                    <table class="table edit__form">
-                        <tr>
-                            <th>{{ texts.meal_size }}</th>
-                            <th>{{ texts.meal_portion }}</th>
-                        </tr>
-                        <tr>
-                            <td>{{ texts.meal_size_big }}</td>
-                            <td>
-                                {{ render_field(form.big_size, "form-control", label=False) }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>{{ texts.meal_size_small }}</td>
-                            <td>
-                                {{ render_field(form.small_size, "form-control", label=False) }}
-                            </td>
-                        </tr>
-                    </tbody>
                     </table>
                     <button type="submit" class="btn btn-warning">{{ texts.edit_confirm }} {{ icons.edit }}</button>
                 </form>

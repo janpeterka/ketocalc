@@ -2,8 +2,10 @@
 
   {% if label %}
     {{ field.label }}
+    {% if "data_toggle" in kwargs and kwargs["data_toggle"] == "tooltip" %}
+      <i class="fa fa-question-circle" data-toggle="tooltip" title="{{ kwargs['title'] }}"></i>
+    {% endif %}
   {% endif %}
-
 
   {% if class %}
     {{ field(class_=class, **kwargs) }}
@@ -14,7 +16,7 @@
   {% if errors and field.errors %}
     <ul class=errors>
     {% for error in field.errors %}
-      <li style="list-style: none" class="warning">{{ error }}</li>
+      <li class="warning no-list">{{ error }}</li>
     {% endfor %}
     </ul>
   {% endif %}

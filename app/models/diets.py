@@ -1,29 +1,10 @@
 import datetime
 from app import db
 
-from app.models.base_mixin import BaseMixin
+from app.models.item_mixin import ItemMixin
 
 
-class Diet(db.Model, BaseMixin):
-    """Diet object
-
-    Extends:
-        Base
-
-    Variables:
-        __tablename__ {str} -- [description]
-        id {int} -- [description]
-        name {string} -- [description]
-        sugar {int} -- sugar amount
-        fat {int} -- fat amount
-        protein {int} -- protein amount
-        small_size {int} -- small size in %
-        big_size {int} -- big size in %
-        active {int} -- int 0 / 1 - works as boolean
-        recipes {relationship} -- [description]
-        author {relationship} -- [description]
-    """
-
+class Diet(db.Model, ItemMixin):
     __tablename__ = "diets"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -32,8 +13,6 @@ class Diet(db.Model, BaseMixin):
     sugar = db.Column(db.Float, nullable=False)
     fat = db.Column(db.Float, nullable=False)
     protein = db.Column(db.Float, nullable=False)
-    small_size = db.Column(db.Float, nullable=False)
-    big_size = db.Column(db.Float, nullable=False)
     active = db.Column(db.Boolean, nullable=False)
     created = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
     last_updated = db.Column(db.DateTime, nullable=True, onupdate=datetime.datetime.now)
@@ -49,11 +28,13 @@ class Diet(db.Model, BaseMixin):
     def is_used(self):
         if len(self.recipes) == 0:
             return False
-        else:
-            return True
+        return True
 
     # TODO: only used for testing, probably want to remove (move to helper)
     @staticmethod
     def load_by_name(diet_name):
         diet = db.session.query(Diet).filter(Diet.name == diet_name).first()
         return diet
+
+    def is_author(self, user) -> bool:
+        return user == self.author

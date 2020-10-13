@@ -1,6 +1,5 @@
 from flask import Blueprint
-from flask import redirect
-from flask import flash, url_for
+from flask import redirect, flash, url_for, session
 from flask import current_app as application
 
 from flask_login import login_user, logout_user, current_user, login_required
@@ -43,15 +42,8 @@ def do_oauth_register(*, user_info, oauth_type):
     user.password = None
     user.google_id = user_info["id"]
 
-    if "given_name" in user_info:
-        user.first_name = user_info["given_name"]
-    else:
-        user.first_name = "-"
-
-    if "family_name" in user_info:
-        user.last_name = user_info["family_name"]
-    else:
-        user.last_name = "-"
+    user.first_name = user_info.get("given_name", "-")
+    user.last_name = user_info.get("family_name", "-")
 
     do_register(user, source="google_oauth")
 
@@ -90,6 +82,7 @@ def do_login(username=None, password=None, from_register=False):
 @login_required
 @auth_blueprint.route("/logout")
 def do_logout():
+    session.pop("logged_from_admin", None)
     if current_user.is_authenticated:
         logout_user()
     return redirect(url_for("LoginView:show"))

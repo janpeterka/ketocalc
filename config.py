@@ -12,7 +12,7 @@ class Config(object):
 
     MAIL_SERVER = "smtp.googlemail.com"
     MAIL_PORT = 465
-    MAIL_USE_TLS = False
+    # MAIL_USE_TLS = False
     MAIL_USE_SSL = True
     MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
@@ -28,6 +28,8 @@ class Config(object):
 
     PASSWORD_VERSION = os.environ.get("PASSWORD_VERSION")
 
+    SENTRY_MONITORING = True
+
 
 class TestConfig(Config):
     TESTING = True
@@ -37,14 +39,17 @@ class TestConfig(Config):
         "TESTING_APP_STATE"
     )  # production, development, debug, shutdown
     SECRET_KEY = os.environ.get("TESTING_SECRET_KEY")
+    SENTRY_MONITORING = False
 
 
 class DevConfig(Config):
     TEMPLATES_AUTO_RELOAD = True
     SQLALCHEMY_DATABASE_URI = os.environ.get("LOCAL_DB_STRING")
+    # SQLALCHEMY_ECHO = True
     APP_STATE = os.environ.get(
         "LOCAL_APP_STATE"
     )  # production, development, debug, shutdown
+    SENTRY_MONITORING = False
 
 
 class ProdConfig(Config):

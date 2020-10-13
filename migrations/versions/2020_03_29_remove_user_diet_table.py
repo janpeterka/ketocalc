@@ -1,4 +1,4 @@
-"""empty message
+"""Remove user_has_table connection, using direct foreign keys instead
 
 Revision ID: fcffcb21448e
 Revises: cd8b44186600

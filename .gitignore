@@ -2,22 +2,15 @@
 .mypy_cache/
 __pycache__/
 ketocalc.egg-info/
-
 *.sublime-project
 *.sublime-workspace
-
 
 scripts/
 db/
 tmp/
 
-todo/
-*.todo
-
 *.env*
 *.flaskenv*
-gunicorn_logs/
-gunicorn_config.py
-local_gunicorn_config.py
 
 node_modules/
+app/static/dist/*

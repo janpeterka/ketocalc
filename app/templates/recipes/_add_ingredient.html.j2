@@ -1,12 +1,17 @@
-<tr id_value="{{ ingredient.id }}"> 
+<tr data-id="{{ ingredient.id }}" data-name="{{ ingredient.name }}"> 
     <td>{{ ingredient.name }}</td> 
     <td>{{ ingredient.calorie }}</td> 
     <td>{{ ingredient.protein }}</td> 
     <td>{{ ingredient.fat }}</td>
     <td>{{ ingredient.sugar }}</td>
-    <td> 
-        {{ icons.ingredient_fixed }} 
-        {{ icons.ingredient_main }} 
-        {{ icons.ingredient_remove }} 
+    <td>
+        <i data-action="click->new-recipe#set_main_ingredient" data-id="{{ ingredient.id }}"
+           class="set_main fas fa-hospital-symbol"></i>
+        
+        <i data-action="click->new-recipe#toggle_fixed_ingredient" data-id="{{ ingredient.id }}"
+           class="set_fixed fas fa-thumbtack"></i>
+
+        <i data-action="click->new-recipe#remove_ingredient" data-id="{{ ingredient.id }}"
+           class="remove fa fa-times"></i>
     </td>
 </tr>
