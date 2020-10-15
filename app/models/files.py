@@ -3,6 +3,8 @@ from werkzeug.utils import secure_filename
 
 from app import db
 
+from flask_login import current_user
+
 from app.models.base_mixin import BaseMixin
 
 from app.handlers.files import FileHandler
@@ -32,7 +34,7 @@ class File(db.Model, BaseMixin):
 
     subfolder = ""
 
-    def get_hash_from_path(self):
+    def _get_hash_from_path(self):
         from hashlib import md5
 
         return md5(self.path.encode("utf-8")).hexdigest()
@@ -52,6 +54,10 @@ class File(db.Model, BaseMixin):
         self.path = os.path.join(
             self.subfolder, "{}.{}".format(self.name, self.extension)
         )
+        self.created_by = current_user.id
+
+        # hash cannot be empty, but real will be created after path
+        self.hash = ""
 
         super().save()
 
@@ -59,7 +65,7 @@ class File(db.Model, BaseMixin):
         self.rename_to_id()
 
         self.name = "{}.{}".format(self.id, self.extension)
-        self.hash = self.get_hash_from_path()
+        self.hash = self._get_hash_from_path()
         # save file to filesystem
         FileHandler(subfolder=self.subfolder).save(self)
         self.expire()

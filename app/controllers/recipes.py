@@ -61,7 +61,14 @@ class RecipesView(BaseRecipesView):
         return redirect(url_for("RecipesView:show", id=self.recipe.id))
 
     def show(self, id):
-        return template("recipes/show.html.j2", recipe=self.recipe, is_print=False,)
+        from .forms.files import PhotoForm
+
+        return template(
+            "recipes/show.html.j2",
+            recipe=self.recipe,
+            is_print=False,
+            photo_form=PhotoForm(),
+        )
 
     def print(self, id):
         return template("recipes/show.html.j2", recipe=self.recipe, is_print=True,)
@@ -120,3 +127,20 @@ class RecipesView(BaseRecipesView):
 
         last_id = recipe.create_and_save(ingredients)
         return url_for("RecipesView:show", id=last_id)
+
+    @route("/upload_photo/<id>", methods=["POST"])
+    def upload_photo(self, id):
+        from werkzeug.datastructures import CombinedMultiDict
+        from .forms.files import PhotoForm
+
+        from app.models.files import File
+
+        form = PhotoForm(CombinedMultiDict((request.files, request.form)))
+
+        if form.file.data:
+            file = File()
+            # data is real file data
+            file.data = form.file.data
+            file.save()
+
+        return redirect(url_for("RecipesView:show", id=id))

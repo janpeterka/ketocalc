@@ -12,6 +12,7 @@ icons = {
     "daily": '<i class="fas fa-calendar-alt"></i>',
     "calculator": '<i class="fas fa-calculator"></i>',
     "list": '<i class="fas fa-list-ul"></i>',
+    "photo": '<i class="far fa-image"></i>',
 }
 
 texts = {
@@ -57,6 +58,7 @@ texts = {
     "recipe_impossible": "Recept nelze vytvořit",
     "recipe_share": "Zveřejnit recept",
     "recipe_unshare": "Zneveřejnit recept",
+    "recipe_upload_photo": "Nahrát fotku",
     "recipes": "Recepty",
     # Diet
     "diet": "Dieta",
