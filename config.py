@@ -28,6 +28,9 @@ class Config(object):
 
     PASSWORD_VERSION = os.environ.get("PASSWORD_VERSION")
 
+    AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+
     SENTRY_MONITORING = True
 
 
