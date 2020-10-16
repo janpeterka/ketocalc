@@ -33,6 +33,8 @@ class Config(object):
 
     STORAGE_SYSTEM = os.environ.get("STORAGE_SYSTEM")  # DEFAULT, AWS
 
+    BUCKET = "ketocalc"
+
     SENTRY_MONITORING = True
 
 
@@ -55,6 +57,9 @@ class DevConfig(Config):
         "LOCAL_APP_STATE"
     )  # production, development, debug, shutdown
     SENTRY_MONITORING = False
+
+    # BUCKET = "ketocalc-dev"
+    BUCKET = "ketocalcdev"
 
 
 class ProdConfig(Config):

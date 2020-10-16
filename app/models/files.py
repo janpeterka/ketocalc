@@ -49,7 +49,7 @@ class File(db.Model, BaseMixin):
         self.path = os.path.join(
             self.subfolder, "{}.{}".format(self.id, self.extension)
         )
-        super().save()
+        super().edit()
         return self
 
     def save(self):
@@ -72,8 +72,10 @@ class File(db.Model, BaseMixin):
         # rename to match db id
         self.rename_to_id()
 
-        self.name = "{}.{}".format(self.id, self.extension)
         self.hash = self._get_hash_from_path()
+        super().edit()
+
+        self.name = "{}.{}".format(self.id, self.extension)
         # save file to filesystem
         if application.config["STORAGE_SYSTEM"] == "DEFAULT":
             FileHandler(subfolder=self.subfolder).save(self)
