@@ -34,4 +34,4 @@ sentry-sdk = {extras = ["flask"],version = "*"}
 boto3 = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.7.9"
