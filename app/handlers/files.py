@@ -61,16 +61,16 @@ class FileHandler(object):
     #     return send_file(file.path, attachment_filename=file.name,)
 
 
-class AWSFileHandler(FileHandler):
+class AWSFileHandler(object):
     def __init__(self):
-        self.s3_client = boto3.client(
+        self.client = boto3.client(
             "s3",
             aws_access_key_id=app.config["AWS_ACCESS_KEY_ID"],
             aws_secret_access_key=app.config["AWS_SECRET_ACCESS_KEY"],
             region_name="eu-west-3",
         )
 
-        self.s3_resource = boto3.resource(
+        self.resource = boto3.resource(
             "s3",
             aws_access_key_id=app.config["AWS_ACCESS_KEY_ID"],
             aws_secret_access_key=app.config["AWS_SECRET_ACCESS_KEY"],
@@ -84,19 +84,11 @@ class AWSFileHandler(FileHandler):
         self.upload_file(os.path.join(fh.folder, file.path), file.name)
         fh.delete(file)
 
-    # def show(self, file):
-    #     pass
-
-    # def download(self, file):
-    #     pass
-
     def upload_file(self, file_path, file_name):
         """
         Function to upload a file to an S3 bucket
         """
-        response = self.s3_client.upload_file(
-            file_path, app.config["BUCKET"], file_name
-        )
+        response = self.client.upload_file(file_path, app.config["BUCKET"], file_name)
 
         return response
 
@@ -104,8 +96,8 @@ class AWSFileHandler(FileHandler):
     #     """
     #     Function to download a given file from an S3 bucket
     #     """
-    #     output = f"downloads/{file_name}"
-    #     self.s3_resource.Bucket(app.config["BUCKET"]).download_file(file_name, output)
+    #     output = file_name
+    #     self.resource.Bucket(app.config["BUCKET"]).download_file(file_name, output)
 
     #     return output
 
@@ -115,7 +107,7 @@ class AWSFileHandler(FileHandler):
         """
         contents = []
         try:
-            for item in self.s3_client.list_objects(Bucket=app.config["BUCKET"])[
+            for item in self.client.list_objects(Bucket=app.config["BUCKET"])[
                 "Contents"
             ]:
                 contents.append(item)
@@ -138,7 +130,7 @@ class AWSFileHandler(FileHandler):
         # Generate a presigned URL for the S3 object
         object_name = file.path
         try:
-            response = self.s3_client.generate_presigned_url(
+            response = self.client.generate_presigned_url(
                 "get_object",
                 Params={"Bucket": app.config["BUCKET"], "Key": object_name},
                 ExpiresIn=expiration,

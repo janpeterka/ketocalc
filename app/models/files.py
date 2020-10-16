@@ -46,9 +46,7 @@ class File(db.Model, BaseMixin):
         return md5(self.path.encode("utf-8")).hexdigest()
 
     def rename_to_id(self):
-        self.path = os.path.join(
-            self.subfolder, "{}.{}".format(self.id, self.extension)
-        )
+        self.path = os.path.join(self.subfolder, f"{self.id}.{self.extension}")
         super().edit()
         return self
 
@@ -57,9 +55,7 @@ class File(db.Model, BaseMixin):
         self.name = secure_filename(".".join(self.data.filename.split(".")[:-1]))
         # converts "some.picture.jpg" to "jpg"
         self.extension = secure_filename(".".join(self.data.filename.split(".")[-1:]))
-        self.path = os.path.join(
-            self.subfolder, "{}.{}".format(self.name, self.extension)
-        )
+        self.path = os.path.join(self.subfolder, f"{self.name}.{self.extension}")
 
         if getattr(self, "created_by", None) is None:
             self.created_by = current_user.id
@@ -75,7 +71,7 @@ class File(db.Model, BaseMixin):
         self.hash = self._get_hash_from_path()
         super().edit()
 
-        self.name = "{}.{}".format(self.id, self.extension)
+        self.name = f"{self.id}.{self.extension}"
         # save file to filesystem
         if application.config["STORAGE_SYSTEM"] == "DEFAULT":
             FileHandler(subfolder=self.subfolder).save(self)
@@ -94,7 +90,7 @@ class File(db.Model, BaseMixin):
         To be overwritten in child classes
 
         Returns:
-            bool -- [description]
+            bool -- True
         """
         return True
 
