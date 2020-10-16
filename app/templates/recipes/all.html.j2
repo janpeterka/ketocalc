@@ -34,12 +34,6 @@
                 <a href="{{ url_for('RecipesView:make_all_public') }}" class="btn btn-secondary">zveřejnit všechny recepty</a>
             </div>    
         </div>
-
-        <div>
-            {% for file in all_files %}
-                {{ file.name }}
-            {% endfor %}
-        </div>
     </div>
 {% endblock %}
 
