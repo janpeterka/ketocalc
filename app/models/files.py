@@ -60,7 +60,9 @@ class File(db.Model, BaseMixin):
         self.path = os.path.join(
             self.subfolder, "{}.{}".format(self.name, self.extension)
         )
-        self.created_by = current_user.id
+
+        if getattr(self, "created_by", None) is None:
+            self.created_by = current_user.id
 
         # hash cannot be empty, but real will be created after path
         self.hash = ""
@@ -114,4 +116,4 @@ class RecipeImageFile(ImageFile):
 
     # def can_view(self, user):
     #     # private?
-    #     return self.recipe in user.recipes or self.recipe.public
+    #     return self.recipe in user.recipes or self.recipe.public or user.is_admin
