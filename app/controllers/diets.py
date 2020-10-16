@@ -50,10 +50,8 @@ class DietsView(ExtendedFlaskView):
             save_form_to_session(request.form)
             return redirect(url_for("DietsView:new"))
 
-        diet = Diet()
+        diet = Diet(active=True, author=current_user)
         form.populate_obj(diet)
-        diet.active = 1
-        diet.author = current_user
 
         if diet.save():
             return redirect(url_for("DietsView:show", id=diet.id))

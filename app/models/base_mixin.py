@@ -8,6 +8,14 @@ from app import db
 # Custom methods for all my classes
 class BaseMixin(object):
     @classmethod
+    def __init__(cls, **kwargs):
+        obj = cls()
+        for kwarg in kwargs:
+            setattr(obj, kwarg.key, kwarg.value)
+
+        return obj
+
+    @classmethod
     def load(cls, *args, **kwargs):
         object_id = kwargs.get("id", args[0])
         return db.session.query(cls).filter(cls.id == object_id).first()
