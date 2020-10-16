@@ -183,6 +183,10 @@ class User(db.Model, UserMixin, ItemMixin):
         return ingredients
 
     @property
+    def name(self):
+        return "{} {}".format(self.first_name, self.last_name)
+
+    @property
     def last_request(self):
         request = (
             db.session.query(RequestLog)

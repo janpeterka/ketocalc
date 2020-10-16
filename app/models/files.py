@@ -30,6 +30,10 @@ class File(db.Model, BaseMixin):
 
     file_type = db.Column(db.String(40))
 
+    author = db.relationship(
+        "User", primaryjoin="File.created_by == User.id", backref="files",
+    )
+
     __mapper_args__ = {"polymorphic_on": file_type, "polymorphic_identity": "file"}
 
     subfolder = ""
@@ -91,7 +95,9 @@ class RecipeImageFile(ImageFile):
     __mapper_args__ = {"polymorphic_identity": "recipe_image"}
 
     recipe = db.relationship(
-        "Recipe", primaryjoin="ImageFile.recipe_id == Recipe.id", backref="images",
+        "Recipe",
+        primaryjoin="RecipeImageFile.recipe_id == Recipe.id",
+        backref="images",
     )
 
     # def can_view(self, user):

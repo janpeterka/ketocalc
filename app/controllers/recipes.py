@@ -133,14 +133,14 @@ class RecipesView(BaseRecipesView):
         from werkzeug.datastructures import CombinedMultiDict
         from .forms.files import PhotoForm
 
-        from app.models.files import File
+        from app.models.files import RecipeImageFile
 
         form = PhotoForm(CombinedMultiDict((request.files, request.form)))
 
         if form.file.data:
-            file = File()
-            # data is real file data
+            file = RecipeImageFile()
             file.data = form.file.data
+            file.recipe_id = id
             file.save()
 
         return redirect(url_for("RecipesView:show", id=id))

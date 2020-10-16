@@ -30,7 +30,8 @@
 
 {% block content %}
     <div class="container">
-        <div class="col-12" data-controller="show-recipe">
+    <div class="row">
+        <div class="col-10" data-controller="show-recipe">
             {% if not is_print %}
                 <span class="data__table">
             {% else %}
@@ -116,13 +117,21 @@
                         <button type="submit" class="btn btn-secondary">{{ texts.recipe_share }} {{ icons.archive }}</button>
                     {% endif %}
                 </form>
-                <form action="{{ url_for('RecipesView:upload_photo', id=recipe.id) }}" method="post" accept-charset="utf-8" enctype=multipart/form-data>
-                    {{ photo_form.file }}
-                    {{ photo_form.submit(class="btn btn-secondary") }}
-                </form>
             </div>
             {% endif %}
         </div>
+        <div class="col-2">
+            {% for image in recipe.images %}
+                <img style="width: 20rem; margin-bottom: 2rem" src="{{ image.url }}" alt="{{ image.name }}"/>
+            {% endfor %}
+            {% if recipe.images|length == 0 and current_user.id == recipe.author.id %}
+                <form action="{{ url_for('RecipesView:upload_photo', id=recipe.id) }}" method="post" accept-charset="utf-8" enctype=multipart/form-data>
+                    {{ photo_form.file }}
+                    {{ photo_form.submit(class="btn btn-secondary") }}
+                </form>         
+            {% endif %}
+        </div>
+    </div>
     </div>
 {% endblock %}
 
