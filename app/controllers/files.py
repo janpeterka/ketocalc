@@ -40,6 +40,7 @@ class FilesView(FlaskView):
 
     def index(self):
         aws_files = AWSFileHandler().list_files()
+        # TODO - match all aws_files to all files (probably composed from multiple models)
         files = []
         for aws_file in aws_files:
             # file = File().load_by_attribute("path", aws_file['Key'])
