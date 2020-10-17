@@ -92,7 +92,7 @@
             <div class="row" data-target="show-recipe.percentage">
                 <div class="col-10">
                 <form class="form-inline" data-action="submit->show-recipe#calculate_recipe">
-                    {% from "_percentage_button.html.j2" import percentage_button %}
+                    {% from "macros/_percentage_button.html.j2" import percentage_button %}
                     {% for percentage in [10, 12.5, 25, 50, 100] %}
                         {{ percentage_button(percentage, controller="show-recipe", action="calculate_recipe") }}
                     {% endfor %}

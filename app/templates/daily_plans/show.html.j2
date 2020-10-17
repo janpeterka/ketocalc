@@ -93,7 +93,7 @@
                 {# Amount #}
                 <div class="form-group form-inline">
                     <label>Podíl z celé diety</label>
-                    {% from "_percentage_button.html.j2" import percentage_button %}
+                    {% from "macros/_percentage_button.html.j2" import percentage_button %}
                     {% for percentage in [10, 12.5, 25, 50, 100] %}
                         {{ percentage_button(percentage, controller="daily-plan", action="set_amount") }}
                     {% endfor %}
