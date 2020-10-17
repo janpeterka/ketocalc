@@ -26,13 +26,13 @@
             <form method="post" action="{{ url_for('IngredientsView:post') }}" class="form-group col-6" accept-charset="UTF-8">
         {% endif %}
             {{ form.csrf_token }}
-            {% from "_form_element.html.j2" import render_field %}
-            {{ render_field(form.name, "form-control") }}
-            {{ render_field(form.protein, "form-control") }}
-            {{ render_field(form.fat, "form-control") }}
-            {{ render_field(form.sugar, "form-control") }}
-            {{ render_field(form.calorie, "form-control") }}
-            {{ render_field(form.submit, class="btn btn-primary", label=False) }}
+            {% from "macros/_form_element.html.j2" import render_field %}
+            {{ render_field(form.name) }}
+            {{ render_field(form.protein) }}
+            {{ render_field(form.fat) }}
+            {{ render_field(form.sugar) }}
+            {{ render_field(form.calorie) }}
+            {{ render_field(form.submit) }}
         </form>
     </div>
 {% endblock %}
