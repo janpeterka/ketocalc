@@ -29,7 +29,7 @@ class DailyPlansView(ExtendedFlaskView):
         self.dates = {"active": date, "previous": date_before, "next": date_after}
 
         self.daily_plan = DailyPlan.load_by_date_or_create(date)
-        self.daily_recipes = self.daily_plan.has_recipes
+        self.daily_recipes = self.daily_plan.daily_recipes
 
         return self.template(diets=current_user.active_diets)
 
@@ -44,7 +44,7 @@ class DailyPlansView(ExtendedFlaskView):
         recipe_id = request.form["recipe_id"]
 
         recipe = Recipe.load(recipe_id)
-        if not recipe.is_author(current_user):
+        if not recipe.can_current_user_add:
             abort(403)
         date = request.form["date"]
 
@@ -53,10 +53,10 @@ class DailyPlansView(ExtendedFlaskView):
 
         daily_plan = DailyPlan.load_by_date(date)
 
-        dphr = DailyPlanHasRecipes()
-        dphr.recipes_id = recipe_id
-        dphr.daily_plans_id = daily_plan.id
-        dphr.amount = amount
+        # TODO this calls for renaming
+        dphr = DailyPlanHasRecipes(
+            recipes_id=recipe_id, daily_plans_id=daily_plan.id, amount=amount
+        )
         dphr.save()
 
         return redirect(url_for("DailyPlansView:show", date=date))
@@ -71,8 +71,6 @@ class DailyPlansView(ExtendedFlaskView):
 
         recipes = Diet.load(diet_id).recipes
 
-        json_recipes = []
-        for recipe in recipes:
-            json_recipes.append(recipe.json)
+        json_recipes = [recipe.json for recipe in recipes]
 
         return jsonify(json_recipes)

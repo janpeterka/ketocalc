@@ -32,5 +32,3 @@ def downgrade():
         existing_type=mysql.VARCHAR(length=255),
         type_=mysql.ENUM("user", "diet", "recipe", "ingredient"),
     )
-
-    pass

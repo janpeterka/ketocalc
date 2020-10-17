@@ -63,22 +63,6 @@ class User(db.Model, UserMixin, ItemMixin):
     @staticmethod
     @login.user_loader
     def load(user_identifier, load_type="id"):
-        """[summary]
-
-        [description]
-
-        Decorators:
-            login.user_loader
-
-        Arguments:
-            user_identifier {[type]} -- [description]
-
-        Keyword Arguments:
-            load_type {str} -- [description] (default: {"id"})
-
-        Returns:
-            [type] -- [description]
-        """
         if load_type == "id":
             user = db.session.query(User).filter(User.id == user_identifier).first()
         elif load_type == "username":
@@ -99,6 +83,10 @@ class User(db.Model, UserMixin, ItemMixin):
             return None
 
         return user
+
+    @staticmethod
+    def load_by_username(username):
+        return User.load(username, load_type="username")
 
     def set_password_hash(self, password):
         if not isinstance(password, bytes) and password is not None:
@@ -148,11 +136,6 @@ class User(db.Model, UserMixin, ItemMixin):
             else:
                 self.login_count += 1
             self.edit()
-
-    # TODO: tohle není ideální
-    @property
-    def is_admin(self):
-        return self.username == "admin"
 
     @property
     def recipes(self, ordered=True):
@@ -242,3 +225,13 @@ class User(db.Model, UserMixin, ItemMixin):
                 return False
         else:
             return False
+
+    # TODO: TO BE REFACTORED
+    @staticmethod
+    def load_shared_user():
+        return User.load_by_attribute("username", "ketocalc.jmp@gmail.com")
+
+    # tohle není ideální
+    @property
+    def is_admin(self):
+        return self.username == "admin"

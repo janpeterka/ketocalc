@@ -24,4 +24,4 @@ class MailsView(FlaskView):
     #     return ",".join(file_names)
 
     def template(self, template_name, folder="onboarding"):
-        return template("mails/{}/{}.html.j2".format(folder, template_name))
+        return template(f"mails/{folder}/{template_name}.html.j2")

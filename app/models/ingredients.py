@@ -3,6 +3,8 @@ import unidecode
 
 from sqlalchemy import and_
 
+from flask_login import current_user
+
 from app import db
 
 from app.models.item_mixin import ItemMixin
@@ -34,9 +36,18 @@ class Ingredient(db.Model, ItemMixin):
     )
 
     @staticmethod
-    def load_all_by_author(username, ordered=True):
+    def load_all_by_author(author, ordered=True):
+        if type(author) == str:
+            author_name = author
+        elif hasattr(author, "username"):
+            author_name = author.username
+        else:
+            raise AttributeError(
+                "Wrong type for 'author', expected `str` or object having attribute `username`"
+            )
+
         ingredients = (
-            db.session.query(Ingredient).filter(Ingredient.author == username).all()
+            db.session.query(Ingredient).filter(Ingredient.author == author_name).all()
         )
         if ordered:
             ingredients.sort(
@@ -48,7 +59,9 @@ class Ingredient(db.Model, ItemMixin):
     def load_all_shared(renamed=False, ordered=True):
         ingredients = (
             db.session.query(Ingredient)
-            .filter(and_(Ingredient.is_shared == True, Ingredient.is_approved == True))
+            .filter(
+                and_(Ingredient.is_shared == True, Ingredient.is_approved == True)
+            )  # noqa: E712
             .all()
         )
 
@@ -67,7 +80,9 @@ class Ingredient(db.Model, ItemMixin):
     def load_all_unapproved():
         ingredients = (
             db.session.query(Ingredient)
-            .filter(and_(Ingredient.is_shared == True, Ingredient.is_approved == False))
+            .filter(
+                and_(Ingredient.is_shared == True, Ingredient.is_approved == False)
+            )  # noqa: E712
             .all()
         )
         ingredients.sort(
@@ -101,6 +116,15 @@ class Ingredient(db.Model, ItemMixin):
 
     def is_author(self, user) -> bool:
         return self.author_user == user
+
+    # PERMISSIONS
+
+    def can_add(self, user) -> bool:
+        return self.is_author(user) or self.public
+
+    @property
+    def can_current_user_add(self) -> bool:
+        return self.can_add(current_user)
 
     # PROPERTIES
 

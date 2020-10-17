@@ -186,7 +186,7 @@
         // main to variable if necessary
         if (variable_count == 2 && main_count == 1){
           var main_ingredient = this._get_main_ingredient(selected_ingredients)
-          if (! main_ingredient === null ){
+          if (!(main_ingredient === null)){
               main_ingredient.removeAttribute("data-main");
               main_count--;
               variable_count++;
@@ -320,9 +320,9 @@
   });
 
   function trialSaveConfirm(){
-      r = confirm("Pokud si chcete recept uložit, musíte se zaregistrovat")
+      var r = confirm("Pokud si chcete recept uložit, musíte se zaregistrovat")
       if (r == true){
-          var win = window.open('{{ url_for("RegisterView:show") }}');
+          window.open('{{ url_for("RegisterView:show") }}');
       }
       return true;
   }

@@ -2,12 +2,7 @@ from werkzeug.datastructures import MultiDict
 
 from flask import session
 
-from app.controllers.forms.diets import *
-from app.controllers.forms.ingredients import *
-from app.controllers.forms.feedback import *
-from app.controllers.forms.login import *
-from app.controllers.forms.password_recovery import *
-from app.controllers.forms.register import *
+from app.controllers.forms import *  # noqa: F401, F403
 
 
 def create_form(form_class, **kwargs):
