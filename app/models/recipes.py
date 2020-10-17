@@ -2,6 +2,8 @@ import datetime
 import math
 import types
 
+from flask_login import current_user
+
 from app import db, cache
 
 from app.models.item_mixin import ItemMixin
@@ -133,6 +135,18 @@ class Recipe(db.Model, ItemMixin):
                 value = total
             setattr(values, metric, value)
         return values
+
+    @property
+    def can_view(self, user=None) -> bool:
+        if user is None:
+            user = current_user
+        return self.is_author(user) or user.is_admin or self.is_public
+
+    @property
+    def can_edit(self, user=None) -> bool:
+        if user is None:
+            user = current_user
+        return self.is_author(user) or user.is_admin
 
     @property
     def public(self) -> bool:

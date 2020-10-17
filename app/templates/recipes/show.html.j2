@@ -92,7 +92,7 @@
             <div class="row" data-target="show-recipe.percentage">
                 <div class="col-10">
                 <form class="form-inline" data-action="submit->show-recipe#calculate_recipe">
-                    {% from "_percentage_button.html.j2" import percentage_button %}
+                    {% from "macros/_percentage_button.html.j2" import percentage_button %}
                     {% for percentage in [10, 12.5, 25, 50, 100] %}
                         {{ percentage_button(percentage, controller="show-recipe", action="calculate_recipe") }}
                     {% endfor %}
@@ -103,8 +103,10 @@
                 <button type="button col-2" data-target="show-recipe.showPercentage" disabled class="btn "></button>
             </div>
 
-            {% if not is_print %}
-            <div>
+            {% if not is_print and recipe.can_edit %}
+            {% from "macros/_admin_field.html.j2" import admin_field_class with context %}
+
+            <div {{ admin_field_class(obj=recipe) }}>
                 <form action="{{ url_for('RecipesView:delete', id=recipe.id) }}" method="post" class="form-inline"  accept-charset="utf-8" onsubmit="return confirm('{{ texts.recipe_delete_confirm }}');">
                     <a class="btn btn-warning" href="{{ url_for('RecipesView:edit', id=recipe.id) }}">{{ texts.edit }} {{ icons.edit }}</a>
                     <a class="btn btn-secondary" href="{{ url_for('RecipesView:print', id=recipe.id) }}" target="_blank" rel="noopener noreferrer">{{ texts.print }} {{ icons.print }}</a>
@@ -120,17 +122,19 @@
             </div>
             {% endif %}
         </div>
+        {% if not is_print %}
         <div class="col-2">
             {% for image in recipe.images %}
                 <img style="width: 20rem; margin-bottom: 2rem" src="{{ image.url }}" alt="{{ image.name }}"/>
             {% endfor %}
-            {% if recipe.images|length == 0 and current_user.id == recipe.author.id %}
-                <form action="{{ url_for('RecipesView:upload_photo', id=recipe.id) }}" method="post" accept-charset="utf-8" enctype=multipart/form-data>
+            {% if recipe.images|length == 0 and recipe.can_edit %}
+                <form {{ admin_field_class(obj=recipe) }} action="{{ url_for('RecipesView:upload_photo', id=recipe.id) }}" method="post" accept-charset="utf-8" enctype=multipart/form-data>
                     {{ photo_form.file }}
                     {{ photo_form.submit(class="btn btn-secondary") }}
                 </form>         
             {% endif %}
         </div>
+        {% endif %}
     </div>
     </div>
 {% endblock %}

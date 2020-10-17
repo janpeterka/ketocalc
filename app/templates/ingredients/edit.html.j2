@@ -2,20 +2,16 @@
 {% block title %}
     {{ texts.ingredient }}
 {% endblock %}
-
 {% block style %}{% endblock %}
-
 {% block script %}{% endblock %}
-
 {% block content %}
     <div class="container">
         <div class="row">
             <div class="col-md-8 col-sm-12" style="margin-bottom:2rem">
                 <form action="{{ url_for('IngredientsView:post_edit', id=ingredient.id) }}" class="form-group" method="post" accept-charset="utf-8">
                     {{ form.csrf_token }}
-                    {% from "_form_element.html.j2" import render_field %}
+                    {% from "macros/_form_element.html.j2" import render_field %}
                     <table class="table">
-
                         <tr>
                             <th class="col-4">{{ texts.title }}</th>
                             <th>{{ texts.energy_100 }}</th>
@@ -25,56 +21,40 @@
                         </tr>
                         <tr>
                             <td>
-                                {{ render_field(form.name, "form-control", label=False) }}
+                                {{ render_field(form.name, has_label=False) }}
                             </td>
                             <td>
-                                {{ render_field(form.calorie, "form-control", label=False) }}
+                                {{ render_field(form.calorie, has_label=False) }}
                             </td>
                             <td>
-                                {% if ingredient.is_used == False %}
-                                    {{ render_field(form.protein, "form-control", label=False) }}
-                                {% else %}
-                                    {{ ingredient.protein }}
-                                {% endif %}
+                                {{ render_field(form.protein, has_label=False, disabled=ingredient.is_used) }}
                             </td>
                             <td>
-                                {% if ingredient.is_used == False %}
-                                    {{ render_field(form.fat, "form-control", label=False) }}
-                                {% else %}
-                                    {{ ingredient.fat }}
-                                {% endif %}
+                                {{ render_field(form.fat, has_label=False, disabled=ingredient.is_used) }}
                             </td>
                             <td>
-                                {% if ingredient.is_used == False %}
-                                    {{ render_field(form.sugar, "form-control", label=False) }}
-                                {% else %}
-                                    {{ ingredient.sugar }}
-                                {% endif %}
+                                {{ render_field(form.sugar, has_label=False, disabled=ingredient.is_used) }}
                             </td>
                         </tr>
                     </table>
-                        <button type="submit" class="btn btn-warning">{{ texts.edit_confirm }} {{ icons.edit }}</button>
-                        <a class="btn btn-secondary" href="{{ url_for('IngredientsView:show', id=ingredient.id) }}">{{ texts.edit_cancel }} {{ icons.edit }}</a>
+                    <button type="submit" class="btn btn-warning">{{ texts.edit_confirm }} {{ icons.edit }}</button>
+                    <a class="btn btn-secondary" href="{{ url_for('IngredientsView:show', id=ingredient.id) }}">{{ texts.edit_cancel }} {{ icons.edit }}</a>
                     
-
                 </form>
-
                 <form
                     action="{{ url_for('IngredientsView:delete', id=ingredient.id) }}"
                     onsubmit="return confirm('{{ texts.ingredient_delete_confirm }}');"
                     method="post"
                     accept-charset="utf-8"
-                >
+                    >
                     {% if ingredient.is_used == False %}
                         <button type="submit" class="btn btn-danger">{{ texts.ingredient_delete }} {{ icons.delete }}</button>
                     {% else %}
                         <button type="submit" class="btn btn-danger" disabled>{{ texts.delete_error }} {{ icons.delete }}</button>
                     {% endif %}
-                 </form>
+                </form>
             </div>
-
-             {% include ('recipes/_recipe_list.html.j2') %}
+            {% include ('recipes/_recipe_list.html.j2') %}
         </div>
     </div>
 {% endblock %}
-
