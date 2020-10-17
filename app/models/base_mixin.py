@@ -1,5 +1,7 @@
 from flask import current_app as application
 
+from flask_login import current_user
+
 from sqlalchemy.exc import DatabaseError
 
 from app import db
@@ -10,6 +12,8 @@ class BaseMixin(object):
     def __init__(self, **kwargs):
         for kwarg in kwargs:
             setattr(self, kwarg.key, kwarg.value)
+
+    # LOADING
 
     @classmethod
     def load(cls, *args, **kwargs):
@@ -34,6 +38,8 @@ class BaseMixin(object):
             raise AttributeError
 
         return db.session.query(cls).filter(getattr(cls, attribute) == value).first()
+
+    # DATABASE OPERATIONS
 
     def edit(self, **kw):
         try:
@@ -87,3 +93,45 @@ class BaseMixin(object):
             db.session.rollback()
             application.logger.error("Refresh error: {}".format(e))
             return False
+
+    # OTHER METHODS
+
+    def is_author(self, user) -> bool:
+        if hasattr(self, "author"):
+            return self.author == user
+        else:
+            return False
+            # raise AttributeError("No 'author' attribute.")
+
+    # PROPERTIES
+
+    @property
+    def public(self) -> bool:
+        """alias for is_shared"""
+        if hasattr(self, "is_shared"):
+            return self.is_shared
+        else:
+            return False
+            # raise AttributeError("No 'is_shared' attribute.")
+
+    @property
+    def is_public(self):
+        return self.public
+
+    # PERMISSIONS
+
+    def can_view(self, user) -> bool:
+        return self.is_author(user) or user.is_admin or self.is_public
+
+    @property
+    def can_current_user_view(self) -> bool:
+        return self.can_view(user=current_user)
+
+    def can_edit(self, user=None) -> bool:
+        if user is None:
+            user = current_user
+        return self.is_author(user) or user.is_admin
+
+    @property
+    def can_current_user_edit(self) -> bool:
+        return self.can_edit(user=current_user)
