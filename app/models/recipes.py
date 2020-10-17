@@ -62,7 +62,9 @@ class Recipe(db.Model, ItemMixin):
 
     @staticmethod
     def public_recipes():
-        recipes = db.session.query(Recipe).filter(Recipe.is_shared == True).all()
+        recipes = (
+            db.session.query(Recipe).filter(Recipe.is_shared == True).all()
+        )  # noqa: E712
         return recipes
 
     def create_and_save(self, ingredients):
@@ -120,6 +122,10 @@ class Recipe(db.Model, ItemMixin):
             math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
         )
         return totals
+
+    @property
+    def ratio(self):
+        return self.totals.ratio
 
     @property
     def values(self):
