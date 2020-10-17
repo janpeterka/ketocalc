@@ -30,8 +30,9 @@ class DailyPlansView(ExtendedFlaskView):
 
         self.daily_plan = DailyPlan.load_by_date_or_create(date)
         self.daily_recipes = self.daily_plan.daily_recipes
+        self.diets = current_user.active_diets
 
-        return self.template(diets=current_user.active_diets)
+        return self.template()
 
     def remove_daily_recipe(self, id, date):
         daily_recipe = DailyPlanHasRecipes.load(id)
@@ -63,14 +64,12 @@ class DailyPlansView(ExtendedFlaskView):
 
     @route("/load_recipes_AJAX", methods=["POST"])
     def load_recipes_AJAX(self):
-        diet_id = request.json["diet_id"]
-
-        diet = Diet.load(diet_id)
+        diet = Diet.load(request.json["diet_id"])
+        if diet is None:
+            abort(404)
         if not diet.is_author(current_user):
             abort(403)
 
-        recipes = Diet.load(diet_id).recipes
-
-        json_recipes = [recipe.json for recipe in recipes]
+        json_recipes = [recipe.json for recipe in diet.recipes]
 
         return jsonify(json_recipes)
