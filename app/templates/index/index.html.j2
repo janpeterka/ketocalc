@@ -47,8 +47,11 @@
                     <h4 class="color-blue text-uppercase font-comfortaa-b mt-2">Ukládání receptů</h4>
                     Všechny jednou spočítané recepty už máte navždy uložené ve svém účtu.<br>
                     Můžete mezi nimi hledat (a to i přes suroviny), tisknout je, zobrazovat si je v různém poměru k denní porci.
+                    <h4 class="color-blue text-uppercase font-comfortaa-b mt-2">Sdílení receptů</h4>
+                    Můžete sdílet své recepty s ostatními a zároveň se jejich recepty <a href="{{url_for('CookbookView:index')}}">inspirovat</a>.<br>
+                    Velmi užitečné zejména, pokud s dietou začínáte.
                     <h4 class="color-blue text-uppercase font-comfortaa-b mt-2">Denní plány</h4>
-                    Udělejte si plán vaření třeba na týden dopředu!<br>
+                    Udělejte si <a href="{{ url_for('DailyPlansView:index') }}">plán vaření</a> třeba na týden dopředu!<br>
                     Denní plán umožňuje Vaše recepty přidat k danému dni ve vybraném množství.<br>
                     Můžete tedy rovnou vidět, že Vám jídla naplní denní potřeby nutrientů, nebo můžete seznam receptů využít při tvorbě nákupního seznamu.
                 </div>
