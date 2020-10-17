@@ -322,7 +322,7 @@
   function trialSaveConfirm(){
       var r = confirm("Pokud si chcete recept uložit, musíte se zaregistrovat")
       if (r == true){
-          var win = window.open('{{ url_for("RegisterView:show") }}');
+          window.open('{{ url_for("RegisterView:show") }}');
       }
       return true;
   }
