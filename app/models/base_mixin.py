@@ -7,13 +7,9 @@ from app import db
 
 # Custom methods for all my classes
 class BaseMixin(object):
-    @classmethod
-    def __init__(cls, **kwargs):
-        obj = cls()
+    def __init__(self, **kwargs):
         for kwarg in kwargs:
-            setattr(obj, kwarg.key, kwarg.value)
-
-        return obj
+            setattr(self, kwarg.key, kwarg.value)
 
     @classmethod
     def load(cls, *args, **kwargs):
