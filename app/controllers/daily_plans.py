@@ -30,8 +30,9 @@ class DailyPlansView(ExtendedFlaskView):
 
         self.daily_plan = DailyPlan.load_by_date_or_create(date)
         self.daily_recipes = self.daily_plan.daily_recipes
+        self.diets = current_user.active_diets
 
-        return self.template(diets=current_user.active_diets)
+        return self.template()
 
     def remove_daily_recipe(self, id, date):
         daily_recipe = DailyPlanHasRecipes.load(id)
