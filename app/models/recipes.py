@@ -2,8 +2,6 @@ import datetime
 import math
 import types
 
-from flask_login import current_user
-
 from app import db, cache
 
 from app.models.item_mixin import ItemMixin
@@ -137,30 +135,5 @@ class Recipe(db.Model, ItemMixin):
         return values
 
     @property
-    def can_view(self, user=None) -> bool:
-        if user is None:
-            user = current_user
-        return self.is_author(user) or user.is_admin or self.is_public
-
-    @property
-    def can_edit(self, user=None) -> bool:
-        if user is None:
-            user = current_user
-        return self.is_author(user) or user.is_admin
-
-    @property
-    def public(self) -> bool:
-        """alias for is_shared"""
-        return self.is_shared
-
-    @property
-    def is_public(self) -> bool:
-        """alias for is_shared"""
-        return self.is_shared
-
-    @property
     def author(self):
         return self.diet.author
-
-    def is_author(self, user) -> bool:
-        return user == self.author

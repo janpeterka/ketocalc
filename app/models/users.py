@@ -190,6 +190,8 @@ class User(db.Model, UserMixin, ItemMixin):
     def full_name(self):
         return "{} {}".format(self.first_name, self.last_name)
 
+    # LOGS
+
     @property
     def last_request(self):
         request = (
@@ -199,6 +201,8 @@ class User(db.Model, UserMixin, ItemMixin):
             .first()
         )
         return request
+
+    # MAILING
 
     @property
     def onboarding_welcome_mail_sent(self):

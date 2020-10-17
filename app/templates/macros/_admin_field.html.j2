@@ -3,7 +3,9 @@
 	{% set with_errors = kwargs.pop('in_class', False) %}
 	{% set object = kwargs.pop('obj', None) %}
 
-	{% if current_user.is_admin and object.author != current_user %}
+	{# Only show if this wouldn't be visible to current user if they weren't admin #}
+	{# object.author != current_user.username is added because of old and wrong usage of author in Ingredient. #}
+	{% if current_user.is_admin and object.author != current_user and object.author != current_user.username %}
 		{% if in_class %}
 			"admin-field"
 		{% else %}

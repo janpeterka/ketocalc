@@ -24,15 +24,9 @@ class Diet(db.Model, ItemMixin):
     )
     author = db.relationship("User", uselist=False, back_populates="diets")
 
-    def is_author(self, user) -> bool:
-        return user == self.author
-
     @property
     def is_used(self) -> bool:
-        if self.recipes:
-            return True
-        else:
-            return False
+        return True if self.recipes else False
 
     @property
     def ratio(self) -> float:
