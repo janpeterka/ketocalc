@@ -9,3 +9,15 @@ from .password_recovery import GetNewPasswordForm  # noqa: F401
 from .register import RegisterForm  # noqa: F401
 from .users import UsersForm  # noqa: F401
 from .users import PasswordForm  # noqa: F401
+
+__all__ = [
+    "DietsForm",
+    "FeedbackForm",
+    "IngredientsForm",
+    "LoginForm",
+    "NewPasswordForm",
+    "GetNewPasswordForm",
+    "RegisterForm",
+    "UsersForm",
+    "PasswordForm",
+]
