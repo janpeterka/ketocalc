@@ -1,0 +1,27 @@
+{% extends "base.html.j2" %}
+{% block title %}
+    admin | all users 	
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="admin-field">
+            <table>
+                <thead>
+                    <th>img</th>
+                    <th>author</th>
+                </thead>
+                <tbody>
+                    
+                {% for file in files %}
+                    <tr>
+                        <td><img src="{{ file.url }}" style="height:7rem; width:auto;" alt="{{ file.name }}"/></td>
+                        <td>{{ file.author.name }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
