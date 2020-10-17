@@ -63,14 +63,12 @@ class DailyPlansView(ExtendedFlaskView):
 
     @route("/load_recipes_AJAX", methods=["POST"])
     def load_recipes_AJAX(self):
-        diet_id = request.json["diet_id"]
-
-        diet = Diet.load(diet_id)
+        diet = Diet.load(request.json["diet_id"])
+        if diet is None:
+            abort(404)
         if not diet.is_author(current_user):
             abort(403)
 
-        recipes = Diet.load(diet_id).recipes
-
-        json_recipes = [recipe.json for recipe in recipes]
+        json_recipes = [recipe.json for recipe in diet.recipes]
 
         return jsonify(json_recipes)
