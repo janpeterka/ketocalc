@@ -137,3 +137,7 @@ class Recipe(db.Model, ItemMixin):
     @property
     def author(self):
         return self.diet.author
+
+    @property
+    def concat_ingredients(self):
+        return ", ".join([o.name for o in self.ingredients])

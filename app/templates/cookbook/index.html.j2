@@ -3,32 +3,40 @@
     {{ texts.recipe_all }}
 {% endblock %}
 
+{% block style %}
+	<link href="https://unpkg.com/bootstrap-table@1.18.0/dist/bootstrap-table.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block script %}
+	<script src="https://unpkg.com/bootstrap-table@1.18.0/dist/bootstrap-table.min.js"></script>
+	<script src="https://unpkg.com/bootstrap-table@1.18.0/dist/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
+	<script>
+	  $(function() {$('#table').bootstrapTable()})
+	</script>
+{% endblock %}
+
 {% block content %}
     <div class="container">
-    	<table class="table">
+    	<table id="table" class="table" data-filter-control="true" data-toggle="table" data-search="true">
 		    <thead>
-		    	<th>recept</th>
+		    	<th data-field="recipe">recept</th>
 		    	{# <th></th> #}
-		    	<th>poměr diety</th>
-		    	<th>autor*ka</th>
+		    	<th data-field="ratio" data-sortable="true" data-filter-control="select">poměr diety</th>
+		    	<th data-field="ingredients" data-sortable="true" data-filter-control="input">seznam surovin</th>
+		    	<th data-field="author" data-sortable="true" data-filter-control="select">autor*ka</th>
 		    </thead>
 		    <tbody>
 		    {% for recipe in recipes: %}
 			    <tr style="height: 5rem;">
-			        <td>
-			        	<a href="{{ url_for('RecipesView:show', id=recipe.id) }}">{{ recipe.name }}</a>
-			        </td>
+			        <td><a href="{{ url_for('RecipesView:show', id=recipe.id) }}">{{ recipe.name }}</a></td>
 			        {# <td>
 			        	{% if recipe.images|length > 0 %}
 			        	<img src="{{ recipe.images[0].url }}" style="height:4rem; width:auto;" alt="{{ recipe.images[0].name }}"/>
 			        	{% endif %}
 			        </td> #}
-			        <td>
-			        	{{ recipe.diet.ratio }}
-			        </td>
-			        <td>
-			        	{{ recipe.author.username }}
-			        </td>
+			        <td>{{ recipe.diet.ratio }}</td>
+			        <td>{{ recipe.concat_ingredients }}</td>
+			        <td>{{ recipe.author.name }}</td>
 			    </tr>
 		    {% endfor %}
 		    </tbody>
