@@ -21,7 +21,7 @@
 		    <thead>
 		    	<th data-field="recipe">recept</th>
 		    	{# <th></th> #}
-		    	<th data-field="ratio" data-sortable="true" data-filter-control="select">poměr diety</th>
+		    	<th data-field="ratio" data-sortable="true" data-filter-control="select">poměr receptu</th>
 		    	<th data-field="ingredients" data-sortable="true" data-filter-control="input">seznam surovin</th>
 		    	<th data-field="author" data-sortable="true" data-filter-control="select">autor*ka</th>
 		    </thead>
@@ -34,7 +34,7 @@
 			        	<img src="{{ recipe.images[0].url }}" style="height:4rem; width:auto;" alt="{{ recipe.images[0].name }}"/>
 			        	{% endif %}
 			        </td> #}
-			        <td>{{ recipe.diet.ratio }}</td>
+			        <td>{{ recipe.ratio }}</td>
 			        <td>{{ recipe.concat_ingredients }}</td>
 			        <td>{{ recipe.author.name }}</td>
 			    </tr>
