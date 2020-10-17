@@ -8,15 +8,21 @@
     	<table class="table">
 		    <thead>
 		    	<th>recept</th>
+		    	{# <th></th> #}
 		    	<th>poměr diety</th>
 		    	<th>autor*ka</th>
 		    </thead>
 		    <tbody>
 		    {% for recipe in recipes: %}
-			    <tr>
+			    <tr style="height: 5rem;">
 			        <td>
 			        	<a href="{{ url_for('RecipesView:show', id=recipe.id) }}">{{ recipe.name }}</a>
 			        </td>
+			        {# <td>
+			        	{% if recipe.images|length > 0 %}
+			        	<img src="{{ recipe.images[0].url }}" style="height:4rem; width:auto;" alt="{{ recipe.images[0].name }}"/>
+			        	{% endif %}
+			        </td> #}
 			        <td>
 			        	{{ recipe.diet.ratio }}
 			        </td>

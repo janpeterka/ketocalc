@@ -28,6 +28,13 @@ class Config(object):
 
     PASSWORD_VERSION = os.environ.get("PASSWORD_VERSION")
 
+    AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+
+    STORAGE_SYSTEM = os.environ.get("STORAGE_SYSTEM")  # DEFAULT, AWS
+
+    BUCKET = "ketocalc"
+
     SENTRY_MONITORING = True
 
 
@@ -50,6 +57,9 @@ class DevConfig(Config):
         "LOCAL_APP_STATE"
     )  # production, development, debug, shutdown
     SENTRY_MONITORING = False
+
+    # BUCKET = "ketocalc-dev"
+    BUCKET = "ketocalcdev"
 
 
 class ProdConfig(Config):

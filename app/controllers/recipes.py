@@ -61,7 +61,14 @@ class RecipesView(BaseRecipesView):
         return redirect(url_for("RecipesView:show", id=self.recipe.id))
 
     def show(self, id):
-        return template("recipes/show.html.j2", recipe=self.recipe, is_print=False,)
+        from .forms.files import PhotoForm
+
+        return template(
+            "recipes/show.html.j2",
+            recipe=self.recipe,
+            is_print=False,
+            photo_form=PhotoForm(),
+        )
 
     def print(self, id):
         return template("recipes/show.html.j2", recipe=self.recipe, is_print=True,)
@@ -105,7 +112,7 @@ class RecipesView(BaseRecipesView):
     @route("/saveRecipeAJAX", methods=["POST"])
     def saveRecipeAJAX(self):
         temp_ingredients = request.json["ingredients"]
-        diet_id = request.json["dietID"]
+        diet = Diet.load(request.json["dietID"])
 
         ingredients = []
         for temp_i in temp_ingredients:
@@ -114,9 +121,23 @@ class RecipesView(BaseRecipesView):
             rhi.amount = temp_i["amount"]
             ingredients.append(rhi)
 
-        recipe = Recipe()
-        recipe.name = request.json["name"]
-        recipe.diet = Diet.load(diet_id)
+        recipe = Recipe(name=request.json["name"], diet=diet)
 
         last_id = recipe.create_and_save(ingredients)
         return url_for("RecipesView:show", id=last_id)
+
+    @route("/upload_photo/<id>", methods=["POST"])
+    def upload_photo(self, id):
+        from werkzeug.datastructures import CombinedMultiDict
+        from .forms.files import PhotoForm
+
+        from app.models.files import RecipeImageFile
+
+        form = PhotoForm(CombinedMultiDict((request.files, request.form)))
+
+        if form.file.data:
+            file = RecipeImageFile(recipe_id=id)
+            file.data = form.file.data
+            file.save()
+
+        return redirect(url_for("RecipesView:show", id=id))

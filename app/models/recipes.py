@@ -140,6 +140,11 @@ class Recipe(db.Model, ItemMixin):
         return self.is_shared
 
     @property
+    def is_public(self) -> bool:
+        """alias for is_shared"""
+        return self.is_shared
+
+    @property
     def author(self):
         return self.diet.author
 

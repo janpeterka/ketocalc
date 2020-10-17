@@ -30,7 +30,8 @@
 
 {% block content %}
     <div class="container">
-        <div class="col-12" data-controller="show-recipe">
+    <div class="row">
+        <div class="col-10" data-controller="show-recipe">
             {% if not is_print %}
                 <span class="data__table">
             {% else %}
@@ -103,7 +104,7 @@
             </div>
 
             {% if not is_print %}
-            <div class="">
+            <div>
                 <form action="{{ url_for('RecipesView:delete', id=recipe.id) }}" method="post" class="form-inline"  accept-charset="utf-8" onsubmit="return confirm('{{ texts.recipe_delete_confirm }}');">
                     <a class="btn btn-warning" href="{{ url_for('RecipesView:edit', id=recipe.id) }}">{{ texts.edit }} {{ icons.edit }}</a>
                     <a class="btn btn-secondary" href="{{ url_for('RecipesView:print', id=recipe.id) }}" target="_blank" rel="noopener noreferrer">{{ texts.print }} {{ icons.print }}</a>
@@ -119,6 +120,18 @@
             </div>
             {% endif %}
         </div>
+        <div class="col-2">
+            {% for image in recipe.images %}
+                <img style="width: 20rem; margin-bottom: 2rem" src="{{ image.url }}" alt="{{ image.name }}"/>
+            {% endfor %}
+            {% if recipe.images|length == 0 and current_user.id == recipe.author.id %}
+                <form action="{{ url_for('RecipesView:upload_photo', id=recipe.id) }}" method="post" accept-charset="utf-8" enctype=multipart/form-data>
+                    {{ photo_form.file }}
+                    {{ photo_form.submit(class="btn btn-secondary") }}
+                </form>         
+            {% endif %}
+        </div>
+    </div>
     </div>
 {% endblock %}
 

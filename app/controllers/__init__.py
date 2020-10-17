@@ -5,6 +5,7 @@ def register_all_controllers(application):
     from .dashboard import DashboardView
     from .diets import DietsView
     from .errors import ErrorsView
+    from .files import FilesView
     from .index import IndexView
     from .ingredients import IngredientsView
     from .login import LoginView
@@ -23,6 +24,7 @@ def register_all_controllers(application):
     DashboardView.register(application)
     DietsView.register(application)
     ErrorsView.register(application)
+    FilesView.register(application)
     IndexView.register(application)
     IngredientsView.register(application)
     LoginView.register(application)
