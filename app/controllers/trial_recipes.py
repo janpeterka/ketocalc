@@ -14,7 +14,7 @@ class TrialRecipesView(BaseRecipesView):
             return redirect(url_for("IndexView:index"))
 
     def show(self):
-        shared_user = User.load_by_attribute("username", "ketocalc.jmp@gmail.com")
+        shared_user = User.load_shared_user()
         return template(
             "recipes/new.html.j2",
             ingredients=Ingredient.load_all_shared(),

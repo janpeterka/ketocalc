@@ -6,9 +6,12 @@ from app import db
 
 # from app import cache
 
+from flask_login import current_user
+
 from app.models.item_mixin import ItemMixin
 
 from app.models.ingredients import Ingredient
+from app.models.users import User
 from app.models.recipes_has_ingredients import RecipeHasIngredients
 
 
@@ -44,7 +47,15 @@ class Recipe(db.Model, ItemMixin):
         return recipe
 
     @staticmethod
-    def load_by_ingredient(ingredient_id):
+    def load_by_ingredient(ingredient):
+        # TODO refactor code and only have object
+        if type(ingredient) == int:
+            ingredient_id = ingredient
+        elif type(ingredient) == Ingredient:
+            ingredient_id = ingredient.id
+        else:
+            AttributeError("Wrong ingredient type")
+
         recipes = (
             db.session.query(Recipe)
             .filter(Recipe.ingredients.any(Ingredient.id == ingredient_id))
@@ -53,14 +64,21 @@ class Recipe(db.Model, ItemMixin):
         return recipes
 
     @staticmethod
-    def load_by_ingredient_and_username(ingredient_id, username):
-        recipes = Recipe.load_by_ingredient(ingredient_id)
+    def load_by_ingredient_and_user(ingredient, user):
+        recipes = Recipe.load_by_ingredient(ingredient)
         private_recipes = []
         for recipe in recipes:
-            if recipe.author.username == username:
+            if recipe.author == user:
                 private_recipes.append(recipe)
 
         return private_recipes
+
+    # TODO DEPRECATED
+    @staticmethod
+    def load_by_ingredient_and_username(ingredient, username):
+        return Recipe.load_by_ingredient_and_user(
+            ingredient, User.load_by_username(username)
+        )
 
     @staticmethod
     def public_recipes():
@@ -149,3 +167,12 @@ class Recipe(db.Model, ItemMixin):
     @property
     def concat_ingredients(self):
         return ", ".join([o.name for o in self.ingredients])
+
+    # PERMISSIONS
+
+    def can_add(self, user):
+        return self.is_author(user)
+
+    @property
+    def can_current_user_add(self):
+        return self.can_add(current_user)

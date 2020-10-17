@@ -127,9 +127,7 @@ class BaseMixin(object):
     def can_current_user_view(self) -> bool:
         return self.can_view(user=current_user)
 
-    def can_edit(self, user=None) -> bool:
-        if user is None:
-            user = current_user
+    def can_edit(self, user) -> bool:
         return self.is_author(user) or user.is_admin
 
     @property

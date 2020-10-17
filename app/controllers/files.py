@@ -1,8 +1,6 @@
 from flask import abort
 from flask import render_template as template
 
-from flask_security import current_user
-
 from flask_classful import FlaskView
 
 from app.models.files import File
@@ -18,7 +16,7 @@ class FilesView(FlaskView):
         file = File.load_by_attribute("hash", hash_value)
         if not file:
             abort(404)
-        if not file.can_view(current_user):
+        if not file.can_current_user_view:
             abort(403)
         return FileHandler().show(file)
 
@@ -34,7 +32,7 @@ class FilesView(FlaskView):
         file = File.load(id)
         if not file:
             abort(404)
-        if not file.can_view(current_user):
+        if not file.can_current_user_view:
             abort(403)
         return FileHandler().download(file)
 
@@ -45,6 +43,6 @@ class FilesView(FlaskView):
         for aws_file in aws_files:
             # file = File().load_by_attribute("path", aws_file['Key'])
             file = RecipeImageFile().load_by_attribute("path", aws_file["Key"])
-            if file is not None:
+            if file is not None and file.can_current_user_view:
                 files.append(file)
         return template("admin/files/all.html.j2", files=files)

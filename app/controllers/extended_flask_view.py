@@ -4,51 +4,63 @@ import re
 from flask import render_template as template
 from flask import g
 
-# from app.helpers.form import create_form
-
 from flask_classful import FlaskView
 
-from app.controllers.forms import *  # noqa: F401, F403, F406
+from app.helpers.form import create_form
+
 from app.models import *  # noqa: F401, F403, F406
+from app.controllers.forms import *  # noqa: F401, F403, F406
 
 
 class ExtendedFlaskView(FlaskView):
     """docstring for ExtendedFlaskView"""
 
     def before_request(self, name, id=None, *args, **kwargs):
-        # form_name = model_name + "sForm"
 
-        # e.g. User
-        # model_name = model_name
-
-        # e.g. user
-        # self.attribute_name = self._attribute_name
-
-        # e.g. class <User>
-        try:
-            model_klass = globals()[self._model_name]
-        except KeyError:
-            model_klass = None
-        # e.g. class <UsersForm>
-        # try:
-        #     form_klass = globals()[form_name]
-        # except KeyError:
-        #     form_klass = None
         g.request_item_type = self._attribute_name
 
-        if id is not None and model_klass is not None:
+        # e.g. self.user = User.load(id)
+        if id is not None and self._model_klass is not None:
             g.request_item_id = id
-            instance = model_klass().load(id)
-            # e.g. self.user, or None
+            instance = (self._model_klass)().load(id)
+            # e.g. self.user = user or self.user = None
             setattr(self, self._attribute_name, instance)
         else:
             setattr(self, self._attribute_name, None)
 
+    def before_new(self, *args, **kwargs):
+        # e.g. self.form = create_form(UsersForm)
+        self.form = create_form(self._form_klass)
+
+    def before_edit(self, id, *args, **kwargs):
+        # e.g. self.form = create_form(UserForm, obj=self.user)
+        self.form = create_form(
+            self._form_klass, obj=getattr(self, self._attribute_name)
+        )
+
+    def index(self, *args, **kwargs):
+        return self.template()
+
+    def new(self, *args, **kwargs):
+        return self.template()
+
+    def show(self, id, *args, **kwargs):
+        return self.template()
+
+    def edit(self, id, *args, **kwargs):
+        return self.template()
+
     def template(self, template_name=None, **kwargs):
         # Template name is given from view and method names if not provided
         calling_method = inspect.stack()[1].function
+
+        if hasattr(self, "template_folder"):
+            template_folder = self.template_folder
+        else:
+            template_folder = f"{self._attribute_name}s"
+
         if template_name is None:
-            template_name = self._attribute_name + "s/" + calling_method + ".html.j2"
+            template_name = f"{template_folder}/{calling_method}.html.j2"
 
         # All public variables of the view are passed to template
         view_attributes = self.__dict__
@@ -63,6 +75,7 @@ class ExtendedFlaskView(FlaskView):
 
     @property
     def _model_name(self):
+        # e.g. User
         if type(self).__name__.endswith("sView"):
             model_name = type(self).__name__.replace("sView", "")
         elif type(self).__name__.endswith("View"):
@@ -73,10 +86,36 @@ class ExtendedFlaskView(FlaskView):
         return model_name
 
     @property
+    def _model_klass(self):
+        # e.g. class <User>
+        try:
+            model_klass = globals()[self._model_name]
+        except KeyError:
+            model_klass = None
+        return model_klass
+
+    @property
+    def _form_klass(self):
+        # e.g. class <UsersForm>
+        try:
+            form_klass = globals()[self._form_name]
+        except KeyError:
+            form_klass = None
+
+        return form_klass
+
+    @property
     def _attribute_name(self):
+        # e.g. user
         model_name = self._model_name
         snake_model_name = re.sub("(?!^)([A-Z]+)", r"_\1", model_name).lower()
         return snake_model_name
+
+    @property
+    def _form_name(self):
+        # e.g. UsersForm
+        form_name = f"{self._model_name}sForm"
+        return form_name
 
     @property
     def _template_folder(self):
@@ -85,15 +124,9 @@ class ExtendedFlaskView(FlaskView):
         else:
             self.template_folder = self._attribute_name + "s"
 
-    def index(self, *args, **kwargs):
-        return self.template("{}/index.html.j2".format(self._template_folder))
-
-    def show(self, *args, **kwargs):
-        return self.template("{}/show.html.j2".format(self._template_folder))
-
     # def new(self):
     #     self.form = create_form(self.form_klass)
-    #     return self.template("{}/new.html.j2".format(self._template_folder()))
+    #     return self.template()
 
     # def post(self):
     #     form = self.form_klass(request.form)
