@@ -34,6 +34,7 @@ class IngredientsView(FlaskView):
         self.ingredient.recipes = Recipe.load_by_ingredient_and_username(
             self.ingredient.id, current_user.username
         )
+        self.ingredient.all_recipes = Recipe.load_by_ingredient(self.ingredient.id)
 
     def before_show(self, id):
         self.ingredient.recipes = Recipe.load_by_ingredient_and_username(
@@ -150,6 +151,7 @@ class IngredientsView(FlaskView):
             "ingredients/edit.html.j2",
             ingredient=self.ingredient,
             recipes=self.ingredient.recipes,
+            all_recipes=self.ingredient.all_recipes,
             form=form,
         )
 

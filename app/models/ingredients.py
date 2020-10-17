@@ -99,6 +99,11 @@ class Ingredient(db.Model, ItemMixin):
         if "max" in json_ing and len(json_ing["max"]) > 0:
             self.max = float(json_ing["max"])
 
+    def is_author(self, user) -> bool:
+        return self.author_user == user
+
+    # PROPERTIES
+
     @property
     def author_user(self):
         from app.models.users import User
@@ -106,33 +111,21 @@ class Ingredient(db.Model, ItemMixin):
         user = User.load(self.author, load_type="username")
         return user
 
-    def is_author(self, user) -> bool:
-        return self.author_user == user
-
     @property
     def is_used(self):
-        if len(self.recipes) == 0:
-            return False
-        else:
-            return True
+        return True if self.recipes else False
 
-    @property
-    def public(self) -> bool:
-        """alias for is_shared"""
-        return self.is_shared
-
-    # TODO: only used for testing
+    # TESTING
+    # TODO: only used for testing, should be moved to tests
     def set_fixed(self, value=True, amount=0):
         self.fixed = value
         self.amount = amount
         return self
 
-    # TODO: only used for testing
     def set_main(self, value=True):
         self.main = value
         return self
 
-    # TODO: only used for testing
     @staticmethod
     def load_by_name(ingredient_name):
         ingredient = (
