@@ -12,8 +12,17 @@
 {% block content %}
     <div class="container">
         <div class="col-12">
-            <form action="{{ url_for('RecipesView:post_edit', id=recipe.id) }}" class="form-inline edit__form" method="post" accept-charset="utf-8">
-                <input type="text" name="name" class="form-control col-4" value="{{ recipe.name }}"><br>
+            <form action="{{ url_for('RecipesView:post_edit', id=recipe.id) }}" class="form edit__form" method="post" accept-charset="utf-8">
+                <div class="row">
+                    <div class="col">
+                        <label for="name">Název</label>
+                        <input type="text" name="name" class="form-control" value="{{ recipe.name }}"><br>
+                    </div>
+                    <div class="col">
+                        <label for="description">Popis</label>
+                        <textarea name="description" class="form-control">{{ recipe.description if recipe.description }}</textarea>
+                    </div>
+                </div>
                 <input type="submit" value="{{ texts.recipe_edit }}" class="btn btn-warning">
             </form>
 
