@@ -22,6 +22,8 @@ class Recipe(db.Model, ItemMixin):
     name = db.Column(db.String(255), nullable=False)
     type = db.Column(db.Enum("small", "big", "full"), nullable=False, default="full")
 
+    description = db.Column(db.Text)
+
     created = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
     last_updated = db.Column(db.DateTime, nullable=True, onupdate=datetime.datetime.now)
 
