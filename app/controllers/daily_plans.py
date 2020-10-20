@@ -76,7 +76,12 @@ class DailyPlansView(ExtendedFlaskView):
     @route("/load_recipes_AJAX", methods=["POST"])
     @login_required
     def load_recipes_AJAX(self):
-        diet = Diet.load(request.json["diet_id"])
+        diet_id = request.json["diet_id"]
+        if diet_id is None:
+            return ("", 204)
+
+        diet = Diet.load(diet_id)
+
         if diet is None:
             abort(404)
         if not diet.is_author(current_user):
