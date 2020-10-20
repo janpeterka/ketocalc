@@ -1,0 +1,25 @@
+{% extends "base.html.j2" %}
+
+{% block title %}
+    Vítejte na stránkách KetoKalkulačky
+{% endblock %}
+
+{% block content %}
+    <div class="container font-montserrat">
+        <div class="mb-5 text-center">
+                <h3 class="mt-2 text-uppercase color-blue font-comfortaa-bb">
+                    {{ message }}
+                </h3>
+        </div>
+
+        <div class="color-light-blue text-uppercase text-center font-comfortaa-b mb-5">
+            <p><a href="{{ url_for('LoginView:show') }}">Přihlašte se!</a>
+            <p><a href="{{ url_for('RegisterView:show') }}">Zaregistrujte se!</a>
+        </div>
+
+        <div class="color-light-blue text-uppercase text-center font-comfortaa-b mb-5">
+            <p><a href="{{ url_for('IndexView:index') }}">Více o kalkulačce</a>
+            
+        </div>
+    </div>
+{% endblock %}

@@ -50,6 +50,9 @@ class ExtendedFlaskView(FlaskView):
     def edit(self, id, *args, **kwargs):
         return self.template()
 
+    def not_logged_in(self, message):
+        return template("not_logged_in.html.j2", message=message)
+
     def template(self, template_name=None, **kwargs):
         # Template name is given from view and method names if not provided
         calling_method = inspect.stack()[1].function
