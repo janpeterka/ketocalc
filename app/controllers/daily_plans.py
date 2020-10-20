@@ -15,11 +15,20 @@ from app.controllers.extended_flask_view import ExtendedFlaskView
 
 
 class DailyPlansView(ExtendedFlaskView):
-    decorators = [login_required]
+    def before_index(self):
+        if not current_user.is_authenticated:
+            return redirect(
+                url_for(
+                    "DailyPlansView:not_logged_in",
+                    message="Denní plány jsou přístupné pouze pro přihlášené uživatele.",
+                )
+            )
 
+    @login_required
     def index(self):
         return redirect(url_for("DailyPlansView:show", date=datetime.date.today()))
 
+    @login_required
     def show(self, date):
         if not isinstance(date, datetime.date):
             date = parse_date(date)
@@ -34,6 +43,7 @@ class DailyPlansView(ExtendedFlaskView):
 
         return self.template()
 
+    @login_required
     def remove_daily_recipe(self, id, date):
         daily_recipe = DailyPlanHasRecipes.load(id)
         if daily_recipe:
@@ -41,6 +51,7 @@ class DailyPlansView(ExtendedFlaskView):
         return redirect(url_for("DailyPlansView:show", date=date))
 
     @route("/add_recipe", methods=["POST"])
+    @login_required
     def add_recipe(self):
         recipe_id = request.form["recipe_id"]
 
@@ -63,8 +74,14 @@ class DailyPlansView(ExtendedFlaskView):
         return redirect(url_for("DailyPlansView:show", date=date))
 
     @route("/load_recipes_AJAX", methods=["POST"])
+    @login_required
     def load_recipes_AJAX(self):
-        diet = Diet.load(request.json["diet_id"])
+        diet_id = request.json["diet_id"]
+        if diet_id is None:
+            return ("", 204)
+
+        diet = Diet.load(diet_id)
+
         if diet is None:
             abort(404)
         if not diet.is_author(current_user):
