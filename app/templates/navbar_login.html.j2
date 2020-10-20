@@ -30,6 +30,10 @@
 
       <ul class="nav navbar-nav navbar-right ml-auto">
           <li class="nav-item">
+            {% include '_navbar_facebook.html.j2' %}
+          </li>
+
+          <li class="nav-item">
             <a class="nav-link small" href="{{ url_for('SupportView:terms') }}">Podmínky použití</a>
           </li>
           <li class="nav-item">
