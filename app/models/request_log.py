@@ -19,3 +19,14 @@ class RequestLog(db.Model, BaseMixin):
     item_id = db.Column(db.Integer)
 
     user_id = db.Column(db.ForeignKey(("users.id")), index=True)
+
+    @staticmethod
+    def load_by_like(attribute=None, pattern=None):
+        if not hasattr(RequestLog, attribute):
+            raise AttributeError
+
+        return (
+            db.session.query(RequestLog)
+            .filter(getattr(RequestLog, attribute).like(f"%{pattern}%"))
+            .all()
+        )
