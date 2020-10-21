@@ -79,10 +79,20 @@ texts = {
     "ingredient_delete_confirm": "Opravdu chcete smazat surovinu?",
     # Calc
     "calc_amount": "Spočítat množství!",
+    # Cookbook
+    "cookbook": {
+        "not_logged_in": "Sdílené recepty jsou přístupné pouze pro přihlášené uživatele.",
+    },
+    # Daily plan
+    "daily_plan": {
+        "not_logged_in": "Denní plány jsou přístupné pouze pro přihlášené uživatele.",
+    },
     # User
-    "user_username": "Přihlašovací jméno",
-    "user_firstname": "Jméno",
-    "user_lastname": "Příjmení",
+    "user": {
+        "username": "Přihlašovací jméno",
+        "firstname": "Jméno",
+        "lastname": "Příjmení",
+    },
     "password": "Heslo",
     "password_change": "Změnit heslo",
     "password_new": "Nové heslo",
