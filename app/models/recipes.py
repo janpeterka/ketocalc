@@ -89,6 +89,15 @@ class Recipe(db.Model, ItemMixin):
         )  # noqa: E712
         return recipes
 
+    @staticmethod
+    def public_recipes_paginated(page, items_per_page=20):
+        recipes = (
+            db.session.query(Recipe)
+            .filter(Recipe.is_shared == True)
+            .paginate(page, items_per_page, False)
+        )  # noqa: E712
+        return recipes
+
     def create_and_save(self, ingredients):
         db.session.add(self)
         db.session.flush()
