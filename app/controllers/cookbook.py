@@ -1,6 +1,8 @@
 from app.models.recipes import Recipe
 
-from flask import redirect, request, url_for
+from flask import redirect, url_for
+
+# from flask import request
 
 from flask_login import current_user
 
@@ -19,5 +21,7 @@ class CookbookView(ExtendedFlaskView):
                 )
             )
 
-        page = request.args.get("page", 1, type=int)
-        self.recipes = Recipe.public_recipes_paginated(page, 30)
+        # page = request.args.get("page", 1, type=int)
+        # self.recipe_pagination = Recipe.public_recipes_paginated(page, 30)
+        # self.recipes = self.recipe_pagination.items
+        self.recipes = Recipe.public_recipes()

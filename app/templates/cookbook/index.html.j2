@@ -26,7 +26,7 @@
 		    	<th data-field="author" data-sortable="true" data-filter-control="select">autor*ka</th>
 		    </thead>
 		    <tbody>
-		    {% for recipe in recipes.items: %}
+		    {% for recipe in recipes: %}
 			    <tr style="height: 5rem;">
 			        <td><a href="{{ url_for('RecipesView:show', id=recipe.id) }}">{{ recipe.name }}</a></td>
 			        {# <td>
@@ -42,8 +42,8 @@
 		    </tbody>
     	</table>
 
-    	{% from "macros/_pagination.html.j2" import pagination %}
-    	{{ pagination(recipes, view_page="CookbookView:index") }}
+    	{# {% from "macros/_pagination.html.j2" import pagination %} #}
+    	{# {{ pagination(recipe_pagination, view_page="CookbookView:index") }} #}
     </div>
 {% endblock %}
 
