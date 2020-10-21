@@ -1,7 +1,7 @@
 <script type="text/javascript">
 application.register("daily-plan", class extends Stimulus.Controller {
 	static get targets() {
-		return ["diets", "recipes", "percentage", "submit", "recipesTable"]
+		return ["diets", "recipes", "percentage", "submit"]
 	}
 
 	connect() {
@@ -10,6 +10,8 @@ application.register("daily-plan", class extends Stimulus.Controller {
 
 	load_recipes(){
 		this.submitTarget.disabled=true;
+		this.submitTarget.value="Přidat recept";
+
 		fetch("{{ url_for('DailyPlansView:load_recipes_AJAX') }}",{
 			method: 'POST',
 			body: JSON.stringify({'diet_id' : this.dietsTarget.value}),
@@ -21,7 +23,13 @@ application.register("daily-plan", class extends Stimulus.Controller {
 			for (let i = 0, recipe; recipe = response[i]; i++) {
 				this.add_recipe_option(recipe);
 			}
-			this.submitTarget.disabled=false;
+
+			if (response.length == 0) {
+				this.submitTarget.value="Není vybraný recept";
+			} else {
+				this.submitTarget.disabled=false;
+			}
+
 		}).catch((error) => {
 			console.error('Error:', error);
 		});
