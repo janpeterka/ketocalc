@@ -26,9 +26,19 @@ class UsersView(ExtendedFlaskView):
             self.user = current_user
 
     def show(self, **kwargs):
+        # super().show() needed id.
         return self.template()
 
-    def post(self, page_type=None):
+    def before_edit(self):
+        # super().before_edit() needed id. For now it's not wanted.
+        pass
+
+    def edit(self):
+        self.user_form = create_form(UsersForm, obj=self.user)
+        self.password_form = create_form(PasswordForm)
+        return self.template()
+
+    def post_edit(self, page_type=None):
         form = UsersForm(request.form)
         del form.username
 
@@ -63,11 +73,6 @@ class UsersView(ExtendedFlaskView):
             flash("Nepovedlo se změnit heslo", "error")
 
         return redirect(url_for("UsersView:show"))
-
-    def edit(self):
-        self.user_form = create_form(UsersForm, obj=self.user)
-        self.password_form = create_form(PasswordForm)
-        return self.template()
 
     @admin_required
     def show_by_id(self, id):
