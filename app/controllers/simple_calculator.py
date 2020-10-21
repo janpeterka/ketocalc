@@ -1,15 +1,12 @@
 from flask import render_template as template
 
-from flask_classful import FlaskView, route
+from flask_classful import FlaskView
 from flask_login import current_user
 
 from app.models.ingredients import Ingredient
 
 
 class SimpleCalculatorView(FlaskView):
-    route_base = "/"
-
-    @route("/kalkulacka", methods=["GET"])
     def show(self):
         shared_ingredients = Ingredient.load_all_shared(renamed=True)
 
