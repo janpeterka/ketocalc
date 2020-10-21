@@ -3,20 +3,33 @@
     {{ texts.recipe_all }}
 {% endblock %}
 
-{% block style %}
-	<link href="https://unpkg.com/bootstrap-table@1.18.0/dist/bootstrap-table.min.css" rel="stylesheet">
-{% endblock %}
-
-{% block script %}
-	<script src="https://unpkg.com/bootstrap-table@1.18.0/dist/bootstrap-table.min.js"></script>
-	<script src="https://unpkg.com/bootstrap-table@1.18.0/dist/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
-	<script>
-	  $(function() {$('#table').bootstrapTable()})
-	</script>
-{% endblock %}
+{# {% block script %}
+    {% include 'javascript/stimulus.js.html' %}
+    {% include 'javascript/daily_plan.js.html' %}
+{% endblock %} #}
 
 {% block content %}
     <div class="container">
+    	<form action="{{ url_for('CookbookView:index') }}" method="post" class="form-inline form-control" accept-charset="UTF-8">
+    		{{ form.csrf_token }}
+   			{% from "macros/_form_element.html.j2" import render_field %}
+
+   			<div>
+   				<div>
+   					<span class="align-middle">Poměr receptu mezi</span>
+   					{{ render_field(form.ratio_from, placeholder="např. 2.1", class="col-2 ml-2 mr-2", has_label=False) }}
+   					<span>a</span>
+   					{{ render_field(form.ratio_to, placeholder="např. 2.4", class="col-2 ml-2 mr-2", has_label=False) }}
+   				</div>
+   				<div class="row mt-2">
+   					{{ form.ingredient_name.label(class_="ml-2") }}
+   					{{ render_field(form.ingredient_name, has_label=False, class="ml-3") }}
+					{{ form.submit(class_='btn btn-primary ml-3')}}
+   				</div>
+   			</div>
+
+    	</form>
+
     	<table id="table" class="table" data-filter-control="true" data-toggle="table" data-search="true">
 		    <thead>
 		    	<th data-field="recipe">recept</th>
