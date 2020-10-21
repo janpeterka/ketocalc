@@ -3,17 +3,20 @@
     {{ texts.recipe_all }}
 {% endblock %}
 
-{# {% block script %}
-    {% include 'javascript/stimulus.js.html' %}
-    {% include 'javascript/daily_plan.js.html' %}
-{% endblock %} #}
+
+{% block style %}
+	<link href="https://unpkg.com/bootstrap-table@1.18.0/dist/bootstrap-table.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block script %}
+	<script src="https://unpkg.com/bootstrap-table@1.18.0/dist/bootstrap-table.min.js"></script>
+{% endblock %}
 
 {% block content %}
     <div class="container">
     	<form action="{{ url_for('CookbookView:index') }}" method="post" class="form-inline form-control" accept-charset="UTF-8">
     		{{ form.csrf_token }}
    			{% from "macros/_form_element.html.j2" import render_field %}
-
    			<div>
    				<div>
    					<span class="align-middle">Poměr receptu mezi</span>
