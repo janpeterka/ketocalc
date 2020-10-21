@@ -4,6 +4,8 @@ from flask_login import current_user
 
 from sqlalchemy.exc import DatabaseError
 
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from app import db
 
 
@@ -105,7 +107,7 @@ class BaseMixin(object):
 
     # PROPERTIES
 
-    @property
+    @hybrid_property
     def public(self) -> bool:
         """alias for is_shared"""
         if hasattr(self, "is_shared"):
@@ -114,7 +116,7 @@ class BaseMixin(object):
             return False
             # raise AttributeError("No 'is_shared' attribute.")
 
-    @property
+    @hybrid_property
     def is_public(self):
         return self.public
 
