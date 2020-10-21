@@ -4,6 +4,7 @@ from flask import redirect, url_for
 
 from flask_login import current_user
 
+from app.data.texts import texts
 from app.controllers.extended_flask_view import ExtendedFlaskView
 
 
@@ -12,11 +13,7 @@ class CookbookView(ExtendedFlaskView):
 
     def before_index(self):
         if not current_user.is_authenticated:
-            return redirect(
-                url_for(
-                    "CookbookView:not_logged_in",
-                    message="Sdílené recepty jsou přístupné pouze pro přihlášené uživatele.",
-                )
-            )
+            message = texts.cookbook.not_logged_in
+            return redirect(url_for("CookbookView:not_logged_in", message=message))
 
         self.recipes = Recipe.public_recipes()
