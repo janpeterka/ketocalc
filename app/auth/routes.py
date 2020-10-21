@@ -68,9 +68,7 @@ def do_login(username=None, password=None, from_register=False):
 
         if from_register:
             flash(
-                "Byl jste úspěšně zaregistrován. Protože jste v aplikaci nově, může vám pomoci <a href={}>Nápověda</a>".format(
-                    url_for("SupportView:help")
-                ),
+                f"Byl jste úspěšně zaregistrován. Protože jste v aplikaci nově, může vám pomoci <a href={url_for('SupportView:help')}>Nápověda</a>"
                 "success",
             )
         return True
