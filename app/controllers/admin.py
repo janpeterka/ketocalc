@@ -19,7 +19,6 @@ class AdminView(ExtendedFlaskView):
     decorators = [admin_required]
 
     def index(self):
-        # from app.helpers.general import created_recently
         self.days = 30
         self.new_users = User.created_recently(days=self.days)
         self.new_recipes = Recipe.created_recently(days=self.days)
@@ -28,5 +27,7 @@ class AdminView(ExtendedFlaskView):
         self.share_recipe_toggles = RequestLog.load_by_like(
             attribute="url", pattern="recipes/toggle_shared"
         )
+
+        self.test = User.load_all()
 
         return self.template()

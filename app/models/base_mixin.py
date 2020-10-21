@@ -39,7 +39,7 @@ class BaseMixin(object):
         if not hasattr(cls, attribute):
             raise AttributeError
 
-        return db.session.query(cls).filter(getattr(cls, attribute) == value).first()
+        return db.session.query(cls).filter_by(**{attribute: value}).all()
 
     # OTHER LOADING
     @classmethod
