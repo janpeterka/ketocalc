@@ -33,9 +33,9 @@
     <div class="row">
         <div class="col-10" data-controller="show-recipe">
             {% if not is_print %}
-                <span class="data__table">
+                <span>
             {% else %}
-                <span class="data__table d-print-table">
+                <span class="d-print-table">
             {% endif %}
                     <h2>
                         {{ recipe.name }}
