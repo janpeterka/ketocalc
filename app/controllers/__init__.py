@@ -1,3 +1,4 @@
+from .admin import AdminView
 from .base_recipes import BaseRecipesView
 from .cookbook import CookbookView
 from .daily_plans import DailyPlansView
@@ -18,6 +19,7 @@ from .trial_recipes import TrialRecipesView
 from .users import UsersView
 
 __all__ = [
+    "AdminView",
     "BaseRecipesView",
     "CookbookView",
     "DailyPlansView",
@@ -40,7 +42,7 @@ __all__ = [
 
 
 def register_all_controllers(application):
-
+    AdminView.register(application)
     BaseRecipesView.register(application)
     CookbookView.register(application)
     DailyPlansView.register(application)

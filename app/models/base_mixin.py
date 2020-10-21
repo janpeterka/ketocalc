@@ -1,8 +1,12 @@
+import datetime
+
 from flask import current_app as application
 
 from flask_login import current_user
 
 from sqlalchemy.exc import DatabaseError
+
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from app import db
 
@@ -18,7 +22,7 @@ class BaseMixin(object):
     @classmethod
     def load(cls, *args, **kwargs):
         object_id = kwargs.get("id", args[0])
-        return db.session.query(cls).filter(cls.id == object_id).first()
+        return db.session.query(cls).filter_by(id=object_id).first()
 
     @classmethod
     def load_all(cls):
@@ -30,14 +34,27 @@ class BaseMixin(object):
 
     @classmethod
     def load_by_name(cls, name):
-        return db.session.query(cls).filter(cls.name == name).first()
+        return db.session.query(cls).filter_by(name=name).first()
 
     @classmethod
     def load_by_attribute(cls, attribute, value):
         if not hasattr(cls, attribute):
             raise AttributeError
 
-        return db.session.query(cls).filter(getattr(cls, attribute) == value).first()
+        return db.session.query(cls).filter_by(**{attribute: value}).all()
+
+    # OTHER LOADING
+    @classmethod
+    def created_recently(cls, days=30):
+        date_from = datetime.date.today() - datetime.timedelta(days=days)
+        if hasattr(cls, "created_at"):
+            attr = "created_at"
+        elif hasattr(cls, "created"):
+            attr = "created"
+        else:
+            raise AttributeError
+
+        return db.session.query(cls).filter(getattr(cls, attr) > date_from).all()
 
     # DATABASE OPERATIONS
 
@@ -105,7 +122,7 @@ class BaseMixin(object):
 
     # PROPERTIES
 
-    @property
+    @hybrid_property
     def public(self) -> bool:
         """alias for is_shared"""
         if hasattr(self, "is_shared"):
@@ -114,7 +131,7 @@ class BaseMixin(object):
             return False
             # raise AttributeError("No 'is_shared' attribute.")
 
-    @property
+    @hybrid_property
     def is_public(self):
         return self.public
 

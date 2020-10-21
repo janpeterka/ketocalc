@@ -11,7 +11,6 @@ from flask_login import current_user
 from app.models.item_mixin import ItemMixin
 
 from app.models.ingredients import Ingredient
-from app.models.users import User
 from app.models.recipes_has_ingredients import RecipeHasIngredients
 
 
@@ -75,18 +74,9 @@ class Recipe(db.Model, ItemMixin):
 
         return private_recipes
 
-    # TODO DEPRECATED
-    @staticmethod
-    def load_by_ingredient_and_username(ingredient, username):
-        return Recipe.load_by_ingredient_and_user(
-            ingredient, User.load_by_username(username)
-        )
-
     @staticmethod
     def public_recipes():
-        recipes = (
-            db.session.query(Recipe).filter(Recipe.is_shared == True).all()
-        )  # noqa: E712
+        recipes = db.session.query(Recipe).filter(Recipe.public).all()
         return recipes
 
     @staticmethod

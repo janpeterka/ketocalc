@@ -6,6 +6,8 @@ from flask_login import current_user, login_required
 
 from app.helpers.formaters import parse_date
 
+from app.data.texts import texts
+
 from app.models.daily_plans import DailyPlan
 from app.models.daily_plan_has_recipes import DailyPlanHasRecipes
 from app.models.diets import Diet
@@ -17,12 +19,8 @@ from app.controllers.extended_flask_view import ExtendedFlaskView
 class DailyPlansView(ExtendedFlaskView):
     def before_index(self):
         if not current_user.is_authenticated:
-            return redirect(
-                url_for(
-                    "DailyPlansView:not_logged_in",
-                    message="Denní plány jsou přístupné pouze pro přihlášené uživatele.",
-                )
-            )
+            message = texts.daily_plan.not_logged_in
+            return redirect(url_for("DailyPlansView:not_logged_in", message=message,))
 
     @login_required
     def index(self):
