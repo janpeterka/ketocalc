@@ -1,0 +1,87 @@
+<script type="text/javascript">
+application.register("recipe-reactions", class extends Stimulus.Controller {
+	static get targets() {
+		return ["recipes"]
+	}
+
+	connect() {
+		this.add_reaction_buttons();
+	}
+
+	add_reaction_buttons() {
+		for (let i = 0, recipe; recipe = this.recipesTarget.children[i]; i++) {
+			this._set_recipe_icon(recipe)
+		}
+	}
+
+	toggle_reaction(event){
+		var recipe = event.target.parentNode.parentNode
+		fetch("{{ url_for('RecipesView:toggle_reaction_AJAX') }}",{
+			method: 'POST',
+			body: JSON.stringify({'recipe_id' : recipe.dataset.recipeId}),
+			headers: {'Content-Type': 'application/json,charset=UTF-8'}}
+		).then((response) => {
+			return response.json(); }
+		).then((response) => {
+			recipe.dataset.reaction=response
+			this._set_recipe_icon(recipe)
+		});
+	}
+
+	_set_recipe_icon(recipe){
+		var last_child = recipe.children[recipe.children.length - 1]
+		// remove old icon
+		if (last_child.getElementsByTagName('i').length > 0) {
+			last_child.getElementsByTagName('i')[0].remove()
+		}
+		if (recipe.dataset.reaction == "true") {
+			last_child.innerHTML = this._full_heart_icon(recipe) + last_child.innerHTML
+		} else {
+			last_child.innerHTML = this._empty_heart_icon(recipe) + last_child.innerHTML
+		}
+	}
+
+	_empty_heart_icon(recipe) {
+		return '<i class="far fa-heart color-red"\
+	 				data-recipe-id="'+ recipe.dataset.recipeId +'"\
+	 				data-action="click->recipe-reactions#toggle_reaction">\
+		 		</i>'
+	}
+
+	_full_heart_icon(recipe){
+		return '<i class="fas fa-heart color-red"\
+					data-recipe-id="'+ recipe.dataset.recipeId +'"\
+					data-action="click->recipe-reactions#toggle_reaction">\
+				</i>'
+	}
+
+
+	// load_recipes(){
+	// 	this.submitTarget.disabled=true;
+	// 	this.submitTarget.value="Přidat recept";
+
+	// 	fetch("{{ url_for('DailyPlansView:load_recipes_AJAX') }}",{
+	// 		method: 'POST',
+	// 		body: JSON.stringify({'diet_id' : this.dietsTarget.value}),
+	// 		headers: {'Content-Type': 'application/json,charset=UTF-8'}}
+	// 	).then((response) => {
+	// 		return response.json(); }
+	// 	).then((response) => {
+	// 		this.clear_recipe_options();
+	// 		for (let i = 0, recipe; recipe = response[i]; i++) {
+	// 			this.add_recipe_option(recipe);
+	// 		}
+
+	// 		if (response.length == 0) {
+	// 			this.submitTarget.value="Není vybraný recept";
+	// 		} else {
+	// 			this.submitTarget.disabled=false;
+	// 		}
+
+	// 	}).catch((error) => {
+	// 		console.error('Error:', error);
+	// 	});
+	// }
+
+});
+</script>
