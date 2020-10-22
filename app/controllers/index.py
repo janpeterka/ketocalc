@@ -24,4 +24,4 @@ class IndexView(FlaskView):
     @route("kalkulacka")
     @route("kalkulacka/")
     def simple_calculator(self):
-        return redirect(url_for("SimpleCalculatorView:show"))
+        return redirect(url_for("SimpleCalculatorView:index"))
