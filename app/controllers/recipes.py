@@ -1,5 +1,5 @@
 from flask import render_template as template
-from flask import request, redirect, url_for, flash, abort, g
+from flask import request, redirect, url_for, flash, abort, g, jsonify
 
 from flask_login import login_required, current_user
 
@@ -8,6 +8,7 @@ from flask_classful import route
 from app.models.recipes import Recipe
 from app.models.diets import Diet
 from app.models.ingredients import Ingredient
+
 from app.models.recipes_has_ingredients import RecipeHasIngredients
 from app.controllers.base_recipes import BaseRecipesView
 
@@ -126,6 +127,12 @@ class RecipesView(BaseRecipesView):
 
         last_id = recipe.create_and_save(ingredients)
         return url_for("RecipesView:show", id=last_id)
+
+    @route("/toggleReactionAJAX", methods=["POST"])
+    def toggle_reaction_AJAX(self):
+        recipe = Recipe.load(request.json["recipe_id"])
+        recipe.toggle_reaction()
+        return jsonify(recipe.has_reaction)
 
     @route("/upload_photo/<id>", methods=["POST"])
     def upload_photo(self, id):
