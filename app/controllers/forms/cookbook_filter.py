@@ -1,6 +1,4 @@
-from wtforms import SubmitField, SelectField
-
-# from wtforms import validators
+from wtforms import SubmitField, SelectField, BooleanField
 
 from flask_wtf import FlaskForm
 
@@ -11,6 +9,8 @@ class CookbookFilterForm(FlaskForm):
     ratio_from = ComaFloatField("Poměr (od)")
     ratio_to = ComaFloatField("Poměr (do)")
     ingredient_name = SelectField("Surovina")
+    with_reaction = BooleanField("Moje oblíbené")
+
     submit = SubmitField("Filtrovat")
 
     def __init__(self, *args, ingredient_names=None):
