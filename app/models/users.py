@@ -229,7 +229,7 @@ class User(db.Model, UserMixin, ItemMixin):
     # TODO: TO BE REFACTORED
     @staticmethod
     def load_shared_user():
-        return User.load_by_attribute("username", "ketocalc.jmp@gmail.com")
+        return User.load("ketocalc.jmp@gmail.com", load_type="username")
 
     # tohle není ideální
     @property
