@@ -1,22 +1,21 @@
-from flask import render_template as template
-
-from flask_classful import FlaskView
 from flask_login import current_user
 
 from app.models.ingredients import Ingredient
 
+from .extended_flask_view import ExtendedFlaskView
 
-class SimpleCalculatorView(FlaskView):
-    def show(self):
+
+class SimpleCalculatorView(ExtendedFlaskView):
+    template_folder = "simple_calculator"
+
+    def index(self):
         shared_ingredients = Ingredient.load_all_shared(renamed=True)
 
         if current_user.is_authenticated:
-            ingredients = Ingredient.load_all_by_author(current_user.username)
-            all_ingredients = ingredients + shared_ingredients
-            diets = current_user.diets
+            users_ingredients = Ingredient.load_all_by_author(current_user.username)
+            self.ingredients = users_ingredients + shared_ingredients
+            self.diets = current_user.diets
         else:
-            all_ingredients = shared_ingredients
-            diets = None
-        return template(
-            "simple_calculator/show.html.j2", ingredients=all_ingredients, diets=diets
-        )
+            self.ingredients = shared_ingredients
+            self.diets = None
+        return self.template()
