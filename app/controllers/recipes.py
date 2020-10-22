@@ -8,8 +8,8 @@ from flask_classful import route
 from app.models.recipes import Recipe
 from app.models.diets import Diet
 from app.models.ingredients import Ingredient
-
 from app.models.recipes_has_ingredients import RecipeHasIngredients
+
 from app.controllers.base_recipes import BaseRecipesView
 
 
@@ -75,13 +75,13 @@ class RecipesView(BaseRecipesView):
     def print(self, id):
         return template("recipes/show.html.j2", recipe=self.recipe, is_print=True,)
 
-    def print_all(self, diet_id=None):
-        if diet_id is None:
-            recipes = current_user.recipes
-        else:
-            recipes = Diet.load(diet_id).recipes
+    # def print_all(self, diet_id=None):
+    #     if diet_id is None:
+    #         recipes = current_user.recipes
+    #     else:
+    #         recipes = Diet.load(diet_id).recipes
 
-        return template("recipes/print_all.html.j2", recipes=recipes)
+    #     return template("recipes/print_all.html.j2", recipes=recipes)
 
     def edit(self, id):
         return template(

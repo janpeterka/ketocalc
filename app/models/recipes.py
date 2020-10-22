@@ -110,15 +110,12 @@ class Recipe(db.Model, ItemMixin):
         return self.is_shared
 
     def toggle_reaction(self, user=None):
-        if user is None:
-            user = current_user
+        user = current_user if user is None else user
 
         if self.has_reaction is True:
             self.remove_reaction(user)
         else:
             self.add_reaction(user)
-
-        return True
 
     def add_reaction(self, user):
         UserRecipeReactions(recipe=self, user=user).save()
@@ -129,10 +126,7 @@ class Recipe(db.Model, ItemMixin):
     @property
     def has_reaction(self):
         reactions = UserRecipeReactions.load_by_recipe_and_current_user(self)
-        if reactions:
-            return True
-        else:
-            return False
+        return bool(reactions)
 
     @property
     # @cache.cached(timeout=50, key_prefix="recipe_totals")
