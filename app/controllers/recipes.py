@@ -1,5 +1,5 @@
 from flask import render_template as template
-from flask import request, redirect, url_for, flash, abort, g
+from flask import request, redirect, url_for, flash, abort, g, jsonify
 
 from flask_login import login_required, current_user
 
@@ -9,6 +9,7 @@ from app.models.recipes import Recipe
 from app.models.diets import Diet
 from app.models.ingredients import Ingredient
 from app.models.recipes_has_ingredients import RecipeHasIngredients
+
 from app.controllers.base_recipes import BaseRecipesView
 
 
@@ -74,13 +75,13 @@ class RecipesView(BaseRecipesView):
     def print(self, id):
         return template("recipes/show.html.j2", recipe=self.recipe, is_print=True,)
 
-    def print_all(self, diet_id=None):
-        if diet_id is None:
-            recipes = current_user.recipes
-        else:
-            recipes = Diet.load(diet_id).recipes
+    # def print_all(self, diet_id=None):
+    #     if diet_id is None:
+    #         recipes = current_user.recipes
+    #     else:
+    #         recipes = Diet.load(diet_id).recipes
 
-        return template("recipes/print_all.html.j2", recipes=recipes)
+    #     return template("recipes/print_all.html.j2", recipes=recipes)
 
     def edit(self, id):
         return template(
@@ -126,6 +127,12 @@ class RecipesView(BaseRecipesView):
 
         last_id = recipe.create_and_save(ingredients)
         return url_for("RecipesView:show", id=last_id)
+
+    @route("/toggleReactionAJAX", methods=["POST"])
+    def toggle_reaction_AJAX(self):
+        recipe = Recipe.load(request.json["recipe_id"])
+        recipe.toggle_reaction()
+        return jsonify(recipe.has_reaction)
 
     @route("/upload_photo/<id>", methods=["POST"])
     def upload_photo(self, id):

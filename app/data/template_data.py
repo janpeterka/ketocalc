@@ -13,6 +13,8 @@ icons = {
     "calculator": '<i class="fas fa-calculator"></i>',
     "list": '<i class="fas fa-list-ul"></i>',
     "photo": '<i class="far fa-image"></i>',
+    "heart_empty": '<i class="far fa-heart color-red"></i>',
+    "heart_full": '<i class="fas fa-heart color-red"></i>',
 }
 
 texts = {

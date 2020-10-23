@@ -22,8 +22,7 @@ class UsersView(ExtendedFlaskView):
 
     def before_request(self, name, *args, **kwargs):
         super().before_request(name, *args, **kwargs)
-        if self.user is None:
-            self.user = current_user
+        self.user = current_user if self.user is None else self.user
 
     def show(self, **kwargs):
         # super().show() needed id.

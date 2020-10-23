@@ -33,12 +33,8 @@
 
 
   {% if field.type == 'BooleanField' %}
-    <div class="checkbox">
-        <label>
-            {{ field(class_=class_, **kwargs) }}
-            {{ field.label.text|safe }}
-        </label>
-    </div>
+      {{ field(class_=class_ + ' form-check-input', **kwargs) }}
+      {{ field.label.text|safe }}
   {% else %}
     {% if field.type in ('TextField', 'TextAreaField', 'PasswordField',
                          'IntegerField', 'StringField', 'EmailField', 'DateField', 'URLField', 'TelField', 'ComaFloatField') %}

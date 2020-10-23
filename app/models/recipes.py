@@ -13,6 +13,8 @@ from app.models.item_mixin import ItemMixin
 from app.models.ingredients import Ingredient
 from app.models.recipes_has_ingredients import RecipeHasIngredients
 
+from app.models.user_recipe_reactions import UserRecipeReactions
+
 
 class Recipe(db.Model, ItemMixin):
     __tablename__ = "recipes"
@@ -106,6 +108,25 @@ class Recipe(db.Model, ItemMixin):
         self.is_shared = not self.is_shared
         self.edit()
         return self.is_shared
+
+    def toggle_reaction(self, user=None):
+        user = current_user if user is None else user
+
+        if self.has_reaction is True:
+            self.remove_reaction(user)
+        else:
+            self.add_reaction(user)
+
+    def add_reaction(self, user):
+        UserRecipeReactions(recipe=self, user=user).save()
+
+    def remove_reaction(self, user):
+        UserRecipeReactions.load_by_recipe_and_current_user(recipe=self).remove()
+
+    @property
+    def has_reaction(self):
+        reactions = UserRecipeReactions.load_by_recipe_and_current_user(self)
+        return bool(reactions)
 
     @property
     # @cache.cached(timeout=50, key_prefix="recipe_totals")
