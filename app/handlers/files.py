@@ -3,12 +3,23 @@ import os
 from werkzeug.utils import secure_filename
 
 from flask import send_from_directory
-from flask import current_app as app
+from flask import current_app as application
 
 import boto3
 
 
 class FileHandler(object):
+    def __new__(self, **kwargs):
+        if application.config["STORAGE_SYSTEM"] == "DEFAULT":
+            # FileHandler(subfolder=self.subfolder).save(self)
+            return LocalFileHandler(**kwargs)
+        elif application.config["STORAGE_SYSTEM"] == "AWS":
+            return AWSFileHandler()
+        else:
+            return LocalFileHandler(**kwargs)
+
+
+class LocalFileHandler(object):
     """[summary]
 
     [description]
@@ -18,7 +29,7 @@ class FileHandler(object):
     """
 
     def __init__(self, subfolder=None):
-        self.folder = os.path.join(app.root_path, "files/")
+        self.folder = os.path.join(application.root_path, "files/")
         # create folder `files/` if doesn't exist
         if not os.path.exists(self.folder):
             os.makedirs(self.folder)
@@ -65,21 +76,21 @@ class AWSFileHandler(object):
     def __init__(self):
         self.client = boto3.client(
             "s3",
-            aws_access_key_id=app.config["AWS_ACCESS_KEY_ID"],
-            aws_secret_access_key=app.config["AWS_SECRET_ACCESS_KEY"],
+            aws_access_key_id=application.config["AWS_ACCESS_KEY_ID"],
+            aws_secret_access_key=application.config["AWS_SECRET_ACCESS_KEY"],
             region_name="eu-west-3",
         )
 
         self.resource = boto3.resource(
             "s3",
-            aws_access_key_id=app.config["AWS_ACCESS_KEY_ID"],
-            aws_secret_access_key=app.config["AWS_SECRET_ACCESS_KEY"],
+            aws_access_key_id=application.config["AWS_ACCESS_KEY_ID"],
+            aws_secret_access_key=application.config["AWS_SECRET_ACCESS_KEY"],
             region_name="eu-west-3",
         )
-        self.folder = os.path.join(app.root_path, "files/")
+        self.folder = os.path.join(application.root_path, "files/")
 
     def save(self, file):
-        fh = FileHandler(subfolder="tmp")
+        fh = LocalFileHandler(subfolder="tmp")
         fh.save(file)
         self.upload_file(os.path.join(fh.folder, file.path), file.name)
         fh.delete(file)
@@ -88,7 +99,9 @@ class AWSFileHandler(object):
         """
         Function to upload a file to an S3 bucket
         """
-        response = self.client.upload_file(file_path, app.config["BUCKET"], file_name)
+        response = self.client.upload_file(
+            file_path, application.config["BUCKET"], file_name
+        )
 
         return response
 
@@ -97,7 +110,7 @@ class AWSFileHandler(object):
     #     Function to download a given file from an S3 bucket
     #     """
     #     output = file_name
-    #     self.resource.Bucket(app.config["BUCKET"]).download_file(file_name, output)
+    #     self.resource.Bucket(application.config["BUCKET"]).download_file(file_name, output)
 
     #     return output
 
@@ -107,7 +120,7 @@ class AWSFileHandler(object):
         """
         contents = []
         try:
-            for item in self.client.list_objects(Bucket=app.config["BUCKET"])[
+            for item in self.client.list_objects(Bucket=application.config["BUCKET"])[
                 "Contents"
             ]:
                 contents.append(item)
@@ -132,7 +145,7 @@ class AWSFileHandler(object):
         try:
             response = self.client.generate_presigned_url(
                 "get_object",
-                Params={"Bucket": app.config["BUCKET"], "Key": object_name},
+                Params={"Bucket": application.config["BUCKET"], "Key": object_name},
                 ExpiresIn=expiration,
             )
         except ClientError:
