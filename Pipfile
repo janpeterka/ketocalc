@@ -32,6 +32,7 @@ email-validator = "*"
 flask-caching = "*"
 sentry-sdk = {extras = ["flask"],version = "*"}
 boto3 = "*"
+pillow = "*"
 
 [requires]
 python_version = "3.7.9"
