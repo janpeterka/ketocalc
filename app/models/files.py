@@ -1,7 +1,6 @@
 import os
 from werkzeug.utils import secure_filename
 
-from flask import current_app as application
 from flask_login import current_user
 
 from app import db
@@ -9,7 +8,7 @@ from app import db
 from app.models.base_mixin import BaseMixin
 
 from app.handlers.files import FileHandler
-from app.handlers.files import AWSFileHandler
+from app.handlers.files import ImageHandler
 
 
 class File(db.Model, BaseMixin):
@@ -72,13 +71,9 @@ class File(db.Model, BaseMixin):
         super().edit()
 
         self.name = f"{self.id}.{self.extension}"
-        # save file to filesystem
-        if application.config["STORAGE_SYSTEM"] == "DEFAULT":
-            FileHandler(subfolder=self.subfolder).save(self)
-        elif application.config["STORAGE_SYSTEM"] == "AWS":
-            AWSFileHandler().save(self)
-        else:
-            FileHandler(subfolder=self.subfolder).save(self)
+        self.name = self.full_name
+        # save file
+        FileHandler(subfolder=self.subfolder).save(self)
 
         self.expire()
 
@@ -96,7 +91,11 @@ class File(db.Model, BaseMixin):
 
     @property
     def url(self):
-        return AWSFileHandler().create_presigned_url(self)
+        return FileHandler().create_presigned_url(self)
+
+    @property
+    def full_name(self):
+        return f"{self.name}.{self.extension}"
 
 
 class ImageFile(File):

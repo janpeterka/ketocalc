@@ -57,16 +57,17 @@ class LocalFileHandler(object):
 
         file.name = secure_filename(file.name)
 
-        full_path = os.path.join(self.folder, file.name)
-        file.save(full_path)
+        file.save(self.get_full_path(file))
 
     def delete(self, file):
-        path = os.path.join(self.folder, file.path)
-        if os.path.exists(path):
-            os.remove(path)
+        if os.path.exists(self.get_full_path(file)):
+            os.remove(self.get_full_path(file))
 
     def show(self, file):
         return send_from_directory(self.folder, file.path)
+
+    def get_full_path(self, file):
+        return os.path.join(self.folder, file.name)
 
     # def download(self, file):
     #     return send_file(file.path, attachment_filename=file.name,)
