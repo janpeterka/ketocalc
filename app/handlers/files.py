@@ -66,8 +66,18 @@ class LocalFileHandler(object):
     def show(self, file):
         return send_from_directory(self.folder, file.path)
 
+    def url(self, file):
+        from flask import url_for
+
+        return url_for("FilesView:show", hash_value=file.hash)
+
     def get_full_path(self, file):
         return os.path.join(self.folder, file.name)
+
+    @property
+    def all_files(self):
+        # TODO - list all files in folder
+        return []
 
     # def download(self, file):
     #     return send_file(file.path, attachment_filename=file.name,)

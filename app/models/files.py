@@ -91,7 +91,8 @@ class File(db.Model, BaseMixin):
 
     @property
     def url(self):
-        return FileHandler().create_presigned_url(self)
+        # return FileHandler().create_presigned_url(self)
+        return FileHandler().url(self)
 
     @property
     def full_name(self):
