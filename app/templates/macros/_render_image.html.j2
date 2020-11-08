@@ -5,9 +5,9 @@
 	{% set style = kwargs.pop('style', "") %}
 
 	{% if thumbnail %}
-		<img style="{{ style }}" class="{{ class }}" src="{{ image.thumbnail_url }}" alt="{{ image.name }}"/>		
+		<img style="{{ style }}" class="{{ class }}" src="{{ image.thumbnail_url }}" alt="{{ image.full_name }}"/>		
 	{% else %}
-		<img style="{{ style }}" class="{{ class }}" src="{{ image.url }}" alt="{{ image.name }}"/>		
+		<img style="{{ style }}" class="{{ class }}" src="{{ image.url }}" alt="{{ image.full_name }}"/>		
 	{% endif %}
 
 {% endmacro %}

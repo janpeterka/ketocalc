@@ -55,16 +55,10 @@ class LocalFileHandler(object):
         # self.allowed_extension = {"txt", "pdf", "png", "jpg", "jpeg", "gif"}
 
     def save(self, file):
-        """Save file to filesystem
-
-        Arguments:
-            file {[app.models.files.File or werkzeug.datastructures.FileStorage]} --
         """
-        from app.models.files import File
-
-        if isinstance(file, File):
-            file.data.name = file.name
-            file = file.data
+        Arguments:
+            file {[werkzeug.datastructures.FileStorage]}
+        """
         file.full_name = secure_filename(file.name)
 
         file.save(self._get_full_path(file))

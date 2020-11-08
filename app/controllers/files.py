@@ -9,15 +9,16 @@ from app.handlers.files import FileHandler
 
 
 class FilesView(FlaskView):
+    # def before_request(self,):
+
     def show(self, hash_value):
         file = File.load_first_by_attribute("hash", hash_value)
         if not file:
             abort(404)
         if not file.can_current_user_view:
             abort(403)
-        return FileHandler().show(
-            file, thumbnail=bool(request.args.get("thumbnail", False))
-        )
+        thumbnail = bool(request.args.get("thumbnail", False))
+        return FileHandler().show(file, thumbnail=thumbnail)
 
     @route("/<id>/delete", methods=["POST"])
     def delete(self, id):

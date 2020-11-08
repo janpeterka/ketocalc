@@ -39,16 +39,6 @@ class File(db.Model, BaseMixin):
 
     subfolder = ""
 
-    def _get_hash_from_path(self):
-        from hashlib import md5
-
-        return md5(self.path.encode("utf-8")).hexdigest()
-
-    def rename_to_id(self):
-        self.path = os.path.join(self.subfolder, f"{self.id}.{self.extension}")
-        super().edit()
-        return self
-
     def save(self, with_thumbnail=True):
         # converts "some.picture.jpg" to "some.picture"
         self.name = secure_filename(".".join(self.data.filename.split(".")[:-1]))
@@ -65,23 +55,33 @@ class File(db.Model, BaseMixin):
         super().save()
 
         # rename to match db id
-        self.rename_to_id()
+        self._rename_to_id()
         self.hash = self._get_hash_from_path()
         super().edit()
 
         # save file
         self.name = f"{self.id}.{self.extension}"
-        FileHandler().save(self)
+        FileHandler().save(self.raw_file)
 
         # Create thumbnail
         if with_thumbnail:
-            self.add_thumbnail()
+            self._add_thumbnail()
 
         self.expire()
 
         return self
 
-    def add_thumbnail(self):
+    def _get_hash_from_path(self):
+        from hashlib import md5
+
+        return md5(self.path.encode("utf-8")).hexdigest()  # nosec
+
+    def _rename_to_id(self):
+        self.path = os.path.join(self.subfolder, f"{self.id}.{self.extension}")
+        super().edit()
+        return self
+
+    def _add_thumbnail(self):
         ImageHandler().create_and_save_thumbnail(self)
 
     def can_view(self, user) -> bool:
@@ -90,6 +90,11 @@ class File(db.Model, BaseMixin):
     def delete(self):
         ImageHandler().delete(self)
         super().delete()
+
+    @property
+    def raw_file(self):
+        self.data.name = self.name
+        return self.data
 
     @property
     def url(self):
