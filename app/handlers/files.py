@@ -65,12 +65,15 @@ class LocalFileHandler(object):
         if isinstance(file, File):
             file.data.name = file.name
             file = file.data
-
-        file.name = secure_filename(file.name)
+        file.full_name = secure_filename(file.name)
 
         file.save(self._get_full_path(file))
 
     def delete(self, file):
+        """
+        Arguments:
+            file {app.models.File}
+        """
         if os.path.exists(self._get_full_path(file)):
             os.remove(self._get_full_path(file))
 
@@ -83,7 +86,6 @@ class LocalFileHandler(object):
     def url(self, file, thumbnail=False):
         from flask import url_for
 
-        print(thumbnail)
         return url_for("FilesView:show", hash_value=file.hash, thumbnail=True)
 
     @property
@@ -92,7 +94,9 @@ class LocalFileHandler(object):
         return []
 
     def _get_full_path(self, file):
-        return os.path.join(self.folder, file.name)
+        # File.path or FileStorage.name
+        name = getattr(file, "path", getattr(file, "name", None))
+        return os.path.join(self.folder, name)
 
     # def download(self, file):
     #     return send_file(file.path, attachment_filename=file.name,)
@@ -204,3 +208,7 @@ class ImageHandler(object):
         image.thumbnail(size)
         image.name = file.name
         FileHandler(subfolder="thumbnails").save(image)
+
+    def delete(self, file):
+        FileHandler().delete(file)
+        FileHandler(subfolder="thumbnails").delete(file)

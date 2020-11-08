@@ -79,6 +79,7 @@ texts = {
     "ingredient_all_shared": "Všechny sdílené suroviny",
     "ingredient_delete": "Smazat surovinu",
     "ingredient_delete_confirm": "Opravdu chcete smazat surovinu?",
+    "image": {"delete": "Smazat foto"},
     # Calc
     "calc_amount": "Spočítat množství!",
     # Cookbook

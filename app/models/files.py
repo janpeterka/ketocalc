@@ -117,6 +117,9 @@ class RecipeImageFile(ImageFile):
         backref="images",
     )
 
+    def can_current_user_delete(self):
+        return self.author == current_user or current_user.is_admin
+
     # def can_view(self, user):
     #     # private?
     #     return self.recipe in user.recipes or self.recipe.public or user.is_admin

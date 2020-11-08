@@ -1,13 +1,10 @@
-from flask import abort, request
+from flask import abort, request, redirect, flash
 from flask import render_template as template
 
-from flask_classful import FlaskView
-
-# from app.controllers.extended_flask_view import ExtendedFlaskView
+from flask_classful import FlaskView, route
 
 from app.models.files import File
 
-# from app.models.users import User
 from app.handlers.files import FileHandler
 
 
@@ -22,7 +19,17 @@ class FilesView(FlaskView):
             file, thumbnail=bool(request.args.get("thumbnail", False))
         )
 
+    @route("/<id>/delete", methods=["POST"])
+    def delete(self, id):
+        file = File.load(id)
+        if file.can_current_user_delete:
+            file.delete()
+        else:
+            flash("Nemáte právo toto foto smazat.", "error")
+        return redirect(request.referrer)
+
     # def show_profile_pic(self, user_id):
+    #     from app.models.users import User
     #     file = User.load(user_id).profile_picture_file
     #     if not file:
     #         return FileHandler().show_new_user_placeholder()
