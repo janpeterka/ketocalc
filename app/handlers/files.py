@@ -1,3 +1,25 @@
+"""
+File Handlers
+
+This classes are used to manage files.
+
+Currently two types of storage are supported:
+    - Local (via LocalFileHandler)
+    - AWS (via AWSFileStorage)
+
+    All (both) types should support following public methods:
+    - save (expecting either apps File or werkzeug FileStorage)
+    - delete (expecting File)
+    - show (expecting File)
+    - @property all_files
+    - url
+
+
+expects:
+   - Files model for type checking (probably will find a way to change this)
+   - Files controller (for generating url. don't know how to do this other way yet.)
+"""
+
 import os
 
 from werkzeug.utils import secure_filename
@@ -10,24 +32,15 @@ import boto3
 
 class FileHandler(object):
     def __new__(self, **kwargs):
-        if application.config["STORAGE_SYSTEM"] == "DEFAULT":
-            # FileHandler(subfolder=self.subfolder).save(self)
+        if application.config["STORAGE_SYSTEM"] == "LOCAL":
             return LocalFileHandler(**kwargs)
         elif application.config["STORAGE_SYSTEM"] == "AWS":
-            return AWSFileHandler()
+            return AWSFileHandler(**kwargs)
         else:
             return LocalFileHandler(**kwargs)
 
 
 class LocalFileHandler(object):
-    """[summary]
-
-    [description]
-
-    requirements:
-       - Files model
-    """
-
     def __init__(self, subfolder=None):
         self.folder = os.path.join(application.root_path, "files/")
         # create folder `files/` if doesn't exist
@@ -44,8 +57,6 @@ class LocalFileHandler(object):
     def save(self, file):
         """Save file to filesystem
 
-        [description]
-
         Arguments:
             file {[app.models.files.File or werkzeug.datastructures.FileStorage]} --
         """
@@ -57,34 +68,39 @@ class LocalFileHandler(object):
 
         file.name = secure_filename(file.name)
 
-        file.save(self.get_full_path(file))
+        file.save(self._get_full_path(file))
 
     def delete(self, file):
-        if os.path.exists(self.get_full_path(file)):
-            os.remove(self.get_full_path(file))
+        if os.path.exists(self._get_full_path(file)):
+            os.remove(self._get_full_path(file))
 
-    def show(self, file):
+    def show(self, file, thumbnail=False):
+        if thumbnail:
+            self.folder = os.path.join(self.folder, "thumbnails/")
+
         return send_from_directory(self.folder, file.path)
 
-    def url(self, file):
+    def url(self, file, thumbnail=False):
         from flask import url_for
 
-        return url_for("FilesView:show", hash_value=file.hash)
-
-    def get_full_path(self, file):
-        return os.path.join(self.folder, file.name)
+        print(thumbnail)
+        return url_for("FilesView:show", hash_value=file.hash, thumbnail=True)
 
     @property
     def all_files(self):
         # TODO - list all files in folder
         return []
 
+    def _get_full_path(self, file):
+        return os.path.join(self.folder, file.name)
+
     # def download(self, file):
     #     return send_file(file.path, attachment_filename=file.name,)
+    #
 
 
 class AWSFileHandler(object):
-    def __init__(self):
+    def __init__(self, subfolder=None):
         self.client = boto3.client(
             "s3",
             aws_access_key_id=application.config["AWS_ACCESS_KEY_ID"],
@@ -101,12 +117,12 @@ class AWSFileHandler(object):
         self.folder = os.path.join(application.root_path, "files/")
 
     def save(self, file):
-        fh = LocalFileHandler(subfolder="tmp")
+        fh = FileHandler(subfolder="tmp")
         fh.save(file)
-        self.upload_file(os.path.join(fh.folder, file.path), file.name)
+        self._upload_file(os.path.join(fh.folder, file.path), file.name)
         fh.delete(file)
 
-    def upload_file(self, file_path, file_name):
+    def _upload_file(self, file_path, file_name):
         """
         Function to upload a file to an S3 bucket
         """
@@ -124,8 +140,19 @@ class AWSFileHandler(object):
     #     self.resource.Bucket(application.config["BUCKET"]).download_file(file_name, output)
 
     #     return output
+    @property
+    def all_files(self):
+        from app.models.files import File
 
-    def list_files(self):
+        aws_files = self._list_files()
+        # TODO - match all aws_files to all files (probably composed from multiple models)
+        files = []
+        for file in aws_files:
+            file = File().load_first_by_attribute("path", file["Key"])
+            if file is not None and file.can_current_user_view:
+                files.append(file)
+
+    def _list_files(self):
         """
         Function to list files in a given S3 bucket
         """
@@ -140,7 +167,10 @@ class AWSFileHandler(object):
 
         return contents
 
-    def create_presigned_url(self, file, expiration=3600):
+    def url(self, file):
+        return self._create_presigned_url(file)
+
+    def _create_presigned_url(self, file, expiration=3600):
         from botocore.exceptions import ClientError
 
         """Generate a presigned URL to share an S3 object
@@ -164,3 +194,13 @@ class AWSFileHandler(object):
 
         # The response contains the presigned URL
         return response
+
+
+class ImageHandler(object):
+    def create_and_save_thumbnail(self, file, size=(128, 128)):
+        from PIL import Image
+
+        image = Image.open(FileHandler()._get_full_path(file))
+        image.thumbnail(size)
+        image.name = file.name
+        FileHandler(subfolder="thumbnails").save(image)

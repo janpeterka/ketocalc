@@ -49,7 +49,7 @@ class File(db.Model, BaseMixin):
         super().edit()
         return self
 
-    def save(self):
+    def save(self, with_thumbnail=True):
         # converts "some.picture.jpg" to "some.picture"
         self.name = secure_filename(".".join(self.data.filename.split(".")[:-1]))
         # converts "some.picture.jpg" to "jpg"
@@ -66,33 +66,38 @@ class File(db.Model, BaseMixin):
 
         # rename to match db id
         self.rename_to_id()
-
         self.hash = self._get_hash_from_path()
         super().edit()
 
-        self.name = f"{self.id}.{self.extension}"
-        self.name = self.full_name
         # save file
-        FileHandler(subfolder=self.subfolder).save(self)
+        self.name = f"{self.id}.{self.extension}"
+        FileHandler().save(self)
+
+        # Create thumbnail
+        if with_thumbnail:
+            self.add_thumbnail()
 
         self.expire()
 
         return self
 
+    def add_thumbnail(self):
+        ImageHandler().create_and_save_thumbnail(self)
+
     def can_view(self, user) -> bool:
-        """Check for permission
-
-        To be overwritten in child classes
-
-        Returns:
-            bool -- True
-        """
         return True
+
+    def delete(self):
+        ImageHandler().delete(self)
+        super().delete()
 
     @property
     def url(self):
-        # return FileHandler().create_presigned_url(self)
         return FileHandler().url(self)
+
+    @property
+    def thumbnail_url(self):
+        return FileHandler().url(self, thumbnail=True)
 
     @property
     def full_name(self):

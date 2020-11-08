@@ -124,8 +124,9 @@
         
         {% if not is_print %}
         <div class="col-2">
+            {% from "macros/_render_image.html.j2" import render_image %}
             {% for image in recipe.images %}
-                <img style="width: 20rem; margin-bottom: 2rem" src="{{ image.url }}" alt="{{ image.name }}"/>
+                {{ render_image(image, style="width: 20rem; margin-bottom: 2rem", thumbnail=False) }}
             {% endfor %}
             {% if recipe.images|length == 0 and recipe.can_current_user_edit %}
                 <form {{ admin_field_class(obj=recipe) }} action="{{ url_for('RecipesView:upload_photo', id=recipe.id) }}" method="post" accept-charset="utf-8" enctype=multipart/form-data>

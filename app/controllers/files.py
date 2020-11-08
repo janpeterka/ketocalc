@@ -1,7 +1,9 @@
-from flask import abort
+from flask import abort, request
 from flask import render_template as template
 
 from flask_classful import FlaskView
+
+# from app.controllers.extended_flask_view import ExtendedFlaskView
 
 from app.models.files import File
 
@@ -16,7 +18,9 @@ class FilesView(FlaskView):
             abort(404)
         if not file.can_current_user_view:
             abort(403)
-        return FileHandler().show(file)
+        return FileHandler().show(
+            file, thumbnail=bool(request.args.get("thumbnail", False))
+        )
 
     # def show_profile_pic(self, user_id):
     #     file = User.load(user_id).profile_picture_file

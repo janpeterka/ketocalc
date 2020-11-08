@@ -99,6 +99,9 @@ class BaseMixin(object):
             application.logger.error("Remove error: {}".format(e))
             return False
 
+    def delete(self, **kw):
+        return self.remove(**kw)
+
     def expire(self, **kw):
         """Dumps database changes
         """
