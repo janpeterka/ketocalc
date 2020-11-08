@@ -110,7 +110,6 @@ class LocalFileHandler(object):
 
     @property
     def all_files(self):
-        # TODO - list all files in folder
         from os import listdir
         from os.path import isfile, join
         from app.models.files import File
@@ -156,13 +155,6 @@ class AWSFileHandler(object):
             self.folder = os.path.join(self.folder, subfolder)
 
     def save(self, file):
-        """[summary]
-
-        First saves to file local tmp, then uploads to AWS, then deletes from tmp
-
-        Arguments:
-            file {[type]} -- [description]
-        """
         fh = LocalFileHandler(subfolder="tmp")
         object_name = os.path.join(self.folder, file.name)
         self._upload_file(os.path.join(fh.folder, file.path), object_name)
@@ -187,7 +179,6 @@ class AWSFileHandler(object):
         from app.models.files import File
 
         aws_files = self._list_files()
-        # TODO - match all aws_files to all files (probably composed from multiple models)
         files = []
         for file in aws_files:
             file = File().load_first_by_attribute("path", file["Key"])
@@ -204,7 +195,7 @@ class AWSFileHandler(object):
     #     self.resource.Bucket(application.config["BUCKET"]).download_file(file_name, output)
 
     #     return output
-    #
+
     def _upload_file(self, file_path, file_name):
         """
         Function to upload a file to an S3 bucket
