@@ -9,8 +9,6 @@ from app.handlers.files import FileHandler
 
 
 class FilesView(FlaskView):
-    # def before_request(self,):
-
     def show(self, hash_value):
         file = File.load_first_by_attribute("hash", hash_value)
         if not file:
