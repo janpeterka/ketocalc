@@ -111,7 +111,20 @@ class LocalFileHandler(object):
     @property
     def all_files(self):
         # TODO - list all files in folder
-        return []
+        from os import listdir
+        from os.path import isfile, join
+        from app.models.files import File
+
+        file_names = [f for f in listdir(self.folder) if isfile(join(self.folder, f))]
+
+        files = []
+
+        for file in file_names:
+            file = File().load_first_by_attribute("path", file)
+            if file is not None and file.can_current_user_view:
+                files.append(file)
+
+        return files
 
     def _get_full_path(self, file):
         # File.path or FileStorage.name
@@ -180,6 +193,8 @@ class AWSFileHandler(object):
             file = File().load_first_by_attribute("path", file["Key"])
             if file is not None and file.can_current_user_view:
                 files.append(file)
+
+        return files
 
     # def download_file(self, file_name):
     #     """

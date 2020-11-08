@@ -8,7 +8,7 @@ ketocalc.egg-info/
 scripts/
 db/
 tmp/
-files/
+app/files/
 
 *.env*
 *.flaskenv*
