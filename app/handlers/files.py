@@ -110,11 +110,13 @@ class LocalFileHandler(object):
 
     @property
     def all_files(self):
-        from os import listdir
-        from os.path import isfile, join
         from app.models.files import File
 
-        file_names = [f for f in listdir(self.folder) if isfile(join(self.folder, f))]
+        file_names = [
+            f
+            for f in os.listdir(self.folder)
+            if os.path.isfile(os.path.join(self.folder, f))
+        ]
 
         files = []
 
