@@ -28,8 +28,6 @@ from werkzeug.utils import secure_filename
 from flask import send_from_directory
 from flask import current_app as application
 
-import boto3
-
 
 class FileHandler(object):
     def __new__(self, **kwargs):
@@ -139,6 +137,8 @@ class LocalFileHandler(object):
 
 class AWSFileHandler(object):
     def __init__(self, subfolder=None):
+        import boto3
+
         self.client = boto3.client(
             "s3",
             aws_access_key_id=application.config["AWS_ACCESS_KEY_ID"],
@@ -156,14 +156,15 @@ class AWSFileHandler(object):
         if subfolder is not None:
             self.folder = os.path.join(self.folder, subfolder)
 
+        # TODO check if it's needed to add nonexistent subfolder
+
     def save(self, file):
-        fh = LocalFileHandler(subfolder="tmp")
+        folder = LocalFileHandler(subfolder="tmp").folder
         object_name = os.path.join(self.folder, file.name)
-        self._upload_file(os.path.join(fh.folder, file.path), object_name)
+        self._upload_file(os.path.join(folder, file.path), object_name)
 
     def delete(self, file):
         object_name = os.path.join(self.folder, file.full_identifier)
-        print(object_name)
         self.resource.Object(application.config["BUCKET"], object_name).delete()
 
     def show(self, file):
@@ -292,14 +293,15 @@ class AWSImageHandler(ImageHandlerMixin):
         fh.save(file)
         file_path = fh._get_full_path(file)
 
-        # save file
+        # save file to AWS
         FileHandler().save(file)
 
-        # create and save thumbnail
+        # create and save thumbnail (rewriting original tmp?)
         thumbnail = self.create_thumbnail(file, file_path, size)
         thumbnail.path = file.name
         fh.save(thumbnail)
 
+        # save thumbnail file to AWS
         FileHandler(subfolder="thumbnails").save(thumbnail)
 
         fh.delete(file)
