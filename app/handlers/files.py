@@ -8,11 +8,12 @@ Currently two types of storage are supported:
     - AWS (via AWSFileStorage)
 
     All (both) types should support following public methods:
-    - save (expecting either apps File or werkzeug FileStorage)
+    - save (expecting File)
     - delete (expecting File)
     - show (expecting File)
+    - url (expecting File)
+    -
     - @property all_files
-    - url
 
 
 expects:
@@ -57,11 +58,36 @@ class LocalFileHandler(object):
     def save(self, file):
         """
         Arguments:
-            file {[werkzeug.datastructures.FileStorage]}
+            file {app.models.File}
         """
-        file.full_name = secure_filename(file.name)
+
+        from app.models.files import File
+
+        if isinstance(file, File):
+            file.data.name = file.name
+            file = file.data
+
+        file.name = secure_filename(file.name)
 
         file.save(self._get_full_path(file))
+
+        # convert to raw
+        # file.data.name = file.name
+        # file = file.data
+
+        # print(type(file))
+        # print(file.__dict__)
+
+        # self._save_raw(file)
+
+    def _save_raw(self, raw_file):
+        """
+        Arguments:
+            file {werkzeug.datastructures.FileStorage} --
+        """
+        print(f"saving {raw_file} to {self._get_full_path(raw_file)}")
+        raw_file.name = secure_filename(raw_file.name)
+        raw_file.save(self._get_full_path(raw_file))
 
     def delete(self, file):
         """
@@ -72,7 +98,7 @@ class LocalFileHandler(object):
             os.remove(self._get_full_path(file))
 
     def show(self, file, thumbnail=False):
-        if thumbnail:
+        if thumbnail is True:
             self.folder = os.path.join(self.folder, "thumbnails/")
 
         return send_from_directory(self.folder, file.path)
@@ -80,7 +106,7 @@ class LocalFileHandler(object):
     def url(self, file, thumbnail=False):
         from flask import url_for
 
-        return url_for("FilesView:show", hash_value=file.hash, thumbnail=True)
+        return url_for("FilesView:show", hash_value=file.hash, thumbnail=thumbnail)
 
     @property
     def all_files(self):
@@ -112,32 +138,37 @@ class AWSFileHandler(object):
             aws_secret_access_key=application.config["AWS_SECRET_ACCESS_KEY"],
             region_name="eu-west-3",
         )
-        self.folder = os.path.join(application.root_path, "files/")
+        self.folder = ""
+        if subfolder is not None:
+            self.folder = os.path.join(self.folder, subfolder)
 
     def save(self, file):
-        fh = FileHandler(subfolder="tmp")
-        fh.save(file)
-        self._upload_file(os.path.join(fh.folder, file.path), file.name)
-        fh.delete(file)
+        """[summary]
 
-    def _upload_file(self, file_path, file_name):
+        First saves to file local tmp, then uploads to AWS, then deletes from tmp
+
+        Arguments:
+            file {[type]} -- [description]
         """
-        Function to upload a file to an S3 bucket
-        """
-        response = self.client.upload_file(
-            file_path, application.config["BUCKET"], file_name
-        )
+        fh = LocalFileHandler(subfolder="tmp")
+        object_name = os.path.join(self.folder, file.name)
+        self._upload_file(os.path.join(fh.folder, file.path), object_name)
 
-        return response
+    def delete(self, file):
+        object_name = os.path.join(self.folder, file.full_identifier)
+        print(object_name)
+        self.resource.Object(application.config["BUCKET"], object_name).delete()
 
-    # def download_file(self, file_name):
-    #     """
-    #     Function to download a given file from an S3 bucket
-    #     """
-    #     output = file_name
-    #     self.resource.Bucket(application.config["BUCKET"]).download_file(file_name, output)
+    def show(self, file):
+        raise NotImplementedError
 
-    #     return output
+    def url(self, file, thumbnail=False):
+        if thumbnail is True:
+            file_path = f"thumbnails/{file.path}"
+        else:
+            file_path = file.path
+        return self._create_presigned_url(file_path)
+
     @property
     def all_files(self):
         from app.models.files import File
@@ -149,6 +180,25 @@ class AWSFileHandler(object):
             file = File().load_first_by_attribute("path", file["Key"])
             if file is not None and file.can_current_user_view:
                 files.append(file)
+
+    # def download_file(self, file_name):
+    #     """
+    #     Function to download a given file from an S3 bucket
+    #     """
+    #     output = file_name
+    #     self.resource.Bucket(application.config["BUCKET"]).download_file(file_name, output)
+
+    #     return output
+    #
+    def _upload_file(self, file_path, file_name):
+        """
+        Function to upload a file to an S3 bucket
+        """
+        response = self.client.upload_file(
+            file_path, application.config["BUCKET"], file_name
+        )
+
+        return response
 
     def _list_files(self):
         """
@@ -165,10 +215,7 @@ class AWSFileHandler(object):
 
         return contents
 
-    def url(self, file):
-        return self._create_presigned_url(file)
-
-    def _create_presigned_url(self, file, expiration=3600):
+    def _create_presigned_url(self, file_path, expiration=3600):
         from botocore.exceptions import ClientError
 
         """Generate a presigned URL to share an S3 object
@@ -180,7 +227,7 @@ class AWSFileHandler(object):
         """
 
         # Generate a presigned URL for the S3 object
-        object_name = file.path
+        object_name = file_path
         try:
             response = self.client.generate_presigned_url(
                 "get_object",
@@ -195,14 +242,57 @@ class AWSFileHandler(object):
 
 
 class ImageHandler(object):
-    def create_and_save_thumbnail(self, file, size=(128, 128)):
-        from PIL import Image
+    def __new__(self, **kwargs):
+        if application.config["STORAGE_SYSTEM"] == "LOCAL":
+            return LocalImageHandler(**kwargs)
+        elif application.config["STORAGE_SYSTEM"] == "AWS":
+            return AWSImageHandler(**kwargs)
+        else:
+            return LocalImageHandler(**kwargs)
 
-        image = Image.open(FileHandler()._get_full_path(file))
-        image.thumbnail(size)
-        image.name = file.name
-        FileHandler(subfolder="thumbnails").save(image)
 
+class ImageHandlerMixin(object):
     def delete(self, file):
         FileHandler().delete(file)
         FileHandler(subfolder="thumbnails").delete(file)
+
+    def create_thumbnail(self, file, file_path, size):
+        from PIL import Image
+
+        image = Image.open(file_path)
+        image.thumbnail(size)
+        image.name = file.name
+
+        return image
+
+
+class LocalImageHandler(ImageHandlerMixin):
+    def create_and_save_with_thumbnail(self, file, size=(128, 128)):
+        # save file
+        LocalFileHandler().save(file)
+        file_path = LocalFileHandler()._get_full_path(file)
+
+        thumbnail = self.create_thumbnail(file, file_path, size)
+
+        LocalFileHandler(subfolder="thumbnails").save(thumbnail)
+
+
+class AWSImageHandler(ImageHandlerMixin):
+    def create_and_save_with_thumbnail(self, file, size=(128, 128)):
+        # save to temporary
+        fh = LocalFileHandler(subfolder="tmp")
+        fh.save(file)
+        file_path = fh._get_full_path(file)
+
+        # save file
+        FileHandler().save(file)
+
+        # create and save thumbnail
+        thumbnail = self.create_thumbnail(file, file_path, size)
+        thumbnail.path = file.name
+        fh.save(thumbnail)
+
+        FileHandler(subfolder="thumbnails").save(thumbnail)
+
+        fh.delete(file)
+        fh.delete(thumbnail)

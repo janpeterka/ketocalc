@@ -17,8 +17,8 @@ class FilesView(FlaskView):
             abort(404)
         if not file.can_current_user_view:
             abort(403)
-        thumbnail = bool(request.args.get("thumbnail", False))
-        return FileHandler().show(file, thumbnail=thumbnail)
+        thumbnail = request.args.get("thumbnail", False)
+        return FileHandler().show(file, thumbnail=(thumbnail == "True"))
 
     @route("/<id>/delete", methods=["POST"])
     def delete(self, id):

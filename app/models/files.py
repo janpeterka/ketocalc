@@ -61,11 +61,10 @@ class File(db.Model, BaseMixin):
 
         # save file
         self.name = f"{self.id}.{self.extension}"
-        FileHandler().save(self.raw_file)
-
-        # Create thumbnail
         if with_thumbnail:
             self._add_thumbnail()
+        else:
+            FileHandler().save(self)
 
         self.expire()
 
@@ -82,7 +81,7 @@ class File(db.Model, BaseMixin):
         return self
 
     def _add_thumbnail(self):
-        ImageHandler().create_and_save_thumbnail(self)
+        ImageHandler().create_and_save_with_thumbnail(self)
 
     def can_view(self, user) -> bool:
         return True
@@ -90,11 +89,6 @@ class File(db.Model, BaseMixin):
     def delete(self):
         ImageHandler().delete(self)
         super().delete()
-
-    @property
-    def raw_file(self):
-        self.data.name = self.name
-        return self.data
 
     @property
     def url(self):
@@ -107,6 +101,10 @@ class File(db.Model, BaseMixin):
     @property
     def full_name(self):
         return f"{self.name}.{self.extension}"
+
+    @property
+    def full_identifier(self):
+        return f"{self.id}.{self.extension}"
 
 
 class ImageFile(File):
