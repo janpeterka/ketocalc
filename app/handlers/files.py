@@ -80,14 +80,14 @@ class LocalFileHandler(object):
 
         # self._save_raw(file)
 
-    def _save_raw(self, raw_file):
-        """
-        Arguments:
-            file {werkzeug.datastructures.FileStorage} --
-        """
-        print(f"saving {raw_file} to {self._get_full_path(raw_file)}")
-        raw_file.name = secure_filename(raw_file.name)
-        raw_file.save(self._get_full_path(raw_file))
+    # def _save_raw(self, raw_file):
+    #     """
+    #     Arguments:
+    #         file {werkzeug.datastructures.FileStorage} --
+    #     """
+    #     print(f"saving {raw_file} to {self._get_full_path(raw_file)}")
+    #     raw_file.name = secure_filename(raw_file.name)
+    #     raw_file.save(self._get_full_path(raw_file))
 
     def delete(self, file):
         """
