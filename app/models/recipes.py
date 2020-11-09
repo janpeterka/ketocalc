@@ -2,6 +2,7 @@ import datetime
 import math
 import types
 
+from sqlalchemy import or_
 from flask_login import current_user
 
 from app import db
@@ -94,6 +95,30 @@ class Recipe(db.Model, ItemMixin):
             .paginate(page, items_per_page, False)
         )  # noqa: E712
         return recipes
+
+    def get_filtered_paginated_public_recipes(page=1, filters={}, items_per_page=30):
+        recipes_query = (
+            db.session.query(Recipe)
+            .join(Recipe.reactions, isouter=True)
+            .filter(
+                or_(
+                    UserRecipeReactions.user_id == current_user.id,
+                    UserRecipeReactions.id == None,
+                )  # noqa: E712
+            )
+            .filter(Recipe.is_shared == True)
+        )
+        if "ratio_from" in filters and filters["ratio_from"]:
+            recipes_query = recipes_query.filter(Recipe.ratio >= filters["ratio_from"])
+        if "ratio_to" in filters and filters["ratio_to"]:
+            recipes_query = recipes_query.filter(Recipe.ratio <= filters["ratio_to"])
+        if "with_reaction" in filters and filters["with_reaction"] is True:
+            recipes_query = recipes_query.filter(
+                UserRecipeReactions.user_id == current_user.id
+                and UserRecipeReactions.recipe_id == Recipe.id
+            )
+
+        return recipes_query.all()
 
     def create_and_save(self, ingredients):
         db.session.add(self)

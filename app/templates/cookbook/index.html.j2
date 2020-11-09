@@ -16,7 +16,7 @@
 
 {% block content %}
     <div class="container" data-controller="recipe-reactions">
-    	<form action="{{ url_for('CookbookView:index') }}" method="post" class="form-inline form-control" accept-charset="UTF-8">
+    	<form action="{{ url_for('CookbookView:index') }}" method="get" class="form-inline form-control" accept-charset="UTF-8">
     		{{ form.csrf_token }}
    			{% from "macros/_form_element.html.j2" import render_field %}
    			<div>
