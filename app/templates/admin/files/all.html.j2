@@ -1,3 +1,5 @@
+{% from "macros/_render_image.html.j2" import render_image %}
+
 {% extends "base.html.j2" %}
 {% block title %}
     admin | all users 	
@@ -15,7 +17,7 @@
                     
                 {% for file in files %}
                     <tr>
-                        <td><img src="{{ file.url }}" style="height:7rem; width:auto;" alt="{{ file.name }}"/></td>
+                        <td>{{ render_image(file, style="height: 7rem; width:auto;", thumbnail=True) }}</td>
                         <td>{{ file.author.name }}</td>
                     </tr>
                 {% endfor %}

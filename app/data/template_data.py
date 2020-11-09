@@ -60,7 +60,6 @@ texts = {
     "recipe_impossible": "Recept nelze vytvořit",
     "recipe_share": "Zveřejnit recept",
     "recipe_unshare": "Zneveřejnit recept",
-    "recipe_upload_photo": "Nahrát fotku",
     "recipes": "Recepty",
     # Diet
     "diet": "Dieta",
@@ -79,6 +78,7 @@ texts = {
     "ingredient_all_shared": "Všechny sdílené suroviny",
     "ingredient_delete": "Smazat surovinu",
     "ingredient_delete_confirm": "Opravdu chcete smazat surovinu?",
+    "image": {"upload": "Nahrát foto", "delete": "Smazat foto"},
     # Calc
     "calc_amount": "Spočítat množství!",
     # Cookbook

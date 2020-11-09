@@ -1,7 +1,6 @@
 import os
 from werkzeug.utils import secure_filename
 
-from flask import current_app as application
 from flask_login import current_user
 
 from app import db
@@ -9,7 +8,7 @@ from app import db
 from app.models.base_mixin import BaseMixin
 
 from app.handlers.files import FileHandler
-from app.handlers.files import AWSFileHandler
+from app.handlers.files import ImageHandler
 
 
 class File(db.Model, BaseMixin):
@@ -40,17 +39,7 @@ class File(db.Model, BaseMixin):
 
     subfolder = ""
 
-    def _get_hash_from_path(self):
-        from hashlib import md5
-
-        return md5(self.path.encode("utf-8")).hexdigest()
-
-    def rename_to_id(self):
-        self.path = os.path.join(self.subfolder, f"{self.id}.{self.extension}")
-        super().edit()
-        return self
-
-    def save(self):
+    def save(self, with_thumbnail=True):
         # converts "some.picture.jpg" to "some.picture"
         self.name = secure_filename(".".join(self.data.filename.split(".")[:-1]))
         # converts "some.picture.jpg" to "jpg"
@@ -66,37 +55,56 @@ class File(db.Model, BaseMixin):
         super().save()
 
         # rename to match db id
-        self.rename_to_id()
-
+        self._rename_to_id()
         self.hash = self._get_hash_from_path()
         super().edit()
 
+        # save file
         self.name = f"{self.id}.{self.extension}"
-        # save file to filesystem
-        if application.config["STORAGE_SYSTEM"] == "DEFAULT":
-            FileHandler(subfolder=self.subfolder).save(self)
-        elif application.config["STORAGE_SYSTEM"] == "AWS":
-            AWSFileHandler().save(self)
+        if with_thumbnail:
+            self._add_thumbnail()
         else:
-            FileHandler(subfolder=self.subfolder).save(self)
+            FileHandler().save(self)
 
         self.expire()
 
         return self
 
+    def _get_hash_from_path(self):
+        from hashlib import md5
+
+        return md5(self.path.encode("utf-8")).hexdigest()  # nosec
+
+    def _rename_to_id(self):
+        self.path = os.path.join(self.subfolder, f"{self.id}.{self.extension}")
+        super().edit()
+        return self
+
+    def _add_thumbnail(self):
+        ImageHandler().create_and_save_with_thumbnail(self)
+
     def can_view(self, user) -> bool:
-        """Check for permission
-
-        To be overwritten in child classes
-
-        Returns:
-            bool -- True
-        """
         return True
+
+    def delete(self):
+        ImageHandler().delete(self)
+        super().delete()
 
     @property
     def url(self):
-        return AWSFileHandler().create_presigned_url(self)
+        return FileHandler().url(self)
+
+    @property
+    def thumbnail_url(self):
+        return FileHandler().url(self, thumbnail=True)
+
+    @property
+    def full_name(self):
+        return f"{self.name}.{self.extension}"
+
+    @property
+    def full_identifier(self):
+        return f"{self.id}.{self.extension}"
 
 
 class ImageFile(File):
@@ -111,6 +119,9 @@ class RecipeImageFile(ImageFile):
         primaryjoin="RecipeImageFile.recipe_id == Recipe.id",
         backref="images",
     )
+
+    def can_current_user_delete(self):
+        return self.author == current_user or current_user.is_admin
 
     # def can_view(self, user):
     #     # private?
