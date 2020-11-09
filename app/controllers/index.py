@@ -20,3 +20,8 @@ class IndexView(FlaskView):
     @route("o-kalkulacce/")
     def about(self):
         return template("index/index.html.j2")
+
+    @route("kalkulacka")
+    @route("kalkulacka/")
+    def simple_calculator(self):
+        return redirect(url_for("SimpleCalculatorView:index"))

@@ -9,12 +9,12 @@ from app.controllers.base_recipes import BaseRecipesView
 
 
 class TrialRecipesView(BaseRecipesView):
-    def before_show(self):
+    def before_index(self):
         if current_user.is_authenticated:
             return redirect(url_for("IndexView:index"))
 
-    def show(self):
-        shared_user = User.load_by_attribute("username", "ketocalc.jmp@gmail.com")
+    def index(self):
+        shared_user = User.load_shared_user()
         return template(
             "recipes/new.html.j2",
             ingredients=Ingredient.load_all_shared(),

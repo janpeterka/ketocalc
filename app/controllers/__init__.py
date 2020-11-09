@@ -1,26 +1,55 @@
-def register_all_controllers(application):
-    from .base_recipes import BaseRecipesView
-    from .daily_plans import DailyPlansView
-    from .dashboard import DashboardView
-    from .diets import DietsView
-    from .errors import ErrorsView
-    from .index import IndexView
-    from .ingredients import IngredientsView
-    from .login import LoginView
-    from .mails import MailsView
-    from .password_recovery import PasswordRecoveryView
-    from .recipes import RecipesView
-    from .register import RegisterView
-    from .simple_calculator import SimpleCalculatorView
-    from .support import SupportView
-    from .trial_recipes import TrialRecipesView
-    from .users import UsersView
+from .admin import AdminView
+from .base_recipes import BaseRecipesView
+from .cookbook import CookbookView
+from .daily_plans import DailyPlansView
+from .dashboard import DashboardView
+from .diets import DietsView
+from .errors import ErrorsView
+from .files import FilesView
+from .index import IndexView
+from .ingredients import IngredientsView
+from .login import LoginView
+from .mails import MailsView
+from .password_recovery import PasswordRecoveryView
+from .recipes import RecipesView
+from .register import RegisterView
+from .simple_calculator import SimpleCalculatorView
+from .support import SupportView
+from .trial_recipes import TrialRecipesView
+from .users import UsersView
 
+__all__ = [
+    "AdminView",
+    "BaseRecipesView",
+    "CookbookView",
+    "DailyPlansView",
+    "DashboardView",
+    "DietsView",
+    "ErrorsView",
+    "FilesView",
+    "IndexView",
+    "IngredientsView",
+    "LoginView",
+    "MailsView",
+    "PasswordRecoveryView",
+    "RecipesView",
+    "RegisterView",
+    "SimpleCalculatorView",
+    "SupportView",
+    "TrialRecipesView",
+    "UsersView",
+]
+
+
+def register_all_controllers(application):
+    AdminView.register(application)
     BaseRecipesView.register(application)
+    CookbookView.register(application)
     DailyPlansView.register(application)
     DashboardView.register(application)
     DietsView.register(application)
     ErrorsView.register(application)
+    FilesView.register(application)
     IndexView.register(application)
     IngredientsView.register(application)
     LoginView.register(application)

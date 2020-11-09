@@ -1,73 +1,54 @@
-from flask import abort, flash, g, request, redirect, url_for
+from flask import abort, flash, request, redirect, url_for
 from flask import render_template as template
 
-from flask_classful import FlaskView, route
+from flask_classful import route
 from flask_login import login_required, current_user
 
 from app.auth import admin_required
 from app.helpers.form import create_form, save_form_to_session
 from app.models.ingredients import Ingredient
+from app.controllers.extended_flask_view import ExtendedFlaskView
 from app.models.recipes import Recipe
 from app.controllers.forms.ingredients import IngredientsForm
 
 
-class IngredientsView(FlaskView):
+class IngredientsView(ExtendedFlaskView):
     decorators = [login_required]
 
-    @login_required
-    def before_request(self, name, id=None):
-        g.request_item_type = "ingredient"
-        if id is not None:
-            g.request_item_id = id
-            self.ingredient = Ingredient.load(id)
+    def before_request(self, name, id=None, *args, **kwargs):
+        super().before_request(name, id, *args, **kwargs)
 
+        if id is not None:
             if self.ingredient is None:
                 abort(404)
-            if not (
-                self.ingredient.is_shared
-                or current_user.is_admin
-                or current_user.username == self.ingredient.author
-            ):
+            if not self.ingredient.can_current_user_view:
                 abort(403)
 
     def before_edit(self, id):
-        self.ingredient.recipes = Recipe.load_by_ingredient_and_username(
-            self.ingredient.id, current_user.username
+        super().before_edit(id)
+        self.recipes = Recipe.load_by_ingredient_and_user(
+            self.ingredient.id, current_user
         )
+        self.all_recipes = Recipe.load_by_ingredient(self.ingredient)
 
     def before_show(self, id):
-        self.ingredient.recipes = Recipe.load_by_ingredient_and_username(
-            self.ingredient.id, current_user.username
-        )
-        self.ingredient.all_recipes = Recipe.load_by_ingredient(self.ingredient.id)
+        self.recipes = Recipe.load_by_ingredient_and_user(self.ingredient, current_user)
+        self.all_recipes = Recipe.load_by_ingredient(self.ingredient.id)
 
     def before_index(self):
-        self.ingredients = Ingredient.load_all_by_author(current_user.username)
+        self.ingredients = Ingredient.load_all_by_author(current_user)
         self.shared_ingredients = Ingredient.load_all_shared()
 
     def before_shared(self):
         self.shared_ingredients = Ingredient.load_all_shared()
         self.unapproved_ingredients = Ingredient.load_all_unapproved()
 
-    def index(self):
-        return template(
-            "ingredients/all.html.j2",
-            ingredients=self.ingredients,
-            shared_ingredients=self.shared_ingredients,
-        )
-
-    def shared(self):
-        return template(
-            "ingredients/all_shared.html.j2",
-            shared_ingredients=self.shared_ingredients,
-            unapproved_ingredients=self.unapproved_ingredients,
-        )
-
-    def new(self):
-        form = create_form(IngredientsForm)
-        return template("ingredients/new.html.j2", form=form)
+    @admin_required
+    def all_shared(self):
+        return self.template(template_name="ingredients/all_shared.html.j2",)
 
     def new_shared(self):
+        # TODO can be simplified -> redirect? calling super with kwargs?
         form = create_form(IngredientsForm)
         return template("ingredients/new.html.j2", form=form, shared=True)
 
@@ -78,9 +59,8 @@ class IngredientsView(FlaskView):
             save_form_to_session(request.form)
             return redirect(url_for("IngredientsView:new"))
 
-        ingredient = Ingredient()
+        ingredient = Ingredient(author=current_user.username)
         form.populate_obj(ingredient)
-        ingredient.author = current_user.username
 
         if ingredient.save():
             return redirect(url_for("IngredientsView:show", id=ingredient.id))
@@ -120,10 +100,8 @@ class IngredientsView(FlaskView):
             save_form_to_session(request.form)
             return redirect(url_for("IngredientsView:new_shared"))
 
-        ingredient = Ingredient()
+        ingredient = Ingredient(is_shared=True, source=current_user.username)
         form.populate_obj(ingredient)
-        ingredient.is_shared = True
-        ingredient.source = current_user.username
 
         if ingredient.save():
             flash(
@@ -135,23 +113,9 @@ class IngredientsView(FlaskView):
             flash("Nepodařilo se vytvořit surovinu", "error")
             return redirect(url_for("IngredientsView:new_shared"))
 
-    def show(self, id):
-        return template(
-            "ingredients/show.html.j2",
-            ingredient=self.ingredient,
-            recipes=self.ingredient.recipes,
-            all_recipes=self.ingredient.all_recipes,
-        )
-
-    def edit(self, id):
-        form = create_form(IngredientsForm, obj=self.ingredient)
-
-        return template(
-            "ingredients/edit.html.j2",
-            ingredient=self.ingredient,
-            recipes=self.ingredient.recipes,
-            form=form,
-        )
+    # def edit(self, id):
+    # self.form = create_form(IngredientsForm, obj=self.ingredient)
+    # return self.template()
 
     @route("delete/<id>", methods=["POST"])
     def delete(self, id):

@@ -3,6 +3,8 @@ import unidecode
 
 from sqlalchemy import and_
 
+from flask_login import current_user
+
 from app import db
 
 from app.models.item_mixin import ItemMixin
@@ -34,9 +36,18 @@ class Ingredient(db.Model, ItemMixin):
     )
 
     @staticmethod
-    def load_all_by_author(username, ordered=True):
+    def load_all_by_author(author, ordered=True):
+        if type(author) == str:
+            author_name = author
+        elif hasattr(author, "username"):
+            author_name = author.username
+        else:
+            raise AttributeError(
+                "Wrong type for 'author', expected `str` or object having attribute `username`"
+            )
+
         ingredients = (
-            db.session.query(Ingredient).filter(Ingredient.author == username).all()
+            db.session.query(Ingredient).filter(Ingredient.author == author_name).all()
         )
         if ordered:
             ingredients.sort(
@@ -48,7 +59,9 @@ class Ingredient(db.Model, ItemMixin):
     def load_all_shared(renamed=False, ordered=True):
         ingredients = (
             db.session.query(Ingredient)
-            .filter(and_(Ingredient.is_shared == True, Ingredient.is_approved == True))
+            .filter(
+                and_(Ingredient.is_shared == True, Ingredient.is_approved == True)
+            )  # noqa: E712
             .all()
         )
 
@@ -67,7 +80,9 @@ class Ingredient(db.Model, ItemMixin):
     def load_all_unapproved():
         ingredients = (
             db.session.query(Ingredient)
-            .filter(and_(Ingredient.is_shared == True, Ingredient.is_approved == False))
+            .filter(
+                and_(Ingredient.is_shared == True, Ingredient.is_approved == False)
+            )  # noqa: E712
             .all()
         )
         ingredients.sort(
@@ -99,6 +114,20 @@ class Ingredient(db.Model, ItemMixin):
         if "max" in json_ing and len(json_ing["max"]) > 0:
             self.max = float(json_ing["max"])
 
+    def is_author(self, user) -> bool:
+        return self.author_user == user
+
+    # PERMISSIONS
+
+    def can_add(self, user) -> bool:
+        return self.is_author(user) or self.public
+
+    @property
+    def can_current_user_add(self) -> bool:
+        return self.can_add(current_user)
+
+    # PROPERTIES
+
     @property
     def author_user(self):
         from app.models.users import User
@@ -106,33 +135,21 @@ class Ingredient(db.Model, ItemMixin):
         user = User.load(self.author, load_type="username")
         return user
 
-    def is_author(self, user) -> bool:
-        return self.author_user == user
-
     @property
     def is_used(self):
-        if len(self.recipes) == 0:
-            return False
-        else:
-            return True
+        return True if self.recipes else False
 
-    @property
-    def public(self) -> bool:
-        """alias for is_shared"""
-        return self.is_shared
-
-    # TODO: only used for testing
+    # TESTING
+    # TODO: only used for testing, should be moved to tests
     def set_fixed(self, value=True, amount=0):
         self.fixed = value
         self.amount = amount
         return self
 
-    # TODO: only used for testing
     def set_main(self, value=True):
         self.main = value
         return self
 
-    # TODO: only used for testing
     @staticmethod
     def load_by_name(ingredient_name):
         ingredient = (

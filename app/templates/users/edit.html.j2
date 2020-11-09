@@ -6,21 +6,22 @@
 {% block style %}{% endblock %}
 
 {% block script %}
-    {% include 'javascript/toggle_visibility.js' %}
+    {% include 'javascript/stimulus.js.html' %}
+    {% include 'javascript/toggle_visibility.js.html' %}
 {% endblock %}
 
 {% block content %}
     <div class="container">
         <div class="col-12">
-            <form action="{{ url_for('UsersView:post') }}" class="form-group" method="post" accept-charset="utf-8">
+            <form action="{{ url_for('UsersView:post_edit') }}" class="form-group" method="post" accept-charset="utf-8">
                 {{ user_form.csrf_token }}
-                {% from "_form_element.html.j2" import render_field %}
+                {% from "macros/_form_element.html.j2" import render_field %}
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>{{ texts.user_username}}</th>
-                            <th>{{ texts.user_firstname}}</th>
-                            <th>{{ texts.user_lastname}}</th>
+                            <th>{{ texts.user.username}}</th>
+                            <th>{{ texts.user.firstname}}</th>
+                            <th>{{ texts.user.lastname}}</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -30,13 +31,13 @@
                                 {{ user.username }}
                             </td>
                             <td>
-                                {{ render_field(user_form.first_name, "form-control", label=False) }}
+                                {{ render_field(user_form.first_name, has_label=False) }}
                             </td>
                             <td>
-                                {{ render_field(user_form.last_name, "form-control", label=False) }}
+                                {{ render_field(user_form.last_name, has_label=False) }}
                             </td>
                             <td>
-                                {{ render_field(user_form.submit, "btn btn-warning", label=False, value=texts.edit_confirm) }}
+                                {{ render_field(user_form.submit, class="btn btn-warning", has_label=False, value=texts.edit_confirm) }}
                             </td>
                         </tr>
                     </tbody>
@@ -48,11 +49,11 @@
                 <table class="table">
                     <td>
                         <div class="form-group" data-controller="password-visibility" data-target="password-visibility.password">
-                            {{ render_field(password_form.password, class="form-control")}}
+                            {{ render_field(password_form.password, has_label=False)}}
                         </div>
                     </td>
                     <td>
-                        {{ render_field(password_form.submit, "btn btn-warning float-right", label=False, value=texts.password_change) }}
+                        {{ render_field(password_form.submit, class="btn btn-warning float-right", value=texts.password_change) }}
                     </td>
                 </table>
             </form>

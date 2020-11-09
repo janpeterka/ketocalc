@@ -3,21 +3,29 @@
     admin | all users 	
 {% endblock %}
 
+{% block style %}
+    <link href="https://unpkg.com/bootstrap-table@1.18.0/dist/bootstrap-table.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block script %}
+    <script src="https://unpkg.com/bootstrap-table@1.18.0/dist/bootstrap-table.min.js"></script>
+{% endblock %}
+
 {% block content %}
     <div class="container">
         <div class="admin-field">
             <h1>Uživatelé</h1>
 
-            <details>
+            <details open>
             <summary>Souhrn používání</summary>
-            <table class="table">
+            <table class="table" data-toggle="table" data-search="true">
                 <thead class="thead-dark">
                 <tr>
                     <th>email</th>
                     <th>name</th>
                     <th>registered at</th>
                     <th>last login at</th>
-                    <th>last activity</th>
+                    <th data-field="last_activity" data-sortable="true">last activity</th>
                     <th>login count</th>
 
                     <th>diet count</th>                
@@ -37,7 +45,7 @@
                     <td>{{ user.first_name }} {{ user.last_name }}</td>
                     <td>{{ user.created }}</td>
                     <td>{{ user.last_logged_in }}</td>
-                    <td>{{ user.last_request.url }} | {{ user.last_request.created_at }}</td>
+                    <td>{{ user.last_request.created_at }} | {{ user.last_request.url }}</td>
                     <td>{{ user.login_count }}</td>
                     <td>{{ user.diets|length }}</td>
                     <td>{{ user.recipes|length }}</td>
@@ -53,7 +61,7 @@
             </details>
 
 
-            <details open>
+            <details>
             <summary>Maily</summary>
             <table class="table">
                 <thead class="thead-dark">

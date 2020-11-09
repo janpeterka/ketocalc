@@ -63,22 +63,6 @@ class User(db.Model, UserMixin, ItemMixin):
     @staticmethod
     @login.user_loader
     def load(user_identifier, load_type="id"):
-        """[summary]
-
-        [description]
-
-        Decorators:
-            login.user_loader
-
-        Arguments:
-            user_identifier {[type]} -- [description]
-
-        Keyword Arguments:
-            load_type {str} -- [description] (default: {"id"})
-
-        Returns:
-            [type] -- [description]
-        """
         if load_type == "id":
             user = db.session.query(User).filter(User.id == user_identifier).first()
         elif load_type == "username":
@@ -99,6 +83,10 @@ class User(db.Model, UserMixin, ItemMixin):
             return None
 
         return user
+
+    @staticmethod
+    def load_by_username(username):
+        return User.load(username, load_type="username")
 
     def set_password_hash(self, password):
         if not isinstance(password, bytes) and password is not None:
@@ -149,11 +137,6 @@ class User(db.Model, UserMixin, ItemMixin):
                 self.login_count += 1
             self.edit()
 
-    # TODO: tohle není ideální
-    @property
-    def is_admin(self):
-        return self.username == "admin"
-
     @property
     def recipes(self, ordered=True):
         recipes = []
@@ -183,6 +166,16 @@ class User(db.Model, UserMixin, ItemMixin):
         return ingredients
 
     @property
+    def name(self):
+        return "{} {}".format(self.first_name, self.last_name)
+
+    @property
+    def full_name(self):
+        return "{} {}".format(self.first_name, self.last_name)
+
+    # LOGS
+
+    @property
     def last_request(self):
         request = (
             db.session.query(RequestLog)
@@ -191,6 +184,8 @@ class User(db.Model, UserMixin, ItemMixin):
             .first()
         )
         return request
+
+    # MAILING
 
     @property
     def onboarding_welcome_mail_sent(self):
@@ -230,3 +225,13 @@ class User(db.Model, UserMixin, ItemMixin):
                 return False
         else:
             return False
+
+    # TODO: TO BE REFACTORED
+    @staticmethod
+    def load_shared_user():
+        return User.load("ketocalc.jmp@gmail.com", load_type="username")
+
+    # tohle není ideální
+    @property
+    def is_admin(self):
+        return self.username == "admin"

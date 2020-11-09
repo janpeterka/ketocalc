@@ -27,7 +27,7 @@
         </div>
 
         <div class="row">
-            <table class="table table-striped " data-target="daily-plan.recipesTable">
+            <table class="table table-striped">
                 <thead>
                     <tr>
                         <th>{{ texts.title }}</th>
@@ -43,10 +43,10 @@
                 {% for daily_recipe in daily_recipes %}
                     <tr data-id="{{ daily_recipe.id }}">
                         <td><a href="{{ url_for('RecipesView:show', id=daily_recipe.recipe.id) }}">{{ daily_recipe.recipe.name }}</a></td>
-                        <td>{{ daily_recipe.values.calorie | round(2) }}</td>
-                        <td>{{ daily_recipe.values.protein | round(2) }}</td>
-                        <td>{{ daily_recipe.values.fat | round(2) }}</td>
-                        <td>{{ daily_recipe.values.sugar | round(2) }}</td>
+                        <td>{{ daily_recipe.values.calorie | round(1) }}</td>
+                        <td>{{ daily_recipe.values.protein | round(1) }}</td>
+                        <td>{{ daily_recipe.values.fat | round(1) }}</td>
+                        <td>{{ daily_recipe.values.sugar | round(1) }}</td>
                         <td>{{ daily_recipe.amount }}</td>
                         <td>
                             <a href="{{ url_for('DailyPlansView:remove_daily_recipe', id=daily_recipe.id, date=dates['active']) }}">
@@ -67,23 +67,23 @@
                 </tr>
                 <tr data-target="daily-plan.totals">
                     <th>Celkem:</th>
-                    <td>{{ daily_plan.totals.calorie | round(2) }}</td>
-                    <td>{{ daily_plan.totals.protein | round(2) }}</td>
-                    <td>{{ daily_plan.totals.fat | round(2) }}</td>
-                    <td>{{ daily_plan.totals.sugar | round(2) }}</td>
-                    <td>{{ daily_plan.totals.amount | round(2) }}</td>
+                    <td>{{ daily_plan.totals.calorie | round(1) }}</td>
+                    <td>{{ daily_plan.totals.protein | round(1) }}</td>
+                    <td>{{ daily_plan.totals.fat | round(1) }}</td>
+                    <td>{{ daily_plan.totals.sugar | round(1) }}</td>
+                    <td>{{ daily_plan.totals.amount | round(1) }}</td>
                     <td>{{ daily_plan.totals.ratio }} : 1</td>
                 </tr>
             </table>
 
         </div>
-        <div class="row" style="float:right; margin-top:5rem;">
+        <div class="row float-right mt-5">
             <form class="form" action="{{ url_for('DailyPlansView:add_recipe') }}" method="post">
                 <div class="form-group form-inline">
                     {# Diets #}
                     <select class="form-control" data-target="daily-plan.diets" data-action="change->daily-plan#load_recipes">
                     {% for diet in diets: %}
-                        <option  value="{{ diet.id }}">{{ diet.name }}</option>
+                        <option value="{{ diet.id }}">{{ diet.name }}</option>
                     {% endfor %}
                     </select>
                     {# Recipes #}
@@ -93,7 +93,7 @@
                 {# Amount #}
                 <div class="form-group form-inline">
                     <label>Podíl z celé diety</label>
-                    {% from "_percentage_button.html.j2" import percentage_button %}
+                    {% from "macros/_percentage_button.html.j2" import percentage_button %}
                     {% for percentage in [10, 12.5, 25, 50, 100] %}
                         {{ percentage_button(percentage, controller="daily-plan", action="set_amount") }}
                     {% endfor %}

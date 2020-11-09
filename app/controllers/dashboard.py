@@ -25,13 +25,13 @@ class DashboardView(ExtendedFlaskView):
 
         self.diets = current_user.active_diets
         self.daily_plan = DailyPlan.load_by_date_or_create(date=datetime.date.today())
-        self.daily_recipes = self.daily_plan.has_recipes
+        self.daily_recipes = self.daily_plan.daily_recipes
 
         return self.template(
             "dashboard/dashboard.html.j2", first_name=current_user.first_name,
         )
 
-    def show(self):
+    def show(self, **kwargs):
         return redirect(url_for("DashboardView:index"))
 
     def post(self):

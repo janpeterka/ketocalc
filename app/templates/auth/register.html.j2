@@ -4,7 +4,8 @@
 {% endblock %}
 
 {% block script %}
-    {% include 'javascript/toggle_visibility.js' %}
+    {% include 'javascript/stimulus.js.html' %}
+    {% include 'javascript/toggle_visibility.js.html' %}
 {% endblock %}
 
 {% block content %}
@@ -23,21 +24,21 @@
                 {# <hr class="col-xs-12"> #}
 
                 {{ form.csrf_token }}
-                {% from "_form_element.html.j2" import render_field %}
+                {% from "macros/_form_element.html.j2" import render_field %}
 
-                {{ render_field(form.username, class="form-control") }}
+                {{ render_field(form.username, placeholder="např. moje.jmeno@seznam.cz") }}
                 {{ form.password.label }}
                 <div class="form-group" data-controller="password-visibility" data-target="password-visibility.password">
-                    {{ render_field(form.password, class="form-control", label=False)}}
+                    {{ render_field(form.password, has_label=False, placeholder="***")}}
                 </div>
 
                 <div class="form-row">
                     <div class="col">
-                        {{ render_field(form.first_name, class="form-control") }}
+                        {{ render_field(form.first_name) }}
                     </div>
                     
                     <div class="col">
-                        {{ render_field(form.last_name, class="form-control") }}
+                        {{ render_field(form.last_name) }}
                     </div>
                 </div>
                 {# {{ render_field(form.recaptcha) }} #}

@@ -5,4 +5,17 @@
             <li><a href="{{ url_for('RecipesView:show', id=recipe.id) }}">{{ recipe.name }}</a></li>
         {% endfor %}
     </ul>
+
+    {% if current_user.is_admin and all_recipes %}
+    <div class="admin-field">
+	    <label for="all_recipes"><h3>Všechny</h3></label>
+	    <ul name="all_recipes">
+	        {% for recipe in all_recipes %}
+	            <li><a href="{{ url_for('RecipesView:show', id=recipe.id) }}">{{ recipe.name }}</a></li>
+	        {% endfor %}
+	    </ul>
+    </div>
+    {% endif %}
+
+
 </div>

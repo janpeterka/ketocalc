@@ -27,7 +27,6 @@ def upgrade():
         type_=mysql.ENUM("small", "big", "full"),
         server_default="full",
     )
-    pass
 
 
 def downgrade():
@@ -38,4 +37,3 @@ def downgrade():
         existing_type=mysql.ENUM("small", "big", "full"),
         type_=mysql.ENUM("small", "big"),
     )
-    pass

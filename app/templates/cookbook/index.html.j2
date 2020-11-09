@@ -1,0 +1,64 @@
+{% extends "base.html.j2" %}
+{% block title %}
+    {{ texts.recipe_all }}
+{% endblock %}
+
+
+{% block style %}
+	<link href="https://unpkg.com/bootstrap-table@1.18.0/dist/bootstrap-table.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block script %}
+	{% include 'javascript/stimulus.js.html' %}
+    {% include 'javascript/_recipe_reactions.js.html' %}
+	<script src="https://unpkg.com/bootstrap-table@1.18.0/dist/bootstrap-table.min.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="container" data-controller="recipe-reactions">
+    	<form action="{{ url_for('CookbookView:index') }}" method="post" class="form-inline form-control" accept-charset="UTF-8">
+    		{{ form.csrf_token }}
+   			{% from "macros/_form_element.html.j2" import render_field %}
+   			<div>
+   				<div>
+   					<span class="align-middle">Poměr receptu mezi</span>
+   					{{ render_field(form.ratio_from, placeholder="např. 2.1", class="col-2 ml-2 mr-2", has_label=False) }}
+   					<span>a</span>
+   					{{ render_field(form.ratio_to, placeholder="např. 2.4", class="col-2 ml-2 mr-2", has_label=False) }}
+   					{{ render_field(form.with_reaction, has_label=False, class="ml-3") }}
+   				</div>
+   				<div class="row mt-2">
+   					{{ form.ingredient_name.label(class_="ml-2") }}
+   					{{ render_field(form.ingredient_name, has_label=False, class="ml-3") }}
+					{{ form.submit(class_='btn btn-primary ml-3')}}
+   				</div>
+   			</div>
+
+    	</form>
+
+    	<table id="table" class="table" data-filter-control="true" data-toggle="table" data-search="true">
+		    <thead>
+		    	<th data-field="recipe">recept</th>
+		    	<th data-field="ratio" data-sortable="true">poměr receptu</th>
+		    	<th data-field="ingredients" data-sortable="true">seznam surovin</th>
+		    	<th data-field="author" data-sortable="true">autor*ka</th>
+		    	<th data-field="reactions" data-sortable="true">{{ icons.heart_full }}</th>
+		    </thead>
+		    <tbody data-target="recipe-reactions.recipes">
+		    {% for recipe in recipes: %}
+		    	<tr style="height: 5rem;"
+		    		data-recipe-id="{{ recipe.id }}"
+		    		data-reaction="{{ recipe.has_reaction | lower }}"
+		    		data-reaction-count="{{ recipe.reactions | length }}">
+			        <td><a href="{{ url_for('RecipesView:show', id=recipe.id) }}">{{ recipe.name }}</a></td>
+			        <td>{{ recipe.ratio }}</td>
+			        <td>{{ recipe.concat_ingredients }}</td>
+			        <td>{{ recipe.author.name }}</td>
+			        <td><span class="ml-1">{{ recipe.reactions | length }}</span></td>
+			    </tr>
+		    {% endfor %}
+		    </tbody>
+    	</table>
+    </div>
+{% endblock %}
+
