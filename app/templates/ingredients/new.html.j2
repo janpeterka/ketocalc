@@ -9,22 +9,7 @@
 
 {% block content %}
     <div class="container">
-        {% if shared %}
-            <div class="alert alert-info" role="alert">
-                Přidáváte sdílenou surovinu.<br>
-                To by měly být suroviny, jejichž nutriční hodnoty se nemění, zejména ovoce, zelenina, maso. U balených výrobků se můžou hodnoty měnit, a proto je třeba, abyste je měli jen ve svých účtech, kde můžete hlídat, je jsou údaje pravdivé. <br>
-                Jste si jisti, že by tato surovina měla být použitelná pro všechny? <br>
-                <br>
-                Tato surovina musí projít schválením a poté se zobrazí všem uživatelům.<br>
-                Do té doby ji nebudete moct používat ani vy.<br>
-            </div>
-        {% endif %}
-
-        {% if shared %}
-            <form method="post" action="{{ url_for('IngredientsView:post_shared') }}" class="form-group col-6" accept-charset="UTF-8">
-        {% else %}    
-            <form method="post" action="{{ url_for('IngredientsView:post') }}" class="form-group col-6" accept-charset="UTF-8">
-        {% endif %}
+        <form method="post" action="{{ url_for('IngredientsView:post') }}" class="form-group col-6" accept-charset="UTF-8">
             {{ form.csrf_token }}
             {% from "macros/_form_element.html.j2" import render_field %}
             {{ render_field(form.name) }}

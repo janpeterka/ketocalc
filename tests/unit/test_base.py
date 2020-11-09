@@ -28,6 +28,7 @@ def test_requests_logged_in(app, db, client):
         "/users/edit/",
         "/kalkulacka",
         # "/daily-plans",  # having poblems with context_processors
+        "/trial-recipes",
     ]
 
     redirect_pages = [

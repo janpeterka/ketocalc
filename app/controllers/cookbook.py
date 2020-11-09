@@ -44,12 +44,14 @@ class CookbookView(ExtendedFlaskView):
         ingredient_name = None
         ratio_from = None
         ratio_to = None
+        with_reaction = None
 
         if request.method == "POST":
             if not self.form.ingredient_name.data == "--všechny--":
                 ingredient_name = self.form.ingredient_name.data
             ratio_from = self.form.ratio_from.data
             ratio_to = self.form.ratio_to.data
+            with_reaction = self.form.with_reaction.data
 
         # Filter recipes
         if ingredient_name:
@@ -62,6 +64,9 @@ class CookbookView(ExtendedFlaskView):
 
         if ratio_to:
             self.recipes = [x for x in self.recipes if x.ratio <= ratio_to]
+
+        if with_reaction:
+            self.recipes = [x for x in self.recipes if x.has_reaction]
 
     @route("/", methods=["GET", "POST"])
     def index(self):

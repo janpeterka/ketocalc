@@ -43,6 +43,14 @@ class BaseMixin(object):
 
         return db.session.query(cls).filter_by(**{attribute: value}).all()
 
+    @classmethod
+    def load_first_by_attribute(cls, attribute, value):
+        elements = cls.load_by_attribute(attribute, value)
+        if elements:
+            return elements[0]
+        else:
+            return None
+
     # OTHER LOADING
     @classmethod
     def created_recently(cls, days=30):
@@ -90,6 +98,9 @@ class BaseMixin(object):
             db.session.rollback()
             application.logger.error("Remove error: {}".format(e))
             return False
+
+    def delete(self, **kw):
+        return self.remove(**kw)
 
     def expire(self, **kw):
         """Dumps database changes
