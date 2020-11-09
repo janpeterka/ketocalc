@@ -40,17 +40,19 @@ class CookbookView(ExtendedFlaskView):
         # page = request.args.get("page", 1, type=int)
         # self.recipe_pagination = Recipe.public_recipes_paginated(page, 30)
         # self.recipes = self.recipe_pagination.items
+        self.all_recipes = Recipe.public_recipes()
         self.recipes = Recipe.get_filtered_paginated_public_recipes(
             1,
             filters={
                 "ratio_from": ratio_from,
                 "ratio_to": ratio_to,
                 "with_reaction": with_reaction,
+                "ingredient_name": ingredient_name,
             },
         )
 
         # Get values for filters
-        ingredients = [x.ingredients for x in self.recipes]
+        ingredients = [x.ingredients for x in self.all_recipes]
         flatten_ingredients = [y for x in ingredients for y in x]
         ingredient_names = [x.name for x in flatten_ingredients]
         self.ingredient_names = ["--všechny--"]

@@ -117,6 +117,14 @@ class Recipe(db.Model, ItemMixin):
                 UserRecipeReactions.user_id == current_user.id
                 and UserRecipeReactions.recipe_id == Recipe.id
             )
+        if "ingredient_name" in filters and filters["ingredient_name"]:
+            recipes_query = (
+                recipes_query.join(RecipeHasIngredients)
+                .join(Ingredient)
+                .filter(Ingredient.name == filters["ingredient_name"])
+            )
+
+        print(recipes_query)
 
         return recipes_query.all()
 
