@@ -66,14 +66,9 @@ class BaseMixin(object):
 
     # DATABASE OPERATIONS
 
-    def edit(self, **kw):
-        try:
-            db.session.commit()
-            return True
-        except Exception as e:
-            db.session.rollback()
-            application.logger.error("Edit error: {}".format(e))
-            return False
+    # This is more Crud
+    # def create(self, **kw):
+    #     return self.save(**kw)
 
     def save(self, **kw):
         """Saves (new) object
@@ -87,6 +82,23 @@ class BaseMixin(object):
             application.logger.error("Save error: {}".format(e))
             return False
 
+    # This is more crUd
+    # def update(self, **kw):
+    #     return self.edit(**kw)
+
+    def edit(self, **kw):
+        try:
+            db.session.commit()
+            return True
+        except Exception as e:
+            db.session.rollback()
+            application.logger.error("Edit error: {}".format(e))
+            return False
+
+    # This is more cruD
+    # def delete(self, **kw):
+    #     return self.remove(**kw)
+
     def remove(self, **kw):
         """Deletes object
         """
@@ -98,9 +110,6 @@ class BaseMixin(object):
             db.session.rollback()
             application.logger.error("Remove error: {}".format(e))
             return False
-
-    def delete(self, **kw):
-        return self.remove(**kw)
 
     def expire(self, **kw):
         """Dumps database changes

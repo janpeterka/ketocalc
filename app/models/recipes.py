@@ -2,11 +2,14 @@ import datetime
 import math
 import types
 
+from flask_login import current_user
+
 from app import db
 
 # from app import cache
 
-from flask_login import current_user
+from app.helpers.calculations import calculate_ratio_for_recipe
+
 
 from app.models.item_mixin import ItemMixin
 
@@ -37,6 +40,8 @@ class Recipe(db.Model, ItemMixin):
         viewonly=True,
         order_by="Ingredient.name",
     )
+
+    ratio = db.Column(db.Float)
 
     has_daily_plans = db.relationship("DailyPlanHasRecipes", back_populates="recipe")
 
@@ -113,6 +118,12 @@ class Recipe(db.Model, ItemMixin):
         db.session.commit()
         return True
 
+    def update_ratio(self):
+        if not self.ratio:
+            ratio = calculate_ratio_for_recipe(self)
+            self.ratio = ratio
+            self.edit()
+
     def toggle_shared(self):
         self.is_shared = not self.is_shared
         self.edit()
@@ -164,10 +175,6 @@ class Recipe(db.Model, ItemMixin):
             math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
         )
         return totals
-
-    @property
-    def ratio(self):
-        return self.totals.ratio
 
     @property
     def values(self):

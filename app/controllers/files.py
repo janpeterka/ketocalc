@@ -22,7 +22,7 @@ class FilesView(FlaskView):
     def delete(self, id):
         file = File.load(id)
         if file.can_current_user_delete:
-            file.delete()
+            file.remove()
         else:
             flash("Nemáte právo toto foto smazat.", "error")
         return redirect(request.referrer)

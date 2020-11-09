@@ -5,6 +5,8 @@ from sympy import solve_poly_inequality as solvei
 from sympy import poly
 from sympy.solvers import solvers
 
+import math
+
 
 # CALCULATE RECIPE
 def calculate_recipe(ingredients, diet):
@@ -198,3 +200,30 @@ def calculate_recipe(ingredients, diet):
     diet.expire()
 
     return {"ingredients": ingredients, "totals": totals}
+
+
+def calculate_ratio_for_recipe(recipe):
+    totals = types.SimpleNamespace()
+    metrics = ["calorie", "sugar", "fat", "protein"]
+
+    totals.amount = 0
+
+    for ingredient in recipe.ingredients:
+        ingredient.amount = round(ingredient.load_amount_by_recipe(recipe.id), 2)
+        for metric in metrics:
+            value = getattr(totals, metric, 0)
+            ing_value = getattr(ingredient, metric)
+            setattr(totals, metric, value + (ingredient.amount * ing_value))
+
+        totals.amount += ingredient.amount
+
+    for metric in metrics:
+        value = getattr(totals, metric)
+        setattr(totals, metric, math.floor(value) / 100)
+
+    totals.amount = math.floor(totals.amount)
+
+    totals.ratio = (
+        math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
+    )
+    return totals.ratio
