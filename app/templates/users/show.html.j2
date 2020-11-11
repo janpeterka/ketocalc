@@ -12,9 +12,9 @@
         <div class="col-12">
             <table class="table">
                 <tr>
-                    <th>{{ texts.user.username}}</th>
-                    <th>{{ texts.user.firstname}}</th>
-                    <th>{{ texts.user.lastname}}</th>
+                    <th>{{ texts.user.username }}</th>
+                    <th>{{ texts.user.firstname }}</th>
+                    <th>{{ texts.user.lastname }}</th>
                 </tr>
                 <tr>
                     <td>{{ user.username }}</td>
@@ -28,7 +28,13 @@
             <a href="{{ url_for('UsersView:edit') }}" class="btn btn-secondary">{{ texts.edit }} {{ icons.edit }}</a>
         </div>
 
-        {% if current_user.is_admin %}{% include "admin/users/_info.html.j2"%}{% endif %}
+        {% if current_user.is_admin %}
+            {% include "admin/users/_info.html.j2"%}
+            {% from "macros/_admin_field.html.j2" import admin_field_class with context %}
+            <div class="admin-field">
+                <a href="{{ url_for('RecipesView:make_all_public_for_user', user_id=user.id) }}" class="btn btn-secondary">Zveřejnit všechny recepty uživatele</a>
+            </div>
+        {% endif %}
     </div>
 {% endblock %}
 

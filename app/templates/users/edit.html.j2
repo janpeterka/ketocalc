@@ -19,9 +19,9 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>{{ texts.user.username}}</th>
-                            <th>{{ texts.user.firstname}}</th>
-                            <th>{{ texts.user.lastname}}</th>
+                            <th>{{ texts.user.username }}</th>
+                            <th>{{ texts.user.firstname }}</th>
+                            <th>{{ texts.user.lastname }}</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -49,7 +49,7 @@
                 <table class="table">
                     <td>
                         <div class="form-group" data-controller="password-visibility" data-target="password-visibility.password">
-                            {{ render_field(password_form.password, has_label=False)}}
+                            {{ render_field(password_form.password, has_label=False) }}
                         </div>
                     </td>
                     <td>
@@ -60,7 +60,7 @@
         </div>
 
         <div>
-            <a href="{{ url_for('UsersView:show') }}" class="btn btn-secondary">{{ texts.edit_cancel}} {{ icons.edit }}</a>
+            <a href="{{ url_for('UsersView:show') }}" class="btn btn-secondary">{{ texts.edit_cancel }} {{ icons.edit }}</a>
         </div>
     </div>
 {% endblock %}

@@ -59,6 +59,7 @@ texts = {
     "recipe_save": "Uložit mezi recepty",
     "recipe_impossible": "Recept nelze vytvořit",
     "recipe_share": "Zveřejnit recept",
+    "recipe_share_all": "Zveřejnit všechny moje recepty",
     "recipe_unshare": "Zneveřejnit recept",
     "recipes": "Recepty",
     # Diet
