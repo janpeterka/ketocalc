@@ -30,13 +30,13 @@
    				<div class="row mt-2">
    					{{ form.ingredient_name.label(class_="ml-2") }}
    					{{ render_field(form.ingredient_name, has_label=False, class="ml-3") }}
-					{{ form.submit(class_='btn btn-primary ml-3')}}
+					{{ form.submit(class_='btn btn-primary ml-3') }}
    				</div>
    			</div>
 
     	</form>
 
-    	<table id="table" class="table" data-filter-control="true" data-toggle="table" data-search="true">
+    	<table id="table" class="table" data-filter-control="true" data-toggle="table" data-search="true"  data-pagination="true">
 		    <thead>
 		    	<th data-field="recipe">recept</th>
 		    	<th data-field="ratio" data-sortable="true">poměr receptu</th>

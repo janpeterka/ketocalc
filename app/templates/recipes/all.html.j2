@@ -31,8 +31,8 @@
             </div>
 
             <div style="margin-top: 5px">
-                <a href="{{ url_for('RecipesView:make_all_public') }}" class="btn btn-secondary">zveřejnit všechny recepty</a>
-            </div>    
+                <a href="{{ url_for('RecipesView:make_all_public') }}" class="btn btn-secondary">{{ texts.recipe_share_all }}</a>
+            </div>
         </div>
     </div>
 {% endblock %}
