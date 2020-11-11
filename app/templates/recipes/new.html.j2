@@ -29,9 +29,10 @@
             <div class="hidden">
                 <select data-target="new-recipe.baseSelect">
                     {% for ingredient in ingredients: %}
-                        <option name='{{ ingredient.name }}' value="{{ ingredient.id }}">{{ ingredient.name }}</option>
+                        <option name="{{ ingredient.name }}" value="{{ ingredient.id }}">{{ ingredient.name }}</option>
                     {% endfor %}
                 </select>
+                <input type="hidden" data-target="new-recipe.presetIngredientIds" value="{{ preset_ingredients|safe }}">
             </div>
 
             <div class="col-lg-6 col-md-12" >

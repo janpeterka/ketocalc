@@ -43,11 +43,12 @@ class RecipesView(BaseRecipesView):
         ingredients = Ingredient.load_all_by_author(current_user.username)
         shared_ingredients = Ingredient.load_all_shared(renamed=True)
 
-        # TODO - this couses duplication for admin. shouldn't be problem for users.
+        # TODO - this causes duplication for admin. shouldn't be problem for users.
         all_ingredients = ingredients + shared_ingredients
         return template(
             "recipes/new.html.j2",
             ingredients=all_ingredients,
+            preset_ingredients=request.args.get("preset_ingredient_ids", []),
             diets=active_diets,
             is_trialrecipe=False,
         )

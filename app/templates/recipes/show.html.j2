@@ -119,6 +119,10 @@
                     {% endif %}
                 </form>
             </div>
+            {% if current_user.is_admin %}
+                <div class="admin-field"><a class="btn btn-info" href="{{ url_for('RecipesView:new', preset_ingredient_ids=recipe_ingredient_ids_list(recipe)) }}">Exportovat</a></div>
+            {% endif %}
+
             {% endif %}
         </div>
         

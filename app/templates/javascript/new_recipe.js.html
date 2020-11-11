@@ -3,6 +3,7 @@
       static get targets() {
         return [
           "baseSelect",
+          "presetIngredientIds",
           "select", "ingredientTable", "selectDiet",
 
           "loader", "wrongRecipe",
@@ -14,6 +15,14 @@
 
       connect() {
         this.recipe__hideAll()
+        this._load_preset_ingredients()
+      }
+
+      _load_preset_ingredients(){
+        var ingredient_ids = this._string_to_list(this.presetIngredientIdsTarget.value)
+        for (let i = 0, ingredient_id; ingredient_id = ingredient_ids[i]; i++) {
+          this.add_ingredient_by_id(ingredient_id)
+        }
       }
 
       _refresh_select(){
@@ -25,14 +34,10 @@
         }
       }
 
-      add_ingredient(e){
-        e.preventDefault();
-
-        if (this.selectTarget.value == false){return false;}
-        else{
+      add_ingredient_by_id(ingredient_id){
           fetch("{{ url_for('BaseRecipesView:addIngredientAJAX') }}",{
             method: 'POST',
-            body: JSON.stringify({'ingredient_id' : this.selectTarget.value}),
+            body: JSON.stringify({'ingredient_id' : ingredient_id}),
             headers: {'Content-Type': 'application/json,charset=UTF-8'}}
           ).then((response) => { return response.json(); }
           ).then((response) => {
@@ -42,6 +47,14 @@
             
             this.recipe__hideAll();
           });
+      }
+
+      add_ingredient(e){
+        e.preventDefault();
+
+        if (this.selectTarget.value == false){return false;}
+        else{
+          this.add_ingredient_by_id(this.selectTarget.value);
         }
       }
 
@@ -310,6 +323,10 @@
         $(this.recipeTarget).hide();
         $(this.wrongRecipeTarget).hide();
         $(this.loaderTarget).hide();
+      }
+
+      _string_to_list(string){
+        return string.replace("[","").replace("]","").replace(/\s+/g, '').split(",")
       }
     });
     </script>
