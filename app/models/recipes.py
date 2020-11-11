@@ -2,11 +2,15 @@ import datetime
 import math
 import types
 
+from sqlalchemy import or_
+from flask_login import current_user
+
 from app import db
 
 # from app import cache
 
-from flask_login import current_user
+from app.helpers.calculations import calculate_ratio_for_recipe
+
 
 from app.models.item_mixin import ItemMixin
 
@@ -37,6 +41,8 @@ class Recipe(db.Model, ItemMixin):
         viewonly=True,
         order_by="Ingredient.name",
     )
+
+    ratio = db.Column(db.Float)
 
     has_daily_plans = db.relationship("DailyPlanHasRecipes", back_populates="recipe")
 
@@ -81,6 +87,47 @@ class Recipe(db.Model, ItemMixin):
         recipes = db.session.query(Recipe).filter(Recipe.public).all()
         return recipes
 
+    @staticmethod
+    def public_recipes_paginated(page, items_per_page=20):
+        recipes = (
+            db.session.query(Recipe)
+            .filter(Recipe.is_shared == True)
+            .paginate(page, items_per_page, False)
+        )  # noqa: E712
+        return recipes
+
+    def get_filtered_paginated_public_recipes(page=1, filters={}, items_per_page=30):
+        recipes_query = (
+            db.session.query(Recipe)
+            .join(Recipe.reactions, isouter=True)
+            .filter(
+                or_(
+                    UserRecipeReactions.user_id == current_user.id,
+                    UserRecipeReactions.id == None,
+                )  # noqa: E712
+            )
+            .filter(Recipe.is_shared == True)
+        )
+        if "ratio_from" in filters and filters["ratio_from"]:
+            recipes_query = recipes_query.filter(Recipe.ratio >= filters["ratio_from"])
+        if "ratio_to" in filters and filters["ratio_to"]:
+            recipes_query = recipes_query.filter(Recipe.ratio <= filters["ratio_to"])
+        if "with_reaction" in filters and filters["with_reaction"] is True:
+            recipes_query = recipes_query.filter(
+                UserRecipeReactions.user_id == current_user.id
+                and UserRecipeReactions.recipe_id == Recipe.id
+            )
+        if "ingredient_name" in filters and filters["ingredient_name"]:
+            recipes_query = (
+                recipes_query.join(RecipeHasIngredients)
+                .join(Ingredient)
+                .filter(Ingredient.name == filters["ingredient_name"])
+            )
+
+        print(recipes_query)
+
+        return recipes_query.all()
+
     def create_and_save(self, ingredients):
         db.session.add(self)
         db.session.flush()
@@ -103,6 +150,12 @@ class Recipe(db.Model, ItemMixin):
         db.session.delete(self)
         db.session.commit()
         return True
+
+    def update_ratio(self):
+        if not self.ratio:
+            ratio = calculate_ratio_for_recipe(self)
+            self.ratio = ratio
+            self.edit()
 
     def toggle_shared(self):
         self.is_shared = not self.is_shared
@@ -155,10 +208,6 @@ class Recipe(db.Model, ItemMixin):
             math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
         )
         return totals
-
-    @property
-    def ratio(self):
-        return self.totals.ratio
 
     @property
     def values(self):

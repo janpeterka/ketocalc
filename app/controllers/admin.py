@@ -1,4 +1,4 @@
-# from flask import redirect, url_for
+from flask import redirect
 
 # from flask_login import current_user
 
@@ -31,3 +31,11 @@ class AdminView(ExtendedFlaskView):
         self.test = User.load_all()
 
         return self.template()
+
+    def update_recipe_ratios(self):
+        recipes = Recipe.load_all()
+
+        for recipe in recipes:
+            recipe.update_ratio()
+
+        return redirect("/admin/")
