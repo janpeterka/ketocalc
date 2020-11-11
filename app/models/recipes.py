@@ -189,3 +189,7 @@ class Recipe(db.Model, ItemMixin):
     @property
     def can_current_user_add(self):
         return self.can_add(current_user)
+
+    @property
+    def can_current_user_show(self):
+        return current_user == self.author or current_user.is_admin or self.public

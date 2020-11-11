@@ -28,11 +28,7 @@ class RecipesView(BaseRecipesView):
 
             if self.recipe is None:
                 abort(404)
-            if not (
-                current_user.username == self.recipe.author.username
-                or current_user.is_admin
-                or self.recipe.public
-            ):
+            if not self.recipe.can_current_user_show:
                 abort(403)
 
     def index(self):
