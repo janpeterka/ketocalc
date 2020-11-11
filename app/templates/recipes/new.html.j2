@@ -50,7 +50,8 @@
                 </div>
 
                 <div class="col-11">
-                    <table class="table" data-target="new-recipe.ingredientTable">
+                    <table class="table">
+                        <thead>
                         <tr>
                             <th>{{ texts.title }}</th>
                             <th>{{ texts.energy_100 }}</th>
@@ -59,6 +60,9 @@
                             <th>{{ texts.sugar_100}}</th>
                             <th></th>
                         </tr>
+                        </thead>
+                        <tbody data-target="new-recipe.ingredientTable">
+                        </tbody>
                     </table>
                 </div>
 

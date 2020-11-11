@@ -30,7 +30,11 @@
 
         for (let i = 0, ingredient; ingredient = this._get_currently_selected()[i]; i++) {
           let option = this.selectTarget.querySelector("option[value='" + ingredient.id + "']");
-          option.remove();
+          try {
+            option.remove();
+          } catch(err) {
+            // console.log(err);
+          }
         }
       }
 
@@ -53,9 +57,7 @@
         e.preventDefault();
 
         if (this.selectTarget.value == false){return false;}
-        else{
-          this.add_ingredient_by_id(this.selectTarget.value);
-        }
+        else {this.add_ingredient_by_id(this.selectTarget.value);}
       }
 
       _set_main_ingredient_if_missing(){
@@ -98,8 +100,10 @@
 
       remove_ingredient(event){
         var id = event.target.dataset.id
-        var row = this._get_ingredient_row_by_id(id, this.ingredientTableTarget);
-        row.remove()
+        var rows = this._get_ingredient_rows_by_id(id, this.ingredientTableTarget);
+        for (let i = 0, row; row = rows[i]; i++) {
+          row.remove();
+        }
 
         this._refresh_select();
         this._set_main_ingredient_if_missing();
@@ -128,6 +132,17 @@
         }
         // else
         return null;
+      }
+
+      _get_ingredient_rows_by_id(id, table){
+        var rows = []
+        for (let i = 0, row; row = table.rows[i]; i++) {
+          if (row.dataset.id == id){
+            rows.push(row);
+          }
+        }
+        // else
+        return rows;
       }
 
       _row_to_ingredient(row){

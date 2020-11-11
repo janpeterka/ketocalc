@@ -39,7 +39,7 @@ class IngredientsView(ExtendedFlaskView):
         self.ingredients = Ingredient.load_all_by_author(current_user)
         self.shared_ingredients = Ingredient.load_all_shared()
 
-    def before_shared(self):
+    def before_all_shared(self):
         self.shared_ingredients = Ingredient.load_all_shared()
         self.unapproved_ingredients = Ingredient.load_all_unapproved()
 

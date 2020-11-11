@@ -1,17 +1,36 @@
-<tr data-id="{{ ingredient.id }}" data-name="{{ ingredient.name }}"> 
-    <td>{{ ingredient.name }}</td> 
-    <td>{{ ingredient.calorie }}</td> 
-    <td>{{ ingredient.protein }}</td> 
-    <td>{{ ingredient.fat }}</td>
-    <td>{{ ingredient.sugar }}</td>
-    <td>
-        <i data-action="click->new-recipe#set_main_ingredient" data-id="{{ ingredient.id }}"
-           class="set_main fas fa-hospital-symbol"></i>
-        
-        <i data-action="click->new-recipe#toggle_fixed_ingredient" data-id="{{ ingredient.id }}"
-           class="set_fixed fas fa-thumbtack"></i>
-
-        <i data-action="click->new-recipe#remove_ingredient" data-id="{{ ingredient.id }}"
-           class="remove fa fa-times"></i>
-    </td>
+<tr data-id="{{ ingredient.id }}" data-name="{{ ingredient.name }}">
+    
+  <td>{{ ingredient.name }}</td>
+  <td>{{ ingredient.calorie }}</td>
+  <td>{{ ingredient.protein }}</td>
+  <td>{{ ingredient.fat }}</td>
+  <td>{{ ingredient.sugar }}</td>
+  <td>
+    <i data-action="click->new-recipe#set_main_ingredient" data-id="{{ ingredient.id }}"
+    class="set_main fas fa-hospital-symbol"></i>
+    <i data-action="click->new-recipe#toggle_fixed_ingredient" data-id="{{ ingredient.id }}"
+    class="set_fixed fas fa-thumbtack"></i>
+    <i data-action="click->new-recipe#remove_ingredient" data-id="{{ ingredient.id }}"
+    class="remove fa fa-times"></i>
+  </td>
 </tr>
+
+{% if ingredient.author_user != current_user %}
+<tr data-info="true" data-id="{{ ingredient.id }}" name="infos for copying">
+  <td colspan="6">
+    Cizí surovina<br>
+    {# {{ingredient.author_user.username}} | {{current_user.username}} #}
+    {% if ingredient.has_similar %}
+      <span>Máte podobné! - {{ ingredient.similar }}</span><br>
+    {% endif %}
+
+    {% if ingredient.has_with_same_name %}
+      <span>Máte se stejným jménem! - {{ingredient.with_same_name}}</span>      
+    {% endif %}
+
+  </td>
+</tr>
+{% endif %}
+
+{# 
+</tr> #}

@@ -16,7 +16,15 @@ class ItemMixin(BaseMixin):
             if not attr.startswith("_"):
                 attributes.append(attr)
 
-        return {attr: getattr(self, attr) for attr in attributes}
+        data = {}
+        for attr in attributes:
+            value = getattr(self, attr)
+            if isinstance(value, list):
+                data[attr] = ", ".join([str(x) for x in value])
+            else:
+                data[attr] = value
+
+        return data
 
     @property
     def view_count(self):

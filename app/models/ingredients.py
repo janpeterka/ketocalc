@@ -1,7 +1,8 @@
 import datetime
 import unidecode
 
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from flask_login import current_user
 
@@ -117,14 +118,92 @@ class Ingredient(db.Model, ItemMixin):
     def is_author(self, user) -> bool:
         return self.author_user == user
 
+    # SIMILAR INGREDIENTS
+
+    def load_with_same_name(self):
+        ingredients = (
+            db.session.query(Ingredient)
+            .filter(Ingredient.name == self.name)
+            .filter(Ingredient.is_current_user_author)
+            .all()
+        )
+        return ingredients
+
+    @property
+    def has_with_same_name(self) -> list:
+        return len(self.load_with_same_name()) > 0
+
+    @property
+    def with_same_name(self) -> list:
+        return [x.name for x in self.load_with_same_name()]
+
+    def load_similar(self):
+        delta = 0.05
+        ingredients = (
+            db.session.query(Ingredient)
+            # TODO - nějak zprovoznit ABS
+            .filter(
+                and_(
+                    or_(
+                        and_(
+                            Ingredient.sugar - self.sugar >= 0,
+                            Ingredient.sugar - self.sugar <= delta,
+                        ),
+                        and_(
+                            self.sugar - Ingredient.sugar >= 0,
+                            self.sugar - Ingredient.sugar <= delta,
+                        ),
+                    ),
+                    or_(
+                        and_(
+                            Ingredient.protein - self.protein >= 0,
+                            Ingredient.protein - self.protein <= delta,
+                        ),
+                        and_(
+                            self.protein - Ingredient.protein >= 0,
+                            self.protein - Ingredient.protein <= delta,
+                        ),
+                    ),
+                    or_(
+                        and_(
+                            Ingredient.fat - self.fat >= 0,
+                            Ingredient.fat - self.fat <= delta,
+                        ),
+                        and_(
+                            self.fat - Ingredient.fat >= 0,
+                            self.fat - Ingredient.fat <= delta,
+                        ),
+                    ),
+                )
+            )
+            .filter(Ingredient.is_current_user_author)
+            .all()
+        )
+        return ingredients
+
+    @property
+    def has_similar(self) -> bool:
+        return len(self.load_similar()) > 0
+
+    @property
+    def similar(self) -> list:
+        return [x.name for x in self.load_similar()]
+
     # PERMISSIONS
 
     def can_add(self, user) -> bool:
-        return self.is_author(user) or self.public
+        return self.is_author(user) or self.is_public
 
     @property
     def can_current_user_add(self) -> bool:
         return self.can_add(current_user)
+
+    def can_copy(self, user) -> bool:
+        return not self.is_author(user) and (self.is_public or self.has_public_recipe)
+
+    @property
+    def can_current_user_copy(self) -> bool:
+        return self.can_copy(current_user)
 
     # PROPERTIES
 
@@ -135,9 +214,20 @@ class Ingredient(db.Model, ItemMixin):
         user = User.load(self.author, load_type="username")
         return user
 
+    @hybrid_property
+    def is_current_user_author(self):
+        return self.author == current_user.username
+
     @property
     def is_used(self):
         return True if self.recipes else False
+
+    @property
+    def has_public_recipe(self):
+        for recipe in self.recipes:
+            if recipe.is_public:
+                return True
+        return False
 
     # TESTING
     # TODO: only used for testing, should be moved to tests
