@@ -118,10 +118,14 @@ class Ingredient(db.Model, ItemMixin):
 
     @property
     def with_same_name(self) -> list:
-        return [x.name for x in self.load_with_same_name()]
+        return self.load_with_same_name()
+        # return [x.name for x in self.load_with_same_name()]
 
-    def load_similar(self):
-        delta = 0.05
+    @property
+    def first_with_same_name(self) -> list:
+        return self.with_same_name[0] if self.with_same_name else None
+
+    def load_similar(self, delta=0.05):
         ingredients = (
             # TODO - nějak zprovoznit ABS
             Ingredient.query.filter(
@@ -169,7 +173,23 @@ class Ingredient(db.Model, ItemMixin):
 
     @property
     def similar(self) -> list:
-        return [x.name for x in self.load_similar()]
+        return self.load_similar()
+
+    @property
+    def first_similar(self):
+        return self.similar[0] if self.similar else None
+
+    @property
+    def has_same(self) -> bool:
+        return len(self.load_similar(delta=0)) > 0
+
+    @property
+    def same(self) -> list:
+        return self.load_similar(delta=0)
+
+    @property
+    def first_same(self):
+        return self.same[0] if self.same else None
 
     # PERMISSIONS
 

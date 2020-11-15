@@ -18,14 +18,22 @@
 {% if ingredient.author_user != current_user %}
 <tr data-info="true" data-id="{{ ingredient.id }}" name="infos for copying">
   <td colspan="6">
-    Cizí surovina<br>
+    Cizí surovina
+    <button class="btn" data-id="{{ ingredient.id }}"data-action="click->new-recipe#copy_ingredient">Zkopírovat</button><br>
     {# {{ingredient.author_user.username}} | {{current_user.username}} #}
+    {% if ingredient.has_same %}
+      <span>Máte stejnou! - <a href="{{ url_for('IngredientsView:show', id=ingredient.first_same.id)}}">{{ ingredient.first_same.name }}</a></span><br>
+      <button class="btn" data-id="{{ ingredient.first_same.id }}" data-action="click->new-recipe#replace_ingredient">Nahradit</button>
+    {% endif %}
+
     {% if ingredient.has_similar %}
-      <span>Máte podobné! - {{ ingredient.similar }}</span><br>
+      <span>Máte podobné! - <a href="{{ url_for('IngredientsView:show', id=ingredient.first_similar.id)}}">{{ ingredient.first_similar.name }}</a></span>
+      <button class="btn" data-id="{{ ingredient.first_similar.id }}" data-action="click->new-recipe#replace_ingredient">Nahradit</button><br>
     {% endif %}
 
     {% if ingredient.has_with_same_name %}
-      <span>Máte se stejným jménem! - {{ingredient.with_same_name}}</span>      
+      <span>Máte se stejným jménem! - <a href="{{ url_for('IngredientsView:show', id=ingredient.first_with_same_name.id)}}">{{ingredient.first_with_same_name.name}}</a></span>
+      <button class="btn" data-id="{{ ingredient.first_with_same_name.id }}" data-action="click->new-recipe#replace_ingredient">Nahradit</button><br>      
     {% endif %}
 
   </td>

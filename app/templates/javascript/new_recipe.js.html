@@ -60,6 +60,18 @@
         else {this.add_ingredient_by_id(this.selectTarget.value);}
       }
 
+      replace_ingredient(event){
+        var old_ingredient_id = event.target.parentNode.parentNode.dataset.id
+        var new_ingredient_id = event.target.dataset.id
+
+        this.replace_ingredient_by_ids(old_ingredient_id, new_ingredient_id)
+      }
+
+      replace_ingredient_by_ids(old_ingredient_id, new_ingredient_id){
+        this.remove_ingredient_by_id(old_ingredient_id)
+        this.add_ingredient_by_id(new_ingredient_id)
+      }
+
       _set_main_ingredient_if_missing(){
         if (this._get_main_ingredient_from_table(this.ingredientTableTarget) != null){
           return true;
@@ -99,8 +111,11 @@
       }
 
       remove_ingredient(event){
-        var id = event.target.dataset.id
-        var rows = this._get_ingredient_rows_by_id(id, this.ingredientTableTarget);
+        this.remove_ingredient_by_id(event.target.dataset.id)
+      }
+
+      remove_ingredient_by_id(ingredient_id){
+        var rows = this._get_ingredient_rows_by_id(ingredient_id, this.ingredientTableTarget);
         for (let i = 0, row; row = rows[i]; i++) {
           row.remove();
         }
@@ -141,7 +156,6 @@
             rows.push(row);
           }
         }
-        // else
         return rows;
       }
 
