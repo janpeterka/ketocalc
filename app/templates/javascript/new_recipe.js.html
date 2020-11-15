@@ -187,7 +187,8 @@
         if (variable_count == 2 && main_count == 1){
           var main_ingredient = this._get_main_ingredient(selected_ingredients)
           if (!(main_ingredient === null)){
-              main_ingredient.removeAttribute("data-main");
+            this._get_ingredient_row_by_id(main_ingredient.id, this.ingredientTableTarget).removeAttribute("data-main");
+              // main_ingredient.removeAttribute("data-main");
               main_count--;
               variable_count++;
           }
