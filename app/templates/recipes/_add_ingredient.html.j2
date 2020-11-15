@@ -34,7 +34,7 @@
 
       {% if ingredient.has_with_same_name and ingredient.first_with_same_name != ingredient.first_similar %}
         <span>Máte se stejným jménem! - <a href="{{ url_for('IngredientsView:show', id=ingredient.first_with_same_name.id)}}">{{ingredient.first_with_same_name.name}}</a></span>
-        <button class="btn" data-id="{{ ingredient.first_with_same_name.id }}" data-action="click->new-recipe#replace_ingredient">Nahradit</button><br>      
+        <button class="btn" data-id="{{ ingredient.first_with_same_name.id }}" data-action="click->new-recipe#replace_ingredient">Nahradit</button><br>
       {% endif %}
     {% endif %}
 

@@ -103,7 +103,7 @@
           this._set_main_ingredient(this._get_currently_selected()[0].id);
         }
         else {
-          for (let i = 1, row; row = this.ingredientTableTarget.rows[i]; i++) {
+          for (let i = 0, row; row = this.ingredientTableTarget.rows[i]; i++) {
             if (row.dataset.fixed != "true"){
               this._set_main_ingredient(row.dataset.id);
               return true;
@@ -202,8 +202,8 @@
       _get_ingredients_from_table(table){
         var ingredients = [];
 
-        for (let i = 1, row; row = table.rows[i]; i++) {
-          if ("id" in row.dataset){
+        for (let i = 0, row; row = table.rows[i]; i++) {
+          if ("id" in row.dataset && !("info" in row.dataset)){
             let ingredient = this._row_to_ingredient(row)
             ingredients.push(ingredient);
           }
