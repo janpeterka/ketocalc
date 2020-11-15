@@ -25,3 +25,15 @@ class IndexView(FlaskView):
     @route("kalkulacka/")
     def simple_calculator(self):
         return redirect(url_for("SimpleCalculatorView:index"))
+
+    @route("terms")
+    def terms(self):
+        return redirect(url_for("SupportView:terms"))
+
+    @route("privacy")
+    def privacy(self):
+        return redirect(url_for("SupportView:privacy"))
+
+    @route("uptime")
+    def uptime(self):
+        return "OK"
