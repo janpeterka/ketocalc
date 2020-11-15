@@ -45,10 +45,10 @@
             headers: {'Content-Type': 'application/json,charset=UTF-8'}}
           ).then((response) => { return response.json(); }
           ).then((response) => {
+            // this.replace_ingredient(ingredient_id, response['ingredient_id'])
             $(this.ingredientTableTarget).append(response['template_data']);
             this._set_main_ingredient_if_missing();
             this._refresh_select();
-            
             this.recipe__hideAll();
           });
       }
@@ -58,6 +58,25 @@
 
         if (this.selectTarget.value == false){return false;}
         else {this.add_ingredient_by_id(this.selectTarget.value);}
+      }
+
+      copy_ingredient(event){
+        var old_ingredient_id = event.target.dataset.id
+
+        // create copy of ingredient (AJAX), get back new id
+        fetch("{{ url_for('IngredientsView:duplicateAJAX') }}", {
+          method: 'POST',
+          body: JSON.stringify({
+            'ingredient_id' : old_ingredient_id,
+          }),
+          headers: {'Content-Type': 'application/json,charset=UTF-8'},}
+        ).then((response) => { return response.json(); }
+        ).then((response) => {
+          this.replace_ingredient_by_ids(old_ingredient_id, response['ingredient_id'])
+          this._set_main_ingredient_if_missing();
+          this._refresh_select();
+          this.recipe__hideAll();
+          });
       }
 
       replace_ingredient(event){
@@ -230,9 +249,8 @@
           var main_ingredient = this._get_main_ingredient(selected_ingredients)
           if (!(main_ingredient === null)){
             this._get_ingredient_row_by_id(main_ingredient.id, this.ingredientTableTarget).removeAttribute("data-main");
-              // main_ingredient.removeAttribute("data-main");
-              main_count--;
-              variable_count++;
+            main_count--;
+            variable_count++;
           }
         }
 

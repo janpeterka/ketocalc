@@ -69,6 +69,8 @@ def log_request_start():
 
 @application.teardown_request
 def log_request(exception=None):
+    if application.config["APP_STATE"] == "development":
+        return
     db.session.expire_all()
     pattern = re.compile("/static/")
     if not pattern.search(request.path):

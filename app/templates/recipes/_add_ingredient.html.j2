@@ -1,10 +1,10 @@
 <tr data-id="{{ ingredient.id }}" data-name="{{ ingredient.name }}">
-    
   <td>{{ ingredient.name }}</td>
   <td>{{ ingredient.calorie }}</td>
   <td>{{ ingredient.protein }}</td>
   <td>{{ ingredient.fat }}</td>
   <td>{{ ingredient.sugar }}</td>
+  {% if ingredient.author_user == current_user %}
   <td>
     <i data-action="click->new-recipe#set_main_ingredient" data-id="{{ ingredient.id }}"
     class="set_main fas fa-hospital-symbol"></i>
@@ -13,27 +13,29 @@
     <i data-action="click->new-recipe#remove_ingredient" data-id="{{ ingredient.id }}"
     class="remove fa fa-times"></i>
   </td>
+  {% endif %}
 </tr>
 
 {% if ingredient.author_user != current_user %}
 <tr data-info="true" data-id="{{ ingredient.id }}" name="infos for copying">
   <td colspan="6">
-    Cizí surovina
-    <button class="btn" data-id="{{ ingredient.id }}"data-action="click->new-recipe#copy_ingredient">Zkopírovat</button><br>
+    Cizí surovina<br>
     {# {{ingredient.author_user.username}} | {{current_user.username}} #}
     {% if ingredient.has_same %}
-      <span>Máte stejnou! - <a href="{{ url_for('IngredientsView:show', id=ingredient.first_same.id)}}">{{ ingredient.first_same.name }}</a></span><br>
-      <button class="btn" data-id="{{ ingredient.first_same.id }}" data-action="click->new-recipe#replace_ingredient">Nahradit</button>
-    {% endif %}
+      <span>Máte stejnou! - <a href="{{ url_for('IngredientsView:show', id=ingredient.first_same.id)}}">{{ ingredient.first_same.name }}</a></span>
+      <button class="btn" data-id="{{ ingredient.first_same.id }}" data-action="click->new-recipe#replace_ingredient">Nahradit</button><br>
+    {% else %}
+      <button class="btn" data-id="{{ ingredient.id }}"data-action="click->new-recipe#copy_ingredient">Zkopírovat</button><br>
 
-    {% if ingredient.has_similar %}
-      <span>Máte podobné! - <a href="{{ url_for('IngredientsView:show', id=ingredient.first_similar.id)}}">{{ ingredient.first_similar.name }}</a></span>
-      <button class="btn" data-id="{{ ingredient.first_similar.id }}" data-action="click->new-recipe#replace_ingredient">Nahradit</button><br>
-    {% endif %}
+      {% if ingredient.has_similar %}
+        <span>Máte podobnou! - <a href="{{ url_for('IngredientsView:show', id=ingredient.first_similar.id)}}">{{ ingredient.first_similar.name }}</a></span>
+        <button class="btn" data-id="{{ ingredient.first_similar.id }}" data-action="click->new-recipe#replace_ingredient">Nahradit</button><br>
+      {% endif %}
 
-    {% if ingredient.has_with_same_name %}
-      <span>Máte se stejným jménem! - <a href="{{ url_for('IngredientsView:show', id=ingredient.first_with_same_name.id)}}">{{ingredient.first_with_same_name.name}}</a></span>
-      <button class="btn" data-id="{{ ingredient.first_with_same_name.id }}" data-action="click->new-recipe#replace_ingredient">Nahradit</button><br>      
+      {% if ingredient.has_with_same_name and ingredient.first_with_same_name != ingredient.first_similar %}
+        <span>Máte se stejným jménem! - <a href="{{ url_for('IngredientsView:show', id=ingredient.first_with_same_name.id)}}">{{ingredient.first_with_same_name.name}}</a></span>
+        <button class="btn" data-id="{{ ingredient.first_with_same_name.id }}" data-action="click->new-recipe#replace_ingredient">Nahradit</button><br>      
+      {% endif %}
     {% endif %}
 
   </td>

@@ -1,4 +1,4 @@
-from flask import abort, flash, request, redirect, url_for
+from flask import abort, flash, request, redirect, url_for, jsonify
 from flask import render_template as template
 
 from flask_classful import route
@@ -67,6 +67,13 @@ class IngredientsView(ExtendedFlaskView):
         else:
             flash("Nepodařilo se vytvořit surovinu", "error")
             return redirect(url_for("IngredientsView:new"))
+
+    @route("duplicateAJAX", methods=["POST"])
+    def duplicateAJAX(self):
+        new_ingredient = Ingredient.load(request.json["ingredient_id"]).duplicate()
+        new_ingredient.save()
+        result = {"ingredient_id": new_ingredient.id}
+        return jsonify(result)
 
     @route("edit/<id>", methods=["POST"])
     def post_edit(self, id):

@@ -2,7 +2,7 @@ import datetime
 
 from unidecode import unidecode
 
-from sqlalchemy import and_, or_
+from sqlalchemy import and_
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from flask_login import current_user
@@ -99,6 +99,35 @@ class Ingredient(db.Model, ItemMixin):
         if "max" in json_ing and len(json_ing["max"]) > 0:
             self.max = float(json_ing["max"])
 
+    def duplicate(self, user=None):
+        if not user:
+            user = current_user
+        # check if same doesn't already exist
+        user_ingredients = Ingredient.load_all_by_author(user)
+        name_ingredients = Ingredient.load_all_by_name(self.name)
+        intersections = list(set(user_ingredients) & set(name_ingredients))
+        if intersections:
+            for intersection in intersections:
+                if (
+                    intersection.calorie == self.calorie
+                    and intersection.sugar == self.sugar
+                    and intersection.fat == self.fat
+                    and intersection.protein == self.protein
+                ):
+                    return intersection
+
+        new_ingredient = Ingredient()
+
+        new_ingredient.name = self.name
+        new_ingredient.calorie = self.calorie
+        new_ingredient.sugar = self.sugar
+        new_ingredient.fat = self.fat
+        new_ingredient.protein = self.protein
+
+        new_ingredient.author = user.username
+
+        return new_ingredient
+
     def is_author(self, user) -> bool:
         return self.author_user == user
 
@@ -126,40 +155,15 @@ class Ingredient(db.Model, ItemMixin):
         return self.with_same_name[0] if self.with_same_name else None
 
     def load_similar(self, delta=0.05):
+        from sqlalchemy.sql import func
+
         ingredients = (
             # TODO - nějak zprovoznit ABS
             Ingredient.query.filter(
                 and_(
-                    or_(
-                        and_(
-                            Ingredient.sugar - self.sugar >= 0,
-                            Ingredient.sugar - self.sugar <= delta,
-                        ),
-                        and_(
-                            self.sugar - Ingredient.sugar >= 0,
-                            self.sugar - Ingredient.sugar <= delta,
-                        ),
-                    ),
-                    or_(
-                        and_(
-                            Ingredient.protein - self.protein >= 0,
-                            Ingredient.protein - self.protein <= delta,
-                        ),
-                        and_(
-                            self.protein - Ingredient.protein >= 0,
-                            self.protein - Ingredient.protein <= delta,
-                        ),
-                    ),
-                    or_(
-                        and_(
-                            Ingredient.fat - self.fat >= 0,
-                            Ingredient.fat - self.fat <= delta,
-                        ),
-                        and_(
-                            self.fat - Ingredient.fat >= 0,
-                            self.fat - Ingredient.fat <= delta,
-                        ),
-                    ),
+                    func.abs(Ingredient.sugar - self.sugar) <= delta,
+                    func.abs(Ingredient.protein - self.protein) <= delta,
+                    func.abs(Ingredient.fat - self.fat) <= delta,
                 )
             )
             .filter(Ingredient.is_current_user_author)
@@ -168,28 +172,29 @@ class Ingredient(db.Model, ItemMixin):
         return ingredients
 
     @property
-    def has_similar(self) -> bool:
-        return len(self.load_similar()) > 0
-
-    @property
     def similar(self) -> list:
         return self.load_similar()
+
+    @property
+    def has_similar(self) -> bool:
+        return len(self.similar) > 0
 
     @property
     def first_similar(self):
         return self.similar[0] if self.similar else None
 
     @property
-    def has_same(self) -> bool:
-        return len(self.load_similar(delta=0)) > 0
-
-    @property
     def same(self) -> list:
-        return self.load_similar(delta=0)
+        # TODO: z nějakého důvodu u některých surovin nefunguje s nulou (u některých ano).
+        return self.load_similar(delta=0.000001)
 
     @property
     def first_same(self):
         return self.same[0] if self.same else None
+
+    @property
+    def has_same(self) -> bool:
+        return len(self.same) > 0
 
     # PERMISSIONS
 

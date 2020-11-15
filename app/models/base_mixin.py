@@ -33,6 +33,10 @@ class BaseMixin(object):
         return cls.query.all()[-1]
 
     @classmethod
+    def load_all_by_name(cls, name):
+        return cls.query.filter_by(name=name).all()
+
+    @classmethod
     def load_by_name(cls, name):
         return cls.query.filter_by(name=name).first()
 
