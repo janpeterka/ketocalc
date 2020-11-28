@@ -30,12 +30,34 @@
       <button class="btn" data-id="{{ ingredient.id }}"data-action="click->new-recipe#copy_ingredient">Zkopírovat</button><br>
 
       {% if ingredient.has_similar %}
-        <span>Máte podobnou! - <a href="{{ url_for('IngredientsView:show', id=ingredient.first_similar.id)}}">{{ ingredient.first_similar.name }}</a></span>
+        <span>Máte podobnou! -
+          <a href="{{ url_for('IngredientsView:show', id=ingredient.first_similar.id)}}"
+             data-toggle="tooltip"
+             title="Tato surovina má jiné nutriční hodnoty.
+              Bílkoviny: {{ ingredient.first_with_same_name.protein }}
+              Tuky: {{ ingredient.first_with_same_name.fat }}
+              Sacharidy: {{ ingredient.first_with_same_name.sugar }}"
+          >
+            {{ ingredient.first_similar.name }}
+            <i class="fa fa-exclamation-circle"></i>
+          </a>
+        </span>
         <button class="btn" data-id="{{ ingredient.first_similar.id }}" data-action="click->new-recipe#replace_ingredient">Nahradit</button><br>
       {% endif %}
 
       {% if ingredient.has_with_same_name and ingredient.first_with_same_name != ingredient.first_similar %}
-        <span>Máte se stejným jménem! - <a href="{{ url_for('IngredientsView:show', id=ingredient.first_with_same_name.id)}}">{{ingredient.first_with_same_name.name}}</a></span>
+        <span>Máte se stejným jménem! -
+          <a href="{{ url_for('IngredientsView:show', id=ingredient.first_with_same_name.id)}}"
+             data-toggle="tooltip"
+             title="Tato surovina má jiné nutriční hodnoty.
+              Bílkoviny: {{ ingredient.first_with_same_name.protein }}
+              Tuky: {{ ingredient.first_with_same_name.fat }}
+              Sacharidy: {{ ingredient.first_with_same_name.sugar }}"
+          >
+             {{ingredient.first_with_same_name.name}}
+             <i class="fa fa-exclamation-circle"></i>
+          </a>
+        </span>
         <button class="btn" data-id="{{ ingredient.first_with_same_name.id }}" data-action="click->new-recipe#replace_ingredient">Nahradit</button><br>
       {% endif %}
     {% endif %}
