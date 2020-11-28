@@ -51,13 +51,13 @@ def db_fill_calc():
         sugar=12.2,
         fat=0.1,
         protein=1.1,
-        author="test",
+        author="calc",
     ).save()
     Ingredient(
-        name="Česnek", calorie=366, sugar=21.8, fat=0.2, protein=5.4, author="test"
+        name="Česnek", calorie=366, sugar=21.8, fat=0.2, protein=5.4, author="calc"
     ).save()
     Ingredient(
-        name="Cuketa", calorie=57, sugar=1.8, fat=0.1, protein=0.8, author="test"
+        name="Cuketa", calorie=57, sugar=1.8, fat=0.1, protein=0.8, author="calc"
     ).save()
     Ingredient(
         name="Filé z Aljašky",
@@ -65,10 +65,10 @@ def db_fill_calc():
         sugar=0,
         fat=2.76,
         protein=14.7,
-        author="test",
+        author="calc",
     ).save()
     Ingredient(
-        name="Kurkuma", calorie=1435, sugar=65.9, fat=2.5, protein=10.8, author="test"
+        name="Kurkuma", calorie=1435, sugar=65.9, fat=2.5, protein=10.8, author="calc"
     ).save()
     Ingredient(
         name="Máslo výběrové",
@@ -76,10 +76,10 @@ def db_fill_calc():
         sugar=0.6,
         fat=82,
         protein=0.7,
-        author="test",
+        author="calc",
     ).save()
     Ingredient(
-        name="Okurka salátová", calorie=54, sugar=2.1, fat=0.2, protein=1, author="test"
+        name="Okurka salátová", calorie=54, sugar=2.1, fat=0.2, protein=1, author="calc"
     ).save()
     # for do_register add_default_ingredients confirmation
     Ingredient(
@@ -89,6 +89,8 @@ def db_fill_calc():
         fat=0.2,
         protein=1,
         author="default",
+        is_shared=True,
+        is_approved=True,
     ).save()
     Ingredient(
         name="Okurka defaultová",
@@ -97,6 +99,8 @@ def db_fill_calc():
         fat=0.2,
         protein=1,
         author="default",
+        is_shared=True,
+        is_approved=True,
     ).save()
     Ingredient(
         name="Okurka salátová",
@@ -105,4 +109,6 @@ def db_fill_calc():
         fat=100,
         protein=1,
         author="default",
+        is_shared=True,
+        is_approved=True,
     ).save()

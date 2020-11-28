@@ -12,7 +12,15 @@ def create_user(username="test", password="testtest"):
     return user
 
 
-def test_with_authenticated_user(app):
+def test_with_authenticated_user(app, username=None):
     @app.login_manager.request_loader
-    def load_user_from_request(request):
-        return User.query.first()
+    def load_user_from_request(request, username=username):
+        if not username:
+            user = User.query.first()
+        else:
+            user = User.load_by_username(username)
+
+        if user is None:
+            assert False
+        else:
+            return user
