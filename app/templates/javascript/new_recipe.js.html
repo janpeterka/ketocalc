@@ -121,7 +121,7 @@
       
       _set_main_ingredient(id){
         for (let i = 0, row; row = this.ingredientTableTarget.rows[i]; i++) {
-            row.removeAttribute("data-main");
+          row.removeAttribute("data-main");
         }
 
         var row = this._get_ingredient_row_by_id(id, this.ingredientTableTarget);
