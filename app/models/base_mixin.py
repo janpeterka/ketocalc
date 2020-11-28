@@ -135,6 +135,10 @@ class BaseMixin(object):
             return False
             # raise AttributeError("No 'author' attribute.")
 
+    @property
+    def is_current_user_author(self) -> bool:
+        return self.is_author(current_user)
+
     # PROPERTIES
 
     @hybrid_property

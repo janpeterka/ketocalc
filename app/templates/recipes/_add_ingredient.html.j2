@@ -1,10 +1,10 @@
-<tr data-id="{{ ingredient.id }}" data-name="{{ ingredient.name }}" {% if ingredient.author_user != current_user %}data-unusable="true"{% endif %}>
+<tr data-id="{{ ingredient.id }}" data-name="{{ ingredient.name }}" {% if ingredient.can_current_user_copy %}data-unusable="true"{% endif %}>
   <td>{{ ingredient.name }}</td>
   <td>{{ ingredient.calorie }}</td>
   <td>{{ ingredient.protein }}</td>
   <td>{{ ingredient.fat }}</td>
   <td>{{ ingredient.sugar }}</td>
-  {% if ingredient.author_user == current_user %}
+  {% if ingredient.is_current_user_author %}
   <td>
     <i data-action="click->new-recipe#set_main_ingredient" data-id="{{ ingredient.id }}"
     class="set_main fas fa-hospital-symbol"></i>
@@ -20,7 +20,7 @@
   {% endif %}
 </tr>
 
-{% if ingredient.author_user != current_user %}
+{% if ingredient.can_current_user_copy %}
 <tr data-info="true" data-id="{{ ingredient.id }}" name="infos for copying">
   <td colspan="6">
     {% if ingredient.has_same %}

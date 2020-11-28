@@ -137,7 +137,6 @@ class Ingredient(db.Model, ItemMixin):
     @property
     def with_same_name(self) -> list:
         return self.load_with_same_name()
-        # return [x.name for x in self.load_with_same_name()]
 
     @property
     def first_with_same_name(self) -> list:
@@ -147,7 +146,6 @@ class Ingredient(db.Model, ItemMixin):
         from sqlalchemy.sql import func
 
         ingredients = (
-            # TODO - nějak zprovoznit ABS
             Ingredient.query.filter(
                 and_(
                     func.abs(Ingredient.sugar - self.sugar) <= delta,
