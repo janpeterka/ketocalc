@@ -186,6 +186,8 @@
         // optional
         ingredient['main'] = row.dataset.main
         ingredient['fixed'] = row.dataset.fixed
+        ingredient['unusable'] = row.dataset.unusable
+        
         ingredient['amount'] = row.dataset.amount
 
         return ingredient
@@ -240,6 +242,12 @@
 
         var selected_ingredients = this._get_currently_selected()
 
+        var unusable_count = selected_ingredients.filter((x) => x.unusable).length
+        if (unusable_count > 0){
+          bootbox.alert("Pokoušíte se o výpočet receptu s cizími surovinami.<br> Nejdříve je vyměňte za vlastní, nebo vytvořte jejich kopie.")
+          this._hide_loader()
+          return false;
+        }
         var main_count = selected_ingredients.filter((x) => x.main).length
         var fixed_count = selected_ingredients.filter((x) => x.fixed).length
         var variable_count = selected_ingredients.length - (main_count + fixed_count)
@@ -307,15 +315,26 @@
           headers: {'Content-Type': 'application/json,charset=UTF-8'},
         })
         .then((response) => {
-          if (!response.ok || response.status == 204) {
+          if (response.status == 403) {
+            return 403;
+          } else if (response.status == 204){
+            return 204
+          }
+          else if (!response.ok) {
             return null;
           }
           return response.json();
         })
         .then((response) => {
-          if (response == null){
-              this.recipe__wrong__show();
-              return;
+          if (response == 403) {
+            this.recipe__wrong__show("Tuto surovinu nemůžete použít.");
+            return;
+          } else if(response == 204){
+            this.recipe__wrong__show("Recept nelze vytvořit.");
+            return;
+          } else if (response == null){
+            this.recipe__wrong__show("Někde se stala chyba!");
+            return;
           }
 
           this.recipeTarget.innerHTML = response.template_data
@@ -355,8 +374,9 @@
         $(this.wrongRecipeTarget).hide();
       }
 
-      recipe__wrong__show(){
+      recipe__wrong__show(message){
         $(this.recipeTarget).hide();
+        this.wrongRecipeTarget.getElementsByTagName('span')[0].innerHTML = message;
         $(this.wrongRecipeTarget).show();
         $(this.loaderTarget).hide();
       }

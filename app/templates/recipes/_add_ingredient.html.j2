@@ -1,4 +1,4 @@
-<tr data-id="{{ ingredient.id }}" data-name="{{ ingredient.name }}">
+<tr data-id="{{ ingredient.id }}" data-name="{{ ingredient.name }}" {% if ingredient.author_user != current_user %}data-unusable="true"{% endif %}>
   <td>{{ ingredient.name }}</td>
   <td>{{ ingredient.calorie }}</td>
   <td>{{ ingredient.protein }}</td>
@@ -12,6 +12,10 @@
     class="set_fixed fas fa-thumbtack"></i>
     <i data-action="click->new-recipe#remove_ingredient" data-id="{{ ingredient.id }}"
     class="remove fa fa-times"></i>
+  </td>
+  {% else %}
+    <td data-toggle="tooltip" title="Tuto surovinu nemůžete použít, protože ji vytvořil jiný uživatel. Můžete ji zkopírovat do vlastních surovin, nebo ji nahradit vlastní.">
+    <i class="fa fa-info-circle"></i>
   </td>
   {% endif %}
 </tr>

@@ -48,13 +48,15 @@ class BaseRecipesView(FlaskView):
         ingredients = []
         for json_i in json_ingredients:
             ingredient = Ingredient.load(json_i["id"])
+            if not ingredient.can_current_user_add:
+                return ("Tuto surovinu nemůžete použít", 403)
             ingredient.fill_from_json(json_i)
             ingredients.append(ingredient)
 
         try:
             result = calculations.calculate_recipe(ingredients, diet)
         except ValueError:
-            return ("", 204)
+            return ("Recept nelze vytvořit", 204)
 
         ingredients = result["ingredients"]
         totals = result["totals"]
