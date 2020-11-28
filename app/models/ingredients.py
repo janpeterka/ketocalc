@@ -99,23 +99,7 @@ class Ingredient(db.Model, ItemMixin):
         if "max" in json_ing and len(json_ing["max"]) > 0:
             self.max = float(json_ing["max"])
 
-    def duplicate(self, user=None):
-        if not user:
-            user = current_user
-        # check if same doesn't already exist
-        user_ingredients = Ingredient.load_all_by_author(user)
-        name_ingredients = Ingredient.load_all_by_name(self.name)
-        intersections = list(set(user_ingredients) & set(name_ingredients))
-        if intersections:
-            for intersection in intersections:
-                if (
-                    intersection.calorie == self.calorie
-                    and intersection.sugar == self.sugar
-                    and intersection.fat == self.fat
-                    and intersection.protein == self.protein
-                ):
-                    return intersection
-
+    def duplicate(self):
         new_ingredient = Ingredient()
 
         new_ingredient.name = self.name
@@ -123,10 +107,15 @@ class Ingredient(db.Model, ItemMixin):
         new_ingredient.sugar = self.sugar
         new_ingredient.fat = self.fat
         new_ingredient.protein = self.protein
+        new_ingredient.author = current_user.username
 
-        new_ingredient.author = user.username
-
-        return new_ingredient
+        # check if same doesn't already exist
+        if new_ingredient.has_same:
+            same_ingredient = new_ingredient.first_same
+            del new_ingredient
+            return same_ingredient
+        else:
+            return new_ingredient
 
     def is_author(self, user) -> bool:
         return self.author_user == user
