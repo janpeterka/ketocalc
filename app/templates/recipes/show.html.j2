@@ -119,11 +119,18 @@
                     {% endif %}
                 </form>
             </div>
-            {% if current_user.is_admin %}
-                <div class="admin-field"><a class="btn btn-info" href="{{ url_for('RecipesView:new', preset_ingredient_ids=recipe_ingredient_ids_list(recipe)) }}">Exportovat</a></div>
             {% endif %}
+            
+            <div class="mt-2">
+                <a class="btn btn-info" href="{{ url_for('RecipesView:new', preset_ingredient_ids=recipe_ingredient_ids_list(recipe)) }}">
+                    {% if recipe.is_current_user_author %}
+                        Převést do jiné diety
+                    {% else %}
+                        Převést do mých receptů
+                    {% endif %}
+                </a>
+            </div>
 
-            {% endif %}
         </div>
         
         {% if not is_print %}
