@@ -28,11 +28,7 @@ class RecipesView(BaseRecipesView):
 
             if self.recipe is None:
                 abort(404)
-            if not (
-                current_user.username == self.recipe.author.username
-                or current_user.is_admin
-                or self.recipe.public
-            ):
+            if not self.recipe.can_current_user_show:
                 abort(403)
 
     def index(self):
@@ -43,11 +39,12 @@ class RecipesView(BaseRecipesView):
         ingredients = Ingredient.load_all_by_author(current_user.username)
         shared_ingredients = Ingredient.load_all_shared(renamed=True)
 
-        # TODO - this couses duplication for admin. shouldn't be problem for users.
+        # TODO - this causes duplication for admin. shouldn't be problem for users.
         all_ingredients = ingredients + shared_ingredients
         return template(
             "recipes/new.html.j2",
             ingredients=all_ingredients,
+            preset_ingredients=request.args.get("preset_ingredient_ids", []),
             diets=active_diets,
             is_trialrecipe=False,
         )

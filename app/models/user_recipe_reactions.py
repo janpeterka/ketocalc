@@ -19,20 +19,19 @@ class UserRecipeReactions(db.Model, BaseMixin):
     recipe = db.relationship("Recipe", backref="reactions")
     user = db.relationship("User", backref="reactions")
 
+    # LOADERS
+
+    @staticmethod
+    def load_by_recipe(recipe):
+        return UserRecipeReactions.load_by_attribute("recipe_id", recipe.id)
+
     @staticmethod
     def load_by_recipe_and_user(recipe, user):
-        reactions = (
-            db.session.query(UserRecipeReactions)
-            .filter(UserRecipeReactions.recipe_id == recipe.id)
-            .filter(UserRecipeReactions.user_id == user.id)
-            .first()
-        )
+        reactions = UserRecipeReactions.query.filter_by(
+            recipe_id=recipe.id, user_id=user.id
+        ).first()
         return reactions
 
     @staticmethod
     def load_by_recipe_and_current_user(recipe):
         return UserRecipeReactions.load_by_recipe_and_user(recipe, current_user)
-
-    @staticmethod
-    def load_by_recipe(recipe):
-        return UserRecipeReactions.load_by_attribute("recipe_id", recipe.id)

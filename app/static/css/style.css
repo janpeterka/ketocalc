@@ -38,6 +38,9 @@ form ul.errors li.warning{
 [data-fixed="true"] {
   background-color: var(--color-grey);
 }
+[data-unusable="true"] {
+  background-color: var(--palette-orange);
+}
 
 .loader_circular {
   display: none;

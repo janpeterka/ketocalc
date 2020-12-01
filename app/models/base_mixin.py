@@ -17,31 +17,35 @@ class BaseMixin(object):
         for kwarg in kwargs:
             setattr(self, kwarg.key, kwarg.value)
 
-    # LOADING
+    # LOADERS
 
     @classmethod
     def load(cls, *args, **kwargs):
         object_id = kwargs.get("id", args[0])
-        return db.session.query(cls).filter_by(id=object_id).first()
+        return cls.query.filter_by(id=object_id).first()
 
     @classmethod
     def load_all(cls):
-        return db.session.query(cls).all()
+        return cls.query.all()
 
     @classmethod
     def load_last(cls):
-        return db.session.query(cls).all()[-1]
+        return cls.query.all()[-1]
+
+    @classmethod
+    def load_all_by_name(cls, name):
+        return cls.query.filter_by(name=name).all()
 
     @classmethod
     def load_by_name(cls, name):
-        return db.session.query(cls).filter_by(name=name).first()
+        return cls.query.filter_by(name=name).first()
 
     @classmethod
     def load_by_attribute(cls, attribute, value):
         if not hasattr(cls, attribute):
             raise AttributeError
 
-        return db.session.query(cls).filter_by(**{attribute: value}).all()
+        return cls.query.filter_by(**{attribute: value}).all()
 
     @classmethod
     def load_first_by_attribute(cls, attribute, value):
@@ -62,7 +66,7 @@ class BaseMixin(object):
         else:
             raise AttributeError
 
-        return db.session.query(cls).filter(getattr(cls, attr) > date_from).all()
+        return cls.query.filter(getattr(cls, attr) > date_from).all()
 
     # DATABASE OPERATIONS
 
@@ -131,6 +135,10 @@ class BaseMixin(object):
             return False
             # raise AttributeError("No 'author' attribute.")
 
+    @property
+    def is_current_user_author(self) -> bool:
+        return self.is_author(current_user)
+
     # PROPERTIES
 
     @hybrid_property
@@ -143,7 +151,7 @@ class BaseMixin(object):
             # raise AttributeError("No 'is_shared' attribute.")
 
     @hybrid_property
-    def is_public(self):
+    def is_public(self) -> bool:
         return self.public
 
     # PERMISSIONS

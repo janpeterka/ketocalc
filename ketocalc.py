@@ -40,7 +40,13 @@ def utility_processor():
         else:
             return date.strftime("%d.%m.%Y")
 
-    return dict(human_format_date=human_format_date)
+    def recipe_ingredient_ids_list(recipe):
+        return str([i.id for i in recipe.ingredients])
+
+    return dict(
+        human_format_date=human_format_date,
+        recipe_ingredient_ids_list=recipe_ingredient_ids_list,
+    )
 
 
 @application.before_request
@@ -63,6 +69,8 @@ def log_request_start():
 
 @application.teardown_request
 def log_request(exception=None):
+    if application.config["APP_STATE"] == "development":
+        return
     db.session.expire_all()
     pattern = re.compile("/static/")
     if not pattern.search(request.path):
