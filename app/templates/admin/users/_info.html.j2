@@ -21,12 +21,12 @@
         <table id="diets" class="table">
         {% for diet in user.diets: %}
             <tr>
-                <th class='diet'><a href="{{ url_for('DietsView:show', id=diet.id) }}">{{ diet.name }}</a></th>
+                <th class='diet'>{{ link_to(diet) }}</th>
             </tr>
 
             {% for recipe in diet.recipes: %}
                 <tr>
-                    <td><a href="{{ url_for('RecipesView:show', id=recipe.id) }}">{{ recipe.name }}</a></td>
+                    <td>{{ link_to(recipe) }}</td>
                 </tr>
             {% endfor %}
         {% endfor %}       
@@ -38,7 +38,7 @@
         <table class="table">
         {% for ingredient in user.ingredients: %}
             <tr>
-                <td><a href="{{ url_for('IngredientsView:show', id=ingredient.id) }}">{{ ingredient.name }}</a></td>
+                <td>{{ link_to(ingredient) }}</td>
                 <td>{{ ingredient.calorie }}</td>
                 <td>{{ ingredient.protein }}</td>
                 <td>{{ ingredient.fat }}</td>
