@@ -26,6 +26,11 @@ class IndexView(FlaskView):
     def simple_calculator(self):
         return redirect(url_for("SimpleCalculatorView:index"))
 
+    @route("kucharka")
+    @route("kucharka/")
+    def public_cookbook(self):
+        return redirect(url_for("CookbookView:public_index"))
+
     @route("terms")
     def terms(self):
         return redirect(url_for("SupportView:terms"))

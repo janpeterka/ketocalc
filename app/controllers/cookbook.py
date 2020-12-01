@@ -1,12 +1,12 @@
 from app.models.recipes import Recipe
 
 from flask import redirect, url_for, request
+from flask import render_template as template
 
 from flask_classful import route
 
 from flask_login import current_user
 
-from app.data.texts import texts
 from .extended_flask_view import ExtendedFlaskView
 from .forms.cookbook_filter import CookbookFilterForm
 
@@ -16,8 +16,7 @@ class CookbookView(ExtendedFlaskView):
 
     def before_index(self):
         if not current_user.is_authenticated:
-            message = texts.cookbook.not_logged_in
-            return redirect(url_for("CookbookView:not_logged_in", message=message))
+            return redirect(url_for("CookbookView:public_index"))
 
         self.recipes = Recipe.public_recipes()
         # Get values for filters
@@ -66,3 +65,8 @@ class CookbookView(ExtendedFlaskView):
     @route("/", methods=["GET", "POST"])
     def index(self):
         return self.template()
+
+    @route("/public", methods=["GET", "POST"])
+    def public_index(self):
+        recipes = Recipe.public_recipes()
+        return template("cookbook/index.html.j2", public=True, recipes=recipes)
