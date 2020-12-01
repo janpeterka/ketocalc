@@ -83,9 +83,9 @@ texts = {
     # Calc
     "calc_amount": "Spočítat množství!",
     # Cookbook
-    "cookbook": {
-        "not_logged_in": "Sdílené recepty jsou přístupné pouze pro přihlášené uživatele.",
-    },
+    # "cookbook": {
+    #     "not_logged_in": "Sdílené recepty jsou přístupné pouze pro přihlášené uživatele.",
+    # },
     # Daily plan
     "daily_plan": {
         "not_logged_in": "Denní plány jsou přístupné pouze pro přihlášené uživatele.",
