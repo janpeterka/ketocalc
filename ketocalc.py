@@ -43,9 +43,16 @@ def utility_processor():
     def recipe_ingredient_ids_list(recipe):
         return str([i.id for i in recipe.ingredients])
 
+    def link_to(obj):
+        try:
+            return obj.link_to
+        except Exception:
+            raise NotImplementedError("This object link_to is not implemented")
+
     return dict(
         human_format_date=human_format_date,
         recipe_ingredient_ids_list=recipe_ingredient_ids_list,
+        link_to=link_to,
     )
 
 

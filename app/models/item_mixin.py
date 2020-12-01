@@ -31,3 +31,11 @@ class ItemMixin(BaseMixin):
             )
         ).count()
         return log_count
+
+    # CONTEXT PROCESSOR UTILITIES
+    @property
+    def link_to(self):
+        from flask import url_for
+
+        self_view_name = f"{type(self).__name__.capitalize()}sView:show"
+        return f"<a href='{url_for(self_view_name, id=self.id)}'>{self.name}</a>"

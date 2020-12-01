@@ -75,7 +75,7 @@
                         data-fat="{{ ingredient.fat }}"
                         data-sugar="{{ ingredient.sugar }}"
                         data-amount="{{ ingredient.amount }}">
-                        <td><a href="{{ url_for('IngredientsView:show', id=ingredient.id) }}">{{ ingredient.name }}</a></td>
+                        <td>{{ link_to(ingredient) }}</td>
                         <td data-type="calorie"></td>
                         <td data-type="protein"></td>
                         <td data-type="fat"></td>
