@@ -674,11 +674,11 @@
         },
         "sympy": {
             "hashes": [
-                "sha256:0f6c5724a999eca02f4b453260b0c7151d6fa076313f441274db98bbf97ba8cd",
-                "sha256:1cfadcc80506e4b793f5b088558ca1fcbeaec24cd6fc86f1fdccaa3ee1d48708"
+                "sha256:09aa4b3075e505108cb84785ba358e58a53d9596c8c71f07b613958b9150c481",
+                "sha256:9104004669cda847f38cfd8cd16dd174952c537349dbae740fea5331d2b3a51b"
             ],
             "index": "pypi",
-            "version": "==1.6.2"
+            "version": "==1.7"
         },
         "toml": {
             "hashes": [
