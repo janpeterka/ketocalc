@@ -27,7 +27,20 @@
       <span>Máte stejnou! - {{ link_to(ingredient.first_same) }}</span>
       <button class="btn" data-id="{{ ingredient.first_same.id }}" data-action="click->new-recipe#replace_ingredient">Nahradit</button><br>
     {% else %}
-      <button class="btn" data-id="{{ ingredient.id }}"data-action="click->new-recipe#copy_ingredient">Zkopírovat</button><br>
+      <button class="btn" data-id="{{ ingredient.id }}" data-action="click->new-recipe#copy_ingredient">Zkopírovat</button><br>
+
+      <details {% if not ingredient.has_similar and not ingredient.has_with_same_name %} open {% endif%}>
+      <summary>Vybrat z mých surovin</summary>
+      <div>
+        <form class="form-inline" data-action="submit->new-recipe#replace_ingredient_from_form">  
+          <select class="form-control">
+            {% for ingredient in current_user.ingredients %}
+              {{ option(ingredient) }}
+            {% endfor %}
+          </select>
+          <input type="submit" class="btn btn-primary" value="Nahradit touto surovinou" />
+      </div>
+      </details>
 
       {% if ingredient.has_similar %}
         <span>Máte podobnou! -
