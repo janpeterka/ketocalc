@@ -49,13 +49,14 @@
     	{% endif %}
 
 
-    	<table id="table" class="table" data-filter-control="true" data-toggle="table" data-search="true"  data-pagination="true">
+    	<table id="table" class="table" data-filter-control="true" data-toggle="table" data-search="true"  data-pagination="true" data-sort-name="reaction_count" data-sort-order="desc">
 		    <thead>
 		    	<th data-field="recipe">recept</th>
 		    	<th data-field="ratio" data-sortable="true">poměr receptu</th>
 		    	<th data-field="ingredients" data-sortable="true">seznam surovin</th>
 		    	<th data-field="author" data-sortable="true">autor*ka</th>
-		    	<th data-field="reactions" data-sortable="true">{{ icons.heart_full }}</th>
+		    	<th data-field="reactions" {% if current_user.is_authenticated %}data-sortable="true"{% endif %}>{{ icons.heart_full }}</th>
+          <th data-field="reaction_count" data-sortable="true">{{ icons.heart_empty }}</th>
 		    </thead>
 		    <tbody data-target="recipe-reactions.recipes" data-public="{{ not current_user.is_authenticated }}">
 		    {% for recipe in recipes: %}
@@ -71,6 +72,7 @@
 		        <td>{{ recipe.ratio }}</td>
 		        <td>{{ recipe.concat_ingredients }}</td>
 		        <td>{{ recipe.author.name }}</td>
+            <td></td>
 		        <td><span class="ml-1">{{ recipe.reactions | length }}</span></td>
 			    </tr>
 		    {% endfor %}
