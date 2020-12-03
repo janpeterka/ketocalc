@@ -268,6 +268,7 @@
 
         var unique_ingredient_ids = [...new Set(selected_ingredient_ids)];
 
+        // Remove duplicate ingredients
         if (unique_ingredient_ids.length != selected_ingredient_ids.length){
           for (let i = 0, ingredient_id; ingredient_id = unique_ingredient_ids[i]; i++) {
             this.remove_duplicate_ingredient_by_id(ingredient_id)
