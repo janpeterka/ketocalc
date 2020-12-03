@@ -16,6 +16,7 @@
 
 {% block content %}
     <div class="container" data-controller="recipe-reactions">
+    	{% if current_user.is_authenticated %}
     	<form action="{{ url_for('CookbookView:index') }}" method="post" class="form-inline form-control" accept-charset="UTF-8">
     		{{ form.csrf_token }}
    			{% from "macros/_form_element.html.j2" import render_field %}
@@ -33,8 +34,20 @@
 					{{ form.submit(class_='btn btn-primary ml-3') }}
    				</div>
    			</div>
-
     	</form>
+    	{% else %}
+      <div class="alert alert-warning" role="alert" style="font-size: 0.9rem; margin: 1rem 2rem;">
+    		Funkce prohlížení veřejných receptů je pro nepřihlášené uživatele omezená.<br>
+    		{{ link_to("login", text="Přihlaste se") }}, a budete moct:<br>
+    		<ul>
+          <li>filtrovat recepty podle diety či suroviny</li>
+    			<li>zobrazit detail receptu</li>
+    			<li>přidat recept do své sbírky receptů</li>
+    			<li>označit oblíbené recepty</li>
+    		</ul>
+    	</div>
+    	{% endif %}
+
 
     	<table id="table" class="table" data-filter-control="true" data-toggle="table" data-search="true"  data-pagination="true">
 		    <thead>
@@ -50,11 +63,15 @@
 		    		data-recipe-id="{{ recipe.id }}"
 		    		data-reaction="{{ recipe.has_reaction | lower }}"
 		    		data-reaction-count="{{ recipe.reactions | length }}">
-			        <td><a href="{{ url_for('RecipesView:show', id=recipe.id) }}">{{ recipe.name }}</a></td>
-			        <td>{{ recipe.ratio }}</td>
-			        <td>{{ recipe.concat_ingredients }}</td>
-			        <td>{{ recipe.author.name }}</td>
-			        <td><span class="ml-1">{{ recipe.reactions | length }}</span></td>
+		    		{% if not public %}
+		        	<td>{{ link_to(recipe) }}</td>
+		        {% else %}
+		        	<td>{{ recipe.name }}</td>
+		        {% endif %}
+		        <td>{{ recipe.ratio }}</td>
+		        <td>{{ recipe.concat_ingredients }}</td>
+		        <td>{{ recipe.author.name }}</td>
+		        <td><span class="ml-1">{{ recipe.reactions | length }}</span></td>
 			    </tr>
 		    {% endfor %}
 		    </tbody>

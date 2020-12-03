@@ -15,10 +15,9 @@
             <div class="col-sm-6 col-md-4">
                 <h4>Seznam receptů:</h4>
                 <ul>
-                    {% for recipe in selected_diet.recipes %}
-                        <li>
-                            <a href="{{ url_for('RecipesView:show', id=recipe.id) }}">{{ recipe.name }}</a></li>
-                    {% endfor %}
+                {% for recipe in selected_diet.recipes %}
+                    <li>{{ link_to(recipe) }}</li>
+                {% endfor %}
                 </ul>
             </div>
 
