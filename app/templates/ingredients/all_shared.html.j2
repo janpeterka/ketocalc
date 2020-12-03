@@ -23,7 +23,7 @@
                 </tr>
                 {% for ingredient in unapproved_ingredients: %}
                     <tr>
-                        <td><a href="{{ url_for('IngredientsView:show', id=ingredient.id) }}">{{ ingredient.name }}</a></td>
+                        <td>{{ link_to(ingredient) }}</td>
                         <td>{{ ingredient.calorie }}</td>
                         <td>{{ ingredient.protein }}</td>
                         <td>{{ ingredient.fat }}</td>
@@ -53,7 +53,7 @@
                 </tr>
                 {% for ingredient in shared_ingredients: %}
                     <tr>
-                        <td><a href="{{ url_for('IngredientsView:show', id=ingredient.id) }}">{{ ingredient.name }}</a></td>
+                        <td>{{ link_to(ingredient) }}</td>
                         <td>{{ ingredient.calorie }}</td>
                         <td>{{ ingredient.protein }}</td>
                         <td>{{ ingredient.fat }}</td>

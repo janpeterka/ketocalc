@@ -22,12 +22,9 @@ class DailyPlan(db.Model, BaseMixin):
 
     @staticmethod
     def load_by_date(date):
-        date_plan = (
-            db.session.query(DailyPlan)
-            .filter(DailyPlan.date == date)
-            .filter(DailyPlan.user_id == current_user.id)
-            .first()
-        )
+        date_plan = DailyPlan.query.filter_by(
+            date=date, user_id=current_user.id
+        ).first()
         return date_plan
 
     @staticmethod

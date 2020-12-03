@@ -1,17 +1,67 @@
-<tr data-id="{{ ingredient.id }}" data-name="{{ ingredient.name }}"> 
-    <td>{{ ingredient.name }}</td> 
-    <td>{{ ingredient.calorie }}</td> 
-    <td>{{ ingredient.protein }}</td> 
-    <td>{{ ingredient.fat }}</td>
-    <td>{{ ingredient.sugar }}</td>
-    <td>
-        <i data-action="click->new-recipe#set_main_ingredient" data-id="{{ ingredient.id }}"
-           class="set_main fas fa-hospital-symbol"></i>
-        
-        <i data-action="click->new-recipe#toggle_fixed_ingredient" data-id="{{ ingredient.id }}"
-           class="set_fixed fas fa-thumbtack"></i>
-
-        <i data-action="click->new-recipe#remove_ingredient" data-id="{{ ingredient.id }}"
-           class="remove fa fa-times"></i>
-    </td>
+<tr data-id="{{ ingredient.id }}" data-name="{{ ingredient.name }}" {% if ingredient.can_current_user_copy %}data-unusable="true"{% endif %}>
+  <td>{{ ingredient.name }}</td>
+  <td>{{ ingredient.calorie }}</td>
+  <td>{{ ingredient.protein }}</td>
+  <td>{{ ingredient.fat }}</td>
+  <td>{{ ingredient.sugar }}</td>
+  {% if ingredient.is_current_user_author %}
+  <td>
+    <i data-action="click->new-recipe#set_main_ingredient" data-id="{{ ingredient.id }}"
+    class="set_main fas fa-hospital-symbol"></i>
+    <i data-action="click->new-recipe#toggle_fixed_ingredient" data-id="{{ ingredient.id }}"
+    class="set_fixed fas fa-thumbtack"></i>
+    <i data-action="click->new-recipe#remove_ingredient" data-id="{{ ingredient.id }}"
+    class="remove fa fa-times"></i>
+  </td>
+  {% else %}
+    <td data-toggle="tooltip" title="Tuto surovinu nemůžete použít, protože ji vytvořil jiný uživatel. Můžete ji zkopírovat do vlastních surovin, nebo ji nahradit vlastní.">
+    <i class="fa fa-info-circle"></i>
+  </td>
+  {% endif %}
 </tr>
+
+{% if ingredient.can_current_user_copy %}
+<tr data-info="true" data-id="{{ ingredient.id }}" name="infos for copying">
+  <td colspan="6">
+    {% if ingredient.has_same %}
+      <span>Máte stejnou! - {{ link_to(ingredient.first_same) }}</span>
+      <button class="btn" data-id="{{ ingredient.first_same.id }}" data-action="click->new-recipe#replace_ingredient">Nahradit</button><br>
+    {% else %}
+      <button class="btn" data-id="{{ ingredient.id }}"data-action="click->new-recipe#copy_ingredient">Zkopírovat</button><br>
+
+      {% if ingredient.has_similar %}
+        <span>Máte podobnou! -
+          <a href="{{ url_for('IngredientsView:show', id=ingredient.first_similar.id)}}"
+             data-toggle="tooltip"
+             title="Tato surovina má jiné nutriční hodnoty.
+              Bílkoviny: {{ ingredient.first_with_same_name.protein }}
+              Tuky: {{ ingredient.first_with_same_name.fat }}
+              Sacharidy: {{ ingredient.first_with_same_name.sugar }}"
+          >
+            {{ ingredient.first_similar.name }}
+            <i class="fa fa-exclamation-circle"></i>
+          </a>
+        </span>
+        <button class="btn" data-id="{{ ingredient.first_similar.id }}" data-action="click->new-recipe#replace_ingredient">Nahradit</button><br>
+      {% endif %}
+
+      {% if ingredient.has_with_same_name and ingredient.first_with_same_name != ingredient.first_similar %}
+        <span>Máte se stejným jménem! -
+          <a href="{{ url_for('IngredientsView:show', id=ingredient.first_with_same_name.id)}}"
+             data-toggle="tooltip"
+             title="Tato surovina má jiné nutriční hodnoty.
+              Bílkoviny: {{ ingredient.first_with_same_name.protein }}
+              Tuky: {{ ingredient.first_with_same_name.fat }}
+              Sacharidy: {{ ingredient.first_with_same_name.sugar }}"
+          >
+             {{ingredient.first_with_same_name.name}}
+             <i class="fa fa-exclamation-circle"></i>
+          </a>
+        </span>
+        <button class="btn" data-id="{{ ingredient.first_with_same_name.id }}" data-action="click->new-recipe#replace_ingredient">Nahradit</button><br>
+      {% endif %}
+    {% endif %}
+
+  </td>
+</tr>
+{% endif %}

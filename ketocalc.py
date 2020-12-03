@@ -4,7 +4,7 @@ import time
 
 import datetime
 
-from flask import request, redirect, session
+from flask import request, redirect, session, url_for
 from flask import g
 
 from flask_login import current_user
@@ -40,7 +40,28 @@ def utility_processor():
         else:
             return date.strftime("%d.%m.%Y")
 
-    return dict(human_format_date=human_format_date)
+    def recipe_ingredient_ids_list(recipe):
+        return str([i.id for i in recipe.ingredients])
+
+    def link_to(obj, text=None):
+        if type(obj) == str:
+            if obj == "login":
+                if text is None:
+                    text = "Přihlaste se"
+                return f"<a href='{url_for('LoginView:show')}'>{text}</a>"
+            else:
+                raise NotImplementedError("This string has no associated link_to")
+
+        try:
+            return obj.link_to
+        except Exception:
+            raise NotImplementedError("This object link_to is probably not implemented")
+
+    return dict(
+        human_format_date=human_format_date,
+        recipe_ingredient_ids_list=recipe_ingredient_ids_list,
+        link_to=link_to,
+    )
 
 
 @application.before_request
@@ -63,6 +84,8 @@ def log_request_start():
 
 @application.teardown_request
 def log_request(exception=None):
+    if application.config["APP_STATE"] == "development":
+        return
     db.session.expire_all()
     pattern = re.compile("/static/")
     if not pattern.search(request.path):

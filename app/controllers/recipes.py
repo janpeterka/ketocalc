@@ -5,8 +5,11 @@ from flask_login import login_required, current_user
 
 from flask_classful import route
 
+from app.auth import admin_required
+
 from app.models.recipes import Recipe
 from app.models.diets import Diet
+from app.models.users import User
 from app.models.ingredients import Ingredient
 from app.models.recipes_has_ingredients import RecipeHasIngredients
 
@@ -17,7 +20,7 @@ class RecipesView(BaseRecipesView):
     decorators = [login_required]
 
     @login_required
-    def before_request(self, name, id=None):
+    def before_request(self, name, id=None, **kwargs):
         g.request_item_type = "recipe"
         if id is not None:
             g.request_item_id = id
@@ -25,11 +28,7 @@ class RecipesView(BaseRecipesView):
 
             if self.recipe is None:
                 abort(404)
-            if not (
-                current_user.username == self.recipe.author.username
-                or current_user.is_admin
-                or self.recipe.public
-            ):
+            if not self.recipe.can_current_user_show:
                 abort(403)
 
     def index(self):
@@ -40,11 +39,12 @@ class RecipesView(BaseRecipesView):
         ingredients = Ingredient.load_all_by_author(current_user.username)
         shared_ingredients = Ingredient.load_all_shared(renamed=True)
 
-        # TODO - this couses duplication for admin. shouldn't be problem for users.
+        # TODO - this causes duplication for admin. shouldn't be problem for users.
         all_ingredients = ingredients + shared_ingredients
         return template(
             "recipes/new.html.j2",
             ingredients=all_ingredients,
+            preset_ingredients=request.args.get("preset_ingredient_ids", []),
             diets=active_diets,
             is_trialrecipe=False,
         )
@@ -103,6 +103,20 @@ class RecipesView(BaseRecipesView):
             recipe.is_shared = True
             recipe.save()
         flash("Všechny Vaše recepty byly zveřejněny", "success")
+        return redirect(url_for("DashboardView:index"))
+
+    @admin_required
+    @route("/make_all_recipes_public/user=<user_id>")
+    def make_all_public_for_user(self, user_id):
+        if user_id is not None:
+            user = User.load(user_id)
+        else:
+            flash("No user", "error")
+
+        for recipe in user.recipes:
+            recipe.is_shared = True
+            recipe.save()
+        flash(f"Všechny recepty uživatele {user.full_name} byly zveřejněny", "success")
         return redirect(url_for("DashboardView:index"))
 
     @route("/delete/<id>", methods=["POST"])

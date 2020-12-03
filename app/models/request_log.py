@@ -25,8 +25,6 @@ class RequestLog(db.Model, BaseMixin):
         if not hasattr(RequestLog, attribute):
             raise AttributeError
 
-        return (
-            db.session.query(RequestLog)
-            .filter(getattr(RequestLog, attribute).like(f"%{pattern}%"))
-            .all()
-        )
+        return RequestLog.query.filter(
+            getattr(RequestLog, attribute).like(f"%{pattern}%")
+        ).all()

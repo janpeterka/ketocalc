@@ -64,21 +64,13 @@ class User(db.Model, UserMixin, ItemMixin):
     @login.user_loader
     def load(user_identifier, load_type="id"):
         if load_type == "id":
-            user = db.session.query(User).filter(User.id == user_identifier).first()
+            user = User.query.filter_by(id=user_identifier).first()
         elif load_type == "username":
-            user = (
-                db.session.query(User).filter(User.username == user_identifier).first()
-            )
+            user = User.query.filter_by(username=user_identifier).first()
         elif load_type == "google_id":
-            user = (
-                db.session.query(User).filter(User.google_id == user_identifier).first()
-            )
+            user = User.query.filter_by(google_id=user_identifier).first()
         elif load_type == "new_password_token":
-            user = (
-                db.session.query(User)
-                .filter(User.new_password_token == user_identifier)
-                .first()
-            )
+            user = User.query.filter_by(new_password_token=user_identifier).first()
         else:
             return None
 
@@ -154,11 +146,7 @@ class User(db.Model, UserMixin, ItemMixin):
 
     @property
     def ingredients(self, ordered=True):
-        ingredients = (
-            db.session.query(Ingredient)
-            .filter(Ingredient.author == self.username)
-            .all()
-        )
+        ingredients = Ingredient.query.filter_by(author=self.username).all()
         if ordered:
             ingredients.sort(
                 key=lambda x: unidecode.unidecode(x.name.lower()), reverse=False
@@ -166,11 +154,11 @@ class User(db.Model, UserMixin, ItemMixin):
         return ingredients
 
     @property
-    def name(self):
+    def name(self) -> str:
         return "{} {}".format(self.first_name, self.last_name)
 
     @property
-    def full_name(self):
+    def full_name(self) -> str:
         return "{} {}".format(self.first_name, self.last_name)
 
     # LOGS
@@ -178,8 +166,7 @@ class User(db.Model, UserMixin, ItemMixin):
     @property
     def last_request(self):
         request = (
-            db.session.query(RequestLog)
-            .filter(RequestLog.user_id == self.id)
+            RequestLog.query.filter_by(user_id=self.id)
             .order_by(RequestLog.created_at.desc())
             .first()
         )
@@ -233,5 +220,5 @@ class User(db.Model, UserMixin, ItemMixin):
 
     # tohle není ideální
     @property
-    def is_admin(self):
+    def is_admin(self) -> bool:
         return self.username == "admin"

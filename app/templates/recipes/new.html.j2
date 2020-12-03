@@ -29,9 +29,10 @@
             <div class="hidden">
                 <select data-target="new-recipe.baseSelect">
                     {% for ingredient in ingredients: %}
-                        <option name='{{ingredient.name}}' value="{{ingredient.id}}">{{ingredient.name}}</option>
+                        <option name="{{ ingredient.name }}" value="{{ ingredient.id }}">{{ ingredient.name }}</option>
                     {% endfor %}
                 </select>
+                <input type="hidden" data-target="new-recipe.presetIngredientIds" value="{{ preset_ingredients|safe }}">
             </div>
 
             <div class="col-lg-6 col-md-12" >
@@ -39,7 +40,7 @@
                     <form class="form-inline" data-action="submit->new-recipe#add_ingredient">
                         <select class="form-control" id="ingredient_select" data-target="new-recipe.select">
                         {% for ingredient in ingredients: %}
-                            <option name='{{ingredient.name}}' value="{{ingredient.id}}">{{ingredient.name}}</option>
+                            <option name='{{ ingredient.name }}' value="{{ ingredient.id }}">{{ ingredient.name }}</option>
                         {% endfor %}
                         </select>
 
@@ -49,7 +50,8 @@
                 </div>
 
                 <div class="col-11">
-                    <table class="table" data-target="new-recipe.ingredientTable">
+                    <table class="table">
+                        <thead>
                         <tr>
                             <th>{{ texts.title }}</th>
                             <th>{{ texts.energy.for_100 }}</th>
@@ -58,15 +60,18 @@
                             <th>{{ texts.sugar_100}}</th>
                             <th></th>
                         </tr>
+                        </thead>
+                        <tbody data-target="new-recipe.ingredientTable">
+                        </tbody>
                     </table>
                 </div>
 
                 <div class="col-12">
                     <form class="form-inline" data-action="submit->new-recipe#calculate_recipe">
-                        <label >{{ texts.diet_name}}</label>
+                        <label >{{ texts.diet_name }}</label>
                         <select class="form-control" data-target="new-recipe.selectDiet">
                         {% for diet in diets: %}
-                            <option value="{{diet.id}}">{{ diet.name }}</option>
+                            <option value="{{ diet.id }}">{{ diet.name }}</option>
                         {% endfor %}
                         </select>
                         <input type="submit" class="btn btn-primary"  value="{{ texts.calc_amount }}" />

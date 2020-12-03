@@ -1,9 +1,9 @@
 {% extends "base.html.j2" %}
 {% block title %}
     {% if not is_print %}
-        {{ texts.recipe}}
+        {{ texts.recipe }}
     {% else %}
-        {{ texts.recipe_print}} - {{ recipe.name }}
+        {{ texts.recipe_print }} - {{ recipe.name }}
     {% endif %}
 {% endblock %}
     
@@ -40,7 +40,7 @@
                     <h2>
                         {{ recipe.name }}
                         {% if recipe.public and current_user != recipe.author %}
-                            <span class="font-italic font-weight-light">(vytvořil*a {{ recipe.author.first_name }} {{recipe.author.last_name}})</span>
+                            <span class="font-italic font-weight-light">(vytvořil*a {{ recipe.author.first_name }} {{ recipe.author.last_name }})</span>
                         {% elif recipe.public %}
                             <span class="font-italic font-weight-light">(zveřejněno)</span>
                         {% endif %}
@@ -75,7 +75,7 @@
                         data-fat="{{ ingredient.fat }}"
                         data-sugar="{{ ingredient.sugar }}"
                         data-amount="{{ ingredient.amount }}">
-                        <td><a href="{{ url_for('IngredientsView:show', id=ingredient.id) }}">{{ ingredient.name }}</a></td>
+                        <td>{{ link_to(ingredient) }}</td>
                         <td data-type="calorie"></td>
                         <td data-type="protein"></td>
                         <td data-type="fat"></td>
@@ -109,7 +109,7 @@
                 <form action="{{ url_for('RecipesView:delete', id=recipe.id) }}" method="post" class="form-inline"  accept-charset="utf-8" onsubmit="return confirm('{{ texts.recipe_delete_confirm }}');">
                     <a class="btn btn-warning" href="{{ url_for('RecipesView:edit', id=recipe.id) }}">{{ texts.edit }} {{ icons.edit }}</a>
                     <a class="btn btn-secondary" href="{{ url_for('RecipesView:print', id=recipe.id) }}" target="_blank" rel="noopener noreferrer">{{ texts.print }} {{ icons.print }}</a>
-                    <button type="submit" class="btn btn-danger">{{ texts.recipe_delete}} {{ icons.delete }}</button>
+                    <button type="submit" class="btn btn-danger">{{ texts.recipe_delete }} {{ icons.delete }}</button>
                 </form>
                 <form action="{{ url_for('RecipesView:toggle_shared', id=recipe.id) }}" method="post" accept-charset="utf-8">
                     {% if recipe.public == True %}
@@ -120,12 +120,29 @@
                 </form>
             </div>
             {% endif %}
+            
+            <div class="mt-2">
+                <a class="btn btn-info" href="{{ url_for('RecipesView:new', preset_ingredient_ids=recipe_ingredient_ids_list(recipe)) }}">
+                    {% if recipe.is_current_user_author %}
+                        Převést do jiné diety
+                    {% else %}
+                        Převést do mých receptů
+                    {% endif %}
+                </a>
+            </div>
+
         </div>
         
         {% if not is_print %}
         <div class="col-2">
+            {% from "macros/_render_image.html.j2" import render_image %}
             {% for image in recipe.images %}
-                <img style="width: 20rem; margin-bottom: 2rem" src="{{ image.url }}" alt="{{ image.name }}"/>
+                {{ render_image(image, style="width: 20rem; margin-bottom: 2rem", thumbnail=False) }}
+                {% if image.author == current_user or current_user.is_admin %}
+                    <form action="{{ url_for('FilesView:delete', id=image.id) }}" method="post">
+                        <button type="submit" class="btn btn-danger">{{ texts.image.delete }} {{ icons.delete }}</button>
+                    </form>
+                {% endif %}
             {% endfor %}
             {% if recipe.images|length == 0 and recipe.can_current_user_edit %}
                 <form {{ admin_field_class(obj=recipe) }} action="{{ url_for('RecipesView:upload_photo', id=recipe.id) }}" method="post" accept-charset="utf-8" enctype=multipart/form-data>

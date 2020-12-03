@@ -58,8 +58,8 @@ texts = {
     "recipe_save": "Uložit mezi recepty",
     "recipe_impossible": "Recept nelze vytvořit",
     "recipe_share": "Zveřejnit recept",
+    "recipe_share_all": "Zveřejnit všechny moje recepty",
     "recipe_unshare": "Zneveřejnit recept",
-    "recipe_upload_photo": "Nahrát fotku",
     "recipes": "Recepty",
     # Diet
     "diet": "Dieta",
@@ -78,12 +78,13 @@ texts = {
     "ingredient_all_shared": "Všechny sdílené suroviny",
     "ingredient_delete": "Smazat surovinu",
     "ingredient_delete_confirm": "Opravdu chcete smazat surovinu?",
+    "image": {"upload": "Nahrát foto", "delete": "Smazat foto"},
     # Calc
     "calc_amount": "Spočítat množství!",
     # Cookbook
-    "cookbook": {
-        "not_logged_in": "Sdílené recepty jsou přístupné pouze pro přihlášené uživatele.",
-    },
+    # "cookbook": {
+    #     "not_logged_in": "Sdílené recepty jsou přístupné pouze pro přihlášené uživatele.",
+    # },
     # Daily plan
     "daily_plan": {
         "not_logged_in": "Denní plány jsou přístupné pouze pro přihlášené uživatele.",

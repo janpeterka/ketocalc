@@ -12,13 +12,11 @@
         <table id="diets" class="table">
 
             {% for diet in diets: %}
-                <tr>
-                    <th class='diet'><a href="{{ url_for('DietsView:show', id=diet.id) }}">{{ diet.name }}</a></th>
-                </tr>
+                <tr><th class='diet'>{{ link_to(diet) }}</th></tr>
 
                 {% for recipe in diet.recipes: %}
                     <tr>
-                        <td><a href="{{ url_for('RecipesView:show', id=recipe.id) }}">{{ recipe.name }}</a></td>
+                        <td>{{ link_to(recipe) }}</td>
                     </tr>
                 {% endfor %}
             {% endfor %}       
@@ -31,8 +29,8 @@
             </div>
 
             <div style="margin-top: 5px">
-                <a href="{{ url_for('RecipesView:make_all_public') }}" class="btn btn-secondary">zveřejnit všechny recepty</a>
-            </div>    
+                <a href="{{ url_for('RecipesView:make_all_public') }}" class="btn btn-secondary">{{ texts.recipe_share_all }}</a>
+            </div>
         </div>
     </div>
 {% endblock %}
