@@ -12,6 +12,10 @@
     class="set_fixed fas fa-thumbtack"></i>
     <i data-action="click->new-recipe#remove_ingredient" data-id="{{ ingredient.id }}"
     class="remove fa fa-times"></i>
+    {% if (ingredient.protein + ingredient.fat + ingredient.sugar) == 0 %}
+    <i class="fa fa-exclamation-circle" data-toggle="tooltip"
+       title="Tato surovina má nulové hodnoty. Pro funkční výpočet je tedy potřeba, aby měla pevně dané množství."></i>
+    {% endif %}
   </td>
   {% else %}
     <td data-toggle="tooltip" title="Tuto surovinu nemůžete použít, protože ji vytvořil jiný uživatel. Můžete ji zkopírovat do vlastních surovin, nebo ji nahradit vlastní.">
