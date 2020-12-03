@@ -29,7 +29,7 @@
     {% else %}
       <button class="btn" data-id="{{ ingredient.id }}" data-action="click->new-recipe#copy_ingredient">Zkopírovat</button><br>
 
-      <details>
+      <details {% if not ingredient.has_similar and not ingredient.has_with_same_name %} open {% endif%}>
       <summary>Vybrat z mých surovin</summary>
       <div>
         <form class="form-inline" data-action="submit->new-recipe#replace_ingredient_from_form">  
