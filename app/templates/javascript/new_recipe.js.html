@@ -45,7 +45,6 @@
             headers: {'Content-Type': 'application/json,charset=UTF-8'}}
           ).then((response) => { return response.json(); }
           ).then((response) => {
-            // this.replace_ingredient(ingredient_id, response['ingredient_id'])
             $(this.ingredientTableTarget).append(response['template_data']);
             this._set_main_ingredient_if_missing();
             this._refresh_select();
@@ -80,8 +79,23 @@
       }
 
       replace_ingredient(event){
+        // for non-IE, this could be used instead. TODO - find out how many use IE.
+        // Also, then `replace_ingredient` and `replace_ingredient_from_form` may be possibly merged
+        // var old_ingredient_id = event.target.closest("[data-id]").dataset.id
         var old_ingredient_id = event.target.parentNode.parentNode.dataset.id
         var new_ingredient_id = event.target.dataset.id
+
+        this.replace_ingredient_by_ids(old_ingredient_id, new_ingredient_id)
+      }
+
+
+      replace_ingredient_from_form(event){
+        event.preventDefault();
+
+        // for non-IE, this could be used. TODO - find out how many use IE
+        // var old_ingredient_id = event.target.closest("[data-id]").dataset.id
+        var old_ingredient_id = event.target.parentNode.parentNode.parentNode.parentNode.dataset.id
+        var new_ingredient_id = event.target.getElementsByTagName('select')[0].value
 
         this.replace_ingredient_by_ids(old_ingredient_id, new_ingredient_id)
       }
@@ -142,6 +156,11 @@
         this._refresh_select();
         this._set_main_ingredient_if_missing();
         $(".recipe__right").hide();
+      }
+
+      remove_duplicate_ingredient_by_id(ingredient_id){
+        this.remove_ingredient_by_id(ingredient_id)
+        this.add_ingredient_by_id(ingredient_id)
       }
 
       toggle_fixed_ingredient(event){
@@ -240,7 +259,24 @@
 
         this.recipe__loader__show()
 
-        var selected_ingredients = this._get_currently_selected()
+        var selected_ingredients = this._get_currently_selected();
+
+        var selected_ingredient_ids = []
+        for (let i = 0, ingredient; ingredient = selected_ingredients[i]; i++) {
+          selected_ingredient_ids.push(ingredient.id)
+        }
+
+        var unique_ingredient_ids = [...new Set(selected_ingredient_ids)];
+
+        if (unique_ingredient_ids.length != selected_ingredient_ids.length){
+          for (let i = 0, ingredient_id; ingredient_id = unique_ingredient_ids[i]; i++) {
+            this.remove_duplicate_ingredient_by_id(ingredient_id)
+          }
+
+          bootbox.alert("Nějakou surovinu jste měli ve výběru vícekrát. Odebrali jsme ji. Zkontrolujte prosím správnost surovin")
+          this._hide_loader()
+          return false;
+        }
 
         var unusable_count = selected_ingredients.filter((x) => x.unusable).length
         if (unusable_count > 0){
