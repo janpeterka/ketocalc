@@ -20,11 +20,11 @@
 
     {% include 'javascript/stimulus.js.html' %}
     {% include 'javascript/new_recipe_controller.js.html' %}
-    {% include 'javascript/new_recipe_help.js.html' %}
+    {% include 'javascript/show_info_controller.js.html' %}
 {% endblock %}
 
 {% block content %}
-    <div class="container-fluid ml-5" data-controller="new-recipe new-recipe-help">
+    <div class="container-fluid ml-5" data-controller="new-recipe show-info">
         <div class="row">
             <div class="hidden">
                 <select data-target="new-recipe.baseSelect">
@@ -45,7 +45,7 @@
                         </select>
 
                         <input type="submit" class="btn btn-primary" value="Přidat surovinu" />
-                        <i class="help fa fa-info-circle" data-action="mouseover->new-recipe-help#show_help mouseout->new-recipe-help#hide_help"></i>
+                        <i data-target="show-info.icon"></i>
                     </form>
                 </div>
 
@@ -83,7 +83,9 @@
 
             
             <div class="col-lg-6 col-md-12">
-                <div data-target="new-recipe-help.help"></div>
+                <div data-target="show-info.info">
+                    {% include "recipes/_new_recipe_info.html.j2" %}
+                </div>
 
                 <div class="loader_circular" data-target="new-recipe.loader"></div>
 
