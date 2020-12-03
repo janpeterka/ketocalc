@@ -8,7 +8,7 @@
     {% include 'javascript/simple_calculator_controller.js.html' %}
     {% include 'javascript/show_info_controller.js.html' %}
 
-        <!-- Google Charts -->
+    <!-- Google Charts -->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
     <!-- Bootstrap slider -->
@@ -20,9 +20,7 @@
     <div class="container" data-controller="simple-calculator show-info">
         <div class="hidden">
             <select data-target="simple-calculator.baseSelect">
-                {% for ingredient in ingredients: %}
-                    <option name='{{ ingredient.name }}' value="{{ ingredient.id }}">{{ ingredient.name }}</option>
-                {% endfor %}
+                {{ options(ingredients) }}
             </select>
         </div>
 
@@ -30,9 +28,7 @@
             <div>
                 <form class="form-inline" data-action="submit->simple-calculator#add_ingredient">
                     <select class="form-control" id="ingredient_select" data-target="simple-calculator.select">
-                    {% for ingredient in ingredients: %}
-                        <option name='{{ ingredient.name }}' value="{{ ingredient.id }}">{{ ingredient.name }}</option>
-                    {% endfor %}
+                        {{ options(ingredients) }}
                     </select>
 
                     <input type="submit" class="btn btn-primary" value="Přidat surovinu" />
@@ -61,16 +57,21 @@
                         <th>{{ texts.amount_simple }}</th>
                         <th>{{ texts.ratio_full }}</th>
                     </tr>
-                    <tr data-target="simple-calculator.totals"></tr>
+                    <tr data-target="simple-calculator.totals">
+                        <td data-field="calorie"></td>
+                        <td data-field="protein"></td>
+                        <td data-field="fat"></td>
+                        <td data-field="sugar"></td>
+                        <td data-field="amount"></td>
+                        <td data-field="ratio"></td>"
+                    </tr>
                 </table>
 
                 <div class="col-12">
                     {% if current_user.is_authenticated %}
                         <form class="form-inline" data-action="submit->simple-calculator#save_recipe">
                             <select class="form-control" data-target="simple-calculator.recipeDiet">
-                            {% for diet in diets: %}
-                                <option value="{{ diet.id }}">{{ diet.name }}</option>
-                            {% endfor %}
+                                {{ options(diets) }}
                             </select>
 
                             <label>Název receptu</label>

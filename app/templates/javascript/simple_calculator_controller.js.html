@@ -130,24 +130,14 @@
     }
 
     _set_totals(totals){
-      $(this.totalsTarget).empty();
-      var html =
-        "<td>" +
-        totals["calorie"] +
-        "</td><td>" +
-        totals["protein"]+
-        "</td><td>" +
-        totals["fat"] +
-        "</td><td>" +
-        totals["sugar"] +
-        "</td><td>" +
-        totals["amount"] +
-        "</td><td> <em>" +
-        this._float_to_fixed(totals["ratio"]) + 
-        ": 1 </em></td>"
-
-      $(this.totalsTarget).append(html);
+      var fields = ["calorie", "protein", "fat", "sugar", "amount"]
+      for (let i = 0, field; field = fields[i]; i++) {
+        this.totalsTarget.querySelector('[data-field=' + field + ']').innerHTML = this._float_to_fixed(totals[field]) 
+      }
+      
+      this.totalsTarget.querySelector('[data-field="ratio"]').innerHTML = "<em>" + this._float_to_fixed(totals["ratio"]) + " : 1</em>" 
     }
+
   });
 </script>
 

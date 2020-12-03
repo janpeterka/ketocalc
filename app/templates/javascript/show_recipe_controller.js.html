@@ -102,26 +102,13 @@
       }
 
       _set_totals(totals){
-      $(this.totalsTarget).empty();
+        var fields = ["calorie", "protein", "fat", "sugar", "amount"]
+        for (let i = 0, field; field = fields[i]; i++) {
+          this.totalsTarget.querySelector('[data-field=' + field + ']').innerHTML = this._float_to_fixed(totals[field]) 
+        }
 
-      var html =
-      	"<td> Celkem " +
-        "</td><td>" +
-        this._float_to_fixed(totals["calorie"]) +
-        "</td><td>" +
-        this._float_to_fixed(totals["protein"]) +
-        "</td><td>" +
-        this._float_to_fixed(totals["fat"]) +
-        "</td><td>" +
-        this._float_to_fixed(totals["sugar"]) +
-        "</td><td>" +
-        this._float_to_fixed(totals["amount"]) +
-        "</td><td> <em>Poměr: " +
-        this._float_to_fixed(totals["ratio"]) + 
-        ": 1 </em></td>"
+        this.totalsTarget.querySelector('[data-field="ratio"]').innerHTML = "<em>" + this._float_to_fixed(totals["ratio"]) + " : 1 </em>" 
+      }
 
-      $(this.totalsTarget).append(html);
-    }
   });
-
-    </script>
+</script>
