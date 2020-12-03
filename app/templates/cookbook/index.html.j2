@@ -10,7 +10,7 @@
 
 {% block script %}
 	{% include 'javascript/stimulus.js.html' %}
-    {% include 'javascript/_recipe_reactions.js.html' %}
+  {% include 'javascript/_recipe_reactions.js.html' %}
 	<script src="https://unpkg.com/bootstrap-table@1.18.0/dist/bootstrap-table.min.js"></script>
 {% endblock %}
 
@@ -57,7 +57,7 @@
 		    	<th data-field="author" data-sortable="true">autor*ka</th>
 		    	<th data-field="reactions" data-sortable="true">{{ icons.heart_full }}</th>
 		    </thead>
-		    <tbody data-target="recipe-reactions.recipes">
+		    <tbody data-target="recipe-reactions.recipes" data-public="{{ not current_user.is_authenticated }}">
 		    {% for recipe in recipes: %}
 		    	<tr style="height: 5rem;"
 		    		data-recipe-id="{{ recipe.id }}"

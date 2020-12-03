@@ -1,10 +1,12 @@
 <script type="text/javascript">
-application.register("recipe-reactions", class extends Stimulus.Controller {
+	application.register("recipe-reactions", class extends Stimulus.Controller {
+	
 	static get targets() {
 		return ["recipes"]
 	}
 
 	connect() {
+		this.public = (this.recipesTarget.dataset.public == "True") ? true : false
 		this.add_reaction_buttons();
 	}
 
@@ -49,21 +51,34 @@ application.register("recipe-reactions", class extends Stimulus.Controller {
 			icon = this._empty_heart_icon(recipe)
 		}
 
-		last_cell.innerHTML = icon + last_cell.innerHTML
+		last_cell.innerHTML = icon.outerHTML + last_cell.innerHTML
 	}
 
 	_empty_heart_icon(recipe) {
-		return '<i class="far fa-heart color-red"\
-	 				data-recipe-id="'+ recipe.dataset.recipeId +'"\
-	 				data-action="click->recipe-reactions#toggle_reaction">\
-		 		</i>'
+		var icon = this._heart_icon(recipe)
+		icon.classList.add('far')
+
+		return icon
 	}
 
 	_full_heart_icon(recipe){
-		return '<i class="fas fa-heart color-red"\
-					data-recipe-id="'+ recipe.dataset.recipeId +'"\
-					data-action="click->recipe-reactions#toggle_reaction">\
-				</i>'
+		var icon = this._heart_icon(recipe)
+		icon.classList.add('fas')
+
+		return icon
+	}
+
+	_heart_icon(recipe){
+		var icon = document.createElement("i")
+		icon.className = "fa-heart color-red"
+		icon.dataset.recipeId = recipe.dataset.recipeId
+		if (this.public) {
+			icon.style.cursor = "not-allowed"
+		} else {
+			icon.dataset.action = 'click->recipe-reactions#toggle_reaction'
+		}
+
+		return icon
 	}
 
 });
