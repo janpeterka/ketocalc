@@ -73,5 +73,4 @@ class SupportView(FlaskView):
 
     @route("facebook")
     def facebook_redirect(self):
-        print("hey!")
         return redirect("https://www.facebook.com/ketokalkulacka")
