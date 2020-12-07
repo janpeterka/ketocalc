@@ -58,7 +58,7 @@
 		    	<th data-field="reactions" {% if current_user.is_authenticated %}data-sortable="true"{% endif %}>{{ icons.heart_full }}</th>
           <th data-field="reaction_count" data-sortable="true">{{ icons.heart_empty }}</th>
 		    </thead>
-		    <tbody data-target="recipe-reactions.recipes" data-public="{{ not current_user.is_authenticated }}">
+		    <tbody data-recipe-reactions-target="recipes" data-public="{{ not current_user.is_authenticated }}">
 		    {% for recipe in recipes: %}
 		    	<tr style="height: 5rem;"
 		    		data-recipe-id="{{ recipe.id }}"

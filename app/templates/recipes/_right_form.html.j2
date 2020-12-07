@@ -1,7 +1,7 @@
 <form class="form-group" data-action="submit->new-recipe#save_recipe">
     <label>Název receptu</label>
-    <input type="text" data-target="new-recipe.recipeName" required class="form-control"/>
-    <table class="table" data-target="new-recipe.recipeIngredientTable">
+    <input type="text" data-new-recipe-target="recipeName" required class="form-control"/>
+    <table class="table" data-new-recipe-target="recipeIngredientTable">
         <tr>
             <th>{{ texts.title }}</th>
             <th>{{ texts.energy_simple }}</th>
@@ -65,7 +65,7 @@
     </table>
 
     <div class="form-inline">
-        <span class="col-4" data-target="new-recipe.recipeDiet" data-new-recipe-diet-id="{{ diet.id }}">Dieta: {{ diet.name }}</span>
+        <span class="col-4" data-new-recipe-target="recipeDiet" data-new-recipe-diet-id="{{ diet.id }}">Dieta: {{ diet.name }}</span>
         {% if not is_trialrecipe %}
             <input type="submit" class="btn btn-primary col-4 " value="{{ texts.recipe_save }}" />
         {% else %}
