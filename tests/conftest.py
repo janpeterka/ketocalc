@@ -26,8 +26,6 @@ def app(scope="session"):
             texts=template_data.texts,
         )
 
-    return app
-
     @app.context_processor
     def utility_processor():
         def human_format_date(date):
@@ -76,6 +74,8 @@ def app(scope="session"):
             option=option,
             options=options,
         )
+
+    return app
 
 
 @pytest.fixture
