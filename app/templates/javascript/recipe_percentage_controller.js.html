@@ -1,10 +1,9 @@
 <script type="text/javascript">
     application.register("recipe-percentage", class extends Stimulus.Controller {
       static targets = [ "percentage", "percentageInput", "showPercentage"]
-      static values = {}
+      // static values = {}
 
       connect() {
-      	this.element[this.identifier] = this;
       	this.set_percentage()
       }
 
@@ -20,17 +19,15 @@
           	coeficient = this.percentageInputTarget.value / 100;
           }
         }
-      	this.show_percentage(coeficient * 100)
+      	this._show_percentage(coeficient * 100)
 
       	this.percentageTarget.showRecipe.calculate_recipe(coeficient)
 
       }
 
-      show_percentage(percentage){
+      _show_percentage(percentage){
       	this.showPercentageTarget.innerHTML = percentage;
       }
-
-
 
   });
 </script>

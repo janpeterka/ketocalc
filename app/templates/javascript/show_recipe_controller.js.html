@@ -87,10 +87,12 @@
       _ingredient_to_row(ingredient, table){
         var row = table.querySelectorAll(`[data-id='` + ingredient.id + `']`)[0]
 
-        row.querySelectorAll(`[data-type='sugar']`)[0].innerHTML = this._float_to_fixed(ingredient["sugar"] * ingredient["amount"])
-        row.querySelectorAll(`[data-type='fat']`)[0].innerHTML = this._float_to_fixed(ingredient["fat"] * ingredient["amount"])
-        row.querySelectorAll(`[data-type='protein']`)[0].innerHTML = this._float_to_fixed(ingredient["protein"] * ingredient["amount"])
-        row.querySelectorAll(`[data-type='calorie']`)[0].innerHTML = this._float_to_fixed(ingredient["calorie"] * ingredient["amount"])
+        var fields = ["calorie", "protein", "fat", "sugar", "amount"]
+
+        for (let i = 0, field; field = fields[i]; i++) {
+          row.querySelectorAll('[data-type='+ field + ']')[0].innerHTML = this._float_to_fixed(ingredient[field] * ingredient["amount"])
+        }
+
         row.querySelectorAll(`[data-type='amount']`)[0].innerHTML = this._float_to_fixed(ingredient["amount"] * 100) 
       }
 
