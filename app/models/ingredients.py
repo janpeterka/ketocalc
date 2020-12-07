@@ -193,7 +193,11 @@ class Ingredient(db.Model, ItemMixin):
         return self.can_add(current_user)
 
     def can_copy(self, user) -> bool:
-        return not self.is_author(user) and (self.is_public or self.has_public_recipe)
+        return (
+            user.is_authenticated
+            and not self.is_author(user)
+            and (self.is_public or self.has_public_recipe)
+        )
 
     @property
     def can_current_user_copy(self) -> bool:
