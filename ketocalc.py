@@ -64,11 +64,19 @@ def utility_processor():
     def option(obj):
         return f"<option name='{obj.name}' value='{obj.id}'>{obj.name}</option>"
 
+    def options(array):
+        html = ""
+        for item in array:
+            html += option(item) + "\n"
+
+        return html
+
     return dict(
         human_format_date=human_format_date,
         recipe_ingredient_ids_list=recipe_ingredient_ids_list,
         link_to=link_to,
         option=option,
+        options=options,
     )
 
 
