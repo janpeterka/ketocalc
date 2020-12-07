@@ -17,7 +17,7 @@
        title="Tato surovina má nulové hodnoty. Pro funkční výpočet je tedy potřeba, aby měla pevně dané množství."></i>
     {% endif %}
   </td>
-  {% else %}
+  {% elif current_user.is_authenticated %}
     <td data-toggle="tooltip" title="Tuto surovinu nemůžete použít, protože ji vytvořil jiný uživatel. Můžete ji zkopírovat do vlastních surovin, nebo ji nahradit vlastní.">
     <i class="fa fa-info-circle"></i>
   </td>
