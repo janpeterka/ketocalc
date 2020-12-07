@@ -27,25 +27,25 @@
     <div class="container-fluid ml-5" data-controller="new-recipe show-info">
         <div class="row">
             <div class="hidden">
-                <select data-target="new-recipe.baseSelect">
+                <select data-new-recipe-target="baseSelect">
                     {% for ingredient in ingredients: %}
                         <option name="{{ ingredient.name }}" value="{{ ingredient.id }}">{{ ingredient.name }}</option>
                     {% endfor %}
                 </select>
-                <input type="hidden" data-target="new-recipe.presetIngredientIds" value="{{ preset_ingredients|safe }}">
+                <input type="hidden" data-new-recipe-target="presetIngredientIds" value="{{ preset_ingredients|safe }}">
             </div>
 
             <div class="col-lg-6 col-md-12" >
                 <div class="col-12">
                     <form class="form-inline" data-action="submit->new-recipe#add_ingredient">
-                        <select class="form-control" id="ingredient_select" data-target="new-recipe.select">
+                        <select class="form-control" id="ingredient_select" data-new-recipe-target="select">
                         {% for ingredient in ingredients: %}
                             <option name='{{ ingredient.name }}' value="{{ ingredient.id }}">{{ ingredient.name }}</option>
                         {% endfor %}
                         </select>
 
                         <input type="submit" class="btn btn-primary" value="Přidat surovinu" />
-                        <i data-target="show-info.icon"></i>
+                        <i data-show-info-target="icon"></i>
                     </form>
                 </div>
 
@@ -61,7 +61,7 @@
                             <th></th>
                         </tr>
                         </thead>
-                        <tbody data-target="new-recipe.ingredientTable">
+                        <tbody data-new-recipe-target="ingredientTable">
                         </tbody>
                     </table>
                 </div>
@@ -69,7 +69,7 @@
                 <div class="col-12">
                     <form class="form-inline" data-action="submit->new-recipe#calculate_recipe">
                         <label >{{ texts.diet_name }}</label>
-                        <select class="form-control" data-target="new-recipe.selectDiet">
+                        <select class="form-control" data-new-recipe-target="selectDiet">
                         {% for diet in diets: %}
                             <option value="{{ diet.id }}">{{ diet.name }}</option>
                         {% endfor %}
@@ -83,17 +83,17 @@
 
             
             <div class="col-lg-6 col-md-12">
-                <div data-target="show-info.info">
+                <div data-show-info-target="info">
                     {% include "recipes/_new_recipe_info.html.j2" %}
                 </div>
 
-                <div class="loader_circular" data-target="new-recipe.loader"></div>
+                <div class="loader_circular" data-new-recipe-target="loader"></div>
 
-                <div class="text-center color-red" data-target="new-recipe.wrongRecipe">
+                <div class="text-center color-red" data-new-recipe-target="wrongRecipe">
                     <span>{{ texts.recipe_impossible }}</span>
                 </div>
 
-                <div class="recipe__right" data-target="new-recipe.recipe"></div>
+                <div class="recipe__right" data-new-recipe-target="recipe"></div>
 
             </div>
         </div>

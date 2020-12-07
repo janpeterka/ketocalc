@@ -65,7 +65,7 @@
                     <th>{{ texts.amount_simple }}</th>
                     <th data-toggle="tooltip" title="tuky: bílkoviny + cukry">{{ texts.ratio }}</th>
                 </tr>
-                <tr data-target="daily-plan.totals">
+                <tr data-daily-plan-target="totals">
                     <th>Celkem:</th>
                     <td>{{ daily_plan.totals.calorie | round(1) }}</td>
                     <td>{{ daily_plan.totals.protein | round(1) }}</td>
@@ -81,13 +81,13 @@
             <form class="form" action="{{ url_for('DailyPlansView:add_recipe') }}" method="post">
                 <div class="form-group form-inline">
                     {# Diets #}
-                    <select class="form-control" data-target="daily-plan.diets" data-action="change->daily-plan#load_recipes">
+                    <select class="form-control" data-daily-plan-target="diets" data-action="change->daily-plan#load_recipes">
                     {% for diet in diets: %}
                         <option value="{{ diet.id }}">{{ diet.name }}</option>
                     {% endfor %}
                     </select>
                     {# Recipes #}
-                    <select name="recipe_id" class="form-control" data-target="daily-plan.recipes"></select>
+                    <select name="recipe_id" class="form-control" data-daily-plan-target="recipes"></select>
                 </div>
 
                 {# Amount #}
@@ -97,12 +97,12 @@
                     {% for percentage in [10, 12.5, 25, 50, 100] %}
                         {{ percentage_button(percentage, controller="daily-plan", action="set_amount") }}
                     {% endfor %}
-                    <input type="number" step="0.1" min="1" max="100" data-target="daily-plan.percentage" name="recipe_percentage" class="form-control" required>
+                    <input type="number" step="0.1" min="1" max="100" data-daily-plan-target="percentage" name="recipe_percentage" class="form-control" required>
                 </div>
                 {# Hidden #}
                 <input type="hidden" name="date" value="{{ dates['active'] }}">
                 {# Submit #}
-                <input type="submit" data-target="daily-plan.submit" class="form-control btn btn-primary" value="Přidat recept">
+                <input type="submit" data-daily-plan-target="submit" class="form-control btn btn-primary" value="Přidat recept">
             </form>
         </div>
 
