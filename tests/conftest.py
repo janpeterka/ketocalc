@@ -1,5 +1,9 @@
 import pytest
 
+import datetime
+
+from flask import url_for
+
 from app import create_app
 from app import db as _db
 from app.data import template_data
@@ -23,6 +27,55 @@ def app(scope="session"):
         )
 
     return app
+
+    @app.context_processor
+    def utility_processor():
+        def human_format_date(date):
+            if date == datetime.date.today():
+                return "Dnes"
+            elif date == datetime.date.today() + datetime.timedelta(days=-1):
+                return "Včera"
+            elif date == datetime.date.today() + datetime.timedelta(days=1):
+                return "Zítra"
+            else:
+                return date.strftime("%d.%m.%Y")
+
+        def recipe_ingredient_ids_list(recipe):
+            return str([i.id for i in recipe.ingredients])
+
+        def link_to(obj, text=None):
+            if type(obj) == str:
+                if obj == "login":
+                    if text is None:
+                        text = "Přihlaste se"
+                    return f"<a href='{url_for('LoginView:show')}'>{text}</a>"
+                else:
+                    raise NotImplementedError("This string has no associated link_to")
+
+            try:
+                return obj.link_to
+            except Exception:
+                raise NotImplementedError(
+                    "This object link_to is probably not implemented"
+                )
+
+        def option(obj):
+            return f"<option name='{obj.name}' value='{obj.id}'>{obj.name}</option>"
+
+        def options(array):
+            html = ""
+            for item in array:
+                html += option(item) + "\n"
+
+            return html
+
+        return dict(
+            human_format_date=human_format_date,
+            recipe_ingredient_ids_list=recipe_ingredient_ids_list,
+            link_to=link_to,
+            option=option,
+            options=options,
+        )
 
 
 @pytest.fixture
