@@ -1,32 +1,25 @@
 <script type="text/javascript">
     application.register("show-recipe", class extends Stimulus.Controller {
-      static get targets() {
-        return [
-        	"ingredientTable", "totals",
-          "percentage", "showPercentage"
-          ]
-      }
+      static targets = [ "percentage", "ingredientTable", "totals"]
+      static values = { dietRatio: Number }
 
       connect() {
-      	this.calculate_recipe()
+        // tohle je složitý kód, co napojí controller na prvek, a pak jde odtamtud rovnou volat
+      	this.percentageTarget[
+          (str => {
+            return str
+              .split('--')
+              .slice(-1)[0]
+              .split(/[-_]/)
+              .map(w => w.replace(/./, m => m.toUpperCase()))
+              .join('')
+              .replace(/^\w/, c => c.toLowerCase())
+          })(this.identifier)
+        ] = this
+
       }
 
-      calculate_recipe(event){
-		    var coeficient = 1;
-
-        if (event != undefined){
-          event.preventDefault();
-          var target = event.target
-          if ("percentage" in target.dataset){
-          	coeficient = target.dataset.percentage / 100;
-          } else {
-          	coeficient = target.getElementsByTagName("input")[0].value / 100;
-          }
-        }
-
-
-        this.showPercentageTarget.innerHTML = "Aktuálně zobrazeno " + (coeficient * 100).toString() + "% diety.";
-
+      calculate_recipe(coeficient){
         var selected_ingredients = this._get_currently_selected()
 
         var totals = {

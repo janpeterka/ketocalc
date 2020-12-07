@@ -1,0 +1,38 @@
+<script type="text/javascript">
+    application.register("recipe-percentage", class extends Stimulus.Controller {
+      static targets = [ "percentage", "percentageInput", "showPercentage"]
+      static values = {}
+
+      connect() {
+      	this.element[this.identifier] = this;
+      	this.set_percentage()
+      }
+
+      set_percentage(event){
+	    var coeficient = 1;
+
+        if (event != undefined){
+          event.preventDefault();
+          var target = event.target
+          if ("percentage" in target.dataset){
+          	coeficient = target.dataset.percentage / 100;
+          } else {
+          	coeficient = this.percentageInputTarget.value / 100;
+          }
+        }
+      	this.show_percentage(coeficient * 100)
+
+      	this.percentageTarget.showRecipe.calculate_recipe(coeficient)
+
+      }
+
+      show_percentage(percentage){
+      	this.showPercentageTarget.innerHTML = percentage;
+      }
+
+
+
+  });
+</script>
+
+
