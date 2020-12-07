@@ -5,8 +5,8 @@
 
 {% block script %}
     {% include 'javascript/stimulus.js.html' %}
-    {% include 'javascript/simple_calculator.js.html' %}
-    {% include 'javascript/simple_calculator_help.js.html' %}
+    {% include 'javascript/simple_calculator_controller.js.html' %}
+    {% include 'javascript/show_info_controller.js.html' %}
 
         <!-- Google Charts -->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -17,7 +17,7 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container" data-controller="simple-calculator simple-calculator-help">
+    <div class="container" data-controller="simple-calculator show-info">
         <div class="hidden">
             <select data-target="simple-calculator.baseSelect">
                 {% for ingredient in ingredients: %}
@@ -36,7 +36,7 @@
                     </select>
 
                     <input type="submit" class="btn btn-primary" value="Přidat surovinu" />
-                    <i class="help fa fa-info-circle" data-action="mouseover->simple-calculator-help#show_help mouseout->simple-calculator-help#hide_help"></i>
+                    <i data-target="show-info.icon"></i>
                 </form>
             </div>
 
@@ -86,7 +86,9 @@
 
             {% include 'ingredients/_data_source_aknowledgement.html.j2' %}
 
-            <div data-target="simple-calculator-help.help"></div>
+            <div data-target="show-info.info">
+                {% include "simple_calculator/_simple_calculator_info.html.j2" %}
+            </div>
         </div>
     </div>
 {% endblock %}
