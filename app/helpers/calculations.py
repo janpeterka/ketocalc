@@ -45,7 +45,9 @@ def calculate_recipe(ingredients, diet):
 
     else:
         for i in range(len(ingredients)):
-            if hasattr(ingredients[i], "main") and ingredients[i].main is True:
+            if hasattr(ingredients[i], "main") and (
+                ingredients[i].main is True or ingredients[i].main == "true"
+            ):
                 mainIngredient = ingredients[i]
                 ingredients.pop(i)
                 ingredients.append(mainIngredient)

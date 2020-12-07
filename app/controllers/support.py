@@ -12,14 +12,6 @@ from app.controllers.forms.feedback import FeedbackForm
 
 
 class SupportView(FlaskView):
-    @route("/terms")
-    def showTerms(self):
-        return template("support/terms.html.j2")
-
-    @route("/privacy")
-    def showPrivacy(self):
-        return template("support/privacy.html.j2")
-
     @route("/google3748bc0390347e56.html")
     def googleVerification(self):
         return template("support/google3748bc0390347e56.html")

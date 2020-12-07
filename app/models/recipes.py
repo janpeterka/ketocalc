@@ -11,8 +11,9 @@ from flask_login import current_user
 from app.models.item_mixin import ItemMixin
 
 from app.models.ingredients import Ingredient
-from app.models.users import User
 from app.models.recipes_has_ingredients import RecipeHasIngredients
+
+from app.models.user_recipe_reactions import UserRecipeReactions
 
 
 class Recipe(db.Model, ItemMixin):
@@ -21,6 +22,8 @@ class Recipe(db.Model, ItemMixin):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(255), nullable=False)
     type = db.Column(db.Enum("small", "big", "full"), nullable=False, default="full")
+
+    description = db.Column(db.Text)
 
     created = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
     last_updated = db.Column(db.DateTime, nullable=True, onupdate=datetime.datetime.now)
@@ -39,7 +42,7 @@ class Recipe(db.Model, ItemMixin):
 
     @staticmethod
     def load(recipe_id):
-        recipe = db.session.query(Recipe).filter(Recipe.id == recipe_id).first()
+        recipe = Recipe.query.filter_by(id=recipe_id).first()
 
         for ingredient in recipe.ingredients:
             ingredient.amount = round(ingredient.load_amount_by_recipe(recipe.id), 2)
@@ -56,35 +59,21 @@ class Recipe(db.Model, ItemMixin):
         else:
             AttributeError("Wrong ingredient type")
 
-        recipes = (
-            db.session.query(Recipe)
-            .filter(Recipe.ingredients.any(Ingredient.id == ingredient_id))
-            .all()
-        )
+        recipes = Recipe.query.filter(
+            Recipe.ingredients.any(Ingredient.id == ingredient_id)
+        ).all()
         return recipes
 
     @staticmethod
     def load_by_ingredient_and_user(ingredient, user):
         recipes = Recipe.load_by_ingredient(ingredient)
-        private_recipes = []
-        for recipe in recipes:
-            if recipe.author == user:
-                private_recipes.append(recipe)
+        private_recipes = [r for r in recipes if r.author == user]
 
         return private_recipes
 
-    # TODO DEPRECATED
-    @staticmethod
-    def load_by_ingredient_and_username(ingredient, username):
-        return Recipe.load_by_ingredient_and_user(
-            ingredient, User.load_by_username(username)
-        )
-
     @staticmethod
     def public_recipes():
-        recipes = (
-            db.session.query(Recipe).filter(Recipe.is_shared == True).all()
-        )  # noqa: E712
+        recipes = Recipe.query.filter(Recipe.public).all()
         return recipes
 
     def create_and_save(self, ingredients):
@@ -100,7 +89,7 @@ class Recipe(db.Model, ItemMixin):
 
     def remove(self):
         # TODO: - to improve w/ orphan cascade (80)
-        ingredients = db.session.query(RecipeHasIngredients).filter(
+        ingredients = RecipeHasIngredients.query.filter(
             RecipeHasIngredients.recipes_id == self.id
         )
         for i in ingredients:
@@ -114,6 +103,25 @@ class Recipe(db.Model, ItemMixin):
         self.is_shared = not self.is_shared
         self.edit()
         return self.is_shared
+
+    def toggle_reaction(self, user=None):
+        user = current_user if user is None else user
+
+        if self.has_reaction is True:
+            self.remove_reaction(user)
+        else:
+            self.add_reaction(user)
+
+    def add_reaction(self, user):
+        UserRecipeReactions(recipe=self, user=user).save()
+
+    def remove_reaction(self, user):
+        UserRecipeReactions.load_by_recipe_and_current_user(recipe=self).remove()
+
+    @property
+    def has_reaction(self):
+        reactions = UserRecipeReactions.load_by_recipe_and_current_user(self)
+        return bool(reactions)
 
     @property
     # @cache.cached(timeout=50, key_prefix="recipe_totals")
@@ -165,14 +173,18 @@ class Recipe(db.Model, ItemMixin):
         return self.diet.author
 
     @property
-    def concat_ingredients(self):
+    def concat_ingredients(self) -> str:
         return ", ".join([o.name for o in self.ingredients])
 
     # PERMISSIONS
 
-    def can_add(self, user):
+    def can_add(self, user) -> bool:
         return self.is_author(user)
 
     @property
-    def can_current_user_add(self):
+    def can_current_user_add(self) -> bool:
         return self.can_add(current_user)
+
+    @property
+    def can_current_user_show(self) -> bool:
+        return current_user == self.author or current_user.is_admin or self.public

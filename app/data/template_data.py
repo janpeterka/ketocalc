@@ -13,6 +13,8 @@ icons = {
     "calculator": '<i class="fas fa-calculator"></i>',
     "list": '<i class="fas fa-list-ul"></i>',
     "photo": '<i class="far fa-image"></i>',
+    "heart_empty": '<i class="far fa-heart color-red"></i>',
+    "heart_full": '<i class="fas fa-heart color-red"></i>',
 }
 
 social_icons = {
@@ -62,8 +64,8 @@ texts = {
     "recipe_save": "Uložit mezi recepty",
     "recipe_impossible": "Recept nelze vytvořit",
     "recipe_share": "Zveřejnit recept",
+    "recipe_share_all": "Zveřejnit všechny moje recepty",
     "recipe_unshare": "Zneveřejnit recept",
-    "recipe_upload_photo": "Nahrát fotku",
     "recipes": "Recepty",
     # Diet
     "diet": "Dieta",
@@ -82,12 +84,23 @@ texts = {
     "ingredient_all_shared": "Všechny sdílené suroviny",
     "ingredient_delete": "Smazat surovinu",
     "ingredient_delete_confirm": "Opravdu chcete smazat surovinu?",
+    "image": {"upload": "Nahrát foto", "delete": "Smazat foto"},
     # Calc
     "calc_amount": "Spočítat množství!",
+    # Cookbook
+    # "cookbook": {
+    #     "not_logged_in": "Sdílené recepty jsou přístupné pouze pro přihlášené uživatele.",
+    # },
+    # Daily plan
+    "daily_plan": {
+        "not_logged_in": "Denní plány jsou přístupné pouze pro přihlášené uživatele.",
+    },
     # User
-    "user_username": "Přihlašovací jméno",
-    "user_firstname": "Jméno",
-    "user_lastname": "Příjmení",
+    "user": {
+        "username": "Přihlašovací jméno",
+        "firstname": "Jméno",
+        "lastname": "Příjmení",
+    },
     "password": "Heslo",
     "password_change": "Změnit heslo",
     "password_new": "Nové heslo",

@@ -85,7 +85,7 @@ def test_calc(app, db, client):
 
     datasets = load_datasets_calc()
 
-    helpers.test_with_authenticated_user(app)
+    helpers.test_with_authenticated_user(app, username="calc")
 
     for dataset in datasets:
         response = client.post(url, json=dataset, follow_redirects=False)

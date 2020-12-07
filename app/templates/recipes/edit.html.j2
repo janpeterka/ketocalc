@@ -1,6 +1,6 @@
 {% extends "base.html.j2" %}
 {% block title %}
-    {{ texts.recipe}}
+    {{ texts.recipe }}
 {% endblock %}
     
 {% block style %}
@@ -12,8 +12,17 @@
 {% block content %}
     <div class="container">
         <div class="col-12">
-            <form action="{{ url_for('RecipesView:post_edit', id=recipe.id) }}" class="form-inline edit__form" method="post" accept-charset="utf-8">
-                <input type="text" name="name" class="form-control col-4" value="{{ recipe.name }}"><br>
+            <form action="{{ url_for('RecipesView:post_edit', id=recipe.id) }}" class="form" method="post" accept-charset="utf-8">
+                <div class="row">
+                    <div class="col">
+                        <label for="name">Název</label>
+                        <input type="text" name="name" class="form-control" value="{{ recipe.name }}"><br>
+                    </div>
+                    <div class="col">
+                        <label for="description">Popis</label>
+                        <textarea name="description" class="form-control">{{ recipe.description if recipe.description }}</textarea>
+                    </div>
+                </div>
                 <input type="submit" value="{{ texts.recipe_edit }}" class="btn btn-warning">
             </form>
 
@@ -30,9 +39,7 @@
 
                 {% for ingredient in recipe.ingredients: %}
                     <tr>
-                        <td>
-                            <a href="{{ url_for('IngredientsView:show', id=ingredient.id) }}">{{ ingredient.name }}</a>
-                        </td>
+                        <td>{{ link_to(ingredient) }}</td>
                         <td>{{ (ingredient.calorie / 100 * ingredient.amount)|round(2,'common') }}</td>
                         <td>{{ (ingredient.protein / 100 * ingredient.amount)|round(2,'common') }}</td>
                         <td>{{ (ingredient.fat / 100 * ingredient.amount)|round(2,'common') }}</td>

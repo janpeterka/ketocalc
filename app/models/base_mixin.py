@@ -1,8 +1,12 @@
+import datetime
+
 from flask import current_app as application
 
 from flask_login import current_user
 
 from sqlalchemy.exc import DatabaseError
+
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from app import db
 
@@ -13,31 +17,56 @@ class BaseMixin(object):
         for kwarg in kwargs:
             setattr(self, kwarg.key, kwarg.value)
 
-    # LOADING
+    # LOADERS
 
     @classmethod
     def load(cls, *args, **kwargs):
         object_id = kwargs.get("id", args[0])
-        return db.session.query(cls).filter(cls.id == object_id).first()
+        return cls.query.filter_by(id=object_id).first()
 
     @classmethod
     def load_all(cls):
-        return db.session.query(cls).all()
+        return cls.query.all()
 
     @classmethod
     def load_last(cls):
-        return db.session.query(cls).all()[-1]
+        return cls.query.all()[-1]
+
+    @classmethod
+    def load_all_by_name(cls, name):
+        return cls.query.filter_by(name=name).all()
 
     @classmethod
     def load_by_name(cls, name):
-        return db.session.query(cls).filter(cls.name == name).first()
+        return cls.query.filter_by(name=name).first()
 
     @classmethod
     def load_by_attribute(cls, attribute, value):
         if not hasattr(cls, attribute):
             raise AttributeError
 
-        return db.session.query(cls).filter(getattr(cls, attribute) == value).first()
+        return cls.query.filter_by(**{attribute: value}).all()
+
+    @classmethod
+    def load_first_by_attribute(cls, attribute, value):
+        elements = cls.load_by_attribute(attribute, value)
+        if elements:
+            return elements[0]
+        else:
+            return None
+
+    # OTHER LOADING
+    @classmethod
+    def created_recently(cls, days=30):
+        date_from = datetime.date.today() - datetime.timedelta(days=days)
+        if hasattr(cls, "created_at"):
+            attr = "created_at"
+        elif hasattr(cls, "created"):
+            attr = "created"
+        else:
+            raise AttributeError
+
+        return cls.query.filter(getattr(cls, attr) > date_from).all()
 
     # DATABASE OPERATIONS
 
@@ -74,6 +103,9 @@ class BaseMixin(object):
             application.logger.error("Remove error: {}".format(e))
             return False
 
+    def delete(self, **kw):
+        return self.remove(**kw)
+
     def expire(self, **kw):
         """Dumps database changes
         """
@@ -103,9 +135,13 @@ class BaseMixin(object):
             return False
             # raise AttributeError("No 'author' attribute.")
 
+    @property
+    def is_current_user_author(self) -> bool:
+        return self.is_author(current_user)
+
     # PROPERTIES
 
-    @property
+    @hybrid_property
     def public(self) -> bool:
         """alias for is_shared"""
         if hasattr(self, "is_shared"):
@@ -114,8 +150,8 @@ class BaseMixin(object):
             return False
             # raise AttributeError("No 'is_shared' attribute.")
 
-    @property
-    def is_public(self):
+    @hybrid_property
+    def is_public(self) -> bool:
         return self.public
 
     # PERMISSIONS

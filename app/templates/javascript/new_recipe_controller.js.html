@@ -3,6 +3,7 @@
       static get targets() {
         return [
           "baseSelect",
+          "presetIngredientIds",
           "select", "ingredientTable", "selectDiet",
 
           "loader", "wrongRecipe",
@@ -14,6 +15,14 @@
 
       connect() {
         this.recipe__hideAll()
+        this._load_preset_ingredients()
+      }
+
+      _load_preset_ingredients(){
+        var ingredient_ids = this._string_to_list(this.presetIngredientIdsTarget.value)
+        for (let i = 0, ingredient_id; ingredient_id = ingredient_ids[i]; i++) {
+          this.add_ingredient_by_id(ingredient_id)
+        }
       }
 
       _refresh_select(){
@@ -21,28 +30,79 @@
 
         for (let i = 0, ingredient; ingredient = this._get_currently_selected()[i]; i++) {
           let option = this.selectTarget.querySelector("option[value='" + ingredient.id + "']");
-          option.remove();
+          try {
+            option.remove();
+          } catch(err) {
+            // console.log(err);
+          }
         }
       }
 
-      add_ingredient(e){
-        e.preventDefault();
-
-        if (this.selectTarget.value == false){return false;}
-        else{
+      add_ingredient_by_id(ingredient_id){
           fetch("{{ url_for('BaseRecipesView:addIngredientAJAX') }}",{
             method: 'POST',
-            body: JSON.stringify({'ingredient_id' : this.selectTarget.value}),
+            body: JSON.stringify({'ingredient_id' : ingredient_id}),
             headers: {'Content-Type': 'application/json,charset=UTF-8'}}
           ).then((response) => { return response.json(); }
           ).then((response) => {
             $(this.ingredientTableTarget).append(response['template_data']);
             this._set_main_ingredient_if_missing();
             this._refresh_select();
-            
             this.recipe__hideAll();
           });
-        }
+      }
+
+      add_ingredient(e){
+        e.preventDefault();
+
+        if (this.selectTarget.value == false){return false;}
+        else {this.add_ingredient_by_id(this.selectTarget.value);}
+      }
+
+      copy_ingredient(event){
+        var old_ingredient_id = event.target.dataset.id
+
+        // create copy of ingredient (AJAX), get back new id
+        fetch("{{ url_for('IngredientsView:duplicateAJAX') }}", {
+          method: 'POST',
+          body: JSON.stringify({
+            'ingredient_id' : old_ingredient_id,
+          }),
+          headers: {'Content-Type': 'application/json,charset=UTF-8'},}
+        ).then((response) => { return response.json(); }
+        ).then((response) => {
+          this.replace_ingredient_by_ids(old_ingredient_id, response['ingredient_id'])
+          this._set_main_ingredient_if_missing();
+          this._refresh_select();
+          this.recipe__hideAll();
+          });
+      }
+
+      replace_ingredient(event){
+        // for non-IE, this could be used instead. TODO - find out how many use IE.
+        // Also, then `replace_ingredient` and `replace_ingredient_from_form` may be possibly merged
+        // var old_ingredient_id = event.target.closest("[data-id]").dataset.id
+        var old_ingredient_id = event.target.parentNode.parentNode.dataset.id
+        var new_ingredient_id = event.target.dataset.id
+
+        this.replace_ingredient_by_ids(old_ingredient_id, new_ingredient_id)
+      }
+
+
+      replace_ingredient_from_form(event){
+        event.preventDefault();
+
+        // for non-IE, this could be used. TODO - find out how many use IE
+        // var old_ingredient_id = event.target.closest("[data-id]").dataset.id
+        var old_ingredient_id = event.target.parentNode.parentNode.parentNode.parentNode.dataset.id
+        var new_ingredient_id = event.target.getElementsByTagName('select')[0].value
+
+        this.replace_ingredient_by_ids(old_ingredient_id, new_ingredient_id)
+      }
+
+      replace_ingredient_by_ids(old_ingredient_id, new_ingredient_id){
+        this.remove_ingredient_by_id(old_ingredient_id)
+        this.add_ingredient_by_id(new_ingredient_id)
       }
 
       _set_main_ingredient_if_missing(){
@@ -57,7 +117,7 @@
           this._set_main_ingredient(this._get_currently_selected()[0].id);
         }
         else {
-          for (let i = 1, row; row = this.ingredientTableTarget.rows[i]; i++) {
+          for (let i = 0, row; row = this.ingredientTableTarget.rows[i]; i++) {
             if (row.dataset.fixed != "true"){
               this._set_main_ingredient(row.dataset.id);
               return true;
@@ -75,7 +135,7 @@
       
       _set_main_ingredient(id){
         for (let i = 0, row; row = this.ingredientTableTarget.rows[i]; i++) {
-            row.removeAttribute("data-main");
+          row.removeAttribute("data-main");
         }
 
         var row = this._get_ingredient_row_by_id(id, this.ingredientTableTarget);
@@ -84,13 +144,23 @@
       }
 
       remove_ingredient(event){
-        var id = event.target.dataset.id
-        var row = this._get_ingredient_row_by_id(id, this.ingredientTableTarget);
-        row.remove()
+        this.remove_ingredient_by_id(event.target.dataset.id)
+      }
+
+      remove_ingredient_by_id(ingredient_id){
+        var rows = this._get_ingredient_rows_by_id(ingredient_id, this.ingredientTableTarget);
+        for (let i = 0, row; row = rows[i]; i++) {
+          row.remove();
+        }
 
         this._refresh_select();
         this._set_main_ingredient_if_missing();
         $(".recipe__right").hide();
+      }
+
+      remove_duplicate_ingredient_by_id(ingredient_id){
+        this.remove_ingredient_by_id(ingredient_id)
+        this.add_ingredient_by_id(ingredient_id)
       }
 
       toggle_fixed_ingredient(event){
@@ -117,6 +187,16 @@
         return null;
       }
 
+      _get_ingredient_rows_by_id(id, table){
+        var rows = []
+        for (let i = 0, row; row = table.rows[i]; i++) {
+          if (row.dataset.id == id){
+            rows.push(row);
+          }
+        }
+        return rows;
+      }
+
       _row_to_ingredient(row){
         var ingredient = {}
         ingredient['id'] = row.dataset.id
@@ -125,6 +205,8 @@
         // optional
         ingredient['main'] = row.dataset.main
         ingredient['fixed'] = row.dataset.fixed
+        ingredient['unusable'] = row.dataset.unusable
+        
         ingredient['amount'] = row.dataset.amount
 
         return ingredient
@@ -141,8 +223,8 @@
       _get_ingredients_from_table(table){
         var ingredients = [];
 
-        for (let i = 1, row; row = table.rows[i]; i++) {
-          if ("id" in row.dataset){
+        for (let i = 0, row; row = table.rows[i]; i++) {
+          if ("id" in row.dataset && !("info" in row.dataset)){
             let ingredient = this._row_to_ingredient(row)
             ingredients.push(ingredient);
           }
@@ -177,8 +259,32 @@
 
         this.recipe__loader__show()
 
-        var selected_ingredients = this._get_currently_selected()
+        var selected_ingredients = this._get_currently_selected();
 
+        var selected_ingredient_ids = []
+        for (let i = 0, ingredient; ingredient = selected_ingredients[i]; i++) {
+          selected_ingredient_ids.push(ingredient.id)
+        }
+
+        var unique_ingredient_ids = [...new Set(selected_ingredient_ids)];
+
+        // Remove duplicate ingredients
+        if (unique_ingredient_ids.length != selected_ingredient_ids.length){
+          for (let i = 0, ingredient_id; ingredient_id = unique_ingredient_ids[i]; i++) {
+            this.remove_duplicate_ingredient_by_id(ingredient_id)
+          }
+
+          bootbox.alert("Nějakou surovinu jste měli ve výběru vícekrát. Odebrali jsme ji. Zkontrolujte prosím správnost surovin")
+          this._hide_loader()
+          return false;
+        }
+
+        var unusable_count = selected_ingredients.filter((x) => x.unusable).length
+        if (unusable_count > 0){
+          bootbox.alert("Pokoušíte se o výpočet receptu s cizími surovinami.<br> Nejdříve je vyměňte za vlastní, nebo vytvořte jejich kopie.")
+          this._hide_loader()
+          return false;
+        }
         var main_count = selected_ingredients.filter((x) => x.main).length
         var fixed_count = selected_ingredients.filter((x) => x.fixed).length
         var variable_count = selected_ingredients.length - (main_count + fixed_count)
@@ -187,9 +293,9 @@
         if (variable_count == 2 && main_count == 1){
           var main_ingredient = this._get_main_ingredient(selected_ingredients)
           if (!(main_ingredient === null)){
-              main_ingredient.removeAttribute("data-main");
-              main_count--;
-              variable_count++;
+            this._get_ingredient_row_by_id(main_ingredient.id, this.ingredientTableTarget).removeAttribute("data-main");
+            main_count--;
+            variable_count++;
           }
         }
 
@@ -246,15 +352,26 @@
           headers: {'Content-Type': 'application/json,charset=UTF-8'},
         })
         .then((response) => {
-          if (!response.ok || response.status == 204) {
+          if (response.status == 403) {
+            return 403;
+          } else if (response.status == 204){
+            return 204
+          }
+          else if (!response.ok) {
             return null;
           }
           return response.json();
         })
         .then((response) => {
-          if (response == null){
-              this.recipe__wrong__show();
-              return;
+          if (response == 403) {
+            this.recipe__wrong__show("Tuto surovinu nemůžete použít.");
+            return;
+          } else if(response == 204){
+            this.recipe__wrong__show("Recept nelze vytvořit.");
+            return;
+          } else if (response == null){
+            this.recipe__wrong__show("Někde se stala chyba!");
+            return;
           }
 
           this.recipeTarget.innerHTML = response.template_data
@@ -294,8 +411,9 @@
         $(this.wrongRecipeTarget).hide();
       }
 
-      recipe__wrong__show(){
+      recipe__wrong__show(message){
         $(this.recipeTarget).hide();
+        this.wrongRecipeTarget.getElementsByTagName('span')[0].innerHTML = message;
         $(this.wrongRecipeTarget).show();
         $(this.loaderTarget).hide();
       }
@@ -310,6 +428,10 @@
         $(this.recipeTarget).hide();
         $(this.wrongRecipeTarget).hide();
         $(this.loaderTarget).hide();
+      }
+
+      _string_to_list(string){
+        return string.replace("[","").replace("]","").replace(/\s+/g, '').split(",")
       }
     });
     </script>

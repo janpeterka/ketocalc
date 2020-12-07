@@ -4,7 +4,8 @@
 {% endblock %}
 
 {% block script %}
-    {% include 'javascript/toggle_visibility.js' %}
+    {% include 'javascript/stimulus.js.html' %}
+    {% include 'javascript/toggle_visibility.js.html' %}
 {% endblock %}
 
 {% block content %}
@@ -16,7 +17,7 @@
                 {{ render_field(form.username, placeholder="např. moje.jmeno@seznam.cz") }}
                 {{ form.password.label }}
                 <div class="form-group" data-controller="password-visibility" data-target="password-visibility.password">
-                    {{ render_field(form.password, has_label=False, placeholder="***")}}
+                    {{ render_field(form.password, has_label=False, placeholder="***") }}
                 </div>
 
                 {{ form.submit(class_='btn btn-primary') }}

@@ -32,19 +32,15 @@ class Log(db.Model):
 
     @staticmethod
     def load_by_level(level):
-        logs = db.session.query(Log).filter(Log.level == level)
+        logs = Log.query.filter_by(level=level)
         return logs
 
     @staticmethod
     def load_all():
-        logs = db.session.query(Log).order_by(Log.timestamp.desc())
+        logs = Log.query.order_by(Log.timestamp.desc())
         return logs
 
     @staticmethod
     def load_since(date="2019-01-01"):
-        logs = (
-            db.session.query(Log)
-            .filter(Log.timestamp > date)
-            .order_by(Log.timestamp.desc())
-        )
+        logs = Log.query.filter(Log.timestamp > date).order_by(Log.timestamp.desc())
         return logs

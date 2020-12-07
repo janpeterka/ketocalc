@@ -2,7 +2,7 @@ import inspect
 import re
 
 from flask import render_template as template
-from flask import g
+from flask import g, request
 
 from flask_classful import FlaskView
 
@@ -49,6 +49,12 @@ class ExtendedFlaskView(FlaskView):
 
     def edit(self, id, *args, **kwargs):
         return self.template()
+
+    def not_logged_in(self, *args, **kwargs):
+        message = request.args.get(
+            "message", "Tato funkce je přístupná pouze pro přihlášené uživatele."
+        )
+        return template("not_logged_in.html.j2", message=message)
 
     def template(self, template_name=None, **kwargs):
         # Template name is given from view and method names if not provided

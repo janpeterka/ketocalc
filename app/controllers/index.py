@@ -20,3 +20,25 @@ class IndexView(FlaskView):
     @route("o-kalkulacce/")
     def about(self):
         return template("index/index.html.j2")
+
+    @route("kalkulacka")
+    @route("kalkulacka/")
+    def simple_calculator(self):
+        return redirect(url_for("SimpleCalculatorView:index"))
+
+    @route("kucharka")
+    @route("kucharka/")
+    def public_cookbook(self):
+        return redirect(url_for("CookbookView:public_index"))
+
+    @route("terms")
+    def terms(self):
+        return redirect(url_for("SupportView:terms"))
+
+    @route("privacy")
+    def privacy(self):
+        return redirect(url_for("SupportView:privacy"))
+
+    @route("uptime")
+    def uptime(self):
+        return "OK"
