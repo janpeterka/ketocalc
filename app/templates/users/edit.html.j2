@@ -48,7 +48,7 @@
                 {{ password_form.csrf_token }}
                 <table class="table">
                     <td>
-                        <div class="form-group" data-controller="password-visibility" data-target="password-visibility.password">
+                        <div class="form-group" data-controller="password-visibility" data-password-visibility-target="password">
                             {{ render_field(password_form.password, has_label=False) }}
                         </div>
                     </td>
