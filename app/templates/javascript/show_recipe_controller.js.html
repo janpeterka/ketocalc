@@ -102,7 +102,12 @@
           this.totalsTarget.querySelector('[data-field=' + field + ']').innerHTML = this._float_to_fixed(totals[field]) 
         }
 
-        this.totalsTarget.querySelector('[data-field="ratio"]').innerHTML = "<em>" + this._float_to_fixed(totals["ratio"]) + " : 1 </em>" 
+        if (this.dietRatioValue == this._float_to_fixed(totals["ratio"])){
+          this.totalsTarget.querySelector('[data-field="ratio"]').innerHTML = "<em>" + this._float_to_fixed(totals["ratio"]) + " : 1 </em>" 
+        } else {
+          this.totalsTarget.querySelector('[data-field="ratio"]').innerHTML = "<em>" + this._float_to_fixed(totals["ratio"]) + ' : 1 </em> <span data-toggle="tooltip" title="Pozor, recept má jiný poměr než dieta! ('+ this.dietRatioValue +')"><i class="fa fa-exclamation-circle color-red"></i></span>'
+        }
+
       }
 
   });
