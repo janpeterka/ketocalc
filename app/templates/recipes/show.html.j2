@@ -32,7 +32,7 @@
 {% block content %}
     <div class="container">
     <div class="row">
-        <div class="col-10" data-controller="show-recipe" data-show-recipe-diet-ratio-value="{{ recipe.diet.ratio}}">
+        <div class="col-10" data-controller="show-recipe" data-show-recipe-diet-ratio-value="{{ recipe.diet.ratio }}">
             <span {% if is_print %} class="d-print-table" {% endif %}>
                 <h2>
                     {{ recipe.name }}
