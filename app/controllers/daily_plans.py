@@ -1,6 +1,6 @@
 import datetime
 
-from flask import redirect, url_for, request, jsonify, abort
+from flask import redirect, url_for, request, abort
 from flask_classful import route
 from flask_login import current_user, login_required
 
@@ -10,7 +10,6 @@ from app.data.texts import texts
 
 from app.models.daily_plans import DailyPlan
 from app.models.daily_plan_has_recipes import DailyPlanHasRecipes
-from app.models.diets import Diet
 from app.models.recipes import Recipe
 
 from app.controllers.extended_flask_view import ExtendedFlaskView
@@ -70,21 +69,3 @@ class DailyPlansView(ExtendedFlaskView):
         dphr.save()
 
         return redirect(url_for("DailyPlansView:show", date=date))
-
-    @route("/load_recipes_AJAX", methods=["POST"])
-    @login_required
-    def load_recipes_AJAX(self):
-        diet_id = request.json["diet_id"]
-        if diet_id is None:
-            return ("", 204)
-
-        diet = Diet.load(diet_id)
-
-        if diet is None:
-            abort(404)
-        if not diet.is_author(current_user):
-            abort(403)
-
-        json_recipes = [recipe.json for recipe in diet.recipes]
-
-        return jsonify(json_recipes)
