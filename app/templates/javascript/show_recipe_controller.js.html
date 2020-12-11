@@ -1,25 +1,17 @@
 <script type="text/javascript">
     application.register("show-recipe", class extends Stimulus.Controller {
-      static targets = [ "percentage", "ingredientTable", "totals"]
-      static values = { dietRatio: Number }
+      static targets = [ "ingredientTable", "totals"]
+      static values = { dietRatio: Number, percentage: Number }
 
-      connect() {
-        // tohle je složitý kód, co napojí controller na prvek, a pak jde odtamtud rovnou volat
-      	this.percentageTarget[
-          (str => {
-            return str
-              .split('--')
-              .slice(-1)[0]
-              .split(/[-_]/)
-              .map(w => w.replace(/./, m => m.toUpperCase()))
-              .join('')
-              .replace(/^\w/, c => c.toLowerCase())
-          })(this.identifier)
-        ] = this
+      connect() {}
 
+      percentageValueChanged(){
+        this.calculate_recipe()
       }
 
-      calculate_recipe(coeficient){
+      calculate_recipe(){
+        var percentage = this.percentageValue
+        var coeficient = percentage / 100
         var selected_ingredients = this._get_currently_selected()
 
         var totals = {
@@ -85,9 +77,8 @@
       }
 
       _ingredient_to_row(ingredient, table){
-        var row = table.querySelectorAll(`[data-id='` + ingredient.id + `']`)[0]
-
         var fields = ["calorie", "protein", "fat", "sugar", "amount"]
+        var row = table.querySelectorAll(`[data-id='` + ingredient.id + `']`)[0]
 
         for (let i = 0, field; field = fields[i]; i++) {
           row.querySelectorAll('[data-type='+ field + ']')[0].innerHTML = this._float_to_fixed(ingredient[field] * ingredient["amount"])
@@ -98,6 +89,7 @@
 
       _set_totals(totals){
         var fields = ["calorie", "protein", "fat", "sugar", "amount"]
+
         for (let i = 0, field; field = fields[i]; i++) {
           this.totalsTarget.querySelector('[data-field=' + field + ']').innerHTML = this._float_to_fixed(totals[field]) 
         }

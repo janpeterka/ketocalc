@@ -1,32 +1,43 @@
 <script type="text/javascript">
     application.register("recipe-percentage", class extends Stimulus.Controller {
       static targets = [ "percentage", "percentageInput", "showPercentage"]
-      // static values = {}
+      static values = { percentage: Number }
 
       connect() {
-      	this.set_percentage()
+        this.showRecipeControllerElement = document.querySelector('[data-controller="show-recipe"]')
+
       }
 
       set_percentage(event){
-	    var coeficient = 1;
+        event.preventDefault();
+        
+  	    var percentage = this.showRecipeControllerElement.dataset.showRecipePercentageValue;
+        var old_percentage = percentage;
 
-        if (event != undefined){
-          event.preventDefault();
-          var target = event.target
-          if ("percentage" in target.dataset){
-          	coeficient = target.dataset.percentage / 100;
-          } else {
-          	coeficient = this.percentageInputTarget.value / 100;
-          }
+        if ("percentage" in event.target.dataset){
+        	percentage = event.target.dataset.percentage;
+        } else {
+        	percentage = this.percentageInputTarget.value;
         }
-      	this._show_percentage(coeficient * 100)
 
-      	this.percentageTarget.showRecipe.calculate_recipe(coeficient)
+        if (! (percentage > 0)){
+          percentage = old_percentage;
+        }
 
+        this._set_percentage(percentage)
       }
 
-      _show_percentage(percentage){
-      	this.showPercentageTarget.innerHTML = percentage;
+      _set_percentage(percentage){
+        this.percentageValue = percentage
+        this.showRecipeControllerElement.dataset.showRecipePercentageValue = percentage;
+      }
+
+      percentageValueChanged(){
+        this._show_percentage()
+      }
+
+      _show_percentage(){
+      	this.showPercentageTarget.innerHTML = this.percentageValue;
       }
 
   });

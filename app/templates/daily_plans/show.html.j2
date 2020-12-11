@@ -6,6 +6,7 @@
 {% block script %}
     {% include 'javascript/stimulus.js.html' %}
     {% include 'javascript/daily_plan_controller.js.html' %}
+    {% include 'javascript/load_recipes_for_diet_controller.js.html' %}
 {% endblock %}
 
 {% block content %}
@@ -77,17 +78,15 @@
             </table>
 
         </div>
-        <div class="row float-right mt-5">
+        <div class="row float-right mt-5" data-controller="load-recipes-for-diet">
             <form class="form" action="{{ url_for('DailyPlansView:add_recipe') }}" method="post">
                 <div class="form-group form-inline">
                     {# Diets #}
-                    <select class="form-control" data-daily-plan-target="diets" data-action="change->daily-plan#load_recipes">
-                    {% for diet in diets: %}
-                        <option value="{{ diet.id }}">{{ diet.name }}</option>
-                    {% endfor %}
+                    <select class="form-control" data-load-recipes-for-diet-target="diets" data-action="change->load-recipes-for-diet#load_recipes">
+                        {{ options(diets) }}
                     </select>
                     {# Recipes #}
-                    <select name="recipe_id" class="form-control" data-daily-plan-target="recipes"></select>
+                    <select name="recipe_id" class="form-control" data-load-recipes-for-diet-target="recipes"></select>
                 </div>
 
                 {# Amount #}
@@ -102,7 +101,7 @@
                 {# Hidden #}
                 <input type="hidden" name="date" value="{{ dates['active'] }}">
                 {# Submit #}
-                <input type="submit" data-daily-plan-target="submit" class="form-control btn btn-primary" value="Přidat recept">
+                <input type="submit" data-load-recipes-for-diet-target="submit" class="form-control btn btn-primary" value="Přidat recept">
             </form>
         </div>
 

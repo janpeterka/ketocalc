@@ -163,3 +163,21 @@ class RecipesView(BaseRecipesView):
             file.save()
 
         return redirect(url_for("RecipesView:show", id=id))
+
+    @route("/load_recipes_AJAX", methods=["POST"])
+    # @login_required
+    def load_recipes_AJAX(self):
+        diet_id = request.json["diet_id"]
+        if diet_id is None:
+            return ("", 204)
+
+        diet = Diet.load(diet_id)
+
+        if diet is None:
+            abort(404)
+        if not diet.can_current_user_view:
+            abort(403)
+
+        json_recipes = [recipe.json for recipe in diet.recipes]
+
+        return jsonify(json_recipes)

@@ -32,7 +32,7 @@
 {% block content %}
     <div class="container">
     <div class="row">
-        <div class="col-10" data-controller="show-recipe" data-show-recipe-diet-ratio-value="{{ recipe.diet.ratio }}">
+        <div class="col-10" data-controller="show-recipe" data-show-recipe-diet-ratio-value="{{ recipe.diet.ratio }}" data-show-recipe-percentage-value="100">
             <span {% if is_print %} class="d-print-table" {% endif %}>
                 <h2>
                     {{ recipe.name }}
@@ -93,7 +93,7 @@
                 </tr>
             </table>
 
-            <div class="row" data-controller="recipe-percentage" data-recipe-percentage-target="percentage" data-show-recipe-target="percentage">
+            <div class="row" data-controller="recipe-percentage" data-recipe-percentage-target="percentage" data-recipe-percentage-percentage-value=100>
                 <div class="col-10">
                 <form class="form-inline" data-action="submit->recipe-percentage#set_percentage">
                     {% from "macros/_percentage_button.html.j2" import percentage_button %}
