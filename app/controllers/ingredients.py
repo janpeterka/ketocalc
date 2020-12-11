@@ -140,7 +140,7 @@ class IngredientsView(ExtendedFlaskView):
         self.ingredient.is_approved = True
         self.ingredient.edit()
         flash("Surovina schválena", "success")
-        return redirect(url_for("IngredientsView:shared"))
+        return redirect(url_for("IngredientsView:all_shared"))
 
     @admin_required
     @route("disapprove/<id>", methods=["GET"])
@@ -148,4 +148,4 @@ class IngredientsView(ExtendedFlaskView):
         self.ingredient.is_approved = None
         self.ingredient.edit()
         flash("Surovina neschválena", "info")
-        return redirect(url_for("IngredientsView:shared"))
+        return redirect(url_for("IngredientsView:all_shared"))

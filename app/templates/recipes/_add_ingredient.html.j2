@@ -4,7 +4,7 @@
   <td>{{ ingredient.protein }}</td>
   <td>{{ ingredient.fat }}</td>
   <td>{{ ingredient.sugar }}</td>
-  {% if ingredient.is_current_user_author %}
+  {% if ingredient.can_current_user_view %}
   <td>
     <i data-action="click->new-recipe#set_main_ingredient" data-id="{{ ingredient.id }}"
     class="set_main fas fa-hospital-symbol"></i>
