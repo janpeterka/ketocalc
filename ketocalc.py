@@ -53,6 +53,10 @@ def utility_processor():
                 if text is None:
                     text = "Přihlaste se"
                 return f"<a href='{url_for('LoginView:show')}'>{text}</a>"
+            elif obj == "register":
+                if text is None:
+                    text = "Zaregistrujte se"
+                return f"<a href='{url_for('RegisterView:show')}'>{text}</a>"
             else:
                 raise NotImplementedError("This string has no associated link_to")
 
