@@ -1,4 +1,5 @@
 import datetime
+import random
 
 from unidecode import unidecode
 
@@ -69,6 +70,15 @@ class Ingredient(db.Model, ItemMixin):
                 ingredient.name = ingredient.name + " (sdílené)"
 
         return ingredients
+
+    @staticmethod
+    def load_shared_by_name(name):
+        ingredient = (
+            Ingredient.query.filter(and_(Ingredient.is_shared, Ingredient.is_approved))
+            .filter_by(name=name)
+            .first()
+        )
+        return ingredient
 
     @staticmethod
     def load_all_unapproved():
@@ -237,3 +247,22 @@ class Ingredient(db.Model, ItemMixin):
     def set_main(self, value=True):
         self.main = value
         return self
+
+    # RANDOM DATA FOR TRIAL RECIPE
+    @staticmethod
+    def load_random_by_nutrient(nutrient):
+        other_nutrients = ["fat", "sugar", "protein"]
+        other_nutrients.remove(str(nutrient))
+
+        possible_ingredients = []
+        shared_ingredients = Ingredient.load_all_shared()
+
+        for ingredient in shared_ingredients:
+            if getattr(ingredient, nutrient) > (
+                2 * getattr(ingredient, other_nutrients[0])
+            ) and getattr(ingredient, nutrient) > (
+                2 * getattr(ingredient, other_nutrients[1])
+            ):
+                possible_ingredients.append(ingredient)
+
+        return random.choice(possible_ingredients)

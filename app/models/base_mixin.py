@@ -157,14 +157,16 @@ class BaseMixin(object):
     # PERMISSIONS
 
     def can_view(self, user) -> bool:
-        return self.is_author(user) or user.is_admin or self.is_public
+        return (
+            self.is_public or self.is_author(user) or getattr(user, "is_admin", False)
+        )
 
     @property
     def can_current_user_view(self) -> bool:
         return self.can_view(user=current_user)
 
     def can_edit(self, user) -> bool:
-        return self.is_author(user) or user.is_admin
+        return self.is_author(user) or getattr(user, "is_admin", False)
 
     @property
     def can_current_user_edit(self) -> bool:
