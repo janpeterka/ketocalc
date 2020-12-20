@@ -103,7 +103,10 @@ class User(db.Model, UserMixin, ItemMixin):
 
         db_password_hash = self.pwdhash
         if not isinstance(db_password_hash, bytes):
-            db_password_hash = db_password_hash.encode("utf-8")
+            if db_password_hash is None:
+                return False
+            else:
+                db_password_hash = db_password_hash.encode("utf-8")
 
         if self.password_version == "SHA256":
             if hashlib.sha256(password).hexdigest() == self.pwdhash:
