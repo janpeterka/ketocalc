@@ -14,7 +14,7 @@ class SimpleCalculatorView(ExtendedFlaskView):
         if current_user.is_authenticated:
             users_ingredients = Ingredient.load_all_by_author(current_user.username)
             self.ingredients = users_ingredients + shared_ingredients
-            self.diets = current_user.diets
+            self.diets = current_user.active_diets
         else:
             self.ingredients = shared_ingredients
             self.diets = None
