@@ -15,6 +15,7 @@ class DailyPlanHasRecipes(db.Model, BaseMixin):
     )
 
     amount = db.Column(db.Float, nullable=False)
+    order_index = db.Column(db.Integer)
     added_at = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
 
     daily_plan = db.relationship("DailyPlan")
