@@ -64,6 +64,25 @@ class DailyPlan(db.Model, BaseMixin):
         else:
             return False
 
+    def change_order(self, daily_recipe_id, order_type):
+        if order_type == "up":
+            coef = 1
+        else:
+            coef = -1
+
+        selected_daily_recipe = DailyPlanHasRecipes.load(daily_recipe_id)
+
+        for daily_recipe in self.daily_recipes:
+            if daily_recipe.order_index == selected_daily_recipe.order_index - (
+                1 * coef
+            ):
+                daily_recipe.order_index += 1 * coef
+                daily_recipe.edit()
+
+                selected_daily_recipe.order_index -= 1 * coef
+                selected_daily_recipe.edit()
+                return
+
     @property
     def totals(self):
         totals = types.SimpleNamespace()

@@ -38,6 +38,7 @@
                         <th>{{ texts.sugar_simple }}</th>
                         <th>{{ texts.amount_simple }}</th>
                         <th></th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -50,7 +51,15 @@
                         <td>{{ daily_recipe.values.sugar | round(1) }}</td>
                         <td>{{ daily_recipe.amount }}</td>
                         <td>
-                            <a href="{{ url_for('DailyPlansView:remove_daily_recipe', id=daily_recipe.id, date=dates['active']) }}">
+                            <a href="{{ url_for('DailyPlansView:sort_up', daily_recipe_id=daily_recipe.id, date=dates['active']) }}">
+                                <i class="fas fa-sort-up"></i>
+                            </a>
+                            <a href="{{ url_for('DailyPlansView:sort_down', daily_recipe_id=daily_recipe.id, date=dates['active']) }}">
+                                <i class="fas fa-sort-down"></i>
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('DailyPlansView:remove_daily_recipe', daily_recipe_id=daily_recipe.id, date=dates['active']) }}">
                                 <i class="remove fa fa-times"></i>
                             </a>
                         </td>

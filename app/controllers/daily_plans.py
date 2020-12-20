@@ -70,3 +70,11 @@ class DailyPlansView(ExtendedFlaskView):
         daily_plan.add_recipe(recipe, amount)
 
         return redirect(url_for("DailyPlansView:show", date=date))
+
+    def sort_up(self, daily_recipe_id, date):
+        self.daily_plan.change_order(daily_recipe_id, order_type="up")
+        return redirect(url_for("DailyPlansView:show", date=date))
+
+    def sort_down(self, daily_recipe_id, date):
+        self.daily_plan.change_order(daily_recipe_id, order_type="down")
+        return redirect(url_for("DailyPlansView:show", date=date))
