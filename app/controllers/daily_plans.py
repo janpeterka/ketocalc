@@ -9,7 +9,6 @@ from app.helpers.formaters import parse_date
 from app.data.texts import texts
 
 from app.models.daily_plans import DailyPlan
-from app.models.daily_plan_has_recipes import DailyPlanHasRecipes
 from app.models.recipes import Recipe
 
 from app.controllers.extended_flask_view import ExtendedFlaskView
@@ -20,6 +19,12 @@ class DailyPlansView(ExtendedFlaskView):
         if not current_user.is_authenticated:
             message = texts.daily_plan.not_logged_in
             return redirect(url_for("DailyPlansView:not_logged_in", message=message,))
+
+    def before_request(self, name, id=None, *args, **kwargs):
+        super().before_request(name, id, *args, **kwargs)
+
+        if "date" in kwargs:
+            self.daily_plan = DailyPlan.load_by_date_or_create(kwargs["date"])
 
     @login_required
     def index(self):
@@ -36,15 +41,15 @@ class DailyPlansView(ExtendedFlaskView):
 
         self.daily_plan = DailyPlan.load_by_date_or_create(date)
         self.daily_recipes = self.daily_plan.daily_recipes
+        self.daily_recipes.sort(key=lambda x: x.order_index)
         self.diets = current_user.active_diets
 
         return self.template()
 
     @login_required
-    def remove_daily_recipe(self, id, date):
-        daily_recipe = DailyPlanHasRecipes.load(id)
-        if daily_recipe:
-            daily_recipe.remove()
+    def remove_daily_recipe(self, daily_recipe_id, date):
+        daily_plan = DailyPlan.load_by_date_or_create(date)
+        daily_plan.remove_daily_recipe_by_id(daily_recipe_id)
         return redirect(url_for("DailyPlansView:show", date=date))
 
     @route("/add_recipe", methods=["POST"])
@@ -62,10 +67,6 @@ class DailyPlansView(ExtendedFlaskView):
 
         daily_plan = DailyPlan.load_by_date(date)
 
-        # TODO this calls for renaming
-        dphr = DailyPlanHasRecipes(
-            recipes_id=recipe_id, daily_plans_id=daily_plan.id, amount=amount
-        )
-        dphr.save()
+        daily_plan.add_recipe(recipe, amount)
 
         return redirect(url_for("DailyPlansView:show", date=date))

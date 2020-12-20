@@ -43,7 +43,7 @@
                 <tbody>
                 {% for daily_recipe in daily_recipes %}
                     <tr data-id="{{ daily_recipe.id }}">
-                        <td><a href="{{ url_for('RecipesView:show', id=daily_recipe.recipe.id) }}">{{ daily_recipe.recipe.name }}</a></td>
+                        <td>{{ link_to(daily_recipe.recipe) }}</td>
                         <td>{{ daily_recipe.values.calorie | round(1) }}</td>
                         <td>{{ daily_recipe.values.protein | round(1) }}</td>
                         <td>{{ daily_recipe.values.fat | round(1) }}</td>
