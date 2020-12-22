@@ -65,10 +65,7 @@ class DailyPlan(db.Model, BaseMixin):
             return False
 
     def change_order(self, daily_recipe_id, order_type):
-        if order_type == "up":
-            coef = 1
-        else:
-            coef = -1
+        coef = 1 if order_type == "up" else 1
 
         selected_daily_recipe = DailyPlanHasRecipes.load(daily_recipe_id)
 
