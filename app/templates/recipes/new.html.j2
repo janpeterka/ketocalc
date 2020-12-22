@@ -77,7 +77,9 @@
                         <input type="submit" class="btn btn-primary"  value="{{ texts.calc_amount }}" />
                     </form>
 
-                    {% include 'recipes/_trial_recipe_info.html.j2' %}
+                    {% if is_trialrecipe %}
+                        {% include 'recipes/_trial_recipe_info.html.j2' %}
+                    {% endif %}
                     {% include 'ingredients/_data_source_aknowledgement.html.j2' %}
                 </div>
             </div>
