@@ -15,6 +15,17 @@ class TrialRecipesView(BaseRecipesView):
 
     def index(self):
         shared_user = User.load_shared_user()
+        preset_ingredients = self._get_preset_trial_ingredients()
+
+        return template(
+            "recipes/new.html.j2",
+            ingredients=Ingredient.load_all_shared(),
+            preset_ingredients=[i.id for i in preset_ingredients],
+            diets=shared_user.active_diets,
+            is_trialrecipe=True,
+        )
+
+    def _get_preset_trial_ingredients(self):
         preset_ingredients = []
 
         ingredient = Ingredient.load_shared_by_name("Ananas")
@@ -35,10 +46,4 @@ class TrialRecipesView(BaseRecipesView):
         else:
             preset_ingredients.append(Ingredient.load_random_by_nutrient("protein"))
 
-        return template(
-            "recipes/new.html.j2",
-            ingredients=Ingredient.load_all_shared(),
-            preset_ingredients=[i.id for i in preset_ingredients],
-            diets=shared_user.active_diets,
-            is_trialrecipe=True,
-        )
+        return preset_ingredients

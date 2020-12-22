@@ -74,7 +74,7 @@
       _get_ingredients_from_table(table){
         var ingredients = [];
 
-        for (let i = 1, row; row = table.rows[i]; i++) {
+        for (let i = 0, row; row = table.rows[i]; i++) {
           if ("id" in row.dataset){
             let ingredient = this._row_to_ingredient(row)
             ingredients.push(ingredient);
