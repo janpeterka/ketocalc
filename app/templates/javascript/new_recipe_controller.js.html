@@ -155,7 +155,8 @@
 
         this._refresh_select();
         this._set_main_ingredient_if_missing();
-        $(".recipe__right").hide();
+        this._hide_right();
+        // $(".recipe__right").hide();
       }
 
       remove_duplicate_ingredient_by_id(ingredient_id){
@@ -403,6 +404,10 @@
 
       _hide_loader(){
         $(this.loaderTarget).hide();
+      }
+
+      _hide_right(){
+        $(this.recipeTarget).hide();
       }
 
       recipe__loader__show(){
