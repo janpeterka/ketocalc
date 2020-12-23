@@ -1,3 +1,5 @@
+{% include 'javascript/utils.js.html' %}
+
 <script type="text/javascript">
     application.register("simple-calculator", class extends Stimulus.Controller {
       static get targets() {
@@ -20,9 +22,9 @@
         }
       }
 
-      _float_to_fixed(data){
-        return parseFloat(data).toFixed(2)
-      }
+      // _float_to_fixed(data){
+      //   return parseFloat(data).toFixed(2)
+      // }
 
       add_ingredient(e){
         e.preventDefault();
@@ -74,7 +76,7 @@
       _get_ingredients_from_table(table){
         var ingredients = [];
 
-        for (let i = 1, row; row = table.rows[i]; i++) {
+        for (let i = 0, row; row = table.rows[i]; i++) {
           if ("id" in row.dataset){
             let ingredient = this._row_to_ingredient(row)
             ingredients.push(ingredient);
@@ -132,10 +134,10 @@
     _set_totals(totals){
       var fields = ["calorie", "protein", "fat", "sugar", "amount"]
       for (let i = 0, field; field = fields[i]; i++) {
-        this.totalsTarget.querySelector('[data-field=' + field + ']').innerHTML = this._float_to_fixed(totals[field]) 
+        this.totalsTarget.querySelector('[data-field=' + field + ']').innerHTML = _float_to_fixed(totals[field]) 
       }
       
-      this.totalsTarget.querySelector('[data-field="ratio"]').innerHTML = "<em>" + this._float_to_fixed(totals["ratio"]) + " : 1</em>" 
+      this.totalsTarget.querySelector('[data-field="ratio"]').innerHTML = "<em>" + _float_to_fixed(totals["ratio"]) + " : 1</em>" 
     }
 
   });
