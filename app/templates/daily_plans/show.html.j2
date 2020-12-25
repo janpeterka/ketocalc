@@ -42,6 +42,7 @@
                     </tr>
                 </thead>
                 <tbody>
+
                 {% for daily_recipe in daily_recipes %}
                     <tr data-id="{{ daily_recipe.id }}">
                         <td>{{ link_to(daily_recipe.recipe) }}</td>
@@ -51,12 +52,8 @@
                         <td>{{ daily_recipe.values.sugar | round(1) }}</td>
                         <td>{{ daily_recipe.amount }}</td>
                         <td>
-                            <a href="{{ url_for('DailyPlansView:sort_up', daily_recipe_id=daily_recipe.id, date=dates['active']) }}">
-                                <i class="fas fa-sort-up"></i>
-                            </a>
-                            <a href="{{ url_for('DailyPlansView:sort_down', daily_recipe_id=daily_recipe.id, date=dates['active']) }}">
-                                <i class="fas fa-sort-down"></i>
-                            </a>
+                            {% from "macros/_change_order_button.html.j2" import change_order_buttons with context %}
+                            {{ change_order_buttons() }}
                         </td>
                         <td>
                             <a href="{{ url_for('DailyPlansView:remove_daily_recipe', daily_recipe_id=daily_recipe.id, date=dates['active']) }}">

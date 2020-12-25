@@ -82,6 +82,11 @@
     background-color: var(--palette-purple);
 }
 
+/*Color signals*/
+.color-inactive{
+    color: var(--inactive);
+}
+
 /*Filters*/
 
 .filter-gs-25{
