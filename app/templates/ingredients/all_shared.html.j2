@@ -29,11 +29,9 @@
                         <td>{{ ingredient.fat }}</td>
                         <td>{{ ingredient.sugar }}</td>
                         <td>
-                            <a href="{{ url_for('IngredientsView:approve', id=ingredient.id) }}"><i class="approve fa fa-check"></i></a>
-
-                            <a href="{{ url_for('IngredientsView:disapprove', id=ingredient.id) }}"><i class="disapprove fa fa-times"></i></a>
-
-
+                            {% from "macros/_active_icons.html.j2" import approve_icon, disapprove_icon %}
+                            {{ approve_icon(url=url_for('IngredientsView:approve', id=ingredient.id)) }}
+                            {{ disapprove_icon(url=url_for('IngredientsView:disapprove', id=ingredient.id)) }}
                         </td>
                     </tr>
                 {% endfor %}
