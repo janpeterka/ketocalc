@@ -52,7 +52,7 @@
                         <td>{{ daily_recipe.values.sugar | round(1) }}</td>
                         <td>{{ daily_recipe.amount }}</td>
                         <td>
-                            {% from "macros/_change_order_button.html.j2" import change_order_buttons with context %}
+                            {% from "macros/daily_plans/_change_order_button.html.j2" import change_order_buttons with context %}
                             {{ change_order_buttons() }}
                         </td>
                         <td>

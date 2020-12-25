@@ -1,4 +1,4 @@
-{% macro change_order_button(order, daily_recipe, is_first, is_last) %}
+{% macro change_order_button(order) %}
 
 {% if order == "up" %}
 	<a
@@ -33,7 +33,7 @@
 {% macro change_order_buttons() %}
 	{% set is_first = (daily_recipe.order_index == 1) %}
 	{% set is_last = (daily_recipe.order_index == (daily_recipes | length)) %}
-	{% from "macros/_change_order_button.html.j2" import change_order_button with context %}
-	{{ change_order_button("up", daily_recipe, is_first, is_last) }}
-	{{ change_order_button("down", daily_recipe, is_first, is_last) }}
+	{% from "macros/daily_plans/_change_order_button.html.j2" import change_order_button with context %}
+	{{ change_order_button("up") }}
+	{{ change_order_button("down") }}
 {% endmacro %}
