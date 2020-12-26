@@ -39,6 +39,7 @@
                         <th>{{ texts.amount_simple }}</th>
                         <th></th>
                         <th></th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -50,7 +51,16 @@
                         <td>{{ daily_recipe.values.protein | round(1) }}</td>
                         <td>{{ daily_recipe.values.fat | round(1) }}</td>
                         <td>{{ daily_recipe.values.sugar | round(1) }}</td>
-                        <td>{{ daily_recipe.amount }}</td>
+                        <td>
+                            <span data-field="amount">{{ daily_recipe.amount }}</span>
+                            <input class="form-control col-4 hidden" data-field="amount_input" type="number" value={{ daily_recipe.amount }}>
+                            <a data-field="edit_amount_icon" data-id={{daily_recipe.id}} data-action="click->daily-plan#edit_amount">
+                                <i class="edit fas fa-pencil-alt"></i>
+                            </a>
+                            <a data-field="edit_amount_save_icon" class="hidden" data-id={{daily_recipe.id}} data-action="click->daily-plan#edit_amount_save">
+                                <i class="edit fa fa-check"></i>
+                            </a>
+                        </td>
                         <td>
                             {% from "macros/daily_plans/_change_order_button.html.j2" import change_order_buttons with context %}
                             {{ change_order_buttons() }}
