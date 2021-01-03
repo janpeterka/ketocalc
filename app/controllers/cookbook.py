@@ -1,7 +1,6 @@
 from app.models.recipes import Recipe
 
 from flask import redirect, url_for, request
-from flask import render_template as template
 
 from flask_classful import route
 
@@ -14,8 +13,8 @@ from .forms.cookbook_filter import CookbookFilterForm
 class CookbookView(ExtendedFlaskView):
     template_folder = "cookbook"
 
-    def before_index(self):
-        if not current_user.is_authenticated:
+    def before_request(self, name):
+        if name == "index" and not current_user.is_authenticated:
             return redirect(url_for("CookbookView:public_index"))
 
         self.recipes = Recipe.public_recipes()
@@ -68,5 +67,4 @@ class CookbookView(ExtendedFlaskView):
 
     @route("/public", methods=["GET", "POST"])
     def public_index(self):
-        recipes = Recipe.public_recipes()
-        return template("cookbook/index.html.j2", public=True, recipes=recipes)
+        return self.template(template_name="cookbook/index.html.j2", public=True)
