@@ -39,7 +39,7 @@ def create_app(config_name="default"):
         sentry_sdk.init(
             dsn="https://cf0294c7f1784ba2acbe5c9ed2409bef@o457759.ingest.sentry.io/5454190",
             integrations=[FlaskIntegration(), SqlalchemyIntegration()],
-            traces_sample_rate=1.0,
+            traces_sample_rate=0.2,
         )
     else:
         print("No Sentry monitoring.")
