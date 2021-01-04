@@ -71,6 +71,10 @@ class SupportView(FlaskView):
     def privacy(self):
         return template("support/privacy.html.j2")
 
+    @route("unsupported_browser")
+    def unsupported_browser(self):
+        return template("support/unsupported_browser.html.j2")
+
     @route("facebook")
     def facebook_redirect(self):
         return redirect("https://www.facebook.com/ketokalkulacka")
