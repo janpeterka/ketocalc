@@ -70,8 +70,7 @@
 
   {% endif %}
 
-
-  {% if errors and field.errors %}
+  {% if with_errors and field.errors %}
     <ul class=errors>
     {% for error in field.errors %}
       <li class="warning no-list">{{ error }}</li>

@@ -95,6 +95,7 @@ class MailSender(object):
 
         if application.config["APP_STATE"] != "production":
             recipient_mail = DEFAULT_DEV
+            subject = f"[DEV only] {subject}"
 
         message = Message(
             subject=subject,

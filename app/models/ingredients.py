@@ -219,7 +219,7 @@ class Ingredient(db.Model, ItemMixin):
     def author_user(self):
         from app.models.users import User
 
-        user = User.load(self.author, load_type="username")
+        user = User.load_by_username(self.author)
         return user
 
     @hybrid_property
