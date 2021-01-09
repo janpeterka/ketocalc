@@ -61,6 +61,7 @@ def do_login(username=None, password=None, from_register=False):
         password = password.encode("utf-8")
 
     user = User.load_by_username(username)
+    reset_new_password_token(user)
 
     if user is not None and user.check_login(password):
         login_user(user, remember=True)
@@ -128,5 +129,11 @@ def generate_new_password_token(user):
 
 def set_new_password_token(user, token):
     user.new_password_token = token
+    user.edit()
+    return True
+
+
+def reset_new_password_token(user):
+    user.new_password_token = None
     user.edit()
     return True
