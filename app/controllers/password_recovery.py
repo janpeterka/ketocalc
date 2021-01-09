@@ -28,7 +28,7 @@ class PasswordRecoveryView(FlaskView):
             save_form_to_session(request.form)
             return redirect(url_for("PasswordRecoveryView:show"))
 
-        user = User.load(form.username.data, load_type="username")
+        user = User.load_by_username(form.username.data)
 
         html_body = template(
             "auth/mails/_new_password_email.html.j2",

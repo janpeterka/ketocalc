@@ -60,7 +60,7 @@ def do_login(username=None, password=None, from_register=False):
     if not isinstance(password, bytes) and password is not None:
         password = password.encode("utf-8")
 
-    user = User.load(username, load_type="username")
+    user = User.load_by_username(username)
 
     if user is not None and user.check_login(password):
         login_user(user, remember=True)
@@ -112,7 +112,7 @@ def validate_register(username):
     Returns:
         bool
     """
-    if User.load(username, load_type="username") is not None:
+    if User.load_by_username(username) is not None:
         return False
     else:
         return True
