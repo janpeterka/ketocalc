@@ -77,9 +77,13 @@
                             </select>
 
                             <label>Název receptu</label>
-                            <input type="text" class="form-control" data-simple-calculator-target="simple-calculator.recipeName" required />
+                            <input type="text" class="form-control" data-simple-calculator-target="recipeName" required />
                             <input type="submit" class="btn btn-primary" value="{{ texts.recipe_save }}" />
                         </form>
+                    {% else %}
+                        <div class="text-center font-comfortaa-b text-uppercase">
+                            Pro možnost uložení je potřeba být {{ link_to("login", text="přihlášen") }}
+                        </div>
                     {% endif %}
 
                     {% include 'ingredients/_data_source_aknowledgement.html.j2' %}

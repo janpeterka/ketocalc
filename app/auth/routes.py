@@ -61,10 +61,10 @@ def do_login(username=None, password=None, from_register=False):
         password = password.encode("utf-8")
 
     user = User.load_by_username(username)
-    reset_new_password_token(user)
 
     if user is not None and user.check_login(password):
         login_user(user, remember=True)
+        reset_new_password_token(user)
         user.log_login()
 
         if from_register:

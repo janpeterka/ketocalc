@@ -43,7 +43,8 @@
     <!-- sentry -->
     {% if config["SENTRY_MONITORING"] %}
         <script src="https://js.sentry-cdn.com/a3a5a821594d4478874f5915e45247cf.min.js"
-                crossorigin="anonymous">
+                crossorigin="anonymous"
+                data-lazy="no">
         </script>
     {% else %}
         <script type="text/javascript">console.log("Sentry not active.")</script>
