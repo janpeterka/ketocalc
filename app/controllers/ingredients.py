@@ -120,10 +120,6 @@ class IngredientsView(ExtendedFlaskView):
             flash("Nepodařilo se vytvořit surovinu", "error")
             return redirect(url_for("IngredientsView:new_shared"))
 
-    # def edit(self, id):
-    # self.form = create_form(IngredientsForm, obj=self.ingredient)
-    # return self.template()
-
     @route("delete/<id>", methods=["POST"])
     def delete(self, id):
         if not self.ingredient.is_used:

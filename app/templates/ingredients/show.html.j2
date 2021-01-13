@@ -7,6 +7,7 @@
         <div class="row">
             <div class="col-md-8 col-sm-12" style="margin-bottom: 2rem;">
                 <h2>{{ ingredient.name }} {% if ingredient.is_shared %}(sdílená surovina){% endif %}</h2>
+                <span class="font-italic">{{ ingredient.description if ingredient.description }}</span>
                 {% if current_user.is_admin %}
                     <div class="admin-field">
                         Autor: <a href="{{ url_for('UsersView:show_by_id', id=ingredient.author_user.id) }}">{{ ingredient.author }}</a>
