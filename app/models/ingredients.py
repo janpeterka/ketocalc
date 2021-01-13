@@ -4,6 +4,7 @@ import random
 from unidecode import unidecode
 
 from sqlalchemy import and_
+from sqlalchemy.orm import validates
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from flask_login import current_user
@@ -27,6 +28,9 @@ class Ingredient(db.Model, ItemMixin):
     created = db.Column(db.DateTime, default=datetime.datetime.now)
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
 
+    description = db.Column(db.Text)
+    ean_code = db.Column(db.Integer)
+
     is_shared = db.Column(db.Boolean)
     is_approved = db.Column(db.Boolean, default=False)
     source = db.Column(db.String(255), default="user")
@@ -37,6 +41,12 @@ class Ingredient(db.Model, ItemMixin):
         viewonly=True,
         order_by="Recipe.name",
     )
+
+    # VALIDATORS
+    @validates("ean_code")
+    def validate_ean_code(self, key, value):
+        assert value.isdigit()
+        return value
 
     # LOADERS
 
