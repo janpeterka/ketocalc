@@ -14,6 +14,8 @@ class BaseRecipesView(FlaskView):
     @route("/addIngredientAJAX", methods=["POST"])
     def addIngredientAJAX(self):
         ingredient = Ingredient.load(request.json["ingredient_id"])
+        if not ingredient:
+            abort(404)
         if not (ingredient.can_current_user_add or ingredient.can_current_user_copy):
             abort(403)
         template_data = template(
@@ -25,6 +27,8 @@ class BaseRecipesView(FlaskView):
     @route("/addIngredientWithAmount", methods=["POST"])
     def addIngredientWithAmount(self):
         ingredient = Ingredient.load(request.json["ingredient_id"])
+        if not ingredient:
+            abort(404)
         if not ingredient.can_current_user_add:
             abort(403)
         template_data = template(
