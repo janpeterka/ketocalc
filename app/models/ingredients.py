@@ -29,7 +29,7 @@ class Ingredient(db.Model, ItemMixin):
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
 
     description = db.Column(db.Text)
-    ean_code = db.Column(db.Integer)
+    ean_code = db.Column(db.String(13))
 
     is_shared = db.Column(db.Boolean)
     is_approved = db.Column(db.Boolean, default=False)
@@ -45,7 +45,7 @@ class Ingredient(db.Model, ItemMixin):
     # VALIDATORS
     @validates("ean_code")
     def validate_ean_code(self, key, value):
-        assert value.isdigit()
+        assert not value or value.isdigit()
         return value
 
     # LOADERS
