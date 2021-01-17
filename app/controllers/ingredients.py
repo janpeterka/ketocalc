@@ -75,6 +75,16 @@ class IngredientsView(ExtendedFlaskView):
         result = {"ingredient_id": new_ingredient.id}
         return jsonify(result)
 
+    @route("edit/<id>", methods=["GET"])
+    def edit(self, id):
+        if self.ingredient.is_used:
+            self.form.calorie.errors = []
+            self.form.protein.errors = []
+            self.form.fat.errors = []
+            self.form.sugar.errors = []
+
+        return self.template()
+
     @route("edit/<id>", methods=["POST"])
     def post_edit(self, id):
         form = IngredientsForm(request.form)
@@ -119,10 +129,6 @@ class IngredientsView(ExtendedFlaskView):
         else:
             flash("Nepodařilo se vytvořit surovinu", "error")
             return redirect(url_for("IngredientsView:new_shared"))
-
-    # def edit(self, id):
-    # self.form = create_form(IngredientsForm, obj=self.ingredient)
-    # return self.template()
 
     @route("delete/<id>", methods=["POST"])
     def delete(self, id):
