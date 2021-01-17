@@ -224,6 +224,9 @@ class Ingredient(db.Model, ItemMixin):
         return self.can_copy(current_user)
 
     # PROPERTIES
+    @property
+    def ratio(self) -> float:
+        return round(float(self.fat / (self.sugar + self.protein)), 2)
 
     @property
     def author_user(self):
