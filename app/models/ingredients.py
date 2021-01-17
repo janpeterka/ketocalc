@@ -67,7 +67,7 @@ class Ingredient(db.Model, ItemMixin):
         return ingredients
 
     @staticmethod
-    def load_all_shared(renamed=False, ordered=True):
+    def load_all_shared(renamed=False, ordered=True) -> list:
         ingredients = Ingredient.query.filter(
             and_(Ingredient.is_shared, Ingredient.is_approved)
         ).all()
@@ -91,14 +91,14 @@ class Ingredient(db.Model, ItemMixin):
         return ingredient
 
     @staticmethod
-    def load_all_unapproved():
+    def load_all_unapproved() -> list:
         ingredients = Ingredient.query.filter(
             and_(Ingredient.is_shared, Ingredient.is_approved.is_(False))
         ).all()
         ingredients.sort(key=lambda x: unidecode(x.name.lower()), reverse=False)
         return ingredients
 
-    def load_amount_by_recipe(self, recipe_id):
+    def load_amount_by_recipe(self, recipe_id) -> float:
         rhi = RecipeHasIngredients.query.filter_by(
             recipes_id=recipe_id, ingredients_id=self.id
         ).first()
