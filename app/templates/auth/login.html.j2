@@ -16,7 +16,7 @@
                 {% from "macros/_form_element.html.j2" import render_field %}
                 {{ render_field(form.username, placeholder="např. moje.jmeno@seznam.cz") }}
                 {{ form.password.label }}
-                <div class="form-group" data-controller="password-visibility" data-password-visibility-target="passwordDiv">
+                <div class="form-group" data-controller="see-password" data-see-password-target="passwordDiv">
                     {{ render_field(form.password, has_label=False, placeholder="***") }}
                 </div>
 
