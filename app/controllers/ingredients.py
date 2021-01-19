@@ -6,6 +6,9 @@ from flask_login import login_required, current_user
 
 from app.auth import admin_required
 from app.helpers.form import create_form, save_form_to_session
+
+from app.handlers.data import DataHandler
+
 from app.models.ingredients import Ingredient
 from app.controllers.extended_flask_view import ExtendedFlaskView
 from app.models.recipes import Recipe
@@ -70,9 +73,13 @@ class IngredientsView(ExtendedFlaskView):
 
     @route("duplicateAJAX", methods=["POST"])
     def duplicateAJAX(self):
+        if getattr(request.json, "ingredient_id", None) is None:
+            abort(500)
         new_ingredient = Ingredient.load(request.json["ingredient_id"]).duplicate()
         new_ingredient.save()
         result = {"ingredient_id": new_ingredient.id}
+        DataHandler.set_additional_request_data(item_id=new_ingredient.id)
+
         return jsonify(result)
 
     @route("edit/<id>", methods=["GET"])

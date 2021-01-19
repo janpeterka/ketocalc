@@ -6,6 +6,7 @@ from flask import render_template as template
 from flask_classful import FlaskView, route
 
 from app.helpers import calculations
+from app.handlers.data import DataHandler
 from app.models.diets import Diet
 from app.models.ingredients import Ingredient
 
@@ -22,6 +23,10 @@ class BaseRecipesView(FlaskView):
             "recipes/_add_ingredient.html.j2", ingredient=ingredient
         )
         result = {"ingredient": ingredient.json, "template_data": template_data}
+
+        DataHandler.set_additional_request_data(
+            item_type="add_ingredient_AJAX", item_id=ingredient.id
+        )
         return jsonify(result)
 
     @route("/addIngredientWithAmount", methods=["POST"])
@@ -35,6 +40,9 @@ class BaseRecipesView(FlaskView):
             "recipes/_add_ingredient_with_amount.html.j2", ingredient=ingredient
         )
         result = {"ingredient": ingredient.json, "template_data": template_data}
+        DataHandler.set_additional_request_data(
+            item_type="add_ingredient_with_amount_AJAX", item_id=ingredient.id
+        )
         return jsonify(result)
 
     @route("/calcRecipeAJAX", methods=["POST"])
@@ -101,4 +109,7 @@ class BaseRecipesView(FlaskView):
         for ing in ingredients:
             ing.expire()
 
+        DataHandler.set_additional_request_data(
+            item_type="calculate_recipe_AJAX", item_id=ingredient.id
+        )
         return jsonify(result)
