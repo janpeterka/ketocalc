@@ -226,7 +226,10 @@ class Ingredient(db.Model, ItemMixin):
     # PROPERTIES
     @property
     def ratio(self) -> float:
-        return round(float(self.fat / (self.sugar + self.protein)), 2)
+        try:
+            return round(float(self.fat / (self.sugar + self.protein)), 2)
+        except ZeroDivisionError:
+            return "NaN"
 
     @property
     def author_user(self):
