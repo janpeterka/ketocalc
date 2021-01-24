@@ -1,5 +1,5 @@
 <tr data-id="{{ ingredient.id }}" data-name="{{ ingredient.name }}" {% if ingredient.can_current_user_copy %}data-unusable="true"{% endif %}>
-  <td>{{ ingredient.name }}</td>
+  <td>{{ link_to(ingredient, text=ingredient.name) }}</td>
   <td>{{ ingredient.calorie }}</td>
   <td>{{ ingredient.protein }}</td>
   <td>{{ ingredient.fat }}</td>
