@@ -6,6 +6,20 @@ from app.controllers.forms import *  # noqa: F401, F403
 
 
 def create_form(form_class, **kwargs):
+    """Creates form object from given class
+
+    Creates form object based on multiple options.
+
+    Primarily it gets data from session, if any were kept between redirects.
+    Then it creates form object, filling it using data from session and/or given object
+
+    Arguments:
+        form_class {class} -- any form class, such as LoginForm, UserForm,..
+        **kwargs {[kwarg]} -- array of keyword arguments
+
+    Returns:
+        form -- Form object, such as from LoginForm, UserForm,..
+    """
     form_data = None
     if session.get("formdata") is not None:
         form_data = MultiDict(session.get("formdata"))
@@ -27,4 +41,11 @@ def create_form(form_class, **kwargs):
 
 
 def save_form_to_session(form_data):
+    """Saves form data to session
+
+    Used to keep form data between redirects when form is not validated
+
+    Arguments:
+        form_data {request.form} -- request.form data
+    """
     session["formdata"] = form_data
