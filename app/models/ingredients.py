@@ -4,6 +4,7 @@ import random
 from unidecode import unidecode
 
 from sqlalchemy import and_
+from sqlalchemy.orm import validates
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from flask_login import current_user
@@ -27,6 +28,9 @@ class Ingredient(db.Model, ItemMixin):
     created = db.Column(db.DateTime, default=datetime.datetime.now)
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
 
+    description = db.Column(db.Text)
+    ean_code = db.Column(db.String(13))
+
     is_shared = db.Column(db.Boolean)
     is_approved = db.Column(db.Boolean, default=False)
     source = db.Column(db.String(255), default="user")
@@ -37,6 +41,12 @@ class Ingredient(db.Model, ItemMixin):
         viewonly=True,
         order_by="Recipe.name",
     )
+
+    # VALIDATORS
+    @validates("ean_code")
+    def validate_ean_code(self, key, value):
+        assert not value or value.isdigit()
+        return value
 
     # LOADERS
 
@@ -57,7 +67,7 @@ class Ingredient(db.Model, ItemMixin):
         return ingredients
 
     @staticmethod
-    def load_all_shared(renamed=False, ordered=True):
+    def load_all_shared(renamed=False, ordered=True) -> list:
         ingredients = Ingredient.query.filter(
             and_(Ingredient.is_shared, Ingredient.is_approved)
         ).all()
@@ -81,14 +91,14 @@ class Ingredient(db.Model, ItemMixin):
         return ingredient
 
     @staticmethod
-    def load_all_unapproved():
+    def load_all_unapproved() -> list:
         ingredients = Ingredient.query.filter(
             and_(Ingredient.is_shared, Ingredient.is_approved.is_(False))
         ).all()
         ingredients.sort(key=lambda x: unidecode(x.name.lower()), reverse=False)
         return ingredients
 
-    def load_amount_by_recipe(self, recipe_id):
+    def load_amount_by_recipe(self, recipe_id) -> float:
         rhi = RecipeHasIngredients.query.filter_by(
             recipes_id=recipe_id, ingredients_id=self.id
         ).first()
@@ -214,6 +224,12 @@ class Ingredient(db.Model, ItemMixin):
         return self.can_copy(current_user)
 
     # PROPERTIES
+    @property
+    def ratio(self) -> float:
+        try:
+            return round(float(self.fat / (self.sugar + self.protein)), 2)
+        except ZeroDivisionError:
+            return "NaN"
 
     @property
     def author_user(self):

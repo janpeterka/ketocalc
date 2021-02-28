@@ -43,6 +43,8 @@ class Recipe(db.Model, ItemMixin):
     @staticmethod
     def load(recipe_id):
         recipe = Recipe.query.filter_by(id=recipe_id).first()
+        if recipe is None:
+            return None
 
         for ingredient in recipe.ingredients:
             ingredient.amount = round(ingredient.load_amount_by_recipe(recipe.id), 2)

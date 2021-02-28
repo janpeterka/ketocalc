@@ -2,11 +2,12 @@ import inspect
 import re
 
 from flask import render_template as template
-from flask import g, request
+from flask import request
 
 from flask_classful import FlaskView
 
 from app.helpers.form import create_form
+from app.handlers.data import DataHandler
 
 from app.models import *  # noqa: F401, F403, F406
 from app.controllers.forms import *  # noqa: F401, F403, F406
@@ -17,11 +18,12 @@ class ExtendedFlaskView(FlaskView):
 
     def before_request(self, name, id=None, *args, **kwargs):
 
-        g.request_item_type = self._attribute_name
+        DataHandler.set_additional_request_data(item_type=self._attribute_name)
 
         # e.g. self.user = User.load(id)
         if id is not None and self._model_klass is not None:
-            g.request_item_id = id
+            DataHandler.set_additional_request_data(item_type=id)
+
             instance = (self._model_klass)().load(id)
             # e.g. self.user = user or self.user = None
             setattr(self, self._attribute_name, instance)

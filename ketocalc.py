@@ -18,6 +18,8 @@ from app.models.request_log import RequestLog
 
 from app.data import template_data
 
+from app.handlers.data import DataHandler
+
 
 env = os.environ.get("FLASK_ENV", "default")
 application = create_app(config_name=env)
@@ -104,14 +106,15 @@ def log_request_start():
 
 @application.teardown_request
 def log_request(exception=None):
-    if application.config["APP_STATE"] == "development":
-        return
+    # if application.config["APP_STATE"] == "development":
+    #     return
     db.session.expire_all()
     pattern = re.compile("/static/")
     if not pattern.search(request.path):
         user_id = getattr(current_user, "id", None)
-        item_type = getattr(g, "request_item_type", None)
-        item_id = getattr(g, "request_item_id", None)
+
+        item_type = DataHandler.get_additional_request_data("item_type")
+        item_id = DataHandler.get_additional_request_data("item_id")
 
         log = RequestLog(
             url=request.path,

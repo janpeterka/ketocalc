@@ -6,6 +6,9 @@ from flask_login import login_required, current_user
 
 from app.auth import admin_required
 from app.helpers.form import create_form, save_form_to_session
+
+from app.handlers.data import DataHandler
+
 from app.models.ingredients import Ingredient
 from app.controllers.extended_flask_view import ExtendedFlaskView
 from app.models.recipes import Recipe
@@ -70,10 +73,24 @@ class IngredientsView(ExtendedFlaskView):
 
     @route("duplicateAJAX", methods=["POST"])
     def duplicateAJAX(self):
+        if request.json.get("ingredient_id") is None:
+            abort(500)
         new_ingredient = Ingredient.load(request.json["ingredient_id"]).duplicate()
         new_ingredient.save()
         result = {"ingredient_id": new_ingredient.id}
+        DataHandler.set_additional_request_data(item_id=new_ingredient.id)
+
         return jsonify(result)
+
+    @route("edit/<id>", methods=["GET"])
+    def edit(self, id):
+        if self.ingredient.is_used:
+            self.form.calorie.errors = []
+            self.form.protein.errors = []
+            self.form.fat.errors = []
+            self.form.sugar.errors = []
+
+        return self.template()
 
     @route("edit/<id>", methods=["POST"])
     def post_edit(self, id):
@@ -119,10 +136,6 @@ class IngredientsView(ExtendedFlaskView):
         else:
             flash("Nepodařilo se vytvořit surovinu", "error")
             return redirect(url_for("IngredientsView:new_shared"))
-
-    # def edit(self, id):
-    # self.form = create_form(IngredientsForm, obj=self.ingredient)
-    # return self.template()
 
     @route("delete/<id>", methods=["POST"])
     def delete(self, id):
