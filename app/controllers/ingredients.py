@@ -73,7 +73,7 @@ class IngredientsView(ExtendedFlaskView):
 
     @route("duplicateAJAX", methods=["POST"])
     def duplicateAJAX(self):
-        if getattr(request.json, "ingredient_id", None) is None:
+        if request.json.get("ingredient_id") is None:
             abort(500)
         new_ingredient = Ingredient.load(request.json["ingredient_id"]).duplicate()
         new_ingredient.save()

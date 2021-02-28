@@ -63,10 +63,19 @@ class BaseMixin(object):
             attr = "created_at"
         elif hasattr(cls, "created"):
             attr = "created"
+        elif hasattr(cls, "date"):
+            # DailyPlan
+            attr = "date"
         else:
-            raise AttributeError
+            raise AttributeError(
+                'No "created_at", "created" or "date" for created_recently'
+            )
 
         return cls.query.filter(getattr(cls, attr) > date_from).all()
+
+    @classmethod
+    def created_in_last_30_days(cls):
+        return cls.created_recently(days=30)
 
     # DATABASE OPERATIONS
 
