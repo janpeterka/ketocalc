@@ -107,3 +107,7 @@ class DailyPlan(db.Model, BaseMixin):
         except ZeroDivisionError:
             totals.ratio = 0
         return totals
+
+    @property
+    def is_active(self):
+        return len(self.daily_recipes) > 0

@@ -4,8 +4,9 @@ from flask import current_app as application
 
 from flask_login import current_user
 
-from sqlalchemy.exc import DatabaseError
+from sqlalchemy.sql import func
 
+from sqlalchemy.exc import DatabaseError
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from app import db
@@ -56,6 +57,22 @@ class BaseMixin(object):
             return None
 
     # OTHER LOADING
+    @classmethod
+    def created_at_date(cls, date):
+        if hasattr(cls, "created_at"):
+            attr = "created_at"
+        elif hasattr(cls, "created"):
+            attr = "created"
+        elif hasattr(cls, "date"):
+            # DailyPlan
+            attr = "date"
+        else:
+            raise AttributeError(
+                'No "created_at", "created" or "date" for created_recently'
+            )
+
+        return cls.query.filter(func.DATE(getattr(cls, attr)) == date).all()
+
     @classmethod
     def created_recently(cls, days=30):
         date_from = datetime.date.today() - datetime.timedelta(days=days)
