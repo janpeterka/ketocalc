@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "eb0bb31beb7d4ad90a2505c08287c0b98e5fca697e6a1d95979700a9943b998c"
+            "sha256": "40b9130d11f706b885baf85311231fde4cd4a0c548ad1af90aa3a9c18e33b36e"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -57,18 +57,18 @@
         },
         "boto3": {
             "hashes": [
-                "sha256:4e177c9dd4ac45d9e41867cfb747f4c985d6b05ff14637ac5861a60daa95c7c1",
-                "sha256:ee03a05669c4e82021db8da61c1e7744f231b7481010917ed9066862c8d3cad9"
+                "sha256:1ca39de26205439832fa740fcc200de85f107b615dae445f869a16b76672e663",
+                "sha256:d6716f6701aae771f6ff2386a1d641855a99a9fedd64bd25476b83bacdd50c94"
             ],
             "index": "pypi",
-            "version": "==1.17.22"
+            "version": "==1.17.23"
         },
         "botocore": {
             "hashes": [
-                "sha256:32e86f9d18555bd3b4dc694a2639a1c1fc8c8b42a49da543b95ac9d04c40770b",
-                "sha256:e92e22275ddc15b80015ee630b14ac3701bd9834bffc0814a65a894d490d2eaf"
+                "sha256:d5ea913331e93cecde25773841397c5d2abbc04f38b1c96c636444e8bb3478f8",
+                "sha256:f3ae5cae250c3fb200d33abacbee3f0c6513fc6f1d17a851b04a3998de68c829"
             ],
-            "version": "==1.20.22"
+            "version": "==1.20.23"
         },
         "certifi": {
             "hashes": [
@@ -172,11 +172,18 @@
         },
         "flask-caching": {
             "hashes": [
-                "sha256:a0356ad868b1d8ec2d0e675a6fe891c41303128f8904d5d79e180d8b3f952aff",
-                "sha256:e6ef2e2af84e13c4fd32c1839c1943a42f11b6b0fbcfdd6bf46547ea5482dbfe"
+                "sha256:27ddf54b2d160267b5fd70400359fc79dba5a87aa6e53abde89e627eb0fd4540",
+                "sha256:f3f826790abe3b7797d42b0ad0356328d3c68651a3acb22a016728734cf43c91"
             ],
             "index": "pypi",
-            "version": "==1.9.0"
+            "version": "==1.10.0"
+        },
+        "flask-charts": {
+            "hashes": [
+                "sha256:12b9d4216e554bc75114faa81aadf678751861486d407c280eef32281679a264"
+            ],
+            "index": "pypi",
+            "version": "==1.7"
         },
         "flask-classful": {
             "hashes": [

@@ -33,6 +33,7 @@ flask-caching = "*"
 sentry-sdk = {extras = ["flask"],version = "*"}
 boto3 = "*"
 pillow = "*"
+flask-charts = "*"
 
 [requires]
 python_version = "3.7"
