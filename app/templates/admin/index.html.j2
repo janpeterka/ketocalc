@@ -2,6 +2,10 @@
 {% block title %}
     admin | dashboard
 {% endblock %}
+{% block head %}
+    {{ super() }}
+    {{ init_charts }}
+{% endblock %}
 
 {% block content %}
     <div class="container admin-field">
@@ -14,6 +18,11 @@
             <li><span class="font-weight-bold">{{ new_ingredients | length }}</span> nových surovin</li>
             <li><span class="font-weight-bold">{{ new_images | length }}</span> nových obrázků</li>
         </ul>
+
+        <h2>requests</h2>
+        {{ charts["activity"]() }}
+        <h2>users</h2>
+        {{ charts["users"]() }}
     </div>
 {% endblock %}
 

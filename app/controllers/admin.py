@@ -1,7 +1,3 @@
-# from flask import redirect, url_for
-
-# from flask_login import current_user
-
 from app.auth import admin_required
 
 from app.models.recipes import Recipe
@@ -21,6 +17,8 @@ class AdminView(ExtendedFlaskView):
 
     def index(self):
         from app.helpers.general import created_recently
+        from datetime import datetime
+        from datetime import timedelta
 
         self.days = 30
         self.new_users = User.created_in_last_30_days()
@@ -36,5 +34,24 @@ class AdminView(ExtendedFlaskView):
             RequestLog.load_by_like(attribute="url", pattern="recipes/toggle_shared"),
             days=self.days,
         )
+
+        from flask_charts import Chart
+
+        activity_chart = Chart("LineChart", "activity_chart")
+        activity_chart.data.add_column("date", "date")
+        activity_chart.data.add_column("number", "request count")
+
+        user_activity_chart = Chart("LineChart", "user_activity_chart")
+        user_activity_chart.data.add_column("date", "date")
+        user_activity_chart.data.add_column("number", "user count")
+        for i in range(self.days):
+            date = (datetime.today() - timedelta(days=self.days - (i + 1))).date()
+            day_requests = RequestLog.load_by_date(date=date)
+            daily_active_users = len(set([r.user_id for r in day_requests]))
+
+            activity_chart.data.add_row([date, len(day_requests)])
+            user_activity_chart.data.add_row([date, daily_active_users])
+
+        self.charts = {"activity": activity_chart, "users": user_activity_chart}
 
         return self.template()
