@@ -28,6 +28,3 @@ class RequestLog(db.Model, BaseMixin):
         return RequestLog.query.filter(
             getattr(RequestLog, attribute).like(f"%{pattern}%")
         ).all()
-
-    def load_by_date(date):
-        return RequestLog.query.filter(func.DATE(RequestLog.created_at) == date).all()
