@@ -22,7 +22,7 @@ class AdminView(ExtendedFlaskView):
     def index(self):
         from app.helpers.general import created_recently
 
-        days = 30
+        self.days = 30
         self.new_users = User.created_in_last_30_days()
         self.new_recipes = Recipe.created_in_last_30_days()
         self.new_ingredients = Ingredient.created_in_last_30_days()
@@ -34,7 +34,7 @@ class AdminView(ExtendedFlaskView):
         self.new_images = ImageFile.created_in_last_30_days()
         self.share_recipe_toggles = created_recently(
             RequestLog.load_by_like(attribute="url", pattern="recipes/toggle_shared"),
-            days=days,
+            days=self.days,
         )
 
         return self.template()
