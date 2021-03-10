@@ -48,22 +48,46 @@ class AdminView(ExtendedFlaskView):
 
         for i in range(self.days):
             date = (datetime.today() - timedelta(days=self.days - (i + 1))).date()
-            day_requests = RequestLog.created_at_date(date)
-            daily_active_users = len(set([r.user_id for r in day_requests]))
-
-            ingredients = Ingredient.created_at_date(date)
-            recipes = Recipe.created_at_date(date)
-            users = User.created_at_date(date)
-            images = ImageFile.created_at_date(date)
-            daily_plans = [
-                plan for plan in DailyPlan.created_at_date(date) if plan.is_active
+            day_requests = [
+                request
+                for request in RequestLog.created_at_date(date)
+                if not request.user.is_admin
             ]
-            share_recipe_toggles = created_at_date(
-                RequestLog.load_by_like(
-                    attribute="url", pattern="recipes/toggle_shared"
-                ),
-                date,
+            daily_active_users = len(
+                set([r.user_id for r in day_requests if not r.user.is_admin])
             )
+
+            ingredients = [
+                ingredient
+                for ingredient in Ingredient.created_at_date(date)
+                if not ingredient.author_user.is_admin
+            ]
+            recipes = [
+                recipe
+                for recipe in Recipe.created_at_date(date)
+                if not recipe.author.is_admin
+            ]
+            users = [user for user in User.created_at_date(date) if not user.is_admin]
+            images = [
+                image
+                for image in ImageFile.created_at_date(date)
+                if not image.author.is_admin
+            ]
+            daily_plans = [
+                plan
+                for plan in DailyPlan.created_at_date(date)
+                if plan.is_active and not plan.author.is_admin
+            ]
+            share_recipe_toggles = [
+                request
+                for request in created_at_date(
+                    RequestLog.load_by_like(
+                        attribute="url", pattern="recipes/toggle_shared"
+                    ),
+                    date,
+                )
+                if not request.user.is_admin
+            ]
 
             activity_chart.data.add_row([date, len(day_requests)])
             user_activity_chart.data.add_row([date, daily_active_users])
