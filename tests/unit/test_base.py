@@ -27,7 +27,7 @@ def test_requests_logged_in(app, db, client):
         "/users/show/",
         "/users/edit/",
         "/kalkulacka",
-        # "/daily-plans",  # having poblems with context_processors
+        # "/daily-plans",  # having problems with context_processors
         "/trial-recipes",
     ]
 
@@ -35,6 +35,7 @@ def test_requests_logged_in(app, db, client):
         "/login",
     ]
 
+    # WIP - tohle teda možná nebude dělat vůbec to co chci
     for page in pages:
         assert client.get(page, follow_redirects=True) == 200
 
