@@ -51,10 +51,16 @@ class AdminView(ExtendedFlaskView):
             day_requests = [
                 request
                 for request in RequestLog.created_at_date(date)
-                if not request.user.is_admin
+                if not (request.user and request.user.is_admin)
             ]
             daily_active_users = len(
-                set([r.user_id for r in day_requests if not r.user.is_admin])
+                set(
+                    [
+                        request.user_id
+                        for request in day_requests
+                        if not (request.user and request.user.is_admin)
+                    ]
+                )
             )
 
             ingredients = [
@@ -86,7 +92,7 @@ class AdminView(ExtendedFlaskView):
                     ),
                     date,
                 )
-                if not request.user.is_admin
+                if not (request.user and request.user.is_admin)
             ]
 
             activity_chart.data.add_row([date, len(day_requests)])
