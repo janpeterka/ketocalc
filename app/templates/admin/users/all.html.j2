@@ -23,14 +23,14 @@
                 <tr>
                     <th>email</th>
                     <th>name</th>
-                    <th>registered at</th>
-                    <th>last login at</th>
+                    <th data-field="registered_at" data-sortable="true">registered at</th>
+                    {# <th>last login at</th> #}
                     <th data-field="last_activity" data-sortable="true">last activity</th>
-                    <th>login count</th>
+                    {# <th>login count</th> #}
 
-                    <th>diet count</th>                
                     <th>recipe count</th>
                     <th>ingredient count</th>
+                    <th>diet count</th>                
                     <th>login as</th>
                 </tr>
                 </thead>
@@ -44,12 +44,12 @@
                     </td>
                     <td>{{ user.first_name }} {{ user.last_name }}</td>
                     <td>{{ user.created }}</td>
-                    <td>{{ user.last_logged_in }}</td>
+                    {# <td>{{ user.last_logged_in }}</td> #}
                     <td>{{ user.last_request.created_at }} | {{ user.last_request.url }}</td>
-                    <td>{{ user.login_count }}</td>
-                    <td>{{ user.diets|length }}</td>
+                    {# <td>{{ user.login_count }}</td> #}
                     <td>{{ user.recipes|length }}</td>
                     <td>{{ user.ingredients|length }}</td>
+                    <td>{{ user.diets|length }}</td>
                     <td>
                         <a href="{{ url_for('UsersView:login_as', user_id=user.id) }}">
                             login as {{ user.username }}
