@@ -1,0 +1,47 @@
+version: 2
+updates:
+- package-ecosystem: pip
+  directory: "/"
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: boto3
+    versions:
+    - "> 1.16.30, < 1.17"
+  - dependency-name: sentry-sdk
+    versions:
+    - "> 0.19.4, < 0.20"
+  - dependency-name: boto3
+    versions:
+    - 1.17.0
+    - 1.17.1
+    - 1.17.10
+    - 1.17.11
+    - 1.17.12
+    - 1.17.13
+    - 1.17.14
+    - 1.17.15
+    - 1.17.2
+    - 1.17.3
+    - 1.17.33
+    - 1.17.39
+    - 1.17.4
+    - 1.17.41
+    - 1.17.44
+    - 1.17.49
+    - 1.17.5
+    - 1.17.53
+    - 1.17.6
+    - 1.17.7
+    - 1.17.8
+  - dependency-name: flask-migrate
+    versions:
+    - 2.7.0
+  - dependency-name: sentry-sdk
+    versions:
+    - 0.20.0
+    - 0.20.1
+  - dependency-name: numpy
+    versions:
+    - 1.20.0
