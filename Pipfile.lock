@@ -194,11 +194,11 @@
         },
         "flask-dance": {
             "hashes": [
-                "sha256:6a570e051fe40148698080c65b815704641bf05091fbb9becae549b8d8e1e33b",
-                "sha256:cd2955a46cf3b72ff9b0b5a6521df5aed05dd5189eb312a5d27a9e2e4983ce29"
+                "sha256:17e5114db33d9b23a0d26fdf4e904b274e32f63f4f781a14831cd3c6740c8b23",
+                "sha256:d1dfe440272cdb2bbeea9c4703b30e0b24b8c0e1d3672c2d5a8741ebfa99dac7"
             ],
             "index": "pypi",
-            "version": "==3.3.1"
+            "version": "==4.0.0"
         },
         "flask-login": {
             "hashes": [
