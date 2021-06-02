@@ -275,7 +275,15 @@ a.inactive {
   margin-left: 2rem;
   padding: 1rem;
   border-radius: 0.5rem;
+  box-shadow: 0.5rem 0.5rem 0.7rem black;
+}
+
+.dev-badge.dev {
   background-color: var(--logo-light-green);
+}
+
+.dev-badge.prod {
+  background-color: var(--palette-orange);
 }
 
 .from-admin-badge {

@@ -21,7 +21,7 @@ from app.data import template_data
 from app.handlers.data import DataHandler
 
 
-env = os.environ.get("FLASK_ENV", "default")
+env = os.environ.get("APP_STATE", "default")
 application = create_app(config_name=env)
 
 
