@@ -83,12 +83,11 @@ class Ingredient(db.Model, ItemMixin):
 
     @staticmethod
     def load_shared_by_name(name):
-        ingredient = (
+        return (
             Ingredient.query.filter(and_(Ingredient.is_shared, Ingredient.is_approved))
             .filter_by(name=name)
             .first()
         )
-        return ingredient
 
     @staticmethod
     def load_all_unapproved() -> list:
@@ -130,12 +129,12 @@ class Ingredient(db.Model, ItemMixin):
         new_ingredient.author = current_user.username
 
         # check if same doesn't already exist
-        if new_ingredient.has_same:
-            same_ingredient = new_ingredient.first_same
-            del new_ingredient
-            return same_ingredient
-        else:
+        if not new_ingredient.has_same:
             return new_ingredient
+
+        same_ingredient = new_ingredient.first_same
+        del new_ingredient
+        return same_ingredient
 
     def is_author(self, user) -> bool:
         return self.author_user == user
@@ -143,12 +142,11 @@ class Ingredient(db.Model, ItemMixin):
     # SIMILAR INGREDIENTS
 
     def load_with_same_name(self):
-        ingredients = (
+        return (
             Ingredient.query.filter_by(name=self.name)
             .filter(Ingredient.is_current_user_author)
             .all()
         )
-        return ingredients
 
     @property
     def has_with_same_name(self) -> list:
@@ -165,7 +163,7 @@ class Ingredient(db.Model, ItemMixin):
     def load_similar(self, delta=0.05):
         from sqlalchemy.sql import func
 
-        ingredients = (
+        return (
             Ingredient.query.filter(
                 and_(
                     func.abs(Ingredient.sugar - self.sugar) <= delta,
@@ -176,7 +174,6 @@ class Ingredient(db.Model, ItemMixin):
             .filter(Ingredient.is_current_user_author)
             .all()
         )
-        return ingredients
 
     @property
     def similar(self) -> list:
@@ -235,8 +232,7 @@ class Ingredient(db.Model, ItemMixin):
     def author_user(self):
         from app.models.users import User
 
-        user = User.load_by_username(self.author)
-        return user
+        return User.load_by_username(self.author)
 
     @hybrid_property
     def is_current_user_author(self) -> bool:
@@ -244,14 +240,11 @@ class Ingredient(db.Model, ItemMixin):
 
     @property
     def is_used(self) -> bool:
-        return True if self.recipes else False
+        return bool(self.recipes)
 
     @property
     def has_public_recipe(self) -> bool:
-        for recipe in self.recipes:
-            if recipe.is_public:
-                return True
-        return False
+        return any(recipe.is_public for recipe in self.recipes)
 
     # TESTING
     # TODO: only used for testing, should be moved to tests
@@ -270,15 +263,15 @@ class Ingredient(db.Model, ItemMixin):
         other_nutrients = ["fat", "sugar", "protein"]
         other_nutrients.remove(str(nutrient))
 
-        possible_ingredients = []
         shared_ingredients = Ingredient.load_all_shared()
 
-        for ingredient in shared_ingredients:
-            if getattr(ingredient, nutrient) > (
-                2 * getattr(ingredient, other_nutrients[0])
-            ) and getattr(ingredient, nutrient) > (
-                2 * getattr(ingredient, other_nutrients[1])
-            ):
-                possible_ingredients.append(ingredient)
+        possible_ingredients = [
+            ingredient
+            for ingredient in shared_ingredients
+            if getattr(ingredient, nutrient)
+            > (2 * getattr(ingredient, other_nutrients[0]))
+            and getattr(ingredient, nutrient)
+            > (2 * getattr(ingredient, other_nutrients[1]))
+        ]
 
         return random.choice(possible_ingredients)

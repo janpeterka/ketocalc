@@ -22,25 +22,19 @@ class Log(db.Model):
             db.session.expire_all()
             db.session.add(self)
             db.session.commit()
-            if self.id is not None:
-                return True
-            else:
-                return False
+            return self.id is not None
         except DatabaseError:
             db.session.rollback()
             return False
 
     @staticmethod
     def load_by_level(level):
-        logs = Log.query.filter_by(level=level)
-        return logs
+        return Log.query.filter_by(level=level)
 
     @staticmethod
     def load_all():
-        logs = Log.query.order_by(Log.timestamp.desc())
-        return logs
+        return Log.query.order_by(Log.timestamp.desc())
 
     @staticmethod
     def load_since(date="2019-01-01"):
-        logs = Log.query.filter(Log.timestamp > date).order_by(Log.timestamp.desc())
-        return logs
+        return Log.query.filter(Log.timestamp > date).order_by(Log.timestamp.desc())

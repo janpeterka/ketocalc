@@ -43,13 +43,12 @@ def app(scope="session"):
 
         def link_to(obj, text=None):
             if type(obj) == str:
-                if obj == "login":
-                    if text is None:
-                        text = "Přihlaste se"
-                    return f"<a href='{url_for('LoginView:show')}'>{text}</a>"
-                else:
+                if obj != "login":
                     raise NotImplementedError("This string has no associated link_to")
 
+                if text is None:
+                    text = "Přihlaste se"
+                return f"<a href='{url_for('LoginView:show')}'>{text}</a>"
             try:
                 return obj.link_to
             except Exception:
@@ -61,11 +60,7 @@ def app(scope="session"):
             return f"<option name='{obj.name}' value='{obj.id}'>{obj.name}</option>"
 
         def options(array):
-            html = ""
-            for item in array:
-                html += option(item) + "\n"
-
-            return html
+            return "".join(option(item) + "\n" for item in array)
 
         return dict(
             human_format_date=human_format_date,

@@ -51,17 +51,11 @@ class AdminView(ExtendedFlaskView):
             day_requests = [
                 request
                 for request in RequestLog.created_at_date(date)
-                if not (request.user and request.user.is_admin)
+                if not request.user or not request.user.is_admin
             ]
-            daily_active_users = len(
-                set(
-                    [
-                        request.user_id
-                        for request in day_requests
-                        if not (request.user and request.user.is_admin)
-                    ]
-                )
-            )
+
+            daily_active_users = len({request.user_id for request in day_requests
+                                if not (request.user and request.user.is_admin)})
 
             ingredients = [
                 ingredient

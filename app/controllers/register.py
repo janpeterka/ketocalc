@@ -36,7 +36,6 @@ class RegisterView(FlaskView):
 
         if do_register(user):
             return redirect(url_for("IndexView:index"))
-        else:
-            flash("registrace se nepodařila", "error")
-            save_form_to_session(request.form)
-            return redirect(url_for("RegisterView:show"))
+        flash("registrace se nepodařila", "error")
+        save_form_to_session(request.form)
+        return redirect(url_for("RegisterView:show"))

@@ -71,11 +71,7 @@ def utility_processor():
         return f"<option name='{obj.name}' value='{obj.id}'>{obj.name}</option>"
 
     def options(array):
-        html = ""
-        for item in array:
-            html += option(item) + "\n"
-
-        return html
+        return "".join(option(item) + "\n" for item in array)
 
     return dict(
         human_format_date=human_format_date,

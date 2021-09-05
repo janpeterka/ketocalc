@@ -28,10 +28,7 @@ class SupportView(FlaskView):
             if not form.validate_on_submit():
                 return template("support/feedback.html.j2", form=form)
 
-            attachments = []
-            if form.feedback_file.data:
-                attachments = [form.feedback_file.data]
-
+            attachments = [form.feedback_file.data] if form.feedback_file.data else []
             MailSender().send_email(
                 subject="[ketocalc] [{}]".format(form.option.data),
                 sender="ketocalc",

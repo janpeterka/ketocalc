@@ -49,9 +49,8 @@ class DietsView(ExtendedFlaskView):
 
         if diet.save():
             return redirect(url_for("DietsView:show", id=diet.id))
-        else:
-            flash("Nepodařilo se vytvořit dietu", "error")
-            return redirect(url_for("DietsView:new"))
+        flash("Nepodařilo se vytvořit dietu", "error")
+        return redirect(url_for("DietsView:new"))
 
     @route("<id>/edit", methods=["POST"])
     def post_edit(self, id):

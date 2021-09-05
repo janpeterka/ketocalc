@@ -67,9 +67,8 @@ class IngredientsView(ExtendedFlaskView):
 
         if ingredient.save():
             return redirect(url_for("IngredientsView:show", id=ingredient.id))
-        else:
-            flash("Nepodařilo se vytvořit surovinu", "error")
-            return redirect(url_for("IngredientsView:new"))
+        flash("Nepodařilo se vytvořit surovinu", "error")
+        return redirect(url_for("IngredientsView:new"))
 
     @route("duplicateAJAX", methods=["POST"])
     def duplicateAJAX(self):
