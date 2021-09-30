@@ -19,5 +19,25 @@ application.register("daily-plan", class extends Stimulus.Controller {
         }
 	}
 
+  edit_amount(event){
+    event.preventDefault();
+    $(event.target.parentNode.parentNode.parentNode.querySelector('[data-field="amount"]')).hide()
+    $(event.target.parentNode.parentNode.parentNode.querySelector('[data-field="amount_input"]')).show()
+
+    $(event.target.parentNode.parentNode.parentNode.querySelector('[data-field="edit_amount_icon"]')).hide()
+    $(event.target.parentNode.parentNode.parentNode.querySelector('[data-field="edit_amount_save_icon"]')).show()
+
+  }
+
+  edit_amount_save(event){
+    console.log(event.target.parentNode.parentNode.parentNode.querySelector('[data-field="amount"]').innerHTML)
+
+    var new_amount = event.target.parentNode.parentNode.parentNode.querySelector('[data-field="amount"]').innerHTML;
+    // $(event.target.parentNode.parentNode.parentNode.querySelector('[data-field="amount"]'))
+    // TODO: call AJAX
+    // refresh whole page?
+
+  }
+
 });
 </script>
