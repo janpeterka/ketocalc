@@ -4,7 +4,7 @@ Stimulus.register("daily-plan", class extends Controller {
   }
 
   set_amount(event){
-      var percentage = 100;
+      // var percentage = 100;
 
         if (event != undefined){
           event.preventDefault();
