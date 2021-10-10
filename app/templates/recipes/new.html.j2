@@ -18,9 +18,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
 
-    {% include 'javascript/stimulus.js.html' %}
-    {% include 'javascript/new_recipe_controller.js.html' %}
-    {% include 'javascript/show_info_controller.js.html' %}
+    {{ stimulus("new-recipe", "show-info") }}
 {% endblock %}
 
 {% block content %}
@@ -100,3 +98,18 @@
         </div>
     </div>
 {% endblock %}
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('#ingredient_select').select2();
+  });
+
+  function trialSaveConfirm(){
+      var r = confirm("Pokud si chcete recept uložit, musíte se zaregistrovat")
+      if (r == true){
+          window.open('{{ url_for("RegisterView:show") }}');
+      }
+      return true;
+  }
+</script>
+

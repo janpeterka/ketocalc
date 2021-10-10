@@ -18,9 +18,7 @@
 {% endblock %}
 
 {% block script %}
-    {% include 'javascript/stimulus.js.html' %}
-    {% include 'javascript/show_recipe_controller.js.html' %}
-    {% include 'javascript/recipe_percentage_controller.js.html' %}
+    {{ stimulus("show-recipe", "recipe-percentage") }}
 {% endblock %}
 
 {% block navbar %}

@@ -1,3 +1,5 @@
+{% from 'javascript/stimulus.js.html' import stimulus %}
+
 <!DOCTYPE html>
 <html lang="cs">
 <head>
@@ -52,6 +54,8 @@
     {% else %}
         <script type="text/javascript">console.log("Sentry not active.")</script>
     {% endif %}
+
+    {% include 'javascript/utils.js.html' %}
 
     {% block style %}{% endblock %}
     {% block script %}{% endblock %}

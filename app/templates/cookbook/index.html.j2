@@ -3,14 +3,12 @@
     {{ texts.recipe_all }}
 {% endblock %}
 
-
 {% block style %}
 	<link href="https://unpkg.com/bootstrap-table@1.18.0/dist/bootstrap-table.min.css" rel="stylesheet">
 {% endblock %}
 
 {% block script %}
-	{% include 'javascript/stimulus.js.html' %}
-  {% include 'javascript/recipe_reactions_controller.js.html' %}
+    {{ stimulus("recipe-reactions") }}
 	<script src="https://unpkg.com/bootstrap-table@1.18.0/dist/bootstrap-table.min.js"></script>
 {% endblock %}
 
