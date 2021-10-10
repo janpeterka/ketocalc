@@ -4,9 +4,7 @@
 {% endblock %}
 
 {% block script %}
-    {% include 'javascript/stimulus.js.html' %}
-    {% include 'javascript/daily_plan_controller.js.html' %}
-    {% include 'javascript/load_recipes_for_diet_controller.js.html' %}
+    {{ stimulus("daily-plan", "load-recipes-for-diet") }}
 {% endblock %}
 
 {% block content %}

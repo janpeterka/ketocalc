@@ -1,17 +1,16 @@
-<script type="text/javascript">
-    application.register("new-recipe", class extends Stimulus.Controller {
-      static get targets() {
-        return [
-          "baseSelect",
-          "presetIngredientIds",
-          "select", "ingredientTable", "selectDiet",
+Stimulus.register("new-recipe", class extends Controller {
+  static get targets() {
+    return [
+      "baseSelect",
+      "presetIngredientIds",
+      "select", "ingredientTable", "selectDiet",
 
-          "loader", "wrongRecipe",
+      "loader", "wrongRecipe",
 
-          "recipeName", "recipeDiet",
-          "recipe", "recipeIngredientTable"
-          ]
-      }
+      "recipeName", "recipeDiet",
+      "recipe", "recipeIngredientTable"
+      ]
+    }
 
       connect() {
         this.recipe__hideAll()
@@ -439,18 +438,3 @@
         return string.replace("[","").replace("]","").replace(/\s+/g, '').split(",")
       }
     });
-    </script>
-
-<script type="text/javascript">
-  $(document).ready(function() {
-    $('#ingredient_select').select2();
-  });
-
-  function trialSaveConfirm(){
-      var r = confirm("Pokud si chcete recept uložit, musíte se zaregistrovat")
-      if (r == true){
-          window.open('{{ url_for("RegisterView:show") }}');
-      }
-      return true;
-  }
-</script>
