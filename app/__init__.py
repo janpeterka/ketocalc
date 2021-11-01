@@ -23,6 +23,15 @@ charts = GoogleCharts()
 def create_app(config_name="default"):
     application = Flask(__name__, instance_relative_config=True)
 
+    from jinja2 import select_autoescape
+
+    application.jinja_options = {
+        "autoescape": select_autoescape(
+            enabled_extensions=("html", "html.j2", "xml"),
+            default_for_string=True,
+        )
+    }
+
     # CONFIG
     from config import configs
 
