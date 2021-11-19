@@ -3,15 +3,11 @@ name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
 
-[dev-packages]
-
 [packages]
 requests = "*"
 pdfkit = "*"
 numpy = "*"
 sympy = "*"
-pytest = "*"
-pytest-flask = "*"
 gunicorn = "*"
 python-dotenv = "*"
 Flask = "*"
@@ -35,5 +31,9 @@ boto3 = "*"
 pillow = "*"
 flask-charts = "*"
 
+[dev-packages]
+pytest = "*"
+pytest-flask = "*"
+
 [requires]
-python_version = "3.8"
+python_version = "3.9"
