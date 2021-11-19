@@ -27,10 +27,7 @@ application = create_app(config_name=env)
 
 @application.context_processor
 def inject_globals():
-    return dict(
-        social_icons=template_data.social_icons,
-        texts=template_data.texts,
-    )
+    return dict(texts=template_data.texts)
 
 
 @application.context_processor
