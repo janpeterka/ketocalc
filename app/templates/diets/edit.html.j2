@@ -38,14 +38,14 @@
                                 </td>
                             </tr>
                         </table>
-                        <button type="submit" class="btn btn-warning">{{ texts.edit_confirm }} {{ icons.edit }}</button>
+                        <button type="submit" class="btn btn-warning">{{ texts.edit_confirm }} {{ icon("edit") }}</button>
                     </form>
                     <form action="{{ url_for('DietsView:delete', id=diet.id) }}" method="post" accept-charset="utf-8">
-                        <a href="{{ url_for('DietsView:show', id=diet.id) }}" class="btn btn-secondary">{{ texts.edit_cancel }} {{ icons.edit }}</a>
+                        <a href="{{ url_for('DietsView:show', id=diet.id) }}" class="btn btn-secondary">{{ texts.edit_cancel }} {{ icon("edit") }}</a>
                         {% if diet.is_used == False %}
-                            <button type="submit" class="btn btn-danger">{{ texts.diet_delete }} {{ icons.delete }}</button>
+                            <button type="submit" class="btn btn-danger">{{ texts.diet_delete }} {{ icon("delete") }}</button>
                         {% else %}
-                            <button type="submit" class="btn btn-danger" disabled>{{ texts.delete_error }} {{ icons.delete }}</button>
+                            <button type="submit" class="btn btn-danger" disabled>{{ texts.delete_error }} {{ icon("delete") }}</button>
                         {% endif %}
                     </form>
                 </div>

@@ -1,0 +1,130 @@
+{% macro icon(name) %}
+
+    {% set tooltip = kwargs.pop('tooltip', None) %}
+    {% set value = kwargs.pop('value', None) %}
+    {% set class_ = kwargs.pop('class', '') %}
+    {% set cursor_class = kwargs.pop('cursor_class', "cursor-default") %}
+    {% set class_ = class_ + " " + cursor_class %}
+    {% set fa_class_ = "" %}
+    
+    {% set action = kwargs.pop('action', None) %}
+
+    {# Pages #}
+    {% if name=="user" %}
+    	{% set fa_class_ = 'far fa-user-circle' %}
+    {% elif name=="daily" %}
+        {% set fa_class_ = 'fas fa-calendar-alt' %}
+    {% elif name=="more" %}
+        {% set fa_class_ = 'fas fa-ellipsis-h' %}
+    {% elif name=="calculator" %}
+        {% set fa_class_ = 'fas fa-calculator' %}
+
+
+
+    {# Operations #}
+    {% elif name=="edit" %}
+        {% set fa_class_ = 'fas fa-pencil-alt' %}
+    {% elif name=="delete" %}
+        {% set fa_class_ = 'fas fa-trash' %}
+    {% elif name=="archive" %}
+        {% set fa_class_ = 'fas fa-archive' %}
+    {% elif name=="unarchive" %}
+        {% set fa_class_ = 'fas fa-archive' %}
+
+    {% elif name=="remove" %}
+        {% set value = '×' %}
+
+    {% elif name=="previous" %}
+        {% set fa_class_ = 'fas fa-chevron-left' %}
+    {% elif name=="next" %}
+        {% set fa_class_ = 'fas fa-chevron-right' %}
+
+
+    {# Sharing, publishing,... #}
+    {% elif name=="shared" %}
+        {% set fa_class_ = 'fas fa-user-friends' %}
+        {% if not tooltip %} {% set tooltip="zveřejněno" %} {% endif %}
+        {% set with_tooltip = True %}
+    {% elif name=="share" %}
+        {% set fa_class_ = 'fas fa-user-friends' %}
+    {% elif name=="unshare" %}
+        {% set fa_class_ = 'fas fa-ban' %}
+    {% elif name=="print" %}
+        {% set fa_class_ = 'fas fa-print' %}
+    {% elif name=="public" %}
+        {% set fa_class_ = 'fas fa-user-friends' %}
+        {% if not tooltip %} {% set tooltip="z veřejných" %} {% endif %}
+        {% set with_tooltip = True %}
+    {% elif name=="heart_empty" %}
+        {% set fa_class_ = 'far fa-heart color-red' %}
+    {% elif name=="heart_full" %}
+        {% set fa_class_ = 'fas fa-heart color-red' %}
+
+    {# Ingredients #}
+    {% elif name=="ingredient_remove" %}
+        {% set fa_class_ = 'remove fa fa-times' %}
+
+    {# Misc #}
+    {% elif name=="recipe_database" %}
+        {% set fa_class_ = 'fas fa-book-open' %}
+    {% elif name=="cookbook" %}
+        {% set fa_class_ = 'fas fa-book' %}
+    {% elif name=="food" %}
+        {% set fa_class_ = 'fas fa-utensils' %}
+    {% elif name=="shopping" %}
+        {% set fa_class_ = 'fas fa-shopping-basket' %}
+    {% elif name=="info" %}
+        {% set fa_class_ = 'fas fa-info' %}
+    {% elif name=="info-circle" %}
+        {% set fa_class_ = 'fas fa-info-circle' %}
+    {% elif name=="list" %}
+        {% set fa_class_ = 'fas fa-list-ul' %}
+    {% elif name=="photo" %}
+        {% set fa_class_ = 'far fa-image' %}
+
+    {% elif name=="up" %}
+        {% set fa_class_ = 'fas fa-sort-up' %}
+    {% elif name=="down" %}
+        {% set fa_class_ = 'fas fa-sort-down' %}
+
+
+    {# Brands #}
+    {% elif name=="github" %}
+        {% set fa_class_ = 'fab fa-github' %}
+    {% elif name=="google" %}
+        {% set fa_class_ = 'fab fa-google' %}
+    {% elif name=="facebook" %}
+        {% set fa_class_ = 'fab fa-facebook-square' %}
+    {% elif name=="pdf" %}
+        {% set fa_class_ = 'fas fa-file-pdf color-red' %}
+        {% if not tooltip %} {% set tooltip="pdf" %} {% endif %}
+        {% set with_tooltip = True %}
+
+    {# Other, currently unused #}
+    
+    
+    
+{#     "facebook_small": '<a target="_blank" title="sledujte na facebooku" href="/support/facebook"><img alt="follow me on facebook" src="https://c866088.ssl.cf3.rackcdn.com/assets/facebook30x30.png" style="width: 1.5rem; height: auto; margin-top: 0.3rem" border=0></a>',
+    "facebook": '<a target="_blank" title="sledujte na facebooku" href="/support/facebook"><img alt="follow me on facebook" src="https://c866088.ssl.cf3.rackcdn.com/assets/facebook40x40.png" border=0></a>', #}
+    
+
+    {% else %}
+        {% set fa_class_ = '' %}
+    {% endif %}
+
+    {% set with_tooltip = kwargs.pop('with_tooltip', with_tooltip) %}
+
+    {% if with_tooltip %}
+        <abbr title="{{ tooltip }}">
+    {% endif %}
+
+    <i class="{{ fa_class_ + ' ' + class_ }}" {% if action %}data-action="{{ action }}"{% endif %}>
+        {% if value %}{{ value }}{% endif %}
+    </i>
+
+
+    {% if with_tooltip %}
+        </abbr>
+    {% endif %}
+	
+{% endmacro %}

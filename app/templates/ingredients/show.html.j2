@@ -39,11 +39,11 @@
                 {% if ingredient.can_current_user_edit %}
                     {% from "macros/_admin_field.html.j2" import admin_field_class with context %}
                     <form {{ admin_field_class(obj=ingredient) }} action="{{ url_for('IngredientsView:delete', id=ingredient.id) }}" onsubmit="return confirm('{{ texts.ingredient_delete_confirm }}');" method="post" accept-charset="utf-8">
-                        <a class="btn btn-secondary" href="{{ url_for('IngredientsView:edit', id=ingredient.id) }}">{{ texts.edit }} {{ icons.edit }}</a>
+                        <a class="btn btn-secondary" href="{{ url_for('IngredientsView:edit', id=ingredient.id) }}">{{ texts.edit }} {{ icon("edit") }}</a>
                         {% if ingredient.is_used == False %}
-                            <button type="submit" class="btn btn-danger">{{ texts.ingredient_delete }} {{ icons.delete }}</button>
+                            <button type="submit" class="btn btn-danger">{{ texts.ingredient_delete }} {{ icon("delete") }}</button>
                         {% else %}
-                            <button type="submit" class="btn btn-danger" disabled>{{ texts.delete_error }} {{ icons.delete }}</button>
+                            <button type="submit" class="btn btn-danger" disabled>{{ texts.delete_error }} {{ icon("delete") }}</button>
                         {% endif %}
                     </form>
                 {% endif %}
