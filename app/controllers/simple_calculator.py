@@ -18,4 +18,5 @@ class SimpleCalculatorView(ExtendedFlaskView):
         else:
             self.ingredients = shared_ingredients
             self.diets = None
+
         return self.template()

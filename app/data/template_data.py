@@ -88,6 +88,4 @@ texts = {
     "register": "Registrovat",
     "register_google": "Registrovat pomocí Google",
     "forgotten_password": "Zapomněli jste heslo?",
-    # Misc
-    "copyright": '&copy; Copyright since 2017 by <a href="mailto:ketocalc.jmp@gmail.com">Jan Peterka</a>',
 }
