@@ -37,6 +37,7 @@ class UsersView(ExtendedFlaskView):
         self.password_form = create_form(PasswordForm)
         return self.template()
 
+    @route("post_edit", methods=["POST"])
     def post_edit(self, page_type=None):
         form = UsersForm(request.form)
         del form.username

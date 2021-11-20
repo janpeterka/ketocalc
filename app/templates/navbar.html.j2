@@ -12,7 +12,7 @@
 
       <ul class="nav navbar-nav navbar-center">
         <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('UsersView:show') }}">{{ icons.user }}</a>
+          <a class="nav-link" href="{{ url_for('UsersView:show') }}"> {{ icon("user") }} </a>
         </li>
 
         <li class="nav-item dropdown">
@@ -21,9 +21,9 @@
             Přidat
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="{{ url_for('RecipesView:new') }}">recept</a>
-            <a class="dropdown-item" href="{{ url_for('DietsView:new') }}">dietu</a>
-            <a class="dropdown-item" href="{{ url_for('IngredientsView:new') }}">surovinu</a>
+            <a class="dropdown-item" href="{{ url_for('RecipesView:new') }}"> recept </a>
+            <a class="dropdown-item" href="{{ url_for('DietsView:new') }}"> dietu </a>
+            <a class="dropdown-item" href="{{ url_for('IngredientsView:new') }}"> surovinu </a>
           </div>
         </li>
 
@@ -39,8 +39,8 @@
           </div>
         </li>
 
-        <a class="nav-link" href="{{ url_for('SimpleCalculatorView:index') }}">Jednoduchá {{ icons.calculator }}</a>
-        <a class="nav-link" href="{{ url_for('DailyPlansView:index') }}">{{ icons.daily }} Denní plán</a>
+        <a class="nav-link" href="{{ url_for('SimpleCalculatorView:index') }}">Jednoduchá {{ icon("calculator") }}</a>
+        <a class="nav-link" href="{{ url_for('DailyPlansView:index') }}">{{ icon("daily") }} Denní plán</a>
         <a class="nav-link" href="{{ url_for('CookbookView:index') }}">Veřejné recepty</a>
 
         {% if current_user.is_admin %}{% include '_navbar_admin.html.j2' %}{% endif %}

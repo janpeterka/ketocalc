@@ -25,7 +25,7 @@
         </div>
 
         <div>
-            <a href="{{ url_for('UsersView:edit') }}" class="btn btn-secondary">{{ texts.edit }} {{ icons.edit }}</a>
+            <a href="{{ url_for('UsersView:edit') }}" class="btn btn-secondary">{{ texts.edit }} {{ icon("edit") }}</a>
         </div>
 
         {% if current_user.is_admin %}

@@ -20,11 +20,7 @@ def app(scope="session"):
 
     @app.context_processor
     def inject_globals():
-        return dict(
-            icons=template_data.icons,
-            social_icons=template_data.social_icons,
-            texts=template_data.texts,
-        )
+        return dict(texts=template_data.texts)
 
     @app.context_processor
     def utility_processor():
