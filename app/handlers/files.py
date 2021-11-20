@@ -31,12 +31,13 @@ from flask import current_app as application
 
 class FileHandler(object):
     def __new__(self, **kwargs):
-        if application.config["STORAGE_SYSTEM"] == "LOCAL":
+        if (
+            application.config["STORAGE_SYSTEM"] == "LOCAL"
+            or application.config["STORAGE_SYSTEM"] != "AWS"
+        ):
             return LocalFileHandler(**kwargs)
-        elif application.config["STORAGE_SYSTEM"] == "AWS":
-            return AWSFileHandler(**kwargs)
         else:
-            return LocalFileHandler(**kwargs)
+            return AWSFileHandler(**kwargs)
 
 
 class LocalFileHandler(object):
@@ -172,10 +173,7 @@ class AWSFileHandler(object):
         raise NotImplementedError
 
     def url(self, file, thumbnail=False):
-        if thumbnail is True:
-            file_path = f"thumbnails/{file.path}"
-        else:
-            file_path = file.path
+        file_path = f"thumbnails/{file.path}" if thumbnail is True else file.path
         return self._create_presigned_url(file_path)
 
     @property
@@ -204,11 +202,9 @@ class AWSFileHandler(object):
         """
         Function to upload a file to an S3 bucket
         """
-        response = self.client.upload_file(
+        return self.client.upload_file(
             file_path, application.config["BUCKET"], file_name
         )
-
-        return response
 
     def _list_files(self):
         """
@@ -253,12 +249,13 @@ class AWSFileHandler(object):
 
 class ImageHandler(object):
     def __new__(self, **kwargs):
-        if application.config["STORAGE_SYSTEM"] == "LOCAL":
+        if (
+            application.config["STORAGE_SYSTEM"] == "LOCAL"
+            or application.config["STORAGE_SYSTEM"] != "AWS"
+        ):
             return LocalImageHandler(**kwargs)
-        elif application.config["STORAGE_SYSTEM"] == "AWS":
-            return AWSImageHandler(**kwargs)
         else:
-            return LocalImageHandler(**kwargs)
+            return AWSImageHandler(**kwargs)
 
 
 class ImageHandlerMixin(object):
