@@ -1,13 +1,13 @@
 """
 File Handlers
 
-This classes are used to manage files.
+This class is used to manage files.
 
 Currently two types of storage are supported:
     - Local (via LocalFileHandler)
-    - AWS (via AWSFileStorage)
+    - AWS (via AWSFileHandler)
 
-    All (both) types should support following public methods:
+    All types should support following public methods:
     - save (expecting File)
     - delete (expecting File)
     - show (expecting File)
@@ -45,6 +45,7 @@ class LocalFileHandler(object):
         # create folder `files/` if doesn't exist
         if not os.path.exists(self.folder):
             os.makedirs(self.folder)
+        
         if subfolder is not None:
             self.folder = os.path.join(self.folder, subfolder)
             # create folder `files/subfolder/` if doesn't exist
