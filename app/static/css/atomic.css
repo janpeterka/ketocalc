@@ -33,4 +33,10 @@
 	font-family: 'MontSerrat', serif;
 }
 
-/* margins - using Bootstap */
+.text-smaller {
+	font-size: smaller !important;
+}
+
+.text-larger {
+	font-size: larger !important;
+}
