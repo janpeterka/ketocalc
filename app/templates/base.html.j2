@@ -9,6 +9,7 @@
 {% block head %}
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     {% block links %}
 
@@ -66,6 +67,7 @@
     <title>{% block title %}{% endblock %}</title>
 {% endblock head %}
 </head>
+
 <body>
     {% block navbar %}
         {% if current_user.is_authenticated %}
@@ -76,9 +78,7 @@
     {% endblock %}
 
     {% block top %}
-        {% if current_user.is_admin %}
-            {% include('_admin_warning.html.j2') %}
-        {% endif %}
+        
         {% include('_flashing.html.j2') %}
     {% endblock %}
 
@@ -88,10 +88,19 @@
         <span class="dev-badge prod"><strong>PROD</strong></span>
     {% endif %}
 
+    {% if current_user.is_admin %}
+        {% include('_admin_warning.html.j2') %}
+    {% endif %}
+
+
     {% if current_user.logged_from_admin %}
         {% include 'admin/_from_admin.html.j2'%}        
     {% endif %}
-    <div id="content">{% block content %}{% endblock %}</div>
+
+    <div id="content" class="container mb-5">
+        {% block content %}{% endblock %}
+    </div>
+    
     <div class="footer">
         {% block footer %}
             &copy; Copyright since 2017 by <a href="mailto:ketocalc.jmp@gmail.com"> Jan Peterka </a>
@@ -100,4 +109,5 @@
     <!-- cookies -->
     {% include('support/_cookies_consent.html.j2') %}
 </body>
+
 </html>

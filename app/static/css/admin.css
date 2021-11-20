@@ -1,0 +1,52 @@
+.color-admin {
+  color: var(--admin-yellow) !important;
+}
+
+.bg-color-admin {
+  background-color: var(--admin-yellow) !important;
+
+}
+
+.admin-field {
+  background-color: var(--admin-yellow);
+  margin-top: 2rem;
+  padding: 0.5rem;
+  border: solid 0.1rem red;
+}
+
+.badge {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0.5rem 0.5rem 0.7rem black;
+}
+
+.admin-warning {
+  text-align: center;
+  position: fixed;
+  bottom: 2rem;
+  left: 2rem;
+  z-index: 1;
+}
+
+.dev-badge {
+  margin-left: 2rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0.5rem 0.5rem 0.7rem black;
+}
+
+.dev-badge.dev {
+  background-color: var(--logo-light-green);
+}
+
+.dev-badge.prod {
+  background-color: var(--palette-orange);
+}
+
+.from-admin-badge {
+  float: right;
+  margin-right: 2rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: var(--logo-light-green);
+}
