@@ -1,6 +1,6 @@
 {% macro admin_field_class() %}
 
-	{% set with_errors = kwargs.pop('in_class', False) %}
+	{% set in_class = kwargs.pop('in_class', False) %}
 	{% set object = kwargs.pop('obj', None) %}
 
 	{# Only show if this wouldn't be visible to current user if they weren't admin #}
