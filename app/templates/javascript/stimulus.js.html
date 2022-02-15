@@ -10,6 +10,11 @@
 import { Application, Controller } from "https://unpkg.com/@hotwired/stimulus/dist/stimulus.js"
 window.Stimulus = Application.start()
 
+{% if config["APP_STATE"]=="development" %}
+	window.Stimulus.debug = true
+{% endif %}
+
+
 {% for controller in varargs %}
 	{% if controller == "daily-plan" %}
 		{% include 'javascript/_daily_plan_controller.js' %}
