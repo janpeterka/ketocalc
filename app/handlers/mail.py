@@ -31,7 +31,7 @@ class MailSender(object):
     def send_email(
         self,
         subject,
-        recipients=None,
+        recipients=[],
         recipient_mails=[],
         text_body=None,
         html_body=None,
