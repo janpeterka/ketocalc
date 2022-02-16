@@ -143,7 +143,7 @@ class Recipe(db.Model, ItemMixin):
             totals.amount += ingredient.amount
 
         for metric in metrics:
-            value = getattr(totals, metric)
+            value = getattr(totals, metric, 0)
             setattr(totals, metric, math.floor(value) / 100)
 
         totals.amount = math.floor(totals.amount)
