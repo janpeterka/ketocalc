@@ -148,9 +148,13 @@ class Recipe(db.Model, ItemMixin):
 
         totals.amount = math.floor(totals.amount)
 
-        totals.ratio = (
-            math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
-        )
+        if totals.protein + totals.sugar > 0:
+            totals.ratio = (
+                math.floor((totals.fat / (totals.protein + totals.sugar)) * 100) / 100
+            )
+        else:
+            totals.ratio = 0
+
         return totals
 
     @property
