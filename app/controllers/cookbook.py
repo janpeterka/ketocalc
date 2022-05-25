@@ -6,7 +6,7 @@ from app.helpers.base_view import BaseView
 
 from app.models import Recipe
 
-from app.controllers.forms import CookbookFilterForm
+from app.forms import CookbookFilterForm
 
 
 class CookbookView(BaseView):

@@ -1,6 +1,7 @@
 from .cookbook_filter import CookbookFilterForm
 from .diets import DietForm
 from .feedback import FeedbackForm
+from .files import PhotoForm
 from .ingredients import IngredientForm
 from .login import LoginForm
 from .password_recovery import NewPasswordForm
@@ -16,6 +17,7 @@ __all__ = [
     "IngredientForm",
     "LoginForm",
     "NewPasswordForm",
+    "PhotoForm",
     "GetNewPasswordForm",
     "RegisterForm",
     "UserForm",

@@ -8,7 +8,7 @@ from flask_login import current_user, login_required
 
 from app.handlers.mail import MailSender
 
-from app.controllers.forms.feedback import FeedbackForm
+from app.forms.feedback import FeedbackForm
 
 
 class SupportView(FlaskView):
@@ -60,7 +60,8 @@ class SupportView(FlaskView):
         PATH = os.path.dirname(os.path.realpath(__file__))
         FILES_PATH = os.path.join(PATH, "../public/files/")
         return send_file(
-            os.path.join(FILES_PATH, filename), attachment_filename=filename,
+            os.path.join(FILES_PATH, filename),
+            attachment_filename=filename,
         )
 
     @route("terms")

@@ -3,7 +3,7 @@ from wtforms import validators, ValidationError
 
 from flask_wtf import FlaskForm
 
-from app.controllers.forms.custom import ComaFloatField
+from app.forms.custom import ComaFloatField
 
 
 class IngredientForm(FlaskForm):

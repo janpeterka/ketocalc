@@ -12,7 +12,7 @@ from app.helpers.form import create_form, save_form_to_session
 
 from app.models import User
 
-from app.controllers.forms import UserForm, PasswordForm
+from app.forms import UserForm, PasswordForm
 
 
 class UserView(BaseView):

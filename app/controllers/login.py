@@ -6,7 +6,7 @@ from flask_login import current_user
 
 from app.auth.routes import do_login
 from app.helpers.form import create_form, save_form_to_session
-from app.controllers.forms.login import LoginForm
+from app.forms.login import LoginForm
 
 
 class LoginView(FlaskView):

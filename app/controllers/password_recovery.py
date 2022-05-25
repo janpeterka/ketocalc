@@ -7,7 +7,7 @@ from flask_login import current_user
 
 from app.auth.routes import generate_new_password_token
 
-from app.controllers.forms.password_recovery import NewPasswordForm, GetNewPasswordForm
+from app.forms.password_recovery import NewPasswordForm, GetNewPasswordForm
 from app.handlers.mail import MailSender
 from app.helpers.form import create_form, save_form_to_session
 from app.models.users import User
@@ -36,7 +36,9 @@ class PasswordRecoveryView(FlaskView):
         )
 
         MailSender().send_email(
-            subject="Nové heslo", recipients=[user], html_body=html_body,
+            subject="Nové heslo",
+            recipients=[user],
+            html_body=html_body,
         )
 
         flash("Nové heslo vám bylo zasláno do emailu", "success")

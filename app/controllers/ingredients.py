@@ -8,7 +8,7 @@ from app.helpers.base_view import BaseView
 
 from app.models import Ingredient, Recipe
 
-from app.controllers.forms import IngredientForm
+from app.forms import IngredientForm
 
 
 class IngredientView(BaseView):

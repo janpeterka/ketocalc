@@ -52,7 +52,7 @@ class RecipeView(BaseRecipeView):
         pass
 
     def show(self, id):
-        from .forms.files import PhotoForm
+        from app.forms import PhotoForm
 
         self.is_print = False
         self.photo_form = PhotoForm()
@@ -143,9 +143,9 @@ class RecipeView(BaseRecipeView):
     @route("/upload_photo/<id>", methods=["POST"])
     def upload_photo(self, id):
         from werkzeug.datastructures import CombinedMultiDict
-        from .forms.files import PhotoForm
+        from app.forms.files import PhotoForm
 
-        from app.models.files import RecipeImageFile
+        from app.models import RecipeImageFile
 
         form = PhotoForm(CombinedMultiDict((request.files, request.form)))
 

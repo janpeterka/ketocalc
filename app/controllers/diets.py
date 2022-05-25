@@ -7,7 +7,7 @@ from app.helpers.form import save_form_to_session, create_form
 
 from app.models import Diet
 
-from app.controllers.forms import DietForm
+from app.forms import DietForm
 
 
 class DietView(BaseView):
