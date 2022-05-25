@@ -139,7 +139,7 @@ class BaseView(FlaskView):
         """
         e.g. string "UserForm"
         """
-        form_name = f"{self._model_name}sForm"
+        form_name = f"{self._model_name}Form"
         return form_name
 
     @property

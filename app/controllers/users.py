@@ -12,7 +12,7 @@ from app.helpers.form import create_form, save_form_to_session
 
 from app.models import User
 
-from app.controllers.forms import UsersForm, PasswordForm
+from app.controllers.forms import UserForm, PasswordForm
 
 
 class UserView(BaseView):
@@ -25,14 +25,14 @@ class UserView(BaseView):
         return self.template()
 
     def edit(self):
-        self.user_form = create_form(UsersForm, obj=self.user)
+        self.user_form = create_form(UserForm, obj=self.user)
         self.password_form = create_form(PasswordForm)
 
         return self.template()
 
     @route("update", methods=["POST"])
     def update(self, page_type=None):
-        form = UsersForm(request.form)
+        form = UserForm(request.form)
         del form.username
 
         if not form.validate_on_submit():

@@ -8,7 +8,7 @@ from app.helpers.base_view import BaseView
 
 from app.models import Ingredient, Recipe
 
-from app.controllers.forms import IngredientsForm
+from app.controllers.forms import IngredientForm
 
 
 class IngredientView(BaseView):
@@ -45,12 +45,12 @@ class IngredientView(BaseView):
         return self.template()
 
     def new(self):
-        self.form = create_form(IngredientsForm)
+        self.form = create_form(IngredientForm)
 
         return self.template()
 
     def post(self):
-        form = IngredientsForm(request.form)
+        form = IngredientForm(request.form)
 
         if not form.validate_on_submit():
             save_form_to_session(request.form)
@@ -69,7 +69,7 @@ class IngredientView(BaseView):
         return self.template()
 
     def edit(self, id):
-        self.form = create_form(IngredientsForm, obj=self.ingredient)
+        self.form = create_form(IngredientForm, obj=self.ingredient)
 
         if self.ingredient.is_used:
             self.form.calorie.errors = []
@@ -81,7 +81,7 @@ class IngredientView(BaseView):
 
     @route("update/<id>", methods=["POST"])
     def update(self, id):
-        form = IngredientsForm(request.form)
+        form = IngredientForm(request.form)
 
         if self.ingredient.is_used:
             del form.calorie
@@ -122,7 +122,7 @@ class IngredientView(BaseView):
 
     def new_shared(self):
         # TODO can be simplified -> redirect? calling super with kwargs?
-        form = create_form(IngredientsForm)
+        form = create_form(IngredientForm)
 
         return self.template("ingredients/new.html.j2", form=form, shared=True)
 
@@ -138,7 +138,7 @@ class IngredientView(BaseView):
 
     @route("post/shared", methods=["POST"])
     def post_shared(self):
-        form = IngredientsForm(request.form)
+        form = IngredientForm(request.form)
 
         if not form.validate_on_submit():
             save_form_to_session(request.form)

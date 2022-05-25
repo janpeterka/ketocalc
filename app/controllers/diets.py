@@ -7,7 +7,7 @@ from app.helpers.form import save_form_to_session, create_form
 
 from app.models import Diet
 
-from app.controllers.forms import DietsForm
+from app.controllers.forms import DietForm
 
 
 class DietView(BaseView):
@@ -36,12 +36,12 @@ class DietView(BaseView):
         return self.template()
 
     def new(self):
-        self.form = create_form(DietsForm)
+        self.form = create_form(DietForm)
 
         return self.template()
 
     def post(self):
-        form = DietsForm(request.form)
+        form = DietForm(request.form)
 
         if not form.validate_on_submit():
             save_form_to_session(request.form)
@@ -60,13 +60,13 @@ class DietView(BaseView):
         return self.template()
 
     def edit(self, id):
-        self.form = create_form(DietsForm, obj=self.diet)
+        self.form = create_form(DietForm, obj=self.diet)
 
         return self.template()
 
     @route("update/<id>", methods=["POST"])
     def update(self, id):
-        form = DietsForm(request.form)
+        form = DietForm(request.form)
 
         if self.diet.is_used:
             del form.calorie

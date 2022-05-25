@@ -6,7 +6,7 @@ from flask_wtf import FlaskForm
 from app.controllers.forms.custom import ComaFloatField
 
 
-class DietsForm(FlaskForm):
+class DietForm(FlaskForm):
     name = StringField(
         "Název diety", [validators.InputRequired("Název musí být vyplněn")]
     )
