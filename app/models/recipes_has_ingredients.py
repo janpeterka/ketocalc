@@ -26,5 +26,15 @@ class RecipeHasIngredient(db.Model):
     )
     amount = db.Column(db.Float, nullable=False)
 
-    ingredients = db.relationship("Ingredient")
-    recipes = db.relationship("Recipe")
+    ingredients = db.relationship(
+        "Ingredient",
+        backref=db.backref(
+            "ingredient_recipes", cascade="all, delete, delete-orphan", viewonly=False
+        ),
+    )
+    recipes = db.relationship(
+        "Recipe",
+        backref=db.backref(
+            "recipe_ingredients", cascade="all, delete, delete-orphan", viewonly=False
+        ),
+    )

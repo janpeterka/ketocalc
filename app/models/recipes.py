@@ -10,10 +10,7 @@ from flask_login import current_user
 
 from app.models.item_mixin import ItemMixin
 
-from app.models.ingredients import Ingredient
-from app.models.recipes_has_ingredients import RecipeHasIngredient
-
-from app.models.user_recipe_reactions import UserHasRecipeReaction
+from app.models import Ingredient
 
 
 class Recipe(db.Model, ItemMixin):
@@ -89,21 +86,10 @@ class Recipe(db.Model, ItemMixin):
         db.session.commit()
         return self.id
 
-    def remove(self):
-        # TODO: - to improve w/ orphan cascade (80)
-        ingredients = RecipeHasIngredient.query.filter(
-            RecipeHasIngredient.recipes_id == self.id
-        )
-        for i in ingredients:
-            db.session.delete(i)
-
-        db.session.delete(self)
-        db.session.commit()
-        return True
-
     def toggle_shared(self):
         self.is_shared = not self.is_shared
         self.edit()
+
         return self.is_shared
 
     def toggle_reaction(self, user=None):
@@ -115,13 +101,19 @@ class Recipe(db.Model, ItemMixin):
             self.add_reaction(user)
 
     def add_reaction(self, user):
+        from app.models import UserHasRecipeReaction
+
         UserHasRecipeReaction(recipe=self, user=user).save()
 
     def remove_reaction(self, user):
+        from app.models import UserHasRecipeReaction
+
         UserHasRecipeReaction.load_by_recipe_and_current_user(recipe=self).remove()
 
     @property
     def has_reaction(self):
+        from app.models import UserHasRecipeReaction
+
         reactions = UserHasRecipeReaction.load_by_recipe_and_current_user(self)
         return bool(reactions)
 

@@ -12,7 +12,7 @@
 {% block content %}
     <div class="container">
         <div class="col-12">
-            <form action="{{ url_for('RecipeView:post_edit', id=recipe.id) }}" class="form" method="post" accept-charset="utf-8">
+            <form action="{{ url_for('RecipeView:update', id=recipe.id) }}" class="form" method="post" accept-charset="utf-8">
                 <div class="row">
                     <div class="col">
                         <label for="name">Název</label>
@@ -51,12 +51,12 @@
 
                 <tr class="totals">
                     <td>Celkem</td>
-                    <td>{{ totals.calorie }}</td>
-                    <td>{{ totals.protein }}</td>
-                    <td>{{ totals.fat }}</td>
-                    <td>{{ totals.sugar }}</td>
-                    <td>{{ totals.amount|round(2,'common')  }}</td>
-                    <td>Poměr: {{ totals.ratio }} : 1</td>
+                    <td>{{ recipe.totals.calorie }}</td>
+                    <td>{{ recipe.totals.protein }}</td>
+                    <td>{{ recipe.totals.fat }}</td>
+                    <td>{{ recipe.totals.sugar }}</td>
+                    <td>{{ recipe.totals.amount|round(2,'common')  }}</td>
+                    <td>Poměr: {{ recipe.totals.ratio }} : 1</td>
                 </tr>
             </table>
 

@@ -40,9 +40,6 @@ class DietView(BaseView):
 
         return self.template()
 
-    def show(self, id):
-        return self.template()
-
     def post(self):
         form = DietsForm(request.form)
 
@@ -58,6 +55,9 @@ class DietView(BaseView):
         else:
             flash("Nepodařilo se vytvořit dietu", "error")
             return redirect(url_for("DietView:new"))
+
+    def show(self, id):
+        return self.template()
 
     def edit(self, id):
         self.form = create_form(DietsForm, obj=self.diet)

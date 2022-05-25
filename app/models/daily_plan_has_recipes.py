@@ -18,8 +18,18 @@ class DailyPlanHasRecipes(db.Model, BaseMixin):
     order_index = db.Column(db.Integer)
     added_at = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
 
-    daily_plan = db.relationship("DailyPlan")
-    recipe = db.relationship("Recipe")
+    daily_plan = db.relationship(
+        "DailyPlan",
+        backref=db.backref(
+            "daily_plan_recipes", cascade="all, delete, delete-orphan", viewonly=False
+        ),
+    )
+    recipe = db.relationship(
+        "Recipe",
+        backref=db.backref(
+            "recipe_daily_plans", cascade="all, delete, delete-orphan", viewonly=False
+        ),
+    )
 
     # @staticmethod
     # def load_by_daily_plan_and_order_index(daily_plan, order_index):

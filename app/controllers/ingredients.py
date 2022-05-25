@@ -49,9 +49,6 @@ class IngredientView(BaseView):
 
         return self.template()
 
-    def show(self, id):
-        return self.template()
-
     def post(self):
         form = IngredientsForm(request.form)
 
@@ -67,6 +64,9 @@ class IngredientView(BaseView):
         else:
             flash("Nepodařilo se vytvořit surovinu", "error")
             return redirect(url_for("IngredientView:new"))
+
+    def show(self, id):
+        return self.template()
 
     def edit(self, id):
         self.form = create_form(IngredientsForm, obj=self.ingredient)
