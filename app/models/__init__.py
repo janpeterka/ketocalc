@@ -1,14 +1,29 @@
-# This is needed for Flask-Migrate to work
-# import all tables that are not classes (only raw M:N relationship tables)
-# imports automatically (because it's __init__.py file)
-
-from .daily_plan_has_recipes import DailyPlanHasRecipes  # noqa: F401
 from .diets_has_recipes import diets_has_recipes  # noqa: F401
+from .users_has_diets import users_has_diets  # noqa: F401
 from .request_log import RequestLog  # noqa: F401
 
-# This is needed for ExtendedFlaskView to automatically import all Model classes
-from .daily_plans import DailyPlan  # noqa: F401
-from .diets import Diet  # noqa: F401
-from .ingredients import Ingredient  # noqa: F401
-from .recipes import Recipe  # noqa: F401
-from .users import User  # noqa: F401
+from .daily_plans import DailyPlan
+from .daily_plan_has_recipes import DailyPlanHasRecipes
+from .diets import Diet
+from .files import File, RecipeImageFile
+from .ingredients import Ingredient
+from .recipes import Recipe
+from .recipes_has_ingredients import RecipeHasIngredient
+from .sent_mails import SentMail
+from .user_recipe_reactions import UserHasRecipeReaction
+from .users import User
+
+
+__all__ = [
+    "DailyPlanHasRecipes",
+    "DailyPlan",
+    "Diet",
+    "File",
+    "RecipeImageFile",
+    "Ingredient",
+    "Recipe",
+    "RecipeHasIngredient",
+    "SentMail",
+    "UserHasRecipeReaction",
+    "User",
+]

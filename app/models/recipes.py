@@ -11,9 +11,9 @@ from flask_login import current_user
 from app.models.item_mixin import ItemMixin
 
 from app.models.ingredients import Ingredient
-from app.models.recipes_has_ingredients import RecipeHasIngredients
+from app.models.recipes_has_ingredients import RecipeHasIngredient
 
-from app.models.user_recipe_reactions import UserRecipeReactions
+from app.models.user_recipe_reactions import UserHasRecipeReaction
 
 
 class Recipe(db.Model, ItemMixin):
@@ -33,7 +33,7 @@ class Recipe(db.Model, ItemMixin):
     diet = db.relationship("Diet", secondary="diets_has_recipes", uselist=False)
     ingredients = db.relationship(
         "Ingredient",
-        primaryjoin="and_(Recipe.id == remote(RecipeHasIngredients.recipes_id), foreign(Ingredient.id) == RecipeHasIngredients.ingredients_id)",
+        primaryjoin="and_(Recipe.id == remote(RecipeHasIngredient.recipes_id), foreign(Ingredient.id) == RecipeHasIngredient.ingredients_id)",
         viewonly=True,
         order_by="Ingredient.name",
     )
@@ -91,8 +91,8 @@ class Recipe(db.Model, ItemMixin):
 
     def remove(self):
         # TODO: - to improve w/ orphan cascade (80)
-        ingredients = RecipeHasIngredients.query.filter(
-            RecipeHasIngredients.recipes_id == self.id
+        ingredients = RecipeHasIngredient.query.filter(
+            RecipeHasIngredient.recipes_id == self.id
         )
         for i in ingredients:
             db.session.delete(i)
@@ -115,14 +115,14 @@ class Recipe(db.Model, ItemMixin):
             self.add_reaction(user)
 
     def add_reaction(self, user):
-        UserRecipeReactions(recipe=self, user=user).save()
+        UserHasRecipeReaction(recipe=self, user=user).save()
 
     def remove_reaction(self, user):
-        UserRecipeReactions.load_by_recipe_and_current_user(recipe=self).remove()
+        UserHasRecipeReaction.load_by_recipe_and_current_user(recipe=self).remove()
 
     @property
     def has_reaction(self):
-        reactions = UserRecipeReactions.load_by_recipe_and_current_user(self)
+        reactions = UserHasRecipeReaction.load_by_recipe_and_current_user(self)
         return bool(reactions)
 
     @property

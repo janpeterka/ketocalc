@@ -11,7 +11,7 @@ from app.models.recipes import Recipe
 from app.models.diets import Diet
 from app.models.users import User
 from app.models.ingredients import Ingredient
-from app.models.recipes_has_ingredients import RecipeHasIngredients
+from app.models.recipes_has_ingredients import RecipeHasIngredient
 
 from app.controllers.base_recipes import BaseRecipesView
 
@@ -132,7 +132,7 @@ class RecipesView(BaseRecipesView):
 
         ingredients = []
         for temp_i in temp_ingredients:
-            rhi = RecipeHasIngredients()
+            rhi = RecipeHasIngredient()
             rhi.ingredients_id = temp_i["id"]
             rhi.amount = temp_i["amount"]
             ingredients.append(rhi)
