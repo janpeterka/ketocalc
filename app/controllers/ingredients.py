@@ -109,7 +109,7 @@ class IngredientView(BaseView):
         if not self.ingredient.is_used:
             self.ingredient.remove()
             flash("Surovina byla smazána", "success")
-            return redirect(url_for("DashboardView:show"))
+            return redirect(url_for("DashboardView:index"))
         else:
             flash("Tato surovina je použita, nelze smazat", "error")
             return redirect(url_for("IngredientView:show", id=self.ingredient.id))

@@ -123,7 +123,7 @@ class RecipeView(BaseRecipeView):
     def delete(self, id):
         self.recipe.remove()
         flash("Recept byl smazán.", "success")
-        return redirect(url_for("DashboardView:show"))
+        return redirect(url_for("DashboardView:index"))
 
     @route("/saveRecipeAJAX", methods=["POST"])
     def saveRecipeAJAX(self):
