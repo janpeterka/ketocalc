@@ -14,9 +14,8 @@ from app.models.recipes import Recipe
 from app.controllers.extended_flask_view import ExtendedFlaskView
 
 
-class DailyPlansView(ExtendedFlaskView):
+class DailyPlanView(ExtendedFlaskView):
     decorators = [login_required]
-
 
     @login_required
     def before_request(self, name, id=None, *args, **kwargs):
@@ -31,10 +30,10 @@ class DailyPlansView(ExtendedFlaskView):
     def before_index(self):
         if not current_user.is_authenticated:
             message = texts.daily_plan.not_logged_in
-            return redirect(url_for("DailyPlansView:not_logged_in", message=message))
-    
+            return redirect(url_for("DailyPlanView:not_logged_in", message=message))
+
     def index(self):
-        return redirect(url_for("DailyPlansView:show", date=datetime.date.today()))
+        return redirect(url_for("DailyPlanView:show", date=datetime.date.today()))
 
     def show(self, date):
         date_before = self.date + datetime.timedelta(days=-1)
@@ -51,7 +50,7 @@ class DailyPlansView(ExtendedFlaskView):
     def remove_daily_recipe(self, daily_recipe_id, date):
         daily_plan = DailyPlan.load_by_date_or_create(date)
         daily_plan.remove_daily_recipe_by_id(daily_recipe_id)
-        return redirect(url_for("DailyPlansView:show", date=date))
+        return redirect(url_for("DailyPlanView:show", date=date))
 
     @route("/add_recipe", methods=["POST"])
     def add_recipe(self):
@@ -68,12 +67,12 @@ class DailyPlansView(ExtendedFlaskView):
 
         daily_plan.add_recipe(recipe, amount)
 
-        return redirect(url_for("DailyPlansView:show", date=date))
+        return redirect(url_for("DailyPlanView:show", date=date))
 
     def sort_up(self, daily_recipe_id, date):
         self.daily_plan.change_order(daily_recipe_id, order_type="up")
-        return redirect(url_for("DailyPlansView:show", date=date))
+        return redirect(url_for("DailyPlanView:show", date=date))
 
     def sort_down(self, daily_recipe_id, date):
         self.daily_plan.change_order(daily_recipe_id, order_type="down")
-        return redirect(url_for("DailyPlansView:show", date=date))
+        return redirect(url_for("DailyPlanView:show", date=date))

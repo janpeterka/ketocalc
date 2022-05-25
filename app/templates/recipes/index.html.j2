@@ -1,37 +1,24 @@
 {% extends "base.html.j2" %}
-{% block title %}
-    {{ texts.recipe_all }}
-{% endblock %}
-
-{% block style %}{% endblock %}
-
-{% block script %}{% endblock %}
+{% block title %} moje recepty {% endblock %}
 
 {% block content %}
-    <div class="container">
-        <table id="diets" class="table">
+<h1>
+    moje recepty
+    <a class="btn btn-secondary float-right" href="{{ url_for('RecipeView:new') }}"> přidat recept </a>
+</h1>
 
-            {% for diet in diets: %}
-                <tr><th class='diet'>{{ link_to(diet) }}</th></tr>
+<table id="diets" class="table">
 
-                {% for recipe in diet.recipes: %}
-                    <tr>
-                        <td>{{ link_to(recipe) }}</td>
-                    </tr>
-                {% endfor %}
-            {% endfor %}       
+    {% for diet in diets: %}
+        <tr><th class='diet'>{{ link_to(diet) }}</th></tr>
 
-        </table>
+        {% for recipe in diet.recipes: %}
+            <tr>
+                <td>{{ link_to(recipe) }}</td>
+            </tr>
+        {% endfor %}
+    {% endfor %}       
 
-        <div>
-            <div>
-                <a href="{{ url_for('RecipesView:new') }}" target="_blank" class="btn btn-secondary">{{ texts.recipe_new }}</a>
-            </div>
-
-            <div style="margin-top: 5px">
-                <a href="{{ url_for('RecipesView:make_all_public') }}" class="btn btn-secondary">{{ texts.recipe_share_all }}</a>
-            </div>
-        </div>
-    </div>
+</table>
 {% endblock %}
 

@@ -11,7 +11,7 @@ from app.models.diets import Diet
 from app.models.ingredients import Ingredient
 
 
-class BaseRecipesView(FlaskView):
+class BaseRecipeView(FlaskView):
     @route("/addIngredientAJAX", methods=["POST"])
     def addIngredientAJAX(self):
         ingredient = Ingredient.load(request.json["ingredient_id"])

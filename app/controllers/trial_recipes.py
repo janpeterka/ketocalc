@@ -5,10 +5,10 @@ from flask_login import current_user
 
 from app.models.ingredients import Ingredient
 from app.models.users import User
-from app.controllers.base_recipes import BaseRecipesView
+from app.controllers.base_recipes import BaseRecipeView
 
 
-class TrialRecipesView(BaseRecipesView):
+class TrialRecipeView(BaseRecipeView):
     def before_index(self):
         if current_user.is_authenticated:
             return redirect(url_for("IndexView:index"))

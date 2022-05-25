@@ -46,7 +46,7 @@
 
             {% if current_user.is_admin %}
                 <div class="admin-field">
-                    Autor: <a href="{{ url_for('UsersView:show_by_id', id=recipe.author.id) }}">{{ recipe.author.username }}</a>
+                    Autor: <a href="{{ url_for('UserView:show_by_id', id=recipe.author.id) }}">{{ recipe.author.username }}</a>
                     Recipe views: {{ recipe.view_count }}
                 </div>
             {% endif %}
@@ -109,12 +109,12 @@
             {% from "macros/_admin_field.html.j2" import admin_field_class with context %}
 
             <div {{ admin_field_class(obj=recipe) }}>
-                <form action="{{ url_for('RecipesView:delete', id=recipe.id) }}" method="post" class="form-inline"  accept-charset="utf-8" onsubmit="return confirm('{{ texts.recipe_delete_confirm }}');">
-                    <a class="btn btn-warning" href="{{ url_for('RecipesView:edit', id=recipe.id) }}">{{ texts.edit }} {{ icon("edit") }}</a>
-                    <a class="btn btn-secondary" href="{{ url_for('RecipesView:print', id=recipe.id) }}" target="_blank" rel="noopener noreferrer">{{ texts.print }} {{ icon("print") }}</a>
+                <form action="{{ url_for('RecipeView:delete', id=recipe.id) }}" method="post" class="form-inline"  accept-charset="utf-8" onsubmit="return confirm('{{ texts.recipe_delete_confirm }}');">
+                    <a class="btn btn-warning" href="{{ url_for('RecipeView:edit', id=recipe.id) }}">{{ texts.edit }} {{ icon("edit") }}</a>
+                    <a class="btn btn-secondary" href="{{ url_for('RecipeView:print', id=recipe.id) }}" target="_blank" rel="noopener noreferrer">{{ texts.print }} {{ icon("print") }}</a>
                     <button type="submit" class="btn btn-danger">{{ texts.recipe_delete }} {{ icon("delete") }}</button>
                 </form>
-                <form action="{{ url_for('RecipesView:toggle_shared', id=recipe.id) }}" method="post" accept-charset="utf-8">
+                <form action="{{ url_for('RecipeView:toggle_shared', id=recipe.id) }}" method="post" accept-charset="utf-8">
                     {% if recipe.public == True %}
                         <button type="submit" class="btn btn-secondary">{{ texts.recipe_unshare }} {{ icon("unarchive") }}</button>
                     {% else %}
@@ -125,7 +125,7 @@
             {% endif %}
             
             <div class="mt-2">
-                <a class="btn btn-info" href="{{ url_for('RecipesView:new', preset_ingredient_ids=recipe_ingredient_ids_list(recipe)) }}">
+                <a class="btn btn-info" href="{{ url_for('RecipeView:new', preset_ingredient_ids=recipe_ingredient_ids_list(recipe)) }}">
                     {% if recipe.is_current_user_author %}
                         Převést do jiné diety
                     {% else %}
@@ -142,13 +142,13 @@
             {% for image in recipe.images %}
                 {{ render_image(image, style="width: 20rem; margin-bottom: 2rem", thumbnail=False) }}
                 {% if image.author == current_user or current_user.is_admin %}
-                    <form action="{{ url_for('FilesView:delete', id=image.id) }}" method="post">
+                    <form action="{{ url_for('FileView:delete', id=image.id) }}" method="post">
                         <button type="submit" class="btn btn-danger">{{ texts.image.delete }} {{ icon("delete") }}</button>
                     </form>
                 {% endif %}
             {% endfor %}
             {% if recipe.images|length == 0 and recipe.can_current_user_edit %}
-                <form {{ admin_field_class(obj=recipe) }} action="{{ url_for('RecipesView:upload_photo', id=recipe.id) }}" method="post" accept-charset="utf-8" enctype=multipart/form-data>
+                <form {{ admin_field_class(obj=recipe) }} action="{{ url_for('RecipeView:upload_photo', id=recipe.id) }}" method="post" accept-charset="utf-8" enctype=multipart/form-data>
                     {{ photo_form.file }}
                     {{ photo_form.submit(class="btn btn-secondary") }}
                 </form>         

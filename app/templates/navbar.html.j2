@@ -10,36 +10,13 @@
 
     <div id="navbar" class="collapse navbar-collapse">
 
-      <ul class="nav navbar-nav navbar-center">
-
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Přidat
-          </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="{{ url_for('RecipesView:new') }}"> recept </a>
-            <a class="dropdown-item" href="{{ url_for('DietsView:new') }}"> dietu </a>
-            <a class="dropdown-item" href="{{ url_for('IngredientsView:new') }}"> surovinu </a>
-          </div>
-        </li>
-
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Seznamy
-          </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="{{ url_for('RecipesView:index') }}">recepty</a>
-            <a class="dropdown-item" href="{{ url_for('IngredientsView:index') }}">suroviny</a>
-            <a class="dropdown-item" href="{{ url_for('DietsView:index') }}">diety</a>
-          </div>
-        </li>
-
-        <a class="nav-link" href="{{ url_for('SimpleCalculatorView:index') }}"> Jednoduchá {{ icon("calculator") }} </a>
-        <a class="nav-link" href="{{ url_for('DailyPlansView:index') }}"> Denní plán {{ icon("daily") }} </a>
-        <a class="nav-link" href="{{ url_for('CookbookView:index') }}"> Veřejné recepty </a>
-
+      <ul class="navbar-nav navbar-center">
+        <a class="nav-link active" href="{{ url_for('IngredientView:index') }}"> suroviny </a>
+        <a class="nav-link active" href="{{ url_for('RecipeView:index') }}"> recepty </a>
+        <a class="nav-link active" href="{{ url_for('DietView:index') }}"> diety </a>
+        <a class="nav-link active" href="{{ url_for('DailyPlanView:index') }}"> denní plán {{ icon("daily") }} </a>
+        <a class="nav-link active" href="{{ url_for('SimpleCalculatorView:index') }}"> jednoduchá {{ icon("calculator") }} </a>
+        <a class="nav-link active" href="{{ url_for('CookbookView:index') }}"> veřejné recepty </a>
         {% if current_user.is_admin %}{% include '_navbar_admin.html.j2' %}{% endif %}
       </ul>
 
@@ -80,7 +57,7 @@
           </a>
 
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="{{ url_for('UsersView:show') }}"> Profil </a>
+            <a class="dropdown-item" href="{{ url_for('UserView:show') }}"> Profil </a>
             <a class="dropdown-item" href="/logout"> Odhlásit se </a>
           </div>
         </li>

@@ -10,7 +10,7 @@ from app.models import Diet
 from app.controllers.forms import DietsForm
 
 
-class DietsView(BaseView):
+class DietView(BaseView):
     decorators = [login_required]
     template_folder = "diets"
 
@@ -48,16 +48,16 @@ class DietsView(BaseView):
 
         if not form.validate_on_submit():
             save_form_to_session(request.form)
-            return redirect(url_for("DietsView:new"))
+            return redirect(url_for("DietView:new"))
 
         diet = Diet(active=True, author=current_user)
         form.populate_obj(diet)
 
         if diet.save():
-            return redirect(url_for("DietsView:show", id=diet.id))
+            return redirect(url_for("DietView:show", id=diet.id))
         else:
             flash("Nepodařilo se vytvořit dietu", "error")
-            return redirect(url_for("DietsView:new"))
+            return redirect(url_for("DietView:new"))
 
     def edit(self, id):
         self.form = create_form(DietsForm, obj=self.diet)
@@ -76,22 +76,22 @@ class DietsView(BaseView):
 
         if not form.validate_on_submit():
             save_form_to_session(request.form)
-            return redirect(url_for("DietsView:edit", id=self.diet.id))
+            return redirect(url_for("DietView:edit", id=self.diet.id))
 
         form.populate_obj(self.diet)
         self.diet.edit()
 
-        return redirect(url_for("DietsView:show", id=self.diet.id))
+        return redirect(url_for("DietView:show", id=self.diet.id))
 
     @route("delete/<id>", methods=["POST"])
     def delete(self, id):
         if not self.diet.is_used:
             self.diet.remove()
             flash("Dieta byla smazána", "success")
-            return redirect(url_for("DietsView:index"))
+            return redirect(url_for("DietView:index"))
         else:
             flash("Tato dieta má recepty, nelze smazat", "error")
-            return redirect(url_for("DietsView:show", id=id))
+            return redirect(url_for("DietView:show", id=id))
 
     @route("archive/<id>", methods=["POST"])
     def archive(self, id):
@@ -103,4 +103,4 @@ class DietsView(BaseView):
         else:
             flash("Dieta byla archivována", "success")
 
-        return redirect(url_for("DietsView:show", id=id))
+        return redirect(url_for("DietView:show", id=id))

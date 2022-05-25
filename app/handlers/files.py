@@ -45,7 +45,7 @@ class LocalFileHandler(object):
         # create folder `files/` if doesn't exist
         if not os.path.exists(self.folder):
             os.makedirs(self.folder)
-        
+
         if subfolder is not None:
             self.folder = os.path.join(self.folder, subfolder)
             # create folder `files/subfolder/` if doesn't exist
@@ -105,7 +105,7 @@ class LocalFileHandler(object):
     def url(self, file, thumbnail=False):
         from flask import url_for
 
-        return url_for("FilesView:show", hash_value=file.hash, thumbnail=thumbnail)
+        return url_for("FileView:show", hash_value=file.hash, thumbnail=thumbnail)
 
     @property
     def all_files(self):

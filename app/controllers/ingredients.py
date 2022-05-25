@@ -11,7 +11,7 @@ from app.models import Ingredient, Recipe
 from app.controllers.forms import IngredientsForm
 
 
-class IngredientsView(BaseView):
+class IngredientView(BaseView):
     decorators = [login_required]
     template_folder = "ingredients"
 
@@ -57,16 +57,16 @@ class IngredientsView(BaseView):
 
         if not form.validate_on_submit():
             save_form_to_session(request.form)
-            return redirect(url_for("IngredientsView:new"))
+            return redirect(url_for("IngredientView:new"))
 
         ingredient = Ingredient(author=current_user.username)
         form.populate_obj(ingredient)
 
         if ingredient.save():
-            return redirect(url_for("IngredientsView:show", id=ingredient.id))
+            return redirect(url_for("IngredientView:show", id=ingredient.id))
         else:
             flash("Nepodařilo se vytvořit surovinu", "error")
-            return redirect(url_for("IngredientsView:new"))
+            return redirect(url_for("IngredientView:new"))
 
     def edit(self, id):
         self.form = create_form(IngredientsForm, obj=self.ingredient)
@@ -91,7 +91,7 @@ class IngredientsView(BaseView):
 
         if not form.validate_on_submit():
             save_form_to_session(request.form)
-            return redirect(url_for("IngredientsView:edit", id=self.ingredient.id))
+            return redirect(url_for("IngredientView:edit", id=self.ingredient.id))
 
         form.populate_obj(self.ingredient)
 
@@ -102,7 +102,7 @@ class IngredientsView(BaseView):
             self.ingredient.refresh()
             flash("Sdílenou surovinu nelze upravit", "error")
 
-        return redirect(url_for("IngredientsView:show", id=self.ingredient.id))
+        return redirect(url_for("IngredientView:show", id=self.ingredient.id))
 
     @route("delete/<id>", methods=["POST"])
     def delete(self, id):
@@ -112,7 +112,7 @@ class IngredientsView(BaseView):
             return redirect(url_for("DashboardView:show"))
         else:
             flash("Tato surovina je použita, nelze smazat", "error")
-            return redirect(url_for("IngredientsView:show", id=self.ingredient.id))
+            return redirect(url_for("IngredientView:show", id=self.ingredient.id))
 
     @admin_required
     def all_shared(self):
@@ -142,7 +142,7 @@ class IngredientsView(BaseView):
 
         if not form.validate_on_submit():
             save_form_to_session(request.form)
-            return redirect(url_for("IngredientsView:new_shared"))
+            return redirect(url_for("IngredientView:new_shared"))
 
         ingredient = Ingredient(is_shared=True, source=current_user.username)
         form.populate_obj(ingredient)
@@ -152,10 +152,10 @@ class IngredientsView(BaseView):
                 "Děkujeme za vytvoření sdílené suroviny. Až ji zkontrolujeme, bude zobrazena všem uživatelům.",
                 "success",
             )
-            return redirect(url_for("IngredientsView:index"))
+            return redirect(url_for("IngredientView:index"))
         else:
             flash("Nepodařilo se vytvořit surovinu", "error")
-            return redirect(url_for("IngredientsView:new_shared"))
+            return redirect(url_for("IngredientView:new_shared"))
 
     @admin_required
     @route("approve/<id>", methods=["GET"])
@@ -163,7 +163,7 @@ class IngredientsView(BaseView):
         self.ingredient.is_approved = True
         self.ingredient.edit()
         flash("Surovina schválena", "success")
-        return redirect(url_for("IngredientsView:all_shared"))
+        return redirect(url_for("IngredientView:all_shared"))
 
     @admin_required
     @route("disapprove/<id>", methods=["GET"])
@@ -171,4 +171,4 @@ class IngredientsView(BaseView):
         self.ingredient.is_approved = None
         self.ingredient.edit()
         flash("Surovina neschválena", "info")
-        return redirect(url_for("IngredientsView:all_shared"))
+        return redirect(url_for("IngredientView:all_shared"))

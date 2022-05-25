@@ -4,13 +4,13 @@
     <p> První kroky:</p>
     <ul>
     {% if not current_user.diets | length %}
-        <li>Vytvořte první <a href="{{ url_for('DietsView:new') }}">dietu</a></li>
+        <li>Vytvořte první <a href="{{ url_for('DietView:new') }}">dietu</a></li>
     {% endif %}
     {% if not current_user.recipes | length %}
-        <li>Vytvořte první <a href="{{ url_for('RecipesView:new') }}">recept</a></li>
+        <li>Vytvořte první <a href="{{ url_for('RecipeView:new') }}">recept</a></li>
     {% endif %}
     {% if not current_user.ingredients | length %}
-        <li>Přidejte vlastní <a href="{{ url_for('IngredientsView:new') }}">surovinu</a></li>
+        <li>Přidejte vlastní <a href="{{ url_for('IngredientView:new') }}">surovinu</a></li>
     {% endif %}
     </ul>
 </div>

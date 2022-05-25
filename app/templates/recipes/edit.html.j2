@@ -12,7 +12,7 @@
 {% block content %}
     <div class="container">
         <div class="col-12">
-            <form action="{{ url_for('RecipesView:post_edit', id=recipe.id) }}" class="form" method="post" accept-charset="utf-8">
+            <form action="{{ url_for('RecipeView:post_edit', id=recipe.id) }}" class="form" method="post" accept-charset="utf-8">
                 <div class="row">
                     <div class="col">
                         <label for="name">Název</label>
@@ -61,7 +61,7 @@
             </table>
 
             <div class="row">
-                <a href="{{ url_for('RecipesView:show', id=recipe.id) }}" class="btn btn-secondary">{{ texts.edit_cancel }} {{ icon("edit") }}</a>
+                <a href="{{ url_for('RecipeView:show', id=recipe.id) }}" class="btn btn-secondary">{{ texts.edit_cancel }} {{ icon("edit") }}</a>
             </div>
         </div>
     </div>

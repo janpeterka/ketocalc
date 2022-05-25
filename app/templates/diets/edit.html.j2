@@ -6,7 +6,7 @@
     <div class="container">
         <div class="row">
             <div class="col-8">
-                <form action="{{ url_for('DietsView:update', id=diet.id) }}" class="form-group" method="post" accept-charset="utf-8">
+                <form action="{{ url_for('DietView:update', id=diet.id) }}" class="form-group" method="post" accept-charset="utf-8">
                     {{ form.csrf_token }}
                     {% from "macros/_form_element.html.j2" import render_field %}
                     <table class="table">
@@ -40,8 +40,8 @@
                         </table>
                         <button type="submit" class="btn btn-warning">{{ texts.edit_confirm }} {{ icon("edit") }}</button>
                     </form>
-                    <form action="{{ url_for('DietsView:delete', id=diet.id) }}" method="post" accept-charset="utf-8">
-                        <a href="{{ url_for('DietsView:show', id=diet.id) }}" class="btn btn-secondary">{{ texts.edit_cancel }} {{ icon("edit") }}</a>
+                    <form action="{{ url_for('DietView:delete', id=diet.id) }}" method="post" accept-charset="utf-8">
+                        <a href="{{ url_for('DietView:show', id=diet.id) }}" class="btn btn-secondary">{{ texts.edit_cancel }} {{ icon("edit") }}</a>
                         {% if diet.is_used == False %}
                             <button type="submit" class="btn btn-danger">{{ texts.diet_delete }} {{ icon("delete") }}</button>
                         {% else %}

@@ -30,8 +30,8 @@
                         <td>{{ ingredient.sugar }}</td>
                         <td>
                             {% from "macros/_active_icons.html.j2" import approve_icon, disapprove_icon %}
-                            {{ approve_icon(url=url_for('IngredientsView:approve', id=ingredient.id)) }}
-                            {{ disapprove_icon(url=url_for('IngredientsView:disapprove', id=ingredient.id)) }}
+                            {{ approve_icon(url=url_for('IngredientView:approve', id=ingredient.id)) }}
+                            {{ disapprove_icon(url=url_for('IngredientView:disapprove', id=ingredient.id)) }}
                         </td>
                     </tr>
                 {% endfor %}
@@ -39,7 +39,7 @@
             {% endif %}
 
             <h1>Sdílené suroviny
-            <a href="{{ url_for('IngredientsView:new_shared') }}"><button class="btn btn-secondary float-right">{{ texts.ingredient_add_shared }}</button></a>
+            <a href="{{ url_for('IngredientView:new_shared') }}"><button class="btn btn-secondary float-right">{{ texts.ingredient_add_shared }}</button></a>
             </h1>
             <table id="shared_ingredients" class="table">
                 <tr>

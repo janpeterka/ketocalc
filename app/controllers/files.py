@@ -8,7 +8,7 @@ from app.models.files import File
 from app.handlers.files import FileHandler
 
 
-class FilesView(FlaskView):
+class FileView(FlaskView):
     def show(self, hash_value):
         file = File.load_first_by_attribute("hash", hash_value)
         if not file:

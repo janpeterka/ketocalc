@@ -7,10 +7,10 @@ from app.auth import admin_required
 
 from app.models import Recipe, Diet, User, Ingredient, RecipeHasIngredient
 
-from app.controllers.base_recipes import BaseRecipesView
+from app.controllers.base_recipes import BaseRecipeView
 
 
-class RecipesView(BaseRecipesView):
+class RecipeView(BaseRecipeView):
     decorators = [login_required]
 
     @login_required
@@ -28,7 +28,7 @@ class RecipesView(BaseRecipesView):
     def index(self):
         self.diets = current_user.active_diets
 
-        return self.template("recipes/all.html.j2")
+        return template("recipes/index.html.j2", diets=self.diets)
 
     def new(self):
         active_diets = current_user.active_diets
@@ -56,7 +56,7 @@ class RecipesView(BaseRecipesView):
         self.recipe.edit()
         self.recipe.refresh()
         flash("Recept byl upraven.", "success")
-        return redirect(url_for("RecipesView:show", id=self.recipe.id))
+        return redirect(url_for("RecipeView:show", id=self.recipe.id))
 
     def show(self, id):
         from .forms.files import PhotoForm
@@ -69,7 +69,11 @@ class RecipesView(BaseRecipesView):
         )
 
     def print(self, id):
-        return template("recipes/show.html.j2", recipe=self.recipe, is_print=True,)
+        return template(
+            "recipes/show.html.j2",
+            recipe=self.recipe,
+            is_print=True,
+        )
 
     # def print_all(self, diet_id=None):
     #     if diet_id is None:
@@ -91,7 +95,7 @@ class RecipesView(BaseRecipesView):
             flash("Recept byl zveřejněn.", "success")
         else:
             flash("Recept byl skryt před veřejností.", "success")
-        return redirect(url_for("RecipesView:show", id=self.recipe.id))
+        return redirect(url_for("RecipeView:show", id=self.recipe.id))
 
     @route("/make_all_recipes_public")
     def make_all_public(self):
@@ -136,7 +140,7 @@ class RecipesView(BaseRecipesView):
         recipe = Recipe(name=request.json["name"], diet=diet)
 
         last_id = recipe.create_and_save(ingredients)
-        return url_for("RecipesView:show", id=last_id)
+        return url_for("RecipeView:show", id=last_id)
 
     @route("/toggleReactionAJAX", methods=["POST"])
     def toggle_reaction_AJAX(self):
@@ -158,7 +162,7 @@ class RecipesView(BaseRecipesView):
             file.data = form.file.data
             file.save()
 
-        return redirect(url_for("RecipesView:show", id=id))
+        return redirect(url_for("RecipeView:show", id=id))
 
     @route("/load_recipes_AJAX", methods=["POST"])
     # @login_required

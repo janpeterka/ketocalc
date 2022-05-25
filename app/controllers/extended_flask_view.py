@@ -84,8 +84,8 @@ class ExtendedFlaskView(FlaskView):
     @property
     def _model_name(self):
         # e.g. User
-        if type(self).__name__.endswith("sView"):
-            model_name = type(self).__name__.replace("sView", "")
+        if type(self).__name__.endswith("View"):
+            model_name = type(self).__name__.replace("View", "")
         elif type(self).__name__.endswith("View"):
             model_name = type(self).__name__.replace("View", "")
         else:
@@ -140,7 +140,7 @@ class ExtendedFlaskView(FlaskView):
     #     form = self.form_klass(request.form)
     #     if not form.validate_on_submit():
     #         save_form_to_session(request.form)
-    #         return redirect(url_for("{}sView:new".format(self.model_name)))
+    #         return redirect(url_for("{}View:new".format(self.model_name)))
 
     #     class_object = self.model_klass()
     #     form.populate_obj(class_object)
@@ -149,7 +149,7 @@ class ExtendedFlaskView(FlaskView):
     #         abort(500)
 
     #     return redirect(
-    #         url_for("{}sView:show".format(self.model_name), id=class_object.id)
+    #         url_for("{}View:show".format(self.model_name), id=class_object.id)
     #     )
 
     # @route("<id>/edit", methods=["POST"])
@@ -157,13 +157,13 @@ class ExtendedFlaskView(FlaskView):
     #     form = self.form_klass(request.form)
     #     if not form.validate_on_submit():
     #         save_form_to_session(request.form)
-    #         return redirect(url_for("{}sView:edit".format(self.model_name)))
+    #         return redirect(url_for("{}View:edit".format(self.model_name)))
 
     #     form.populate_obj(self.object)
     #     self.object.edit()
 
     #     return redirect(
-    #         url_for("{}sView:show".format(self.model_name), id=self.object.id,)
+    #         url_for("{}View:show".format(self.model_name), id=self.object.id,)
     #     )
 
     # def edit(self, id):

@@ -11,7 +11,7 @@
     <div class="container" data-controller="daily-plan">
         <div class="text-center">
             <span class="float-left" style="margin-left: 10rem">
-                <a href="{{ url_for('DailyPlansView:show', date=dates['previous']) }}">
+                <a href="{{ url_for('DailyPlanView:show', date=dates['previous']) }}">
                 {{ human_format_date(dates["previous"]) }}
                 </a>
             </span>
@@ -19,7 +19,7 @@
                 {{ human_format_date(dates["active"]) }}
             </span>
             <span class="float-right" style="margin-right: 10rem">
-                <a href="{{ url_for('DailyPlansView:show', date=dates['next']) }}">
+                <a href="{{ url_for('DailyPlanView:show', date=dates['next']) }}">
                 {{ human_format_date(dates["next"]) }}
                 </a>
             </span>
@@ -55,7 +55,7 @@
                         </td>
                         <td>
                             {% from "macros/_active_icons.html.j2" import remove_icon %}
-                            {{ remove_icon(url=url_for('DailyPlansView:remove_daily_recipe', daily_recipe_id=daily_recipe.id, date=dates['active']))}}
+                            {{ remove_icon(url=url_for('DailyPlanView:remove_daily_recipe', daily_recipe_id=daily_recipe.id, date=dates['active']))}}
                         </td>
                     </tr>
                 {% endfor %}
@@ -82,7 +82,7 @@
 
         </div>
         <div class="row float-right mt-5" data-controller="load-recipes-for-diet">
-            <form class="form" action="{{ url_for('DailyPlansView:add_recipe') }}" method="post">
+            <form class="form" action="{{ url_for('DailyPlanView:add_recipe') }}" method="post">
                 <div class="form-group form-inline">
                     {# Diets #}
                     <select class="form-control" data-load-recipes-for-diet-target="diets" data-action="change->load-recipes-for-diet#load_recipes">

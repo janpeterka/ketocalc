@@ -9,7 +9,7 @@
 
 {% block content %}
     <div class="container">
-        <form method="post" action="{{ url_for('IngredientsView:post') }}" class="form-group col-6" accept-charset="UTF-8">
+        <form method="post" action="{{ url_for('IngredientView:post') }}" class="form-group col-6" accept-charset="UTF-8">
             {{ form.csrf_token }}
             {% from "macros/_form_element.html.j2" import render_field %}
             {{ render_field(form.name) }}

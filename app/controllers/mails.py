@@ -5,7 +5,7 @@ from flask_classful import FlaskView
 from app.auth import admin_required
 
 
-class MailsView(FlaskView):
+class MailView(FlaskView):
     decorators = [admin_required]
 
     # def index(self):

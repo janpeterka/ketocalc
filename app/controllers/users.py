@@ -17,7 +17,7 @@ from app.controllers.forms.users import UsersForm, PasswordForm
 from app.controllers.extended_flask_view import ExtendedFlaskView
 
 
-class UsersView(ExtendedFlaskView):
+class UserView(ExtendedFlaskView):
     decorators = [login_required]
 
     def before_request(self, name, *args, **kwargs):
@@ -44,7 +44,7 @@ class UsersView(ExtendedFlaskView):
 
         if not form.validate_on_submit():
             save_form_to_session(request.form)
-            return redirect(url_for("UsersView:edit"))
+            return redirect(url_for("UserView:edit"))
 
         self.user.first_name = form.first_name.data
         self.user.last_name = form.last_name.data
@@ -54,7 +54,7 @@ class UsersView(ExtendedFlaskView):
         else:
             flash("Nepovedlo se změnit uživatele", "error")
 
-        return redirect(url_for("UsersView:show"))
+        return redirect(url_for("UserView:show"))
 
     @route("edit_password", methods=["POST"])
     def post_password_edit(self):
@@ -62,7 +62,7 @@ class UsersView(ExtendedFlaskView):
 
         if not form.validate_on_submit():
             save_form_to_session(request.form)
-            return redirect(url_for("UsersView:edit"))
+            return redirect(url_for("UserView:edit"))
 
         self.user.set_password_hash(form.password.data)
         self.user.password_version = application.config["PASSWORD_VERSION"]
@@ -72,7 +72,7 @@ class UsersView(ExtendedFlaskView):
         else:
             flash("Nepovedlo se změnit heslo", "error")
 
-        return redirect(url_for("UsersView:show"))
+        return redirect(url_for("UserView:show"))
 
     @admin_required
     def show_by_id(self, id):
@@ -107,4 +107,4 @@ class UsersView(ExtendedFlaskView):
         else:
             flash("nejspíš neznáme typ mailu", "error")
 
-        return redirect(url_for("UsersView:show_all"))
+        return redirect(url_for("UserView:show_all"))

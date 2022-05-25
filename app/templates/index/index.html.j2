@@ -26,7 +26,7 @@
                     <h4 class="color-blue text-uppercase font-comfortaa-b mt-2">Ukázkové automatické počítání receptu</h4>
                     Funkce, která má za cíl ušetřit nejvíce práce, je automatický výpočet receptu.<br>
                     Jednoduše vyberete 3 a více surovin, ze kterých chcete jídlo složit, a kalkulačka vám pro danou dietu spočítá množství jednotlivých ingrediencí.<br>
-                    Podívejte se na ukázku výpočtu <a href="{{ url_for('TrialRecipesView:index') }}">tady</a>.<br>
+                    Podívejte se na ukázku výpočtu <a href="{{ url_for('TrialRecipeView:index') }}">tady</a>.<br>
                     Bez registrace probíhá výpočet pro dietu 3,5:1 a lze použít jen sdílené suroviny. Pokud se <a href="{{ url_for('RegisterView:show') }}">zaregistrujete</a>, můžete si vytvořit vlastní diety i suroviny, a všechno mít navždy v aplikaci uložené.
                     <h4 class="color-blue text-uppercase font-comfortaa-b mt-2">Ruční vytvoření receptu</h4>
                     Kromě toho si můžete <a href="{{ url_for('SimpleCalculatorView:index') }}">vytvořit vlastní recept ručně</a> - vybrat si u ingrediencí jejich množství a nechat si spočítat výsledné poměry a množství.<br>
@@ -51,7 +51,7 @@
                     Můžete sdílet své recepty s ostatními a zároveň se jejich recepty <a href="{{ url_for('CookbookView:index') }}">inspirovat</a>.<br>
                     Velmi užitečné zejména, pokud s dietou začínáte.
                     <h4 class="color-blue text-uppercase font-comfortaa-b mt-2">Denní plány</h4>
-                    Udělejte si <a href="{{ url_for('DailyPlansView:index') }}">plán vaření</a> třeba na týden dopředu!<br>
+                    Udělejte si <a href="{{ url_for('DailyPlanView:index') }}">plán vaření</a> třeba na týden dopředu!<br>
                     Denní plán umožňuje Vaše recepty přidat k danému dni ve vybraném množství.<br>
                     Můžete tedy rovnou vidět, že Vám jídla naplní denní potřeby nutrientů, nebo můžete seznam receptů využít při tvorbě nákupního seznamu.
                 </div>
