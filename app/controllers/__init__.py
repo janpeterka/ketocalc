@@ -2,6 +2,7 @@ from .admin import AdminView
 from .base_recipes import BaseRecipeView
 from .cookbook import CookbookView
 from .daily_plans import DailyPlanView
+from .daily_recipes import DailyRecipeView
 from .dashboard import DashboardView
 from .diets import DietView
 from .errors import ErrorView
@@ -23,6 +24,7 @@ __all__ = [
     "BaseRecipeView",
     "CookbookView",
     "DailyPlanView",
+    "DailyRecipeView",
     "DashboardView",
     "DietView",
     "ErrorView",
@@ -46,6 +48,7 @@ def register_all_controllers(application):
     BaseRecipeView.register(application)
     CookbookView.register(application)
     DailyPlanView.register(application)
+    DailyRecipeView.register(application)
     DashboardView.register(application)
     DietView.register(application)
     ErrorView.register(application)
