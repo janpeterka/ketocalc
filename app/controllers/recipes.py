@@ -1,17 +1,11 @@
 from flask import render_template as template
 from flask import request, redirect, url_for, flash, abort, g, jsonify
-
 from flask_login import login_required, current_user
-
 from flask_classful import route
 
 from app.auth import admin_required
 
-from app.models.recipes import Recipe
-from app.models.diets import Diet
-from app.models.users import User
-from app.models.ingredients import Ingredient
-from app.models.recipes_has_ingredients import RecipeHasIngredient
+from app.models import Recipe, Diet, User, Ingredient, RecipeHasIngredient
 
 from app.controllers.base_recipes import BaseRecipesView
 
@@ -32,7 +26,9 @@ class RecipesView(BaseRecipesView):
                 abort(403)
 
     def index(self):
-        return template("recipes/all.html.j2", diets=current_user.active_diets)
+        self.diets = current_user.active_diets
+
+        return self.template("recipes/all.html.j2")
 
     def new(self):
         active_diets = current_user.active_diets
@@ -53,7 +49,7 @@ class RecipesView(BaseRecipesView):
         # TODO: implemented with ajax now, will change
         pass
 
-    @route("<id>/edit", methods=["POST"])
+    @route("update/<id>", methods=["POST"])
     def post_edit(self, id):
         self.recipe.name = request.form["name"]
         self.recipe.description = request.form["description"]

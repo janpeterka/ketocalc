@@ -81,6 +81,7 @@ class UsersView(ExtendedFlaskView):
     @admin_required
     def show_all(self):
         users = User.load_all()
+
         return self.template("admin/users/all.html.j2", users=users)
 
     @admin_required

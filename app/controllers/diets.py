@@ -1,41 +1,47 @@
-from flask import request, redirect, url_for
-from flask import abort, flash
-
+from flask import request, redirect, url_for, flash
 from flask_login import login_required, current_user
-
 from flask_classful import route
 
-from app.helpers.form import save_form_to_session
+from app.helpers.base_view import BaseView
+from app.helpers.form import save_form_to_session, create_form
 
-from app.models.diets import Diet
+from app.models import Diet
 
-from app.controllers.forms.diets import DietsForm
-from app.controllers.extended_flask_view import ExtendedFlaskView
+from app.controllers.forms import DietsForm
 
 
-class DietsView(ExtendedFlaskView):
+class DietsView(BaseView):
     decorators = [login_required]
     template_folder = "diets"
 
     def before_request(self, name, id=None, *args, **kwargs):
-        super().before_request(name, id, *args, **kwargs)
-
-        if id is not None:
-            if self.diet is None:
-                abort(404)
-            elif not self.diet.can_current_user_view:
-                abort(405)
-
-    def before_show(self, id):
-        self.recipes = self.diet.recipes
+        self.diet = Diet.load(id)
 
     def before_index(self):
         self.diets = current_user.diets
         self.diets.sort(key=lambda x: (-x.active, x.name))
 
-    def before_edit(self, id):
-        super().before_edit(id)
+    def before_show(self, id):
         self.recipes = self.diet.recipes
+        self.validate_show(self.diet)
+
+    def before_edit(self, id):
+        self.recipes = self.diet.recipes
+        self.validate_edit(self.diet)
+
+    def before_update(self, id):
+        self.validate_edit(self.diet)
+
+    def index(self):
+        return self.template()
+
+    def new(self):
+        self.form = create_form(DietsForm)
+
+        return self.template()
+
+    def show(self, id):
+        return self.template()
 
     def post(self):
         form = DietsForm(request.form)
@@ -53,8 +59,13 @@ class DietsView(ExtendedFlaskView):
             flash("Nepodařilo se vytvořit dietu", "error")
             return redirect(url_for("DietsView:new"))
 
-    @route("<id>/edit", methods=["POST"])
-    def post_edit(self, id):
+    def edit(self, id):
+        self.form = create_form(DietsForm, obj=self.diet)
+
+        return self.template()
+
+    @route("update/<id>", methods=["POST"])
+    def update(self, id):
         form = DietsForm(request.form)
 
         if self.diet.is_used:
@@ -69,9 +80,10 @@ class DietsView(ExtendedFlaskView):
 
         form.populate_obj(self.diet)
         self.diet.edit()
+
         return redirect(url_for("DietsView:show", id=self.diet.id))
 
-    @route("/<id>/delete", methods=["POST"])
+    @route("delete/<id>", methods=["POST"])
     def delete(self, id):
         if not self.diet.is_used:
             self.diet.remove()
@@ -81,7 +93,7 @@ class DietsView(ExtendedFlaskView):
             flash("Tato dieta má recepty, nelze smazat", "error")
             return redirect(url_for("DietsView:show", id=id))
 
-    @route("/<id>/archive", methods=["POST"])
+    @route("archive/<id>", methods=["POST"])
     def archive(self, id):
         self.diet.active = not self.diet.active
         self.diet.edit()
