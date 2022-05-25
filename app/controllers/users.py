@@ -1,6 +1,5 @@
 from flask import request, url_for, redirect, flash, session
 from flask import current_app as application
-
 from flask_classful import route
 from flask_login import login_required, current_user, login_user
 
@@ -8,37 +7,31 @@ from app.auth import admin_required
 
 from app.handlers.mail import MailSender
 
+from app.helpers.base_view import BaseView
 from app.helpers.form import create_form, save_form_to_session
 
-from app.models.users import User
+from app.models import User
 
-from app.controllers.forms.users import UsersForm, PasswordForm
-
-from app.controllers.extended_flask_view import ExtendedFlaskView
+from app.controllers.forms import UsersForm, PasswordForm
 
 
-class UserView(ExtendedFlaskView):
+class UserView(BaseView):
     decorators = [login_required]
 
     def before_request(self, name, *args, **kwargs):
-        super().before_request(name, *args, **kwargs)
-        self.user = current_user if self.user is None else self.user
+        self.user = current_user
 
     def show(self, **kwargs):
-        # super().show() needed id.
         return self.template()
-
-    def before_edit(self):
-        # super().before_edit() needed id. For now it's not wanted.
-        pass
 
     def edit(self):
         self.user_form = create_form(UsersForm, obj=self.user)
         self.password_form = create_form(PasswordForm)
+
         return self.template()
 
-    @route("post_edit", methods=["POST"])
-    def post_edit(self, page_type=None):
+    @route("update", methods=["POST"])
+    def update(self, page_type=None):
         form = UsersForm(request.form)
         del form.username
 
@@ -56,8 +49,8 @@ class UserView(ExtendedFlaskView):
 
         return redirect(url_for("UserView:show"))
 
-    @route("edit_password", methods=["POST"])
-    def post_password_edit(self):
+    @route("update_password", methods=["POST"])
+    def update_password(self):
         form = PasswordForm(request.form)
 
         if not form.validate_on_submit():

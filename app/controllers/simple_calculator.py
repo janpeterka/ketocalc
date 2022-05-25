@@ -1,11 +1,10 @@
 from flask_login import current_user
+from app.helpers.base_view import BaseView
 
-from app.models.ingredients import Ingredient
-
-from .extended_flask_view import ExtendedFlaskView
+from app.models import Ingredient
 
 
-class SimpleCalculatorView(ExtendedFlaskView):
+class SimpleCalculatorView(BaseView):
     template_folder = "simple_calculator"
 
     def index(self):

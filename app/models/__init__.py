@@ -5,7 +5,7 @@ from .request_log import RequestLog  # noqa: F401
 from .daily_plans import DailyPlan
 from .daily_plan_has_recipes import DailyPlanHasRecipes
 from .diets import Diet
-from .files import File, RecipeImageFile
+from .files import File, ImageFile, RecipeImageFile
 from .ingredients import Ingredient
 from .recipes import Recipe
 from .recipes_has_ingredients import RecipeHasIngredient
@@ -19,6 +19,7 @@ __all__ = [
     "DailyPlan",
     "Diet",
     "File",
+    "ImageFile",
     "RecipeImageFile",
     "Ingredient",
     "Recipe",

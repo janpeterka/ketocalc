@@ -1,11 +1,6 @@
 from app.auth import admin_required
 
-from app.models.recipes import Recipe
-from app.models.users import User
-from app.models.daily_plans import DailyPlan
-from app.models.ingredients import Ingredient
-from app.models.files import ImageFile
-from app.models.request_log import RequestLog
+from app.models import Recipe, User, DailyPlan, Ingredient, ImageFile, RequestLog
 
 
 from app.controllers.extended_flask_view import ExtendedFlaskView

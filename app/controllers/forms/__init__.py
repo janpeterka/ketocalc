@@ -1,16 +1,16 @@
-# This is needed for ExtendedFlaskView to automatically import all Form classes
-
-from .diets import DietsForm  # noqa: F401
-from .feedback import FeedbackForm  # noqa: F401
-from .ingredients import IngredientsForm  # noqa: F401
-from .login import LoginForm  # noqa: F401
-from .password_recovery import NewPasswordForm  # noqa: F401
-from .password_recovery import GetNewPasswordForm  # noqa: F401
-from .register import RegisterForm  # noqa: F401
-from .users import UsersForm  # noqa: F401
-from .users import PasswordForm  # noqa: F401
+from .cookbook_filter import CookbookFilterForm
+from .diets import DietsForm
+from .feedback import FeedbackForm
+from .ingredients import IngredientsForm
+from .login import LoginForm
+from .password_recovery import NewPasswordForm
+from .password_recovery import GetNewPasswordForm
+from .register import RegisterForm
+from .users import UsersForm
+from .users import PasswordForm
 
 __all__ = [
+    "CookbookFilterForm",
     "DietsForm",
     "FeedbackForm",
     "IngredientsForm",

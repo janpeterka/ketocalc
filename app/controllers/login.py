@@ -19,6 +19,7 @@ class LoginView(FlaskView):
     @route("")
     def show(self):
         form = create_form(LoginForm)
+
         return template("auth/login.html.j2", form=form)
 
     def post(self):
