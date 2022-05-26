@@ -50,7 +50,7 @@ class DailyPlan(db.Model, BaseMixin):
 
         dphr.save()
 
-    def remove_daily_recipe_by_id(self, daily_recipe_id):
+    def remove_recipe_by_id(self, daily_recipe_id):
         # TODO - jenom pokud je fakt v tomhle daily_planu
         selected_daily_recipe = DailyPlanHasRecipes.load(daily_recipe_id)
 

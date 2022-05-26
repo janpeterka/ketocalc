@@ -1,55 +1,47 @@
 {% extends "base.html.j2" %}
-{% block title %}
-    {{ texts.diet }}: {{ diet.name }}
-{% endblock %}
+{% block title %} dieta: {{ diet.name }} {% endblock %}
+
 {% block content %}
-    <div class="container">
-        <div class="row">
-            <div class="col-8">
-                <form action="{{ url_for('DietsView:post_edit', id=diet.id) }}" class="form-group" method="post" accept-charset="utf-8">
-                    {{ form.csrf_token }}
-                    {% from "macros/_form_element.html.j2" import render_field %}
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>{{ texts.title }}</th>
-                                <th>{{ texts.energy_simple }}</th>
-                                <th>{{ texts.protein_simple }}</th>
-                                <th>{{ texts.fat_simple }}</th>
-                                <th>{{ texts.sugar_simple }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    {{ render_field(form.name, has_label=False) }}
-                                </td>
-                                <td>
-                                    {{ render_field(form.calorie, has_label=False, disabled=diet.is_used) }}
-                                </td>
-                                <td>
-                                    {{ render_field(form.protein, has_label=False, disabled=diet.is_used) }}
-                                </td>
-                                <td>
-                                    {{ render_field(form.fat, has_label=False, disabled=diet.is_used) }}
-                                </td>
-                                <td>
-                                    {{ render_field(form.sugar, has_label=False, disabled=diet.is_used) }}
-                                </td>
-                            </tr>
-                        </table>
-                        <button type="submit" class="btn btn-warning">{{ texts.edit_confirm }} {{ icon("edit") }}</button>
-                    </form>
-                    <form action="{{ url_for('DietsView:delete', id=diet.id) }}" method="post" accept-charset="utf-8">
-                        <a href="{{ url_for('DietsView:show', id=diet.id) }}" class="btn btn-secondary">{{ texts.edit_cancel }} {{ icon("edit") }}</a>
-                        {% if diet.is_used == False %}
-                            <button type="submit" class="btn btn-danger">{{ texts.diet_delete }} {{ icon("delete") }}</button>
-                        {% else %}
-                            <button type="submit" class="btn btn-danger" disabled>{{ texts.delete_error }} {{ icon("delete") }}</button>
-                        {% endif %}
-                    </form>
-                </div>
-                {% include ('recipes/_recipe_list.html.j2') %}
-            </div>
+<div class="row">
+    <div class="col-8">
+        <form action="{{ url_for('DietView:update', id=diet.id) }}" class="form-group" method="post" accept-charset="utf-8">
+            {{ form.csrf_token }}
+            {% from "macros/_form_element.html.j2" import render_field %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>{{ texts.title }}</th>
+                        <th>{{ texts.energy_simple }}</th>
+                        <th>{{ texts.protein_simple }}</th>
+                        <th>{{ texts.fat_simple }}</th>
+                        <th>{{ texts.sugar_simple }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            {{ render_field(form.name, has_label=False) }}
+                        </td>
+                        <td>
+                            {{ render_field(form.calorie, has_label=False, disabled=diet.is_used) }}
+                        </td>
+                        <td>
+                            {{ render_field(form.protein, has_label=False, disabled=diet.is_used) }}
+                        </td>
+                        <td>
+                            {{ render_field(form.fat, has_label=False, disabled=diet.is_used) }}
+                        </td>
+                        <td>
+                            {{ render_field(form.sugar, has_label=False, disabled=diet.is_used) }}
+                        </td>
+                    </tr>
+                </table>
+                <button type="submit" class="btn btn-warning"> {{ icon("edit") }} uložit </button>
+                <a href="{{ url_for('DietView:show', id=diet.id) }}" class="btn btn-secondary"> {{ icon("edit") }} zrušit </a>
+            </form>
+
         </div>
-    {% endblock %}
+        {% include ('recipes/_recipe_list.html.j2') %}
+    </div>
+</div>
+{% endblock %}

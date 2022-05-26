@@ -16,23 +16,6 @@ from app.models.request_log import RequestLog
 
 
 class User(db.Model, UserMixin, ItemMixin):
-    """User class
-
-
-    Extends:
-        Base
-
-    Variables:
-        __tablename__ {str} -- DB table name
-        id {int} -- user id
-        username {string} -- username (email)
-        pwdhash {string} -- password hash (sha256 / bcrypt)
-        first_name {string} -- first name
-        last_name {string} -- last name
-        password_version {string} -- password version (sha256 / bcrypt)
-        diets {relationship} -- diets of user
-    """
-
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True, unique=True)

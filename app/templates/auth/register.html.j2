@@ -1,51 +1,44 @@
 {% extends "base.html.j2" %}
-{% block title %}
-    Registrace
-{% endblock %}
+{% block title %} ketokalkulačka | registrace {% endblock %}
 
 {% block script %}
     {{ stimulus("password-visibility") }}
 {% endblock %}
 
 {% block content %}
-    <div class="container">
-        <div class="col-10">
-           <form action="{{ url_for('RegisterView:post') }}" method="post" class="form-group form-control" accept-charset="UTF-8">
+<form action="{{ url_for('RegisterView:post') }}" method="post" class="form-group form-control" accept-charset="UTF-8" data-turbo="false">
 {#                 <div class="mx-auto" style="width: 200px;">
-                    <a href="{{ url_for('google.login') }}" >
-                        <button type="button" class="btn btn-social btn-google">
-                            <span class="fab fa-google"></span> {{ texts.register_google }}
-                        </button>
-                    </a>
-                    <p class="text-left" style="color:grey;">nebo</p>
-                </div> #}
-                
-                {# <hr class="col-xs-12"> #}
+        <a href="{{ url_for('google.login') }}" >
+            <button type="button" class="btn btn-social btn-google">
+                <span class="fab fa-google"></span> {{ texts.register_google }}
+            </button>
+        </a>
+        <p class="text-left" style="color:grey;">nebo</p>
+    </div> #}
+    
+    {# <hr class="col-xs-12"> #}
 
-                {{ form.csrf_token }}
-                {% from "macros/_form_element.html.j2" import render_field %}
+    {{ form.csrf_token }}
 
-                {{ render_field(form.username, placeholder="např. moje.jmeno@seznam.cz") }}
-                {{ form.password.label }}
-                <div class="form-group" data-controller="see-password" data-see-password-target="passwordDiv">
-                    {{ render_field(form.password, has_label=False, placeholder="***") }}
-                </div>
+    {{ render_field(form.username, placeholder="např. moje.jmeno@seznam.cz") }}
+    {{ form.password.label }}
+    <div class="form-group" data-controller="see-password" data-see-password-target="passwordDiv">
+        {{ render_field(form.password, has_label=False, placeholder="***") }}
+    </div>
 
-                <div class="form-row">
-                    <div class="col">
-                        {{ render_field(form.first_name) }}
-                    </div>
-                    
-                    <div class="col">
-                        {{ render_field(form.last_name) }}
-                    </div>
-                </div>
-                {# {{ render_field(form.recaptcha) }} #}
-                {{ form.submit(class_='btn btn-primary') }}
-
-                <a class="col-sm-2" href="{{ url_for('LoginView:show') }}">{{ texts.login }}</a><br>
-            </form>
+    <div class="form-row">
+        <div class="col">
+            {{ render_field(form.first_name) }}
+        </div>
+        
+        <div class="col">
+            {{ render_field(form.last_name) }}
         </div>
     </div>
+    {# {{ render_field(form.recaptcha) }} #}
+    {{ form.submit(class_='btn btn-primary') }}
+
+    <a class="col-sm-2" href="{{ url_for('LoginView:show') }}">  přihlásit se </a><br>
+</form>
 {% endblock %}
 

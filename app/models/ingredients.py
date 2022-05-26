@@ -12,7 +12,7 @@ from flask_login import current_user
 from app import db
 
 from app.models.item_mixin import ItemMixin
-from app.models.recipes_has_ingredients import RecipeHasIngredients
+from app.models.recipes_has_ingredients import RecipeHasIngredient
 
 
 class Ingredient(db.Model, ItemMixin):
@@ -37,7 +37,7 @@ class Ingredient(db.Model, ItemMixin):
 
     recipes = db.relationship(
         "Recipe",
-        primaryjoin="and_(Ingredient.id == remote(RecipeHasIngredients.ingredients_id), foreign(Recipe.id) == RecipeHasIngredients.recipes_id)",
+        primaryjoin="and_(Ingredient.id == remote(RecipeHasIngredient.ingredients_id), foreign(Recipe.id) == RecipeHasIngredient.recipes_id)",
         viewonly=True,
         order_by="Recipe.name",
     )
@@ -99,7 +99,7 @@ class Ingredient(db.Model, ItemMixin):
         return ingredients
 
     def load_amount_by_recipe(self, recipe_id) -> float:
-        rhi = RecipeHasIngredients.query.filter_by(
+        rhi = RecipeHasIngredient.query.filter_by(
             recipes_id=recipe_id, ingredients_id=self.id
         ).first()
         return rhi.amount

@@ -57,6 +57,8 @@ def do_oauth_login(*, user, oauth_type=None):
 
 
 def do_login(username=None, password=None, from_register=False):
+    from flask import Markup
+
     if not isinstance(password, bytes) and password is not None:
         password = password.encode("utf-8")
 
@@ -69,7 +71,9 @@ def do_login(username=None, password=None, from_register=False):
 
         if from_register:
             flash(
-                f"Byl jste úspěšně zaregistrován. Protože jste v aplikaci nově, může vám pomoci <a href={url_for('SupportView:help')}>Nápověda</a>"
+                Markup(
+                    f"Byl jste úspěšně zaregistrován. Protože jste v aplikaci nově, může vám pomoci <a href={url_for('SupportView:help')}>Nápověda</a>"
+                ),
                 "success",
             )
         return True
@@ -84,6 +88,7 @@ def do_logout():
     session.pop("logged_from_admin", None)
     if current_user.is_authenticated:
         logout_user()
+
     return redirect(url_for("LoginView:show"))
 
 

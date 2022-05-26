@@ -17,7 +17,7 @@ Stimulus.register("recipe-reactions", class extends Controller {
 
     toggle_reaction(event){
         var recipe = event.target.parentNode.parentNode
-        fetch("{{ url_for('RecipesView:toggle_reaction_AJAX') }}",{
+        fetch("{{ url_for('RecipeView:toggle_reaction_AJAX') }}",{
             method: 'POST',
             body: JSON.stringify({'recipe_id' : recipe.dataset.recipeId}),
             headers: {'Content-Type': 'application/json,charset=UTF-8'}}

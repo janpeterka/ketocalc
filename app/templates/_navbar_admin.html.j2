@@ -1,15 +1,14 @@
 <li class="nav-item dropdown">
 	<a class="nav-link dropdown-toggle color-admin" href="#" id="navbarDropdown" role="button"
 	 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-	Admin
+	admin
 	</a>
 	
 	<div class="dropdown-menu bg-color-admin" aria-labelledby="navbarDropdown">
-		<a class="dropdown-item" href="{{ url_for('AdminView:index') }}">Admin dashboard</a>
-		<a class="dropdown-item" href="{{ url_for('IngredientsView:all_shared') }}">Sdílené suroviny</a>
-		<a class="dropdown-item" href="{{ url_for('UsersView:show_all') }}">Uživatelé</a>
-		<a class="dropdown-item" href="{{ url_for('FilesView:index') }}">Files</a>
-		{# <div class="dropdown-divider"></div> #}
+		<a class="dropdown-item" href="{{ url_for('AdminView:index') }}"> dashboard </a>
+		<a class="dropdown-item" href="{{ url_for('IngredientView:all_shared') }}"> sdílené suroviny </a>
+		<a class="dropdown-item" href="{{ url_for('UserView:show_all') }}"> uživatelé </a>
+		<a class="dropdown-item" href="{{ url_for('FileView:index') }}"> soubory </a>
 	</div>
 </li>
 

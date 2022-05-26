@@ -6,7 +6,7 @@ from flask_classful import FlaskView
 from app.auth import admin_required
 
 
-class ErrorsView(FlaskView):
+class ErrorView(FlaskView):
     def wrongpage(self):
         abort(405)
 

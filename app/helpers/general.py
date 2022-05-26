@@ -1,6 +1,10 @@
 import datetime
 
 
+def list_without_duplicated(array) -> list:
+    return list(dict.fromkeys(array))
+
+
 def created_recently(item_list, days=30):
     if hasattr(item_list[0], "created_at"):
         attr = "created_at"

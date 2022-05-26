@@ -28,7 +28,7 @@
 
       if (this.selectTarget.value == false){return false;}
       else{
-        fetch("{{ url_for('BaseRecipesView:addIngredientWithAmount') }}",{
+        fetch("{{ url_for('BaseRecipeView:addIngredientWithAmount') }}",{
           method: 'POST',
           body: JSON.stringify({'ingredient_id' : this.selectTarget.value}),
           headers: {'Content-Type': 'application/json,charset=UTF-8'}}
@@ -111,7 +111,7 @@
 
   save_recipe(e){
     e.preventDefault();
-    fetch("{{ url_for('RecipesView:saveRecipeAJAX') }}", {
+    fetch("{{ url_for('RecipeView:saveRecipeAJAX') }}", {
       method: 'POST',
       body: JSON.stringify({
         'ingredients' : this._get_currently_selected(),

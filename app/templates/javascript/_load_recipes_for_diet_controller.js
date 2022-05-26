@@ -11,7 +11,7 @@ Stimulus.register("load-recipes-for-diet", class extends Controller {
         this.submitTarget.disabled=true;
         this.submitTarget.value="Přidat recept";
 
-        fetch("{{ url_for('RecipesView:load_recipes_AJAX') }}",{
+        fetch("{{ url_for('RecipeView:load_recipes_AJAX') }}",{
             method: 'POST',
             body: JSON.stringify({'diet_id' : this.dietsTarget.value}),
             headers: {'Content-Type': 'application/json,charset=UTF-8'}}

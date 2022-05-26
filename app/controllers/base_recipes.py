@@ -2,8 +2,8 @@ import json
 
 from flask import jsonify, request, abort
 from flask import render_template as template
-
-from flask_classful import FlaskView, route
+from flask_classful import route
+from app.helpers.base_view import BaseView
 
 from app.helpers import calculations
 from app.handlers.data import DataHandler
@@ -11,7 +11,7 @@ from app.models.diets import Diet
 from app.models.ingredients import Ingredient
 
 
-class BaseRecipesView(FlaskView):
+class BaseRecipeView(BaseView):
     @route("/addIngredientAJAX", methods=["POST"])
     def addIngredientAJAX(self):
         ingredient = Ingredient.load(request.json["ingredient_id"])

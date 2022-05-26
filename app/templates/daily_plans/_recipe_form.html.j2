@@ -1,0 +1,26 @@
+<div class="row float-right mt-5" data-controller="load-recipes-for-diet">
+    <form class="form" action="{{ url_for('DailyRecipeView:add_recipe', daily_plan_id=daily_plan.id) }}" method="post">
+        <div class="form-group form-inline">
+            {# Diets #}
+            <select class="form-control" data-load-recipes-for-diet-target="diets" data-action="change->load-recipes-for-diet#load_recipes">
+                {{ options(diets) }}
+            </select>
+            {# Recipes #}
+            <select name="recipe_id" class="form-control" data-load-recipes-for-diet-target="recipes"></select>
+        </div>
+
+        {# Amount #}
+        <div class="form-group form-inline">
+            <label>Podíl z celé diety</label>
+            {% from "macros/_percentage_button.html.j2" import percentage_button %}
+            {% for percentage in [10, 12.5, 25, 50, 100] %}
+                {{ percentage_button(percentage, controller="daily-plan", action="set_amount") }}
+            {% endfor %}
+            <input type="number" step="0.1" min="1" max="100" data-daily-plan-target="percentage" name="recipe_percentage" class="form-control" required>
+        </div>
+        {# Hidden #}
+        <input type="hidden" name="date" value="{{ dates['active'] }}">
+        {# Submit #}
+        <input type="submit" data-load-recipes-for-diet-target="submit" class="form-control btn btn-primary" value="Přidat recept">
+    </form>
+</div>

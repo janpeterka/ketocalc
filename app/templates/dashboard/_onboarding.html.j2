@@ -1,16 +1,16 @@
 {% if not current_user.diets | length or not current_user.recipes | length or not current_user.ingredients | length %}
 <div class="col font-montserrat">
-    <h2 class="mt-2 text-uppercase color-blue font-comfortaa-bb">Vítejte v kalkulačce!</h2>
-    <p> První kroky:</p>
+    <h2 class="mt-2 text-uppercase color-blue font-comfortaa-bb"> vítejte v kalkulačce! </h2>
+    <p> první kroky: </p>
     <ul>
     {% if not current_user.diets | length %}
-        <li>Vytvořte první <a href="{{ url_for('DietsView:new') }}">dietu</a></li>
+        <li> vytvořte první <a href="{{ url_for('DietView:new') }}">dietu</a></li>
     {% endif %}
     {% if not current_user.recipes | length %}
-        <li>Vytvořte první <a href="{{ url_for('RecipesView:new') }}">recept</a></li>
+        <li> vytvořte první <a href="{{ url_for('RecipeView:new') }}">recept</a></li>
     {% endif %}
     {% if not current_user.ingredients | length %}
-        <li>Přidejte vlastní <a href="{{ url_for('IngredientsView:new') }}">surovinu</a></li>
+        <li> přidejte vlastní <a href="{{ url_for('IngredientView:new') }}">surovinu</a></li>
     {% endif %}
     </ul>
 </div>

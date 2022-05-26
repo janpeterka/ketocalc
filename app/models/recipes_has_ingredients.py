@@ -1,7 +1,7 @@
 from app import db
 
 
-class RecipeHasIngredients(db.Model):
+class RecipeHasIngredient(db.Model):
     """Recipe-Ingredient connection class
 
     Extends:
@@ -26,5 +26,15 @@ class RecipeHasIngredients(db.Model):
     )
     amount = db.Column(db.Float, nullable=False)
 
-    ingredients = db.relationship("Ingredient")
-    recipes = db.relationship("Recipe")
+    ingredients = db.relationship(
+        "Ingredient",
+        backref=db.backref(
+            "ingredient_recipes", cascade="all, delete, delete-orphan", viewonly=False
+        ),
+    )
+    recipes = db.relationship(
+        "Recipe",
+        backref=db.backref(
+            "recipe_ingredients", cascade="all, delete, delete-orphan", viewonly=False
+        ),
+    )

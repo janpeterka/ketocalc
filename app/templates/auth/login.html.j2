@@ -1,35 +1,31 @@
 {% extends "base.html.j2" %}
-{% block title %}
-    Přihlašování
-{% endblock %}
+{% block title %} ketokalkulačka | přihlásit se {% endblock %}
 
 {% block script %}
     {{ stimulus("password-visibility") }}
 {% endblock %}
 
 {% block content %}
-    <div class="container">
-    	<div class="col-12">
-    		<form action="{{ url_for('LoginView:post') }}" method="post" class="form-group form-control" >
-                {{ form.csrf_token }}
-                {% from "macros/_form_element.html.j2" import render_field %}
-                {{ render_field(form.username, placeholder="např. moje.jmeno@seznam.cz") }}
-                {{ form.password.label }}
-                <div class="form-group" data-controller="see-password" data-see-password-target="passwordDiv">
-                    {{ render_field(form.password, has_label=False, placeholder="***") }}
-                </div>
+<div class="col-12" data-turbo="false">
+	<form action="{{ url_for('LoginView:post') }}" method="post" class="form-group form-control" >
+        {{ form.csrf_token }}
+        {% from "macros/_form_element.html.j2" import render_field %}
+        {{ render_field(form.username, placeholder="např. moje.jmeno@seznam.cz") }}
+        {{ form.password.label }}
+        <div class="form-group" data-controller="see-password" data-see-password-target="passwordDiv">
+            {{ render_field(form.password, has_label=False, placeholder="***") }}
+        </div>
 
-                {{ form.submit(class_='btn btn-primary') }}
-                {# <a class="no-decoration" href="{{ url_for('google.login') }}">
-                    <button type="button" class="btn btn-social btn-google">
-                        <span class="fab fa-google"></span> {{ texts.login_google }}
-                    </button>
-                </a> #}
-                <a class="col-sm-2 no-decoration" href="{{ url_for('RegisterView:show') }}">{{ texts.register }}</a>
-                <a class="col-sm-2 info no-decoration" href="{{ url_for('PasswordRecoveryView:show') }}">{{ texts.forgotten_password }}</a>
+        {{ form.submit(class_='btn btn-primary') }}
+        {# <a class="no-decoration" href="{{ url_for('google.login') }}">
+            <button type="button" class="btn btn-social btn-google">
+                <span class="fab fa-google"></span> {{ texts.login_google }}
+            </button>
+        </a> #}
+        <a class="col-sm-2 no-decoration" href="{{ url_for('RegisterView:show') }}">  registrovat se </a>
+        <a class="col-sm-2 info no-decoration" href="{{ url_for('PasswordRecoveryView:show') }}"> zapomenuté heslo </a>
 
-    	    </form>
-    	</div>
-    </div>
+    </form>
+</div>
 {% endblock %}
 

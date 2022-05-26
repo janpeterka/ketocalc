@@ -80,7 +80,7 @@ def load_datasets_calc():
 
 
 def test_calc(app, db, client):
-    url = url_for("RecipesView:calcRecipeAJAX")
+    url = url_for("RecipeView:calcRecipeAJAX")
     # test calculate_recipe_AJAX (json dataset)
 
     datasets = load_datasets_calc()

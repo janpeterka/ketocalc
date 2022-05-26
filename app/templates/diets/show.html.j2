@@ -34,19 +34,17 @@
                         <td>{{ diet.ratio }} : 1</td>
                     </tr>
                 </table>
-                <form action="{{ url_for('DietsView:delete', id=diet.id) }}" method="post" accept-charset="utf-8">
-                    <a href="{{ url_for('DietsView:edit', id=diet.id) }}" class="btn btn-warning">{{ texts.edit }} {{ icon("edit") }}</a>
+                <form action="{{ url_for('DietView:delete', id=diet.id) }}" method="post" accept-charset="utf-8">
+                    <a href="{{ url_for('DietView:edit', id=diet.id) }}" class="btn btn-warning"> {{ icon("edit") }} upravit </a>
                     {% if diet.is_used == False %}
-                        <button type="submit" class="btn btn-danger">{{ texts.diet_delete }} {{ icon("delete") }}</button>
-                    {% else %}
-                        <button type="submit" class="btn btn-danger" disabled>{{ texts.delete_error }} {{ icon("delete") }}</button>
+                        <button type="submit" class="btn btn-danger"> {{ icon("delete") }} smazat </button>
                     {% endif %}
                 </form>
-                <form action="{{ url_for('DietsView:archive', id=diet.id) }}" method="post" accept-charset="utf-8">
+                <form action="{{ url_for('DietView:archive', id=diet.id) }}" method="post" accept-charset="utf-8">
                     {% if diet.active == True %}
-                        <button type="submit" class="btn btn-secondary">{{ texts.archive }} {{ icon("archive") }}</button>
+                        <button type="submit" class="btn btn-secondary"> {{ icon("archive") }} archivovat </button>
                     {% else %}
-                        <button type="submit" class="btn btn-secondary">{{ texts.unarchive }} {{ icon("unarchive") }}</button>
+                        <button type="submit" class="btn btn-secondary"> {{ icon("unarchive") }} aktivovat </button>
                     {% endif %}
                 </form>
             </div>  

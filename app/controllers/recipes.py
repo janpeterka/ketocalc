@@ -1,91 +1,89 @@
 from flask import render_template as template
-from flask import request, redirect, url_for, flash, abort, g, jsonify
-
+from flask import request, redirect, url_for, flash, abort, jsonify
 from flask_login import login_required, current_user
-
 from flask_classful import route
 
 from app.auth import admin_required
 
-from app.models.recipes import Recipe
-from app.models.diets import Diet
-from app.models.users import User
-from app.models.ingredients import Ingredient
-from app.models.recipes_has_ingredients import RecipeHasIngredients
+from app.models import Recipe, Diet, User, Ingredient, RecipeHasIngredient
 
-from app.controllers.base_recipes import BaseRecipesView
+from app.controllers.base_recipes import BaseRecipeView
 
 
-class RecipesView(BaseRecipesView):
+class RecipeView(BaseRecipeView):
     decorators = [login_required]
 
     @login_required
     def before_request(self, name, id=None, **kwargs):
-        g.request_item_type = "recipe"
-        if id is not None:
-            g.request_item_id = id
-            self.recipe = Recipe.load(id)
+        self.recipe = Recipe.load(id)
 
-            if self.recipe is None:
-                abort(404)
-            if not self.recipe.can_current_user_show:
-                abort(403)
+    def before_show(self, id):
+        self.validate_show(self.recipe)
+
+    def before_edit(self, id):
+        self.validate_edit(self.recipe)
+
+    def before_update(self, id):
+        self.validate_update(self.recipe)
 
     def index(self):
-        return template("recipes/all.html.j2", diets=current_user.active_diets)
+        self.diets = current_user.active_diets
+
+        return self.template()
 
     def new(self):
+        from app.helpers.general import list_without_duplicated
+
         active_diets = current_user.active_diets
-        ingredients = Ingredient.load_all_by_author(current_user.username)
+        user_ingredients = Ingredient.load_all_by_author(current_user.username)
         shared_ingredients = Ingredient.load_all_shared(renamed=True)
 
-        # TODO - this causes duplication for admin. shouldn't be problem for users.
-        all_ingredients = ingredients + shared_ingredients
-        return template(
-            "recipes/new.html.j2",
-            ingredients=all_ingredients,
-            preset_ingredients=request.args.get("preset_ingredient_ids", []),
-            diets=active_diets,
-            is_trialrecipe=False,
-        )
+        ingredients = user_ingredients + shared_ingredients
+        self.ingredients = list_without_duplicated(ingredients)
+
+        self.preset_ingredients = request.args.get("preset_ingredient_ids", [])
+        self.diets = active_diets
+        self.is_trialrecipe = False
+
+        return self.template()
 
     def post(self):
         # TODO: implemented with ajax now, will change
         pass
 
-    @route("<id>/edit", methods=["POST"])
-    def post_edit(self, id):
+    def show(self, id):
+        from app.forms import PhotoForm
+
+        self.is_print = False
+        self.photo_form = PhotoForm()
+
+        return self.template()
+
+    def edit(self, id):
+        return self.template()
+
+    @route("update/<id>", methods=["POST"])
+    def update(self, id):
         self.recipe.name = request.form["name"]
         self.recipe.description = request.form["description"]
         self.recipe.edit()
         self.recipe.refresh()
         flash("Recept byl upraven.", "success")
-        return redirect(url_for("RecipesView:show", id=self.recipe.id))
 
-    def show(self, id):
-        from .forms.files import PhotoForm
+        return redirect(url_for("RecipeView:show", id=self.recipe.id))
 
+    @route("/delete/<id>", methods=["POST"])
+    def delete(self, id):
+        self.recipe.remove()
+        flash("Recept byl smazán.", "success")
+
+        return redirect(url_for("DashboardView:index"))
+
+    def print(self, id):
         return template(
             "recipes/show.html.j2",
             recipe=self.recipe,
-            is_print=False,
-            photo_form=PhotoForm(),
-        )
-
-    def print(self, id):
-        return template("recipes/show.html.j2", recipe=self.recipe, is_print=True,)
-
-    # def print_all(self, diet_id=None):
-    #     if diet_id is None:
-    #         recipes = current_user.recipes
-    #     else:
-    #         recipes = Diet.load(diet_id).recipes
-
-    #     return template("recipes/print_all.html.j2", recipes=recipes)
-
-    def edit(self, id):
-        return template(
-            "recipes/edit.html.j2", recipe=self.recipe, totals=self.recipe.totals
+            is_print=True,
         )
 
     @route("/toggle_shared/<id>", methods=["POST"])
@@ -95,7 +93,7 @@ class RecipesView(BaseRecipesView):
             flash("Recept byl zveřejněn.", "success")
         else:
             flash("Recept byl skryt před veřejností.", "success")
-        return redirect(url_for("RecipesView:show", id=self.recipe.id))
+        return redirect(url_for("RecipeView:show", id=self.recipe.id))
 
     @route("/make_all_recipes_public")
     def make_all_public(self):
@@ -119,12 +117,6 @@ class RecipesView(BaseRecipesView):
         flash(f"Všechny recepty uživatele {user.full_name} byly zveřejněny", "success")
         return redirect(url_for("DashboardView:index"))
 
-    @route("/delete/<id>", methods=["POST"])
-    def delete(self, id):
-        self.recipe.remove()
-        flash("Recept byl smazán.", "success")
-        return redirect(url_for("DashboardView:show"))
-
     @route("/saveRecipeAJAX", methods=["POST"])
     def saveRecipeAJAX(self):
         temp_ingredients = request.json["ingredients"]
@@ -132,7 +124,7 @@ class RecipesView(BaseRecipesView):
 
         ingredients = []
         for temp_i in temp_ingredients:
-            rhi = RecipeHasIngredients()
+            rhi = RecipeHasIngredient()
             rhi.ingredients_id = temp_i["id"]
             rhi.amount = temp_i["amount"]
             ingredients.append(rhi)
@@ -140,7 +132,7 @@ class RecipesView(BaseRecipesView):
         recipe = Recipe(name=request.json["name"], diet=diet)
 
         last_id = recipe.create_and_save(ingredients)
-        return url_for("RecipesView:show", id=last_id)
+        return url_for("RecipeView:show", id=last_id)
 
     @route("/toggleReactionAJAX", methods=["POST"])
     def toggle_reaction_AJAX(self):
@@ -151,9 +143,9 @@ class RecipesView(BaseRecipesView):
     @route("/upload_photo/<id>", methods=["POST"])
     def upload_photo(self, id):
         from werkzeug.datastructures import CombinedMultiDict
-        from .forms.files import PhotoForm
+        from app.forms.files import PhotoForm
 
-        from app.models.files import RecipeImageFile
+        from app.models import RecipeImageFile
 
         form = PhotoForm(CombinedMultiDict((request.files, request.form)))
 
@@ -162,7 +154,7 @@ class RecipesView(BaseRecipesView):
             file.data = form.file.data
             file.save()
 
-        return redirect(url_for("RecipesView:show", id=id))
+        return redirect(url_for("RecipeView:show", id=id))
 
     @route("/load_recipes_AJAX", methods=["POST"])
     # @login_required

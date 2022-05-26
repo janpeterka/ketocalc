@@ -38,7 +38,7 @@ Stimulus.register("new-recipe", class extends Controller {
       }
 
       add_ingredient_by_id(ingredient_id){
-          fetch("{{ url_for('BaseRecipesView:addIngredientAJAX') }}",{
+          fetch("{{ url_for('BaseRecipeView:addIngredientAJAX') }}",{
             method: 'POST',
             body: JSON.stringify({'ingredient_id' : ingredient_id}),
             headers: {'Content-Type': 'application/json,charset=UTF-8'}}
@@ -62,7 +62,7 @@ Stimulus.register("new-recipe", class extends Controller {
         var old_ingredient_id = event.target.dataset.id
 
         // create copy of ingredient (AJAX), get back new id
-        fetch("{{ url_for('IngredientsView:duplicateAJAX') }}", {
+        fetch("{{ url_for('IngredientView:duplicateAJAX') }}", {
           method: 'POST',
           body: JSON.stringify({
             'ingredient_id' : old_ingredient_id,
@@ -342,7 +342,7 @@ Stimulus.register("new-recipe", class extends Controller {
       }
 
       _calculate_core(ingredients, dietID){
-        fetch("{{ url_for('BaseRecipesView:calcRecipeAJAX') }}", {
+        fetch("{{ url_for('BaseRecipeView:calcRecipeAJAX') }}", {
           method: 'POST',
           body: JSON.stringify({
               'ingredients' : ingredients,
@@ -384,7 +384,7 @@ Stimulus.register("new-recipe", class extends Controller {
       save_recipe(e){
         e.preventDefault();
 
-        fetch("{{ url_for('RecipesView:saveRecipeAJAX') }}", {
+        fetch("{{ url_for('RecipeView:saveRecipeAJAX') }}", {
           method: 'POST',
           body: JSON.stringify({
             'ingredients' : this._get_currently_calculated(),

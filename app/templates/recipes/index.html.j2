@@ -1,0 +1,24 @@
+{% extends "base.html.j2" %}
+{% block title %} moje recepty {% endblock %}
+
+{% block content %}
+<h1>
+    moje recepty
+    <a class="btn btn-secondary float-right" href="{{ url_for('RecipeView:new') }}"> přidat recept </a>
+</h1>
+
+<table id="diets" class="table">
+
+    {% for diet in diets: %}
+        <tr><th class='diet'>{{ link_to(diet) }}</th></tr>
+
+        {% for recipe in diet.recipes: %}
+            <tr>
+                <td>{{ link_to(recipe) }}</td>
+            </tr>
+        {% endfor %}
+    {% endfor %}       
+
+</table>
+{% endblock %}
+

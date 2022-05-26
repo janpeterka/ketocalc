@@ -1,14 +1,18 @@
 from flask import abort, request, redirect, flash
 from flask import render_template as template
-
 from flask_classful import FlaskView, route
 
-from app.models.files import File
-
+from app.auth import admin_required
 from app.handlers.files import FileHandler
 
+from app.models import File
 
-class FilesView(FlaskView):
+
+class FileView(FlaskView):
+    @admin_required
+    def index(self):
+        return template("admin/files/all.html.j2", files=FileHandler().all_files)
+
     def show(self, hash_value):
         file = File.load_first_by_attribute("hash", hash_value)
         if not file:
@@ -16,6 +20,7 @@ class FilesView(FlaskView):
         if not file.can_current_user_view:
             abort(403)
         thumbnail = request.args.get("thumbnail", False)
+
         return FileHandler().show(file, thumbnail=(thumbnail == "True"))
 
     @route("/<id>/delete", methods=["POST"])
@@ -25,6 +30,7 @@ class FilesView(FlaskView):
             file.delete()
         else:
             flash("Nemáte právo toto foto smazat.", "error")
+
         return redirect(request.referrer)
 
     # def show_profile_pic(self, user_id):
@@ -42,7 +48,5 @@ class FilesView(FlaskView):
             abort(404)
         if not file.can_current_user_view:
             abort(403)
-        return FileHandler().download(file)
 
-    def index(self):
-        return template("admin/files/all.html.j2", files=FileHandler().all_files)
+        return FileHandler().download(file)

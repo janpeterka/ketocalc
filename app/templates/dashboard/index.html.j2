@@ -1,28 +1,23 @@
 {% extends "base.html.j2" %}
-
-{% block title %}
-    Vítejte {{ first_name }}
-{% endblock %}
-
-{% block script %}
-{% endblock %}
+{% block title %} ketokalkulačka | {% endblock %}
 
 {% block content %}
-
 <div class="row">
 
     {% include 'dashboard/_onboarding.html.j2' %}
 
     <div class="col-sm-12 col-md-6">
         <div class="form-inline d-block">
-            <h5 class="text-uppercase font-comfortaa">Aktuální dieta:</h5>
-            <form method="POST" action="{{ url_for('DashboardView:post') }}">
-                <select name="select_diet" class="form-control col-12" onchange="this.form.submit()">
+            <h5 class="text-uppercase font-comfortaa"> aktuální dieta: </h5>
+            
+            <form action="{{ url_for('DashboardView:index') }}">
+                <select name="selected_diet_id" class="form-control col-12" onchange="this.form.submit()">
                     {% for diet in diets: %}
                         <option value="{{ diet.id }}" {% if selected_diet.id == diet.id %}selected="selected"{% endif %}>{{ diet.name }}</option>
                     {% endfor %}
                 </select>
             </form>
+
         </div>
 
         <div>
@@ -40,5 +35,4 @@
         {% include 'dashboard/_daily_plan.html.j2' %}
     </div>
 </div>
-
 {% endblock %}

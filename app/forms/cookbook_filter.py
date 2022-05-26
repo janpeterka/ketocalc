@@ -2,7 +2,7 @@ from wtforms import SubmitField, SelectField, BooleanField
 
 from flask_wtf import FlaskForm
 
-from app.controllers.forms.custom import ComaFloatField
+from app.forms.custom import ComaFloatField
 
 
 class CookbookFilterForm(FlaskForm):

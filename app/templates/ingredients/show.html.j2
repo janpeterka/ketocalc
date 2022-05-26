@@ -1,54 +1,53 @@
 {% extends "base.html.j2" %}
-{% block title %}
-    {{ texts.ingredient }}
-{% endblock %}
+{% block title %} surovina | {{ ingredient.name }} {% endblock %}
+
 {% block content %}
-    <div class="container">
-        <div class="row">
-            <div class="col-md-8 col-sm-12" style="margin-bottom: 2rem;">
-                <h2>{{ ingredient.name }} {% if ingredient.is_shared %}(sdílená surovina){% endif %}</h2>
-                <span class="font-italic">
-                    {{ ingredient.description if ingredient.description }}
-                    {% if ingredient.ean_code %}
-                    <span class="float-right"> EAN: {{ ingredient.ean_code }} </span>
-                    {% endif %}
-                </span>
-                {% if current_user.is_admin %}
-                    <div class="admin-field">
-                        Autor: <a href="{{ url_for('UsersView:show_by_id', id=ingredient.author_user.id) }}">{{ ingredient.author }}</a>
-                    </div>
-                {% endif %}
-                <table class="table">
-                    <tr>
-                        {# <th>{{ texts.title }}</th> #}
-                        <th>{{ texts.energy_100 }}</th>
-                        <th>{{ texts.protein_100 }}</th>
-                        <th>{{ texts.fat_100 }}</th>
-                        <th>{{ texts.sugar_100 }}</th>
-                        <th>{{ texts.ratio }}</th>
-                    </tr>
-                    <tr>
-                        {# <td>{{ ingredient.name }}</td> #}
-                        <td>{{ ingredient.calorie }}</td>
-                        <td>{{ ingredient.protein }}</td>
-                        <td>{{ ingredient.fat }}</td>
-                        <td>{{ ingredient.sugar }}</td>
-                        <td>{{ ingredient.ratio }} : 1</td>
-                    </tr>
-                </table>
-                {% if ingredient.can_current_user_edit %}
-                    {% from "macros/_admin_field.html.j2" import admin_field_class with context %}
-                    <form {{ admin_field_class(obj=ingredient) }} action="{{ url_for('IngredientsView:delete', id=ingredient.id) }}" onsubmit="return confirm('{{ texts.ingredient_delete_confirm }}');" method="post" accept-charset="utf-8">
-                        <a class="btn btn-secondary" href="{{ url_for('IngredientsView:edit', id=ingredient.id) }}">{{ texts.edit }} {{ icon("edit") }}</a>
-                        {% if ingredient.is_used == False %}
-                            <button type="submit" class="btn btn-danger">{{ texts.ingredient_delete }} {{ icon("delete") }}</button>
-                        {% else %}
-                            <button type="submit" class="btn btn-danger" disabled>{{ texts.delete_error }} {{ icon("delete") }}</button>
-                        {% endif %}
-                    </form>
-                {% endif %}
+<div class="row">
+    <div class="col-md-8 col-sm-12" style="margin-bottom: 2rem;">
+        <h2>{{ ingredient.name }} {% if ingredient.is_shared %}(sdílená surovina){% endif %}</h2>
+        <span class="font-italic">
+            {{ ingredient.description if ingredient.description }}
+            {% if ingredient.ean_code %}
+            <span class="float-right"> EAN: {{ ingredient.ean_code }} </span>
+            {% endif %}
+        </span>
+
+        {% if current_user.is_admin %}
+            <div class="admin-field">
+                Autor: <a href="{{ url_for('UserView:show_by_id', id=ingredient.author_user.id) }}">{{ ingredient.author }}</a>
             </div>
-            {% include ('recipes/_recipe_list.html.j2') %}
-        </div>
+        {% endif %}
+
+        <table class="table">
+            <tr>
+                {# <th>{{ texts.title }}</th> #}
+                <th>{{ texts.energy_100 }}</th>
+                <th>{{ texts.protein_100 }}</th>
+                <th>{{ texts.fat_100 }}</th>
+                <th>{{ texts.sugar_100 }}</th>
+                <th>{{ texts.ratio }}</th>
+            </tr>
+            <tr>
+                {# <td>{{ ingredient.name }}</td> #}
+                <td>{{ ingredient.calorie }}</td>
+                <td>{{ ingredient.protein }}</td>
+                <td>{{ ingredient.fat }}</td>
+                <td>{{ ingredient.sugar }}</td>
+                <td>{{ ingredient.ratio }} : 1</td>
+            </tr>
+        </table>
+        {% if ingredient.can_current_user_edit %}
+            {% from "macros/_admin_field.html.j2" import admin_field_class with context %}
+            <form {{ admin_field_class(obj=ingredient) }} action="{{ url_for('IngredientView:delete', id=ingredient.id) }}" onsubmit="return confirm('{{ texts.ingredient_delete_confirm }}');" method="post" accept-charset="utf-8">
+                <a class="btn btn-secondary" href="{{ url_for('IngredientView:edit', id=ingredient.id) }}">{{ texts.edit }} {{ icon("edit") }}</a>
+                {% if ingredient.is_used == False %}
+                    <button type="submit" class="btn btn-danger">{{ texts.ingredient_delete }} {{ icon("delete") }}</button>
+                {% else %}
+                    <button type="submit" class="btn btn-danger" disabled>{{ texts.delete_error }} {{ icon("delete") }}</button>
+                {% endif %}
+            </form>
+        {% endif %}
     </div>
+    {% include ('recipes/_recipe_list.html.j2') %}
+</div>
 {% endblock %}

@@ -24,11 +24,11 @@ def test_requests_logged_in(app, db, client):
 
     pages = [
         "/dashboard/",
-        "/users/show/",
-        "/users/edit/",
+        "/user/show/",
+        "/user/edit/",
         "/kalkulacka",
         # "/daily-plans",  # having problems with context_processors
-        "/trial-recipes",
+        "/trial-recipe",
     ]
 
     redirect_pages = [

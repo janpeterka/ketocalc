@@ -1,16 +1,15 @@
-from app.models.recipes import Recipe
-
 from flask import redirect, url_for, request
-
 from flask_classful import route
-
 from flask_login import current_user
 
-from .extended_flask_view import ExtendedFlaskView
-from .forms.cookbook_filter import CookbookFilterForm
+from app.helpers.base_view import BaseView
+
+from app.models import Recipe
+
+from app.forms import CookbookFilterForm
 
 
-class CookbookView(ExtendedFlaskView):
+class CookbookView(BaseView):
     template_folder = "cookbook"
 
     def before_request(self, name):

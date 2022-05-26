@@ -63,22 +63,10 @@ def utility_processor():
         except Exception:
             raise NotImplementedError("This object link_to is probably not implemented")
 
-    # def option(obj):
-    #     return f"<option name='{obj.name}' value='{obj.id}'>{obj.name}</option>"
-
-    # def options(array):
-    #     html = ""
-    #     for item in array:
-    #         html += option(item) + "\n"
-
-    #     return html
-
     return dict(
         human_format_date=human_format_date,
         recipe_ingredient_ids_list=recipe_ingredient_ids_list,
         link_to=link_to,
-        # option=option,
-        # options=options,
     )
 
 
@@ -126,3 +114,17 @@ def log_request(exception=None):
 # @application.shell_context_processor
 # def make_shell_context():
 #     return {"db": db, "User": User}
+
+
+@application.cli.command("reset-passwords")
+def reset_passwords():
+    from app.models import User
+
+    if not application.config["APP_STATE"] == "development":
+        print("You cannot do this!")
+        return
+
+    for user in User.load_all():
+        user.set_password_hash("sudo")
+        user.updated_by = 1
+        user.edit()
