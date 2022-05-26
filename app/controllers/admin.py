@@ -47,14 +47,13 @@ class AdminView(BaseView):
                 if not (request.user and request.user.is_admin)
             ]
             daily_active_users = len(
-                set(
-                    [
-                        request.user_id
-                        for request in day_requests
-                        if not (request.user and request.user.is_admin)
-                    ]
-                )
+                {
+                    request.user_id
+                    for request in day_requests
+                    if not (request.user and request.user.is_admin)
+                }
             )
+
 
             ingredients = [
                 ingredient

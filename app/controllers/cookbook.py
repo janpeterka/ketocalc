@@ -39,7 +39,7 @@ class CookbookView(BaseView):
         with_reaction = None
 
         if request.method == "POST":
-            if not self.form.ingredient_name.data == "--všechny--":
+            if self.form.ingredient_name.data != "--všechny--":
                 ingredient_name = self.form.ingredient_name.data
             ratio_from = self.form.ratio_from.data
             ratio_to = self.form.ratio_to.data

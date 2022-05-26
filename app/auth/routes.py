@@ -15,18 +15,16 @@ auth_blueprint = Blueprint("auth", __name__, template_folder="templates/auth/")
 
 @oauth_authorized.connect
 def oauth_login(blueprint, token):
-    # TODO: rewrite for multiple oaths @TEST (30)
-    if blueprint.name == "google":
-        try:
-            user_info = google.get("/oauth2/v2/userinfo").json()
-            # username = user_info["email"]
-            google_id = user_info["id"]
-        except Exception as e:
-            application.logger.error(e)
-    else:
+    if blueprint.name != "google":
         # not implemented
         return False
 
+    try:
+        user_info = google.get("/oauth2/v2/userinfo").json()
+        # username = user_info["email"]
+        google_id = user_info["id"]
+    except Exception as e:
+        application.logger.error(e)
     if blueprint.name == "google":
         user = User.load(google_id, load_type="google_id")
 
@@ -49,11 +47,10 @@ def do_oauth_register(*, user_info, oauth_type):
 
 
 def do_oauth_login(*, user, oauth_type=None):
-    if oauth_type == "google":
-        if user.google_id is not None:
-            login_user(user)
-            user.log_login()
-            return True
+    if oauth_type == "google" and user.google_id is not None:
+        login_user(user)
+        user.log_login()
+        return True
 
 
 def do_login(username=None, password=None, from_register=False):
@@ -118,10 +115,7 @@ def validate_register(username):
     Returns:
         bool
     """
-    if User.load_by_username(username) is not None:
-        return False
-    else:
-        return True
+    return User.load_by_username(username) is None
 
 
 def generate_new_password_token(user):

@@ -52,9 +52,8 @@ class DietView(BaseView):
 
         if diet.save():
             return redirect(url_for("DietView:show", id=diet.id))
-        else:
-            flash("Nepodařilo se vytvořit dietu", "error")
-            return redirect(url_for("DietView:new"))
+        flash("Nepodařilo se vytvořit dietu", "error")
+        return redirect(url_for("DietView:new"))
 
     def show(self, id):
         return self.template()

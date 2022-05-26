@@ -28,12 +28,9 @@ class SupportView(FlaskView):
             if not form.validate_on_submit():
                 return template("support/feedback.html.j2", form=form)
 
-            attachments = []
-            if form.feedback_file.data:
-                attachments = [form.feedback_file.data]
-
+            attachments = [form.feedback_file.data] if form.feedback_file.data else []
             MailSender().send_email(
-                subject="[ketocalc] [{}]".format(form.option.data),
+                subject=f"[ketocalc] [{form.option.data}]",
                 sender="ketocalc",
                 recipient_mails=["ketocalc.jmp+feedback@gmail.com"],
                 text_body="Message: {}\n Send by: {} [user: {}]".format(
@@ -42,6 +39,7 @@ class SupportView(FlaskView):
                 html_body=None,
                 attachments=attachments,
             )
+
 
             flash("Vaše připomínka byla zaslána na vyšší místa.", "success")
             return redirect(url_for("DashboardView:index"))

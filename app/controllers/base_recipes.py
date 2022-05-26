@@ -49,11 +49,7 @@ class BaseRecipeView(BaseView):
     def calcRecipeAJAX(self):
         json_ingredients = request.json["ingredients"]
         diet = Diet.load(request.json["dietID"])
-        if "trial" in request.json and request.json["trial"] == "True":
-            is_trialrecipe = True
-        else:
-            is_trialrecipe = False
-
+        is_trialrecipe = "trial" in request.json and request.json["trial"] == "True"
         if diet is None:
             abort(400, "no diet")
 

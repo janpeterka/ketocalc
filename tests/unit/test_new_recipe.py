@@ -9,8 +9,6 @@ import helpers
 
 
 def load_datasets_calc():
-    datasets = []
-
     # 4
     diet = Diet.load_by_name("3.5")
     ingredients = [
@@ -25,8 +23,7 @@ def load_datasets_calc():
         "diet": diet.json,
         "none": "False",
     }
-    datasets.append(test_dataset)
-
+    datasets = [test_dataset]
     # 4 + fixed
     diet = Diet.load_by_name("3.5")
     ingredients = [
@@ -93,7 +90,6 @@ def test_calc(app, db, client):
         assert response in (200, 204, 400)
         if dataset["none"] == "True":
             assert response.json is None
-            pass
         else:
             assert (
                 round(float(json.loads(response.json["totals"])["sugar"]))

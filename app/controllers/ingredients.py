@@ -61,9 +61,8 @@ class IngredientView(BaseView):
 
         if ingredient.save():
             return redirect(url_for("IngredientView:show", id=ingredient.id))
-        else:
-            flash("Nepodařilo se vytvořit surovinu", "error")
-            return redirect(url_for("IngredientView:new"))
+        flash("Nepodařilo se vytvořit surovinu", "error")
+        return redirect(url_for("IngredientView:new"))
 
     def show(self, id):
         return self.template()

@@ -91,20 +91,16 @@ class User(db.Model, UserMixin, ItemMixin):
             else:
                 db_password_hash = db_password_hash.encode("utf-8")
 
-        if self.password_version == "SHA256":
-            if hashlib.sha256(password).hexdigest() == self.pwdhash:
-                # changing from sha256 to current
-                self.set_password_hash(password)
-                self.password_version = application.config["PASSWORD_VERSION"]
-                self.edit()
-                return True
-            else:
-                return False
+        if self.password_version != "SHA256":
+            return bool(bcrypt.checkpw(password, db_password_hash))
+        if hashlib.sha256(password).hexdigest() == self.pwdhash:
+            # changing from sha256 to current
+            self.set_password_hash(password)
+            self.password_version = application.config["PASSWORD_VERSION"]
+            self.edit()
+            return True
         else:
-            if bcrypt.checkpw(password, db_password_hash):
-                return True
-            else:
-                return False
+            return False
 
     def log_login(self):
         if application.config["APP_STATE"] == "production":
@@ -141,61 +137,66 @@ class User(db.Model, UserMixin, ItemMixin):
 
     @property
     def name(self) -> str:
-        return "{} {}".format(self.first_name, self.last_name)
+        return f"{self.first_name} {self.last_name}"
 
     @property
     def full_name(self) -> str:
-        return "{} {}".format(self.first_name, self.last_name)
+        return f"{self.first_name} {self.last_name}"
 
     # LOGS
 
     @property
     def last_request(self):
-        request = (
+        return (
             RequestLog.query.filter_by(user_id=self.id)
             .order_by(RequestLog.created_at.desc())
             .first()
         )
-        return request
 
     # MAILING
 
     @property
     def onboarding_welcome_mail_sent(self):
-        for mail in self.sent_mails:
-            if mail.template == "mails/onboarding/welcome.html.j2":
-                return mail.created_at
-
-        return None
+        return next(
+            (
+                mail.created_at
+                for mail in self.sent_mails
+                if mail.template == "mails/onboarding/welcome.html.j2"
+            ),
+            None,
+        )
 
     @property
     def onboarding_inactive_mail_sent(self):
-        for mail in self.sent_mails:
-            if mail.template == "mails/onboarding/inactive.html.j2":
-                return mail.created_at
-
-        return None
+        return next(
+            (
+                mail.created_at
+                for mail in self.sent_mails
+                if mail.template == "mails/onboarding/inactive.html.j2"
+            ),
+            None,
+        )
 
     def state(self, name=None):
         if name == "onboarding_welcome":
-            if (
-                self.created
-                and datetime.date.today() - datetime.timedelta(days=7)
-                < self.created.date()
-            ):
-                return True
-            else:
-                return False
+            return bool(
+                (
+                    self.created
+                    and datetime.date.today() - datetime.timedelta(days=7)
+                    < self.created.date()
+                )
+            )
+
         elif name == "onboarding_inactive":
-            if (
-                self.created
-                and datetime.date.today() - datetime.timedelta(days=30)
-                < self.created.date()
-                and len(self.recipes) == 0
-            ):
-                return True
-            else:
-                return False
+            return bool(
+                (
+                    self.created
+                    and datetime.date.today() - datetime.timedelta(days=30)
+                    < self.created.date()
+                    and len(self.recipes) == 0
+                )
+            )
+
         else:
             return False
 

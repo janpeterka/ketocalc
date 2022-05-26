@@ -28,20 +28,19 @@ class TrialRecipeView(BaseRecipeView):
     def _get_preset_trial_ingredients(self):
         preset_ingredients = []
 
-        ingredient = Ingredient.load_shared_by_name("Ananas")
-        if ingredient:
+        if ingredient := Ingredient.load_shared_by_name("Ananas"):
             preset_ingredients.append(ingredient)
         else:
             preset_ingredients.append(Ingredient.load_random_by_nutrient("sugar"))
 
-        ingredient = Ingredient.load_shared_by_name("Avokádo")
-        if ingredient:
+        if ingredient := Ingredient.load_shared_by_name("Avokádo"):
             preset_ingredients.append(ingredient)
         else:
             preset_ingredients.append(Ingredient.load_random_by_nutrient("fat"))
 
-        ingredient = Ingredient.load_shared_by_name("Maso - krůtí, prsa bez kosti")
-        if ingredient:
+        if ingredient := Ingredient.load_shared_by_name(
+            "Maso - krůtí, prsa bez kosti"
+        ):
             preset_ingredients.append(ingredient)
         else:
             preset_ingredients.append(Ingredient.load_random_by_nutrient("protein"))

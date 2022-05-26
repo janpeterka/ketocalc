@@ -131,16 +131,14 @@ class BaseView(FlaskView):
         e.g. class <UserForm>
         """
         model_name = self._model_name
-        snake_model_name = re.sub("(?!^)([A-Z]+)", r"_\1", model_name).lower()
-        return snake_model_name
+        return re.sub("(?!^)([A-Z]+)", r"_\1", model_name).lower()
 
     @property
     def _form_name(self):
         """
         e.g. string "UserForm"
         """
-        form_name = f"{self._model_name}Form"
-        return form_name
+        return f"{self._model_name}Form"
 
     @property
     def _template_folder(self):
