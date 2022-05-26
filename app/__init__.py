@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_caching import Cache
 
-from flask_charts import GoogleCharts
+# from flask_charts import GoogleCharts
 
 import pymysql
 import numpy as np
@@ -17,7 +17,7 @@ mail = Mail()
 db = SQLAlchemy(session_options={"autoflush": False, "autocommit": False})
 migrate = Migrate()
 cache = Cache(config={"CACHE_TYPE": "simple"})
-charts = GoogleCharts()
+# charts = GoogleCharts()
 
 
 def create_app(config_name="default"):
@@ -37,14 +37,14 @@ def create_app(config_name="default"):
 
     application.config.from_object(configs[config_name])
 
-    print("DB INFO: using {}".format(application.config['INFO_USED_DB']))
+    print("DB INFO: using {}".format(application.config["INFO_USED_DB"]))
 
     # APPS
     mail.init_app(application)
     db.init_app(application)
     migrate.init_app(application, db)
     cache.init_app(application)
-    charts.init_app(application)
+    # charts.init_app(application)
 
     if application.config["SENTRY_MONITORING"]:
         import sentry_sdk
