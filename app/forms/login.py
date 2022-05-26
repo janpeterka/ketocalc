@@ -6,9 +6,9 @@ from flask_wtf import FlaskForm
 
 class LoginForm(FlaskForm):
     username = StringField(
-        "Přihlašovací email", [validators.InputRequired("Email musí být vyplněn")]
+        "přihlašovací e-mail", [validators.InputRequired("e-mail musí být vyplněn")]
     )
     password = PasswordField(
-        "Heslo", [validators.InputRequired("Heslo musí být vyplněno")]
+        "heslo", [validators.InputRequired("heslo musí být vyplněno")]
     )
-    submit = SubmitField("Přihlásit")
+    submit = SubmitField("přihlásit se")
