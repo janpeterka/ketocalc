@@ -29,7 +29,6 @@ flask-caching = "*"
 sentry-sdk = {extras = ["flask"],version = "*"}
 boto3 = "*"
 pillow = "*"
-flask-charts = "*"
 
 [dev-packages]
 pytest = "*"
