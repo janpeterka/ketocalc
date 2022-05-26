@@ -10,25 +10,25 @@
 
       <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link font-weight-bold " href="{{ url_for('LoginView:show') }}">Přihlásit se</a>
+            <a class="nav-link font-weight-bold " href="{{ url_for('LoginView:show') }}"> přihlásit se </a>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('RegisterView:show') }}">Zaregistrovat se</a>
+            <a class="nav-link" href="{{ url_for('RegisterView:show') }}"> registrovat se </a>
           </li>
       </ul>
       <div class="navbar-divider"></div>
       <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('TrialRecipeView:index') }}">Ukázka</a>
+            <a class="nav-link" href="{{ url_for('TrialRecipeView:index') }}"> ukázka kalkulačky</a>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('SimpleCalculatorView:index') }}">Jednoduchá {{ icon("calculator") }}</a>
+            <a class="nav-link" href="{{ url_for('SimpleCalculatorView:index') }}"> jednoduchá kalkulačka {{ icon("calculator") }}</a>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('CookbookView:public_index') }}">Veřejné recepty</a>
+            <a class="nav-link" href="{{ url_for('CookbookView:public_index') }}"> sdílené recepty </a>
           </li>
 
 
@@ -40,10 +40,10 @@
           </li>
 
           <li class="nav-item">
-            <a class="nav-link small" href="{{ url_for('SupportView:terms') }}">Podmínky použití</a>
+            <a class="nav-link small" href="{{ url_for('SupportView:terms') }}"> podmínky použití </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link small" href="{{ url_for('SupportView:privacy') }}">Osobní data</a>
+            <a class="nav-link small" href="{{ url_for('SupportView:privacy') }}"> osobní data </a>
           </li>
       </ul>
 

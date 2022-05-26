@@ -1,9 +1,5 @@
 {% extends "base.html.j2" %}
-{% block title %}
-    Uživatel
-{% endblock %}
-
-{% block style %}{% endblock %}
+{% block title %} {{ user.full_name }} {% endblock %}
 
 {% block script %}
     {{ stimulus("password-visibility") }}

@@ -1,17 +1,11 @@
 {% extends "base.html.j2" %}
-{% block title %}
-    {{ texts.ingredient_all_shared }}	
-{% endblock %}
-
-{% block style %}{% endblock %}
-
-{% block script %}{% endblock %}
+{% block title %} sdílené suroviny {% endblock %}
 
 {% block content %}
     <div class="container">
         <div class="col-12">
             {% if current_user.is_admin %}
-                <h1>Sdílené suroviny ke schválení ({{ unapproved_ingredients|length }})</h1>
+                <h1> sdílené suroviny ke schválení ({{ unapproved_ingredients|length }})</h1>
                 <table id="unapproved_ingredients" class="table">
                 <tr>
                     <th>{{ texts.title }}</th>
@@ -19,7 +13,7 @@
                     <th>{{ texts.protein_100 }}</th>
                     <th>{{ texts.fat_100 }}</th>       
                     <th>{{ texts.sugar_100 }}</th>
-                    <th>Schválit</th>
+                    <th> schválit </th>
                 </tr>
                 {% for ingredient in unapproved_ingredients: %}
                     <tr>
@@ -38,8 +32,9 @@
                 </table>
             {% endif %}
 
-            <h1>Sdílené suroviny
-            <a href="{{ url_for('IngredientView:new_shared') }}"><button class="btn btn-secondary float-right">{{ texts.ingredient_add_shared }}</button></a>
+            <h1>
+                sdílené suroviny
+                <a class="btn btn-secondary float-right" href="{{ url_for('IngredientView:new_shared') }}"> přidat surovinu </a>
             </h1>
             <table id="shared_ingredients" class="table">
                 <tr>
@@ -59,7 +54,6 @@
                     </tr>
                 {% endfor %}
             </table>
-
 
         </div> 
     </div>

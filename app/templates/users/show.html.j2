@@ -1,11 +1,5 @@
 {% extends "base.html.j2" %}
-{% block title %}
-    {% if current_user.is_admin %}
-        Uživatel [{{ user.id }} | {{ user.username }}]   
-    {% else %}
-        Uživatel
-    {% endif %}
-{% endblock %}
+{% block title %} {{ user.full_name }} {% endblock %}
 
 {% block content %}
     <div class="container">
@@ -30,7 +24,6 @@
 
         {% if current_user.is_admin %}
             {% include "admin/users/_info.html.j2"%}
-            {% from "macros/_admin_field.html.j2" import admin_field_class with context %}
             <div class="admin-field">
                 <a href="{{ url_for('RecipeView:make_all_public_for_user', user_id=user.id) }}" class="btn btn-secondary">Zveřejnit všechny recepty uživatele</a>
             </div>

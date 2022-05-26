@@ -1,0 +1,15 @@
+<div class="text-center">
+    <span class="float-left" style="margin-left: 10rem">
+        <a href="{{ url_for('DailyPlanView:show', date=dates['previous']) }}">
+            {{ human_format_date(dates["previous"]) }}
+        </a>
+    </span>
+    <span style="font-size: 2rem">
+        {{ human_format_date(dates["active"]) }}
+    </span>
+    <span class="float-right" style="margin-right: 10rem">
+        <a href="{{ url_for('DailyPlanView:show', date=dates['next']) }}">
+            {{ human_format_date(dates["next"]) }}
+        </a>
+    </span>
+</div>

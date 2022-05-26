@@ -1,20 +1,15 @@
 {% extends "base.html.j2" %}
-{% block title %}
-    {{ texts.diet_new }}
-{% endblock %}
-{% block style %}{% endblock %}
-{% block script %}{% endblock %}
+{% block title %} nová dieta {% endblock %}
+
 {% block content %}
-    <div class="container">
-        <form method="POST" action="{{ url_for('DietView:post') }}" class="form-group col-6" accept-charset="UTF-8">
-            {{ form.csrf_token }}
-            {% from "macros/_form_element.html.j2" import render_field %}
-            {{ render_field(form.name, placeholder="např. Dieta 3.5 nebo Markova dieta") }}
-            {{ render_field(form.calorie, placeholder="např. 850") }}
-            {{ render_field(form.protein, placeholder="např. 100") }}
-            {{ render_field(form.fat, placeholder="např. 50") }}
-            {{ render_field(form.sugar, placeholder="např. 30") }}
-            {{ render_field(form.submit) }}
-        </form>
-    </div>
+<form method="POST" action="{{ url_for('DietView:post') }}" class="form-group col-6" accept-charset="UTF-8">
+    {{ form.csrf_token }}
+    {% from "macros/_form_element.html.j2" import render_field %}
+    {{ render_field(form.name, placeholder="např. Dieta 3.5 nebo Markova dieta") }}
+    {{ render_field(form.calorie, placeholder="např. 850") }}
+    {{ render_field(form.protein, placeholder="např. 100") }}
+    {{ render_field(form.fat, placeholder="např. 50") }}
+    {{ render_field(form.sugar, placeholder="např. 30") }}
+    {{ render_field(form.submit) }}
+</form>
 {% endblock %}

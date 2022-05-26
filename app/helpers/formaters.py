@@ -20,4 +20,5 @@ def string_to_list(string):
     string = string.replace("[", "").replace("]", "")
     array = string.split(",")
     array = [x.strip() for x in array]
+
     return array
