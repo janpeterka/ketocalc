@@ -75,43 +75,8 @@ class Recipe(db.Model, ItemMixin):
         recipes = Recipe.query.filter(Recipe.public).all()
         return recipes
 
-    # def create_and_save(self, ingredients):
-    #     db.session.add(self)
-    #     db.session.flush()
-
-    #     for i in ingredients:
-    #         i.recipes_id = self.id
-    #         db.session.add(i)
-
-    #     db.session.commit()
-    #     return self.id
-
-    def toggle_shared(self):
-        self.is_shared = not self.is_shared
-        self.edit()
-
-        return self.is_shared
-
-    def toggle_reaction(self, user=None):
-        user = current_user if user is None else user
-
-        if self.has_reaction is True:
-            self.remove_reaction(user)
-        else:
-            self.add_reaction(user)
-
-    def add_reaction(self, user):
-        from app.models import UserHasRecipeReaction
-
-        UserHasRecipeReaction(recipe=self, user=user).save()
-
-    def remove_reaction(self, user):
-        from app.models import UserHasRecipeReaction
-
-        UserHasRecipeReaction.load_by_recipe_and_current_user(recipe=self).remove()
-
     @property
-    def has_reaction(self):
+    def has_reaction_by_current_user(self):
         from app.models import UserHasRecipeReaction
 
         reactions = UserHasRecipeReaction.load_by_recipe_and_current_user(self)

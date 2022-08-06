@@ -58,7 +58,7 @@
 	    {% for recipe in recipes: %}
 	    	<tr style="height: 5rem;"
 	    		data-recipe-id="{{ recipe.id }}"
-	    		data-reaction="{{ recipe.has_reaction | lower }}"
+	    		data-reaction="{{ recipe.has_reaction_by_current_user | lower }}"
 	    		data-reaction-count="{{ recipe.reactions | length }}">
 	    		{% if not public %}
 	        	<td>{{ link_to(recipe) }}</td>

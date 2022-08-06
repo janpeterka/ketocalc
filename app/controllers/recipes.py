@@ -7,6 +7,7 @@ from app.helpers.general import list_without_duplicated
 from app.models import Recipe, Diet, User, Ingredient
 from app.forms import PhotoForm
 from app.helpers.base_view import BaseView
+from app.services import RecipeReactionManager, RecipeSharer
 
 
 class RecipeView(BaseView):
@@ -77,11 +78,12 @@ class RecipeView(BaseView):
 
     @route("/toggle_shared/<id>", methods=["POST"])
     def toggle_shared(self, id):
-        toggled = self.recipe.toggle_shared()
+        toggled = RecipeSharer(self.recipe).toggle_shared()
         if toggled is True:
             flash("Recept byl zveřejněn.", "success")
         else:
             flash("Recept byl skryt před veřejností.", "success")
+
         return redirect(url_for("RecipeView:show", id=self.recipe.id))
 
     @route("/make_all_recipes_public")
@@ -123,9 +125,9 @@ class RecipeView(BaseView):
     @route("/toggleReactionAJAX", methods=["POST"])
     def toggle_reaction_AJAX(self):
         recipe = Recipe.load(request.json["recipe_id"])
-        recipe.toggle_reaction()
+        RecipeReactionManager(recipe).toggle_reaction()
 
-        return jsonify(recipe.has_reaction)
+        return jsonify(recipe.has_reaction_by_current_user)
 
     @route("/upload_photo/<id>", methods=["POST"])
     def upload_photo(self, id):
