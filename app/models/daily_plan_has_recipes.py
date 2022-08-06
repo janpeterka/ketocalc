@@ -42,7 +42,10 @@ class DailyPlanHasRecipes(db.Model, BaseMixin):
         for metric in metrics:
             total = getattr(self.recipe.totals, metric)
             if getattr(self, "amount", None) is not None:
-                value = (total / self.recipe.totals.amount) * self.amount
+                if self.recipe.totals.amount > 0:
+                    value = (total / self.recipe.totals.amount) * self.amount
+                else:
+                    value = 0
             else:
                 value = total
             setattr(values, metric, value)

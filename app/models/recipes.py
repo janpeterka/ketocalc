@@ -160,7 +160,10 @@ class Recipe(db.Model, ItemMixin):
         for metric in metrics:
             total = getattr(self.totals, metric)
             if getattr(self, "amount", None) is not None:
-                value = (total / self.totals.amount) * self.amount
+                if self.totals.amount > 0:
+                    value = (total / self.totals.amount) * self.amount
+                else:
+                    value = 0
             else:
                 value = total
             setattr(values, metric, value)

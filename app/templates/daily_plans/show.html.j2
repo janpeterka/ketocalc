@@ -2,10 +2,8 @@
 {% block title %} denní přehled {% endblock %}
 
 {% block content %}
-<div data-controller="daily-plan">
     {% include "daily_plans/_date_navigation.html.j2" %}
 
-    <div class="row">
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -43,15 +41,15 @@
             
             <tr>
                 <th></th>
-                <th>energie (kJ)</th>
-                <th>bílkoviny (g)</th>
-                <th>tuky (g)</th>
-                <th>sacharidy (g)</th> 
-                <th>množství (g)</th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th> 
+                <th></th>
                 <th data-toggle="tooltip" title="tuky: bílkoviny + cukry">poměr</th>
             </tr>
             <tr data-daily-plan-target="totals">
-                <th>Celkem:</th>
+                <th>celkem:</th>
                 <td>{{ daily_plan.totals.calorie | round(1) }}</td>
                 <td>{{ daily_plan.totals.protein | round(1) }}</td>
                 <td>{{ daily_plan.totals.fat | round(1) }}</td>
@@ -60,8 +58,8 @@
                 <td>{{ daily_plan.totals.ratio }} : 1</td>
             </tr>
         </table>
-    </div>
 
+    <div data-controller="daily-plan">
     {% include "daily_plans/_recipe_form.html.j2" %}
-</div>
+    </div>
 {% endblock %}
