@@ -6,7 +6,7 @@
     <div class="col-8">
         <form action="{{ url_for('DietView:update', id=diet.id) }}" class="form-group" method="post" accept-charset="utf-8">
             {{ form.csrf_token }}
-            {% from "macros/_form_element.html.j2" import render_field %}
+            
             <table class="table">
                 <thead>
                     <tr>

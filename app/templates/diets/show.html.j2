@@ -1,7 +1,5 @@
 {% extends "base.html.j2" %}
-{% block title %}
-    {{ texts.diet }}: {{ diet.name }}
-{% endblock %}
+{% block title %} {{ diet.name }} {% endblock %}
 
 {% block style %}
     <style type="text/css" media="screen">
@@ -11,46 +9,43 @@
     </style>
 {% endblock %}
 
-{% block script %}{% endblock %}
-
 {% block content %}
-    <div class="container">
-        <div class="row">
-            <div class="col-8">
-                <h2>{{ diet.name }}</h2>
-                <table id="ingredients" class="table">
-                    <tr>
-                        <th>energie (kJ)</th>
-                        <th>bílkoviny (g)</th>
-                        <th>tuky (g)</th>
-                        <th>sacharidy (g)</th>
-                        <th>poměr</th>
-                    </tr>
-                    <tr>
-                        <td>{{ diet.calorie }}</td>
-                        <td>{{ diet.protein }}</td>
-                        <td>{{ diet.fat }}</td>
-                        <td>{{ diet.sugar }}</td>
-                        <td>{{ diet.ratio }} : 1</td>
-                    </tr>
-                </table>
-                <form action="{{ url_for('DietView:delete', id=diet.id) }}" method="post" accept-charset="utf-8">
-                    <a href="{{ url_for('DietView:edit', id=diet.id) }}" class="btn btn-warning"> {{ icon("edit") }} upravit </a>
-                    {% if diet.is_used == False %}
-                        <button type="submit" class="btn btn-danger"> {{ icon("delete") }} smazat </button>
-                    {% endif %}
-                </form>
-                <form action="{{ url_for('DietView:archive', id=diet.id) }}" method="post" accept-charset="utf-8">
-                    {% if diet.active == True %}
-                        <button type="submit" class="btn btn-secondary"> {{ icon("archive") }} archivovat </button>
-                    {% else %}
-                        <button type="submit" class="btn btn-secondary"> {{ icon("unarchive") }} aktivovat </button>
-                    {% endif %}
-                </form>
-            </div>  
-        {# <div class="loader"></div>  #}
-            {% include ('recipes/_recipe_list.html.j2') %}
-        </div>  
-    </div> 
+
+<div class="row">
+    <div class="col-8">
+        <h2>{{ diet.name }}</h2>
+        <table id="ingredients" class="table">
+            <tr>
+                <th>energie (kJ)</th>
+                <th>bílkoviny (g)</th>
+                <th>tuky (g)</th>
+                <th>sacharidy (g)</th>
+                <th>poměr</th>
+            </tr>
+            <tr>
+                <td>{{ diet.calorie }}</td>
+                <td>{{ diet.protein }}</td>
+                <td>{{ diet.fat }}</td>
+                <td>{{ diet.sugar }}</td>
+                <td>{{ diet.ratio }} : 1</td>
+            </tr>
+        </table>
+        <form action="{{ url_for('DietView:delete', id=diet.id) }}" method="post" accept-charset="utf-8">
+            <a href="{{ url_for('DietView:edit', id=diet.id) }}" class="btn btn-warning"> {{ icon("edit") }} upravit </a>
+            {% if diet.is_used == False %}
+                <button type="submit" class="btn btn-danger"> {{ icon("delete") }} smazat </button>
+            {% endif %}
+        </form>
+        <form action="{{ url_for('DietView:archive', id=diet.id) }}" method="post" accept-charset="utf-8">
+            {% if diet.active == True %}
+                <button type="submit" class="btn btn-secondary"> {{ icon("archive") }} archivovat </button>
+            {% else %}
+                <button type="submit" class="btn btn-secondary"> {{ icon("unarchive") }} aktivovat </button>
+            {% endif %}
+        </form>
+    </div>  
+    {% include ('recipes/_recipe_list.html.j2') %}
+</div>  
+
 {% endblock %}
 

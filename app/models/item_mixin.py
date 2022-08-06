@@ -40,5 +40,5 @@ class ItemMixin(BaseMixin):
         self_view_name = f"{type(self).__name__.capitalize()}View:show"
 
         return Markup(
-            f"<a data-turbo='false' href='{url_for(self_view_name, id=self.id)}'> {escape(self.name)} </a>"
+            f"<a data-turbo=\"false\" href='{url_for(self_view_name, id=self.id)}'> {escape(self.name)} </a>"
         )
