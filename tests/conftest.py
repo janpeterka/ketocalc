@@ -8,8 +8,6 @@ from app import create_app
 from app import db as _db
 from app.data import template_data
 
-from app.models import Ingredient, Diet
-
 from tests.helpers import create_user
 
 
@@ -81,7 +79,7 @@ def db(app):
 
     # insert default data
     with app.app_context():
-        # _db.drop_all()
+        _db.drop_all()
         _db.create_all()
 
     db_fill_calc()
@@ -90,31 +88,12 @@ def db(app):
 
 
 def db_fill_calc():
+    from tests.factories import DietFactory, IngredientFactory
+
     user = create_user(username="calc", password="calc_clack")
     user.save()
 
-    diets = [
-        {
-            "name": "3.5",
-            "calorie": 0,
-            "sugar": 10,
-            "fat": 81,
-            "protein": 13,
-            "active": 1,
-            "user_id": 1,
-        }
-    ]
-
-    for diet in diets:
-        Diet(
-            name=diet["name"],
-            calorie=diet["calorie"],
-            sugar=diet["sugar"],
-            fat=diet["fat"],
-            protein=diet["protein"],
-            active=diet["active"],
-            user_id=diet["user_id"],
-        ).save()
+    DietFactory(name="3.5", calorie=0, sugar=10, fat=81, protein=13).save()
 
     ingredients = [
         {
@@ -207,13 +186,4 @@ def db_fill_calc():
     ]
 
     for ingredient in ingredients:
-        Ingredient(
-            name=ingredient["name"],
-            calorie=ingredient["calorie"],
-            sugar=ingredient["sugar"],
-            fat=ingredient["fat"],
-            protein=ingredient["protein"],
-            author=ingredient["author"],
-            is_shared=getattr(ingredient, "is_shared", None),
-            is_approved=getattr(ingredient, "is_approved", None),
-        ).save()
+        IngredientFactory(**ingredient).save()

@@ -1,4 +1,4 @@
-from tests.helpers import test_with_authenticated_user
+from tests.helpers import test_with_authenticated_user, without_user
 
 
 def test_application(app, client):
@@ -11,7 +11,8 @@ def test_application(app, client):
     assert app.config["TESTING"] is True
 
 
-def test_request(client):
+def test_request(app, db, client):
+    without_user(app)
     # getting page responses
     assert client.get("/login") == 200
     assert client.get("/register") == 200
