@@ -28,13 +28,12 @@ def link_to(obj_or_str, **kwargs):
 
     if type(obj_or_str) == str:
         return Markup(_link_to_str(obj_or_str, **kwargs))
-    else:
-        try:
-            return obj_or_str.link_to(**kwargs)
-        except Exception:
-            raise NotImplementedError(
-                f"{obj_or_str}({obj_or_str.__class__}) doesn't have `link_to` implemented"
-            )
+    try:
+        return obj_or_str.link_to(**kwargs)
+    except Exception:
+        raise NotImplementedError(
+            f"{obj_or_str}({obj_or_str.__class__}) doesn't have `link_to` implemented"
+        )
 
 
 def link_to_edit(obj, **kwargs):
