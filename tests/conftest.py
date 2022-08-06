@@ -8,10 +8,9 @@ from app import create_app
 from app import db as _db
 from app.data import template_data
 
-from app.models.ingredients import Ingredient
-from app.models.diets import Diet
+from app.models import Ingredient, Diet
 
-from tests.unit.helpers import create_user
+from tests.helpers import create_user
 
 
 @pytest.fixture

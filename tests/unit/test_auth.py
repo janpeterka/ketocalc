@@ -1,6 +1,6 @@
 from app.auth.routes import do_login, do_register
 
-import helpers
+from tests.helpers import create_user
 
 
 def test_login(app, db, client):
@@ -17,12 +17,12 @@ def test_logout(app, client):
 
 
 def test_register(app, db):
-    user = helpers.create_user("test", "testtest")
+    user = create_user("test", "testtest")
 
     assert do_register(user) is True
     assert do_login(user.username, user.password) is True
 
-    another_user = helpers.create_user("test", "otherpassword")
+    another_user = create_user("test", "otherpassword")
 
     assert do_register(another_user) is False
 

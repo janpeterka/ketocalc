@@ -1,3 +1,6 @@
+from tests.helpers import test_with_authenticated_user
+
+
 def test_application(app, client):
     # app is correctly set
 
@@ -18,9 +21,7 @@ def test_request(client):
 
 
 def test_requests_logged_in(app, db, client):
-    import helpers
-
-    helpers.test_with_authenticated_user(app)
+    test_with_authenticated_user(app)
 
     pages = [
         "/dashboard/",

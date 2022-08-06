@@ -3,9 +3,11 @@ from flask import request, redirect, url_for, flash, abort, jsonify
 from flask_login import login_required, current_user
 from flask_classful import route
 
+from app.helpers.general import list_without_duplicated
+
 from app.auth import admin_required
 
-from app.models import Recipe, Diet, User, Ingredient, RecipeHasIngredient
+from app.models import Recipe, Diet, User, Ingredient
 
 from app.controllers.base_recipes import BaseRecipeView
 
@@ -32,8 +34,6 @@ class RecipeView(BaseRecipeView):
         return self.template()
 
     def new(self):
-        from app.helpers.general import list_without_duplicated
-
         active_diets = current_user.active_diets
         user_ingredients = Ingredient.load_all_by_author(current_user.username)
         shared_ingredients = Ingredient.load_all_shared(renamed=True)
@@ -119,20 +119,16 @@ class RecipeView(BaseRecipeView):
 
     @route("/saveRecipeAJAX", methods=["POST"])
     def saveRecipeAJAX(self):
+        from app.services import RecipeCreator
+
         temp_ingredients = request.json["ingredients"]
         diet = Diet.load(request.json["dietID"])
+        name = request.json["name"]
 
-        ingredients = []
-        for temp_i in temp_ingredients:
-            rhi = RecipeHasIngredient()
-            rhi.ingredients_id = temp_i["id"]
-            rhi.amount = temp_i["amount"]
-            ingredients.append(rhi)
-
-        recipe = Recipe(name=request.json["name"], diet=diet)
-
-        last_id = recipe.create_and_save(ingredients)
-        return url_for("RecipeView:show", id=last_id)
+        recipe = RecipeCreator.create(
+            name=name, diet=diet, ingredient_dict=temp_ingredients
+        )
+        return url_for("RecipeView:show", id=recipe.id)
 
     @route("/toggleReactionAJAX", methods=["POST"])
     def toggle_reaction_AJAX(self):

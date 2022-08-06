@@ -106,20 +106,18 @@ class BaseMixin(object):
             return False
 
     def save(self, **kw):
-        """Saves (new) object
-        """
+        """Saves (new) object"""
         try:
             db.session.add(self)
             db.session.commit()
-            return self.id is not None
+            return True
         except DatabaseError as e:
             db.session.rollback()
             application.logger.error("Save error: {}".format(e))
             return False
 
     def remove(self, **kw):
-        """Deletes object
-        """
+        """Deletes object"""
         try:
             db.session.delete(self)
             db.session.commit()
@@ -133,8 +131,7 @@ class BaseMixin(object):
         return self.remove(**kw)
 
     def expire(self, **kw):
-        """Dumps database changes
-        """
+        """Dumps database changes"""
         try:
             db.session.expire(self)
             return True

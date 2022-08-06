@@ -75,16 +75,16 @@ class Recipe(db.Model, ItemMixin):
         recipes = Recipe.query.filter(Recipe.public).all()
         return recipes
 
-    def create_and_save(self, ingredients):
-        db.session.add(self)
-        db.session.flush()
+    # def create_and_save(self, ingredients):
+    #     db.session.add(self)
+    #     db.session.flush()
 
-        for i in ingredients:
-            i.recipes_id = self.id
-            db.session.add(i)
+    #     for i in ingredients:
+    #         i.recipes_id = self.id
+    #         db.session.add(i)
 
-        db.session.commit()
-        return self.id
+    #     db.session.commit()
+    #     return self.id
 
     def toggle_shared(self):
         self.is_shared = not self.is_shared
