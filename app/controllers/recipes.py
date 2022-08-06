@@ -1,14 +1,11 @@
-from flask import render_template as template
 from flask import request, redirect, url_for, flash, abort, jsonify
 from flask_login import login_required, current_user
 from flask_classful import route
 
-from app.helpers.general import list_without_duplicated
-
 from app.auth import admin_required
-
+from app.helpers.general import list_without_duplicated
 from app.models import Recipe, Diet, User, Ingredient
-
+from app.forms import PhotoForm
 from app.controllers.base_recipes import BaseRecipeView
 
 
@@ -29,8 +26,6 @@ class RecipeView(BaseRecipeView):
         self.validate_edit(self.recipe)
 
     def index(self):
-        self.diets = current_user.active_diets
-
         return self.template()
 
     def new(self):
@@ -52,8 +47,6 @@ class RecipeView(BaseRecipeView):
         pass
 
     def show(self, id):
-        from app.forms import PhotoForm
-
         self.is_print = False
         self.photo_form = PhotoForm()
 
@@ -80,11 +73,7 @@ class RecipeView(BaseRecipeView):
         return redirect(url_for("DashboardView:index"))
 
     def print(self, id):
-        return template(
-            "recipes/show.html.j2",
-            recipe=self.recipe,
-            is_print=True,
-        )
+        return self.template("show", is_print=True)
 
     @route("/toggle_shared/<id>", methods=["POST"])
     def toggle_shared(self, id):
@@ -128,12 +117,14 @@ class RecipeView(BaseRecipeView):
         recipe = RecipeCreator.create(
             name=name, diet=diet, ingredient_dict=temp_ingredients
         )
+
         return url_for("RecipeView:show", id=recipe.id)
 
     @route("/toggleReactionAJAX", methods=["POST"])
     def toggle_reaction_AJAX(self):
         recipe = Recipe.load(request.json["recipe_id"])
         recipe.toggle_reaction()
+
         return jsonify(recipe.has_reaction)
 
     @route("/upload_photo/<id>", methods=["POST"])

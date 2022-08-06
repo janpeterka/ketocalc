@@ -9,13 +9,15 @@
 
 <table id="diets" class="table">
 
-    {% for diet in diets: %}
-        <tr><th class='diet'>{{ link_to(diet) }}</th></tr>
+    {% for diet in current_user.active_diets: %}
+        <tr>
+            <th class='diet'>{{ link_to(diet) }}</th>
+        </tr>
 
         {% for recipe in diet.recipes: %}
-            <tr>
-                <td>{{ link_to(recipe) }}</td>
-            </tr>
+        <tr>
+            <td>{{ link_to(recipe) }}</td>
+        </tr>
         {% endfor %}
     {% endfor %}       
 
