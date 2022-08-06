@@ -26,7 +26,7 @@ class Diet(db.Model, ItemMixin):
 
     @property
     def is_used(self) -> bool:
-        return True if self.recipes else False
+        return bool(self.recipes)
 
     @property
     def ratio(self) -> float:

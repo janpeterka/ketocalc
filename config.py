@@ -1,9 +1,11 @@
 import os
 
 
+
+
 class Config(object):
     UPLOAD_FOLDER = "/temporary"
-    ALLOWED_EXTENSIONS = set(["png", "jpg", "jpeg", "gif"])
+    ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
 
     SECRET_KEY = os.environ.get("SECRET_KEY")
 
@@ -37,6 +39,7 @@ class Config(object):
 
     SENTRY_MONITORING = True
     INFO_USED_DB = "production db"
+
 
 
 class LocalProdConfig(Config):

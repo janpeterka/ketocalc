@@ -20,10 +20,9 @@ class DailyPlan(db.Model, BaseMixin):
 
     @staticmethod
     def load_by_date(date):
-        date_plan = DailyPlan.query.filter_by(
+        return DailyPlan.query.filter_by(
             date=date, user_id=current_user.id
         ).first()
-        return date_plan
 
     @staticmethod
     def load_by_date_or_create(date):

@@ -32,6 +32,6 @@ class RegisterForm(FlaskForm):
     # recaptcha = RecaptchaField()
     submit = SubmitField("Registrovat")
 
-    def validate_username(form, field):
+    def validate_username(self, field):
         if not validate_register(field.data):
             raise ValidationError("Toto jméno nemůžete použít")

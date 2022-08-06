@@ -39,6 +39,6 @@ class IngredientForm(FlaskForm):
     )
     submit = SubmitField("přidat surovinu")
 
-    def validate_ean_code(form, field):
+    def validate_ean_code(self, field):
         if field.data and (not field.data.isdigit() or len(field.data) != 13):
             raise ValidationError("EAN kód je zadaný ve špatném formátu (13 číslic)")

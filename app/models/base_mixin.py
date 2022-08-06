@@ -50,8 +50,7 @@ class BaseMixin(object):
 
     @classmethod
     def load_first_by_attribute(cls, attribute, value):
-        elements = cls.load_by_attribute(attribute, value)
-        if elements:
+        if elements := cls.load_by_attribute(attribute, value):
             return elements[0]
         else:
             return None
@@ -102,7 +101,7 @@ class BaseMixin(object):
             return True
         except Exception as e:
             db.session.rollback()
-            application.logger.error("Edit error: {}".format(e))
+            application.logger.error(f"Edit error: {e}")
             return False
 
     def save(self, **kw):
@@ -113,7 +112,7 @@ class BaseMixin(object):
             return True
         except DatabaseError as e:
             db.session.rollback()
-            application.logger.error("Save error: {}".format(e))
+            application.logger.error(f"Save error: {e}")
             return False
 
     def remove(self, **kw):
@@ -124,7 +123,7 @@ class BaseMixin(object):
             return True
         except DatabaseError as e:
             db.session.rollback()
-            application.logger.error("Remove error: {}".format(e))
+            application.logger.error(f"Remove error: {e}")
             return False
 
     def delete(self, **kw):
@@ -137,7 +136,7 @@ class BaseMixin(object):
             return True
         except Exception as e:
             db.session.rollback()
-            application.logger.error("Expire error: {}".format(e))
+            application.logger.error(f"Expire error: {e}")
             return False
 
     def refresh(self, **kw):
@@ -146,16 +145,13 @@ class BaseMixin(object):
             return True
         except Exception as e:
             db.session.rollback()
-            application.logger.error("Refresh error: {}".format(e))
+            application.logger.error(f"Refresh error: {e}")
             return False
 
     # OTHER METHODS
 
     def is_author(self, user) -> bool:
-        if hasattr(self, "author"):
-            return self.author == user
-        else:
-            return False
+        return self.author == user if hasattr(self, "author") else False
             # raise AttributeError("No 'author' attribute.")
 
     @property
@@ -167,10 +163,7 @@ class BaseMixin(object):
     @hybrid_property
     def public(self) -> bool:
         """alias for is_shared"""
-        if hasattr(self, "is_shared"):
-            return self.is_shared
-        else:
-            return False
+        return self.is_shared if hasattr(self, "is_shared") else False
             # raise AttributeError("No 'is_shared' attribute.")
 
     @hybrid_property

@@ -30,7 +30,7 @@ class GetNewPasswordForm(FlaskForm):
     )
     submit = SubmitField("získat nové heslo")
 
-    def validate_username(form, field):
+    def validate_username(self, field):
         user = User.load_by_username(field.data)
         if user is None:
             raise ValidationError("Uživatel s tímto emailem neexistuje")

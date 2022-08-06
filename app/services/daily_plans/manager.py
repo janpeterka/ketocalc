@@ -21,15 +21,14 @@ class DailyPlanManager:
         # TODO - jenom pokud je fakt v tomhle daily_planu
         selected_daily_recipe = DailyPlanHasRecipes.load(daily_recipe_id)
 
-        if selected_daily_recipe in self.daily_plan.daily_recipes:
-            for daily_recipe in self.daily_plan.daily_recipes:
-                if daily_recipe.order_index > selected_daily_recipe.order_index:
-                    daily_recipe.order_index -= 1
-                    daily_recipe.edit()
-            selected_daily_recipe.remove()
-            return True
-        else:
+        if selected_daily_recipe not in self.daily_plan.daily_recipes:
             return False
+        for daily_recipe in self.daily_plan.daily_recipes:
+            if daily_recipe.order_index > selected_daily_recipe.order_index:
+                daily_recipe.order_index -= 1
+                daily_recipe.edit()
+        selected_daily_recipe.remove()
+        return True
 
     def change_order(self, daily_recipe_id, order_type):
         coef = 1 if order_type == "up" else -1
