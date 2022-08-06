@@ -37,7 +37,7 @@ def create_app(config_name="default"):
 
     application.config.from_object(configs[config_name])
 
-    print("DB INFO: using {}".format(application.config["INFO_USED_DB"]))
+    print(f'DB INFO: using {application.config["INFO_USED_DB"]}')
 
     # APPS
     mail.init_app(application)
