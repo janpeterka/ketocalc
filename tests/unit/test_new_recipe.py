@@ -81,7 +81,7 @@ def load_datasets_calc():
 def test_calc(app, db, client):
     test_with_authenticated_user(app, username="calc")
 
-    url = url_for("RecipeView:calcRecipeAJAX")
+    url = url_for("RecipeCreatorView:calcRecipeAJAX")
     # test calculate_recipe_AJAX (json dataset)
 
     datasets = load_datasets_calc()

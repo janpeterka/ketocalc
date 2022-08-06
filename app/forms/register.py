@@ -10,9 +10,9 @@ from app.auth.routes import validate_register
 
 class RegisterForm(FlaskForm):
     username = StringField(
-        "Přihlašovací email",
+        "přihlašovací e-mail",
         [
-            validators.InputRequired("Email musí být vyplněn"),
+            validators.InputRequired("e-mail musí být vyplněn"),
             validators.Email("Toto není emailová adresa!"),
         ],
     )

@@ -10,25 +10,25 @@ from app.models.users import User
 
 class NewPasswordForm(FlaskForm):
     password = PasswordField(
-        "Nové heslo",
+        "nové heslo",
         [
-            validators.InputRequired("Heslo musí být vyplněno"),
-            validators.Length(min=8, message="Heslo musí mít alespoň 8 znaků"),
+            validators.InputRequired("heslo musí být vyplněno"),
+            validators.Length(min=8, message="heslo musí mít alespoň 8 znaků"),
         ],
     )
     # recaptcha = RecaptchaField()
-    submit = SubmitField("Změnit heslo")
+    submit = SubmitField("změnit heslo")
 
 
 class GetNewPasswordForm(FlaskForm):
     username = StringField(
-        "Přihlašovací email",
+        "přihlašovací e-mail",
         [
-            validators.InputRequired("Email musí být vyplněn"),
-            validators.Email("Toto není emailová adresa!"),
+            validators.InputRequired("e-mail musí být vyplněn"),
+            validators.Email("toto není emailová adresa!"),
         ],
     )
-    submit = SubmitField("Získat nové heslo")
+    submit = SubmitField("získat nové heslo")
 
     def validate_username(form, field):
         user = User.load_by_username(field.data)

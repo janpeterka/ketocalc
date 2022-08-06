@@ -6,23 +6,23 @@ from flask_wtf import FlaskForm
 
 class UserForm(FlaskForm):
     username = StringField(
-        "Přihlašovací email", [validators.InputRequired("Email musí být vyplněn")]
+        "přihlašovací email", [validators.InputRequired("email musí být vyplněn")]
     )
     first_name = StringField(
-        "Křestní jméno", [validators.InputRequired("Jméno musí být vyplněno")]
+        "křestní jméno", [validators.InputRequired("jméno musí být vyplněno")]
     )
     last_name = StringField(
-        "Příjmení", [validators.InputRequired("Jméno musí být vyplněno")]
+        "příjmení", [validators.InputRequired("příjmení musí být vyplněno")]
     )
-    submit = SubmitField("Upravit")
+    submit = SubmitField("upravit")
 
 
 class PasswordForm(FlaskForm):
     password = PasswordField(
-        "Heslo",
+        "heslo",
         [
-            validators.InputRequired("Heslo musí být vyplněno"),
-            validators.Length(min=8, message="Heslo musí mít alespoň 8 znaků"),
+            validators.InputRequired("heslo musí být vyplněno"),
+            validators.Length(min=8, message="heslo musí mít alespoň 8 znaků"),
         ],
     )
-    submit = SubmitField("Změnit heslo")
+    submit = SubmitField("změnit heslo")

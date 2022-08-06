@@ -18,81 +18,83 @@
 {% endblock %}
 
 {% block content_whole %}
-    <div class="container-fluid ml-5" data-controller="new-recipe show-info">
-        <div class="row">
-            <div class="hidden">
-                <select data-new-recipe-target="baseSelect">
+
+<div class="container-fluid ml-5" data-controller="new-recipe show-info">
+    <div class="row">
+        <div class="hidden">
+            <select data-new-recipe-target="baseSelect">
+                {% for ingredient in ingredients: %}
+                    <option name="{{ ingredient.name }}" value="{{ ingredient.id }}">{{ ingredient.name }}</option>
+                {% endfor %}
+            </select>
+            <input type="hidden" data-new-recipe-target="presetIngredientIds" value="{{ preset_ingredients|safe }}">
+        </div>
+
+        <div class="col-lg-6 col-md-12" >
+            <div class="col-12">
+                <form class="form-inline" data-action="submit->new-recipe#add_ingredient">
+                    <select class="form-control" id="ingredient_select" data-new-recipe-target="select">
                     {% for ingredient in ingredients: %}
-                        <option name="{{ ingredient.name }}" value="{{ ingredient.id }}">{{ ingredient.name }}</option>
+                        <option name='{{ ingredient.name }}' value="{{ ingredient.id }}">{{ ingredient.name }}</option>
                     {% endfor %}
-                </select>
-                <input type="hidden" data-new-recipe-target="presetIngredientIds" value="{{ preset_ingredients|safe }}">
+                    </select>
+
+                    <input type="submit" class="btn btn-primary" value="Přidat surovinu" />
+                    <i data-show-info-target="icon"></i>
+                </form>
             </div>
 
-            <div class="col-lg-6 col-md-12" >
-                <div class="col-12">
-                    <form class="form-inline" data-action="submit->new-recipe#add_ingredient">
-                        <select class="form-control" id="ingredient_select" data-new-recipe-target="select">
-                        {% for ingredient in ingredients: %}
-                            <option name='{{ ingredient.name }}' value="{{ ingredient.id }}">{{ ingredient.name }}</option>
-                        {% endfor %}
-                        </select>
+            <div class="col-11">
+                <table class="table">
+                    <thead>
+                        <th> název </th>
+                        <th> energie (kJ/100g) </th>
+                        <th> bílkoviny (g/100g) </th>
+                        <th> tuky (g/100g) </th>
+                        <th> sacharidy (g/100g) </th>
+                        <th></th>
+                    </thead>
 
-                        <input type="submit" class="btn btn-primary" value="Přidat surovinu" />
-                        <i data-show-info-target="icon"></i>
-                    </form>
-                </div>
-
-                <div class="col-11">
-                    <table class="table">
-                        <thead>
-                            <th> název </th>
-                            <th> energie (kJ/100g) </th>
-                            <th> bílkoviny (g/100g) </th>
-                            <th> tuky (g/100g) </th>
-                            <th> sacharidy (g/100g) </th>
-                            <th></th>
-                        </thead>
-
-                        <tbody data-new-recipe-target="ingredientTable">
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="col-12">
-                    <form class="form-inline" data-action="submit->new-recipe#calculate_recipe">
-                        <label >{{ texts.diet_name }}</label>
-                        <select class="form-control" data-new-recipe-target="selectDiet">
-                        {% for diet in diets: %}
-                            <option value="{{ diet.id }}">{{ diet.name }}</option>
-                        {% endfor %}
-                        </select>
-                        <input type="submit" class="btn btn-primary"  value="{{ texts.calc_amount }}" />
-                    </form>
-
-                    {% if is_trialrecipe %}
-                        {% include 'recipes/_trial_recipe_info.html.j2' %}
-                    {% endif %}
-                    {% include 'ingredients/_data_source_aknowledgement.html.j2' %}
-                </div>
+                    <tbody data-new-recipe-target="ingredientTable">
+                    </tbody>
+                </table>
             </div>
 
-            
-            <div class="col-lg-6 col-md-12">
-                <div data-show-info-target="info">
-                    {% include "recipes/_new_recipe_info.html.j2" %}
-                </div>
+            <div class="col-12">
+                <form class="form-inline" data-action="submit->new-recipe#calculate_recipe">
+                    <label >{{ texts.diet_name }}</label>
+                    <select class="form-control" data-new-recipe-target="selectDiet">
+                    {% for diet in diets: %}
+                        <option value="{{ diet.id }}">{{ diet.name }}</option>
+                    {% endfor %}
+                    </select>
+                    <input type="submit" class="btn btn-primary"  value="{{ texts.calc_amount }}" />
+                </form>
 
-                <div class="loader_circular" data-new-recipe-target="loader"></div>
-
-                <div class="text-center color-red" data-new-recipe-target="wrongRecipe">
-                    <span>{{ texts.recipe_impossible }}</span>
-                </div>
-
-                <div data-new-recipe-target="recipe"></div>
+                {% if is_trialrecipe %}
+                    {% include 'recipes/_trial_recipe_info.html.j2' %}
+                {% endif %}
+                {% include 'ingredients/_data_source_aknowledgement.html.j2' %}
             </div>
         </div>
+
+        
+        <div class="col-lg-6 col-md-12">
+            <div data-show-info-target="info">
+                {% include "recipes/_new_recipe_info.html.j2" %}
+            </div>
+
+            <div class="loader_circular" data-new-recipe-target="loader"></div>
+
+            <div class="text-center color-red" data-new-recipe-target="wrongRecipe">
+                <span>{{ texts.recipe_impossible }}</span>
+            </div>
+
+            <div data-new-recipe-target="recipe"></div>
+        </div>
     </div>
+</div>
+
 {% endblock %}
 
 <script type="text/javascript">

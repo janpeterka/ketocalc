@@ -6,10 +6,10 @@ from app.auth import admin_required
 from app.helpers.general import list_without_duplicated
 from app.models import Recipe, Diet, User, Ingredient
 from app.forms import PhotoForm
-from app.controllers.base_recipes import BaseRecipeView
+from app.helpers.base_view import BaseView
 
 
-class RecipeView(BaseRecipeView):
+class RecipeView(BaseView):
     decorators = [login_required]
 
     @login_required
@@ -130,8 +130,7 @@ class RecipeView(BaseRecipeView):
     @route("/upload_photo/<id>", methods=["POST"])
     def upload_photo(self, id):
         from werkzeug.datastructures import CombinedMultiDict
-        from app.forms.files import PhotoForm
-
+        from app.forms import PhotoForm
         from app.models import RecipeImageFile
 
         form = PhotoForm(CombinedMultiDict((request.files, request.form)))

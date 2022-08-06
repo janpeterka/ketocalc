@@ -9,7 +9,7 @@ from flask_wtf.file import FileField
 
 class FeedbackForm(FlaskForm):
     option = SelectField(
-        "Vyberte typ reakce",
+        "vyberte typ reakce",
         choices=[
             ("bug", "Chyba v programu"),
             ("ux", "Problém s používáním uživatelského rozhraní"),

@@ -1,14 +1,12 @@
 from flask import redirect, url_for
 from flask import render_template as template
-
 from flask_login import current_user
 
-from app.models.ingredients import Ingredient
-from app.models.users import User
-from app.controllers.base_recipes import BaseRecipeView
+from app.helpers.base_view import BaseView
+from app.models import Ingredient, User
 
 
-class TrialRecipeView(BaseRecipeView):
+class TrialRecipeView(BaseView):
     def before_index(self):
         if current_user.is_authenticated:
             return redirect(url_for("IndexView:index"))
