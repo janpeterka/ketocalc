@@ -53,17 +53,13 @@ class IngredientView(BaseView):
         form = IngredientForm(request.form)
 
         if not form.validate_on_submit():
-            save_form_to_session(request.form)
-            return redirect(url_for("IngredientView:new"))
+            return self.template("new", form=form), 422
 
         ingredient = Ingredient(author=current_user.username)
         form.populate_obj(ingredient)
+        ingredient.save()
 
-        if ingredient.save():
-            return redirect(url_for("IngredientView:show", id=ingredient.id))
-        else:
-            flash("Nepodařilo se vytvořit surovinu", "error")
-            return redirect(url_for("IngredientView:new"))
+        return redirect(url_for("IngredientView:show", id=ingredient.id))
 
     def show(self, id):
         return self.template()
@@ -90,8 +86,7 @@ class IngredientView(BaseView):
             del form.sugar
 
         if not form.validate_on_submit():
-            save_form_to_session(request.form)
-            return redirect(url_for("IngredientView:edit", id=self.ingredient.id))
+            return self.template("edit", form=form), 422
 
         form.populate_obj(self.ingredient)
 
@@ -163,6 +158,7 @@ class IngredientView(BaseView):
         self.ingredient.is_approved = True
         self.ingredient.edit()
         flash("Surovina schválena", "success")
+
         return redirect(url_for("IngredientView:all_shared"))
 
     @admin_required
@@ -171,4 +167,5 @@ class IngredientView(BaseView):
         self.ingredient.is_approved = None
         self.ingredient.edit()
         flash("Surovina neschválena", "info")
+
         return redirect(url_for("IngredientView:all_shared"))

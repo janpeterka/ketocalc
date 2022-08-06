@@ -13,7 +13,7 @@ class Diet(db.Model, ItemMixin):
     sugar = db.Column(db.Float, nullable=False)
     fat = db.Column(db.Float, nullable=False)
     protein = db.Column(db.Float, nullable=False)
-    active = db.Column(db.Boolean, nullable=False)
+    active = db.Column(db.Boolean, nullable=False, default=True)
     created = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
     last_updated = db.Column(db.DateTime, nullable=True, onupdate=datetime.datetime.now)
 

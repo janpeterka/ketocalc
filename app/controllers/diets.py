@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from flask_classful import route
 
 from app.helpers.base_view import BaseView
-from app.helpers.form import save_form_to_session, create_form
+from app.helpers.form import create_form
 
 from app.models import Diet
 
@@ -41,20 +41,16 @@ class DietView(BaseView):
         return self.template()
 
     def post(self):
-        form = DietForm(request.form)
+        self.form = DietForm(request.form)
 
-        if not form.validate_on_submit():
-            save_form_to_session(request.form)
-            return redirect(url_for("DietView:new"))
+        if not self.form.validate_on_submit():
+            return self.template("new"), 422
 
-        diet = Diet(active=True, author=current_user)
-        form.populate_obj(diet)
+        diet = Diet(author=current_user)
+        self.form.populate_obj(diet)
+        diet.save()
 
-        if diet.save():
-            return redirect(url_for("DietView:show", id=diet.id))
-        else:
-            flash("Nepodařilo se vytvořit dietu", "error")
-            return redirect(url_for("DietView:new"))
+        return redirect(url_for("DietView:show", id=diet.id))
 
     def show(self, id):
         return self.template()
@@ -66,19 +62,18 @@ class DietView(BaseView):
 
     @route("update/<id>", methods=["POST"])
     def update(self, id):
-        form = DietForm(request.form)
+        self.form = DietForm(request.form)
 
         if self.diet.is_used:
-            del form.calorie
-            del form.protein
-            del form.fat
-            del form.sugar
+            del self.form.calorie
+            del self.form.protein
+            del self.form.fat
+            del self.form.sugar
 
-        if not form.validate_on_submit():
-            save_form_to_session(request.form)
-            return redirect(url_for("DietView:edit", id=self.diet.id))
+        if not self.form.validate_on_submit():
+            return self.template("edit"), 422
 
-        form.populate_obj(self.diet)
+        self.form.populate_obj(self.diet)
         self.diet.edit()
 
         return redirect(url_for("DietView:show", id=self.diet.id))

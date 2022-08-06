@@ -60,6 +60,8 @@ class DevConfig(Config):
 
     INFO_USED_DB = "local db"
 
+    DEV_PASSWORD = os.getenv("DEV_PASSWORD")
+
     # SQLALCHEMY_ECHO = True
 
 

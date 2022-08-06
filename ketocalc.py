@@ -10,6 +10,7 @@ from flask import g
 from flask_login import current_user
 
 from app import create_app
+import cli
 from app import db
 
 # from app.models import db
@@ -23,6 +24,8 @@ from app.handlers.data import DataHandler
 
 env = os.environ.get("APP_STATE", "default")
 application = create_app(config_name=env)
+
+cli.register(application)
 
 
 @application.context_processor

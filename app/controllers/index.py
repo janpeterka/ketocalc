@@ -38,7 +38,3 @@ class IndexView(FlaskView):
     @route("privacy")
     def privacy(self):
         return redirect(url_for("SupportView:privacy"))
-
-    @route("uptime")
-    def uptime(self):
-        return "OK"
