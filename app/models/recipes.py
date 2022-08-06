@@ -11,9 +11,10 @@ from flask_login import current_user
 from app.models.item_mixin import ItemMixin
 
 from app.models import Ingredient
+from app.presenters import RecipePresenter
 
 
-class Recipe(db.Model, ItemMixin):
+class Recipe(db.Model, ItemMixin, RecipePresenter):
     __tablename__ = "recipes"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

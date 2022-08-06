@@ -38,6 +38,7 @@ class RecipeView(BaseView):
         self.ingredients = list_without_duplicated(ingredients)
 
         self.preset_ingredients = request.args.get("preset_ingredient_ids", [])
+        print(self.preset_ingredients)
         self.diets = active_diets
         self.is_trialrecipe = False
 

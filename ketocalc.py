@@ -2,16 +2,13 @@ import os
 import re
 import time
 
-import datetime
-
-from flask import request, redirect, session, url_for
-from flask import g
+from flask import request, redirect, session, g
 
 from flask_login import current_user
 
 from app import create_app
-import cli
 from app import db
+import cli
 
 # from app.models import db
 # from app.models.users import User
@@ -35,42 +32,10 @@ def inject_globals():
 
 @application.context_processor
 def utility_processor():
-    def human_format_date(date):
-        if date == datetime.date.today():
-            return "Dnes"
-        elif date == datetime.date.today() + datetime.timedelta(days=-1):
-            return "Včera"
-        elif date == datetime.date.today() + datetime.timedelta(days=1):
-            return "Zítra"
-        else:
-            return date.strftime("%d.%m.%Y")
-
     def recipe_ingredient_ids_list(recipe):
         return str([i.id for i in recipe.ingredients])
 
-    def link_to(obj, text=None):
-        if type(obj) == str:
-            if obj == "login":
-                if text is None:
-                    text = "Přihlaste se"
-                return f"<a href='{url_for('LoginView:show')}' data-turbo=\"false\">{text}</a>"
-            elif obj == "register":
-                if text is None:
-                    text = "Zaregistrujte se"
-                return f"<a href='{url_for('RegisterView:show')}' data-turbo=\"false\">{text}</a>"
-            else:
-                raise NotImplementedError("This string has no associated link_to")
-
-        try:
-            return obj.link_to
-        except Exception:
-            raise NotImplementedError("This object link_to is probably not implemented")
-
-    return dict(
-        human_format_date=human_format_date,
-        recipe_ingredient_ids_list=recipe_ingredient_ids_list,
-        link_to=link_to,
-    )
+    return dict(recipe_ingredient_ids_list=recipe_ingredient_ids_list)
 
 
 @application.before_request
@@ -117,17 +82,3 @@ def log_request(exception=None):
 # @application.shell_context_processor
 # def make_shell_context():
 #     return {"db": db, "User": User}
-
-
-@application.cli.command("reset-passwords")
-def reset_passwords():
-    from app.models import User
-
-    if application.config["APP_STATE"] != "development":
-        print("You cannot do this!")
-        return
-
-    for user in User.load_all():
-        user.set_password_hash("sudo")
-        user.updated_by = 1
-        user.edit()

@@ -80,4 +80,9 @@ def create_app(config_name="default"):
 
     auth_create_module(application)
 
+    # COMPONENTS
+    from app.components import register_all_components
+
+    register_all_components(application)
+
     return application

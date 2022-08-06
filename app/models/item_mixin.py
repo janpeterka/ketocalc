@@ -32,12 +32,15 @@ class ItemMixin(BaseMixin):
         ).count()
 
     # CONTEXT PROCESSOR UTILITIES
-    @property
-    def link_to(self):
+    def link_to(self, **kwargs):
         from flask import url_for, Markup, escape
 
         self_view_name = f"{type(self).__name__.capitalize()}View:show"
 
+        text = kwargs.get("text")
+        if not text:
+            text = escape(self.name)
+
         return Markup(
-            f"<a data-turbo=\"false\" href='{url_for(self_view_name, id=self.id)}'> {escape(self.name)} </a>"
+            f"<a data-turbo=\"false\" href='{url_for(self_view_name, id=self.id)}'> {text} </a>"
         )
