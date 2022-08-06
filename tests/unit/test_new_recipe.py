@@ -1,16 +1,13 @@
 import json
 
-from app.models.ingredients import Ingredient
-from app.models.diets import Diet
+from app.models import Ingredient, Diet
 
 from flask import url_for
 
-import helpers
+from tests.helpers import test_with_authenticated_user
 
 
 def load_datasets_calc():
-    datasets = []
-
     # 4
     diet = Diet.load_by_name("3.5")
     ingredients = [
@@ -25,8 +22,7 @@ def load_datasets_calc():
         "diet": diet.json,
         "none": "False",
     }
-    datasets.append(test_dataset)
-
+    datasets = [test_dataset]
     # 4 + fixed
     diet = Diet.load_by_name("3.5")
     ingredients = [
@@ -80,12 +76,12 @@ def load_datasets_calc():
 
 
 def test_calc(app, db, client):
-    url = url_for("RecipeView:calcRecipeAJAX")
+    test_with_authenticated_user(app, username="calc")
+
+    url = url_for("RecipeCreatorView:calcRecipeAJAX")
     # test calculate_recipe_AJAX (json dataset)
 
     datasets = load_datasets_calc()
-
-    helpers.test_with_authenticated_user(app, username="calc")
 
     for dataset in datasets:
         response = client.post(url, json=dataset, follow_redirects=False)
@@ -93,7 +89,6 @@ def test_calc(app, db, client):
         assert response in (200, 204, 400)
         if dataset["none"] == "True":
             assert response.json is None
-            pass
         else:
             assert (
                 round(float(json.loads(response.json["totals"])["sugar"]))

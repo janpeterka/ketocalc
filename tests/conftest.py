@@ -1,17 +1,10 @@
 import pytest
 
-import datetime
-
-from flask import url_for
-
 from app import create_app
 from app import db as _db
 from app.data import template_data
 
-from app.models.ingredients import Ingredient
-from app.models.diets import Diet
-
-from tests.unit.helpers import create_user
+from tests.helpers import create_user
 
 
 @pytest.fixture
@@ -21,55 +14,6 @@ def app(scope="session"):
     @app.context_processor
     def inject_globals():
         return dict(texts=template_data.texts)
-
-    @app.context_processor
-    def utility_processor():
-        def human_format_date(date):
-            if date == datetime.date.today():
-                return "Dnes"
-            elif date == datetime.date.today() + datetime.timedelta(days=-1):
-                return "Včera"
-            elif date == datetime.date.today() + datetime.timedelta(days=1):
-                return "Zítra"
-            else:
-                return date.strftime("%d.%m.%Y")
-
-        def recipe_ingredient_ids_list(recipe):
-            return str([i.id for i in recipe.ingredients])
-
-        def link_to(obj, text=None):
-            if type(obj) == str:
-                if obj == "login":
-                    if text is None:
-                        text = "Přihlaste se"
-                    return f"<a href='{url_for('LoginView:show')}'>{text}</a>"
-                else:
-                    raise NotImplementedError("This string has no associated link_to")
-
-            try:
-                return obj.link_to
-            except Exception:
-                raise NotImplementedError(
-                    "This object link_to is probably not implemented"
-                )
-
-        def option(obj):
-            return f"<option name='{obj.name}' value='{obj.id}'>{obj.name}</option>"
-
-        def options(array):
-            html = ""
-            for item in array:
-                html += option(item) + "\n"
-
-            return html
-
-        return dict(
-            human_format_date=human_format_date,
-            recipe_ingredient_ids_list=recipe_ingredient_ids_list,
-            link_to=link_to,
-            option=option,
-            options=options,
-        )
 
     return app
 
@@ -82,7 +26,7 @@ def db(app):
 
     # insert default data
     with app.app_context():
-        # _db.drop_all()
+        _db.drop_all()
         _db.create_all()
 
     db_fill_calc()
@@ -91,31 +35,12 @@ def db(app):
 
 
 def db_fill_calc():
+    from tests.factories import DietFactory, IngredientFactory
+
     user = create_user(username="calc", password="calc_clack")
     user.save()
 
-    diets = [
-        {
-            "name": "3.5",
-            "calorie": 0,
-            "sugar": 10,
-            "fat": 81,
-            "protein": 13,
-            "active": 1,
-            "user_id": 1,
-        }
-    ]
-
-    for diet in diets:
-        Diet(
-            name=diet["name"],
-            calorie=diet["calorie"],
-            sugar=diet["sugar"],
-            fat=diet["fat"],
-            protein=diet["protein"],
-            active=diet["active"],
-            user_id=diet["user_id"],
-        ).save()
+    DietFactory(name="3.5", calorie=0, sugar=10, fat=81, protein=13).save()
 
     ingredients = [
         {
@@ -208,13 +133,4 @@ def db_fill_calc():
     ]
 
     for ingredient in ingredients:
-        Ingredient(
-            name=ingredient["name"],
-            calorie=ingredient["calorie"],
-            sugar=ingredient["sugar"],
-            fat=ingredient["fat"],
-            protein=ingredient["protein"],
-            author=ingredient["author"],
-            is_shared=getattr(ingredient, "is_shared", None),
-            is_approved=getattr(ingredient, "is_approved", None),
-        ).save()
+        IngredientFactory(**ingredient).save()

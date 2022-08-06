@@ -6,15 +6,15 @@
     <div class="col-8">
         <form action="{{ url_for('DietView:update', id=diet.id) }}" class="form-group" method="post" accept-charset="utf-8">
             {{ form.csrf_token }}
-            {% from "macros/_form_element.html.j2" import render_field %}
+            
             <table class="table">
                 <thead>
                     <tr>
-                        <th>{{ texts.title }}</th>
-                        <th>{{ texts.energy_simple }}</th>
-                        <th>{{ texts.protein_simple }}</th>
-                        <th>{{ texts.fat_simple }}</th>
-                        <th>{{ texts.sugar_simple }}</th>
+                        <th>název</th>
+                        <th>energie (kJ)</th>
+                        <th>bílkoviny (g)</th>
+                        <th>tuky (g)</th>
+                        <th>sacharidy (g)</th>
                     </tr>
                 </thead>
                 <tbody>

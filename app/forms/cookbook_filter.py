@@ -6,12 +6,12 @@ from app.forms.custom import ComaFloatField
 
 
 class CookbookFilterForm(FlaskForm):
-    ratio_from = ComaFloatField("Poměr (od)")
-    ratio_to = ComaFloatField("Poměr (do)")
-    ingredient_name = SelectField("Surovina")
-    with_reaction = BooleanField("Moje oblíbené")
+    ratio_from = ComaFloatField("poměr (od)")
+    ratio_to = ComaFloatField("poměr (do)")
+    ingredient_name = SelectField("surovina")
+    with_reaction = BooleanField("moje oblíbené")
 
-    submit = SubmitField("Filtrovat")
+    submit = SubmitField("filtrovat")
 
     def __init__(self, *args, ingredient_names=None):
         if ingredient_names is None:
@@ -21,4 +21,4 @@ class CookbookFilterForm(FlaskForm):
         self.set_ingredient_names(ingredient_names)
 
     def set_ingredient_names(self, ingredient_names):
-        self.ingredient_name.choices = [name for name in ingredient_names]
+        self.ingredient_name.choices = list(ingredient_names)

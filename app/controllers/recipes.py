@@ -1,16 +1,16 @@
-from flask import render_template as template
 from flask import request, redirect, url_for, flash, abort, jsonify
 from flask_login import login_required, current_user
 from flask_classful import route
 
 from app.auth import admin_required
+from app.helpers.general import list_without_duplicated
+from app.models import Recipe, Diet, User, Ingredient
+from app.forms import PhotoForm
+from app.helpers.base_view import BaseView
+from app.services import RecipeReactionManager, RecipeSharer
 
-from app.models import Recipe, Diet, User, Ingredient, RecipeHasIngredient
 
-from app.controllers.base_recipes import BaseRecipeView
-
-
-class RecipeView(BaseRecipeView):
+class RecipeView(BaseView):
     decorators = [login_required]
 
     @login_required
@@ -24,16 +24,12 @@ class RecipeView(BaseRecipeView):
         self.validate_edit(self.recipe)
 
     def before_update(self, id):
-        self.validate_update(self.recipe)
+        self.validate_edit(self.recipe)
 
     def index(self):
-        self.diets = current_user.active_diets
-
         return self.template()
 
     def new(self):
-        from app.helpers.general import list_without_duplicated
-
         active_diets = current_user.active_diets
         user_ingredients = Ingredient.load_all_by_author(current_user.username)
         shared_ingredients = Ingredient.load_all_shared(renamed=True)
@@ -42,6 +38,7 @@ class RecipeView(BaseRecipeView):
         self.ingredients = list_without_duplicated(ingredients)
 
         self.preset_ingredients = request.args.get("preset_ingredient_ids", [])
+        print(self.preset_ingredients)
         self.diets = active_diets
         self.is_trialrecipe = False
 
@@ -52,8 +49,6 @@ class RecipeView(BaseRecipeView):
         pass
 
     def show(self, id):
-        from app.forms import PhotoForm
-
         self.is_print = False
         self.photo_form = PhotoForm()
 
@@ -80,19 +75,16 @@ class RecipeView(BaseRecipeView):
         return redirect(url_for("DashboardView:index"))
 
     def print(self, id):
-        return template(
-            "recipes/show.html.j2",
-            recipe=self.recipe,
-            is_print=True,
-        )
+        return self.template("show", is_print=True)
 
     @route("/toggle_shared/<id>", methods=["POST"])
     def toggle_shared(self, id):
-        toggled = self.recipe.toggle_shared()
+        toggled = RecipeSharer(self.recipe).toggle_shared()
         if toggled is True:
             flash("Recept byl zveřejněn.", "success")
         else:
             flash("Recept byl skryt před veřejností.", "success")
+
         return redirect(url_for("RecipeView:show", id=self.recipe.id))
 
     @route("/make_all_recipes_public")
@@ -119,32 +111,29 @@ class RecipeView(BaseRecipeView):
 
     @route("/saveRecipeAJAX", methods=["POST"])
     def saveRecipeAJAX(self):
+        from app.services import RecipeCreator
+
         temp_ingredients = request.json["ingredients"]
         diet = Diet.load(request.json["dietID"])
+        name = request.json["name"]
 
-        ingredients = []
-        for temp_i in temp_ingredients:
-            rhi = RecipeHasIngredient()
-            rhi.ingredients_id = temp_i["id"]
-            rhi.amount = temp_i["amount"]
-            ingredients.append(rhi)
+        recipe = RecipeCreator.create(
+            name=name, diet=diet, ingredient_dict=temp_ingredients
+        )
 
-        recipe = Recipe(name=request.json["name"], diet=diet)
-
-        last_id = recipe.create_and_save(ingredients)
-        return url_for("RecipeView:show", id=last_id)
+        return url_for("RecipeView:show", id=recipe.id)
 
     @route("/toggleReactionAJAX", methods=["POST"])
     def toggle_reaction_AJAX(self):
         recipe = Recipe.load(request.json["recipe_id"])
-        recipe.toggle_reaction()
-        return jsonify(recipe.has_reaction)
+        RecipeReactionManager(recipe).toggle_reaction()
+
+        return jsonify(recipe.has_reaction_by_current_user)
 
     @route("/upload_photo/<id>", methods=["POST"])
     def upload_photo(self, id):
         from werkzeug.datastructures import CombinedMultiDict
-        from app.forms.files import PhotoForm
-
+        from app.forms import PhotoForm
         from app.models import RecipeImageFile
 
         form = PhotoForm(CombinedMultiDict((request.files, request.form)))

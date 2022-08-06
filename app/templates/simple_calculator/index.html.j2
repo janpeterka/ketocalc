@@ -8,8 +8,6 @@
     <!-- Bootstrap slider -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.2/css/bootstrap-slider.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.2/bootstrap-slider.min.js"></script>
-    
-    {{ stimulus("simple-calculator", "show-info") }}
 {% endblock %}
 
 {% block content %}
@@ -35,7 +33,7 @@
         <div>
             <table class="table">
                 <thead>
-                    <th>{{ texts.title }}</th>
+                    <th>název</th>
                     <th>{{ texts.energy_100 }}</th>
                     <th>{{ texts.protein_100 }}</th>
                     <th>{{ texts.fat_100 }}</th>
@@ -48,11 +46,11 @@
 
             <table class="table">
                 <tr>
-                    <th>{{ texts.energy_simple }}</th>
-                    <th>{{ texts.protein_simple }}</th>
-                    <th>{{ texts.fat_simple }}</th>
-                    <th>{{ texts.sugar_simple }}</th> 
-                    <th>{{ texts.amount_simple }}</th>
+                    <th>energie (kJ)</th>
+                    <th>bílkoviny (g)</th>
+                    <th>tuky (g)</th>
+                    <th>sacharidy (g)</th> 
+                    <th>množství (g)</th>
                     <th>{{ texts.ratio_full }}</th>
                 </tr>
                 <tr data-simple-calculator-target="totals">
@@ -78,7 +76,7 @@
                     </form>
                 {% else %}
                     <div class="text-center font-comfortaa-b text-uppercase">
-                        Pro možnost uložení je potřeba být {{ link_to("login", text="přihlášen") }}
+                        Pro možnost uložení je potřeba být {{ link_to("login", value="přihlášen") }}
                     </div>
                 {% endif %}
 

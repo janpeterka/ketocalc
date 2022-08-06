@@ -28,7 +28,7 @@
 
       if (this.selectTarget.value == false){return false;}
       else{
-        fetch("{{ url_for('BaseRecipeView:addIngredientWithAmount') }}",{
+        fetch("{{ url_for('RecipeCreatorView:addIngredientWithAmount') }}",{
           method: 'POST',
           body: JSON.stringify({'ingredient_id' : this.selectTarget.value}),
           headers: {'Content-Type': 'application/json,charset=UTF-8'}}

@@ -1,10 +1,6 @@
 {% extends "base.html.j2" %}
 {% block title %} ketokalkulačka | registrace {% endblock %}
 
-{% block script %}
-    {{ stimulus("password-visibility") }}
-{% endblock %}
-
 {% block content %}
 <form action="{{ url_for('RegisterView:post') }}" method="post" class="form-group form-control" accept-charset="UTF-8" data-turbo="false">
 {#                 <div class="mx-auto" style="width: 200px;">

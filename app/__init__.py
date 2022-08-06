@@ -37,7 +37,7 @@ def create_app(config_name="default"):
 
     application.config.from_object(configs[config_name])
 
-    print("DB INFO: using {}".format(application.config["INFO_USED_DB"]))
+    print(f'DB INFO: using {application.config["INFO_USED_DB"]}')
 
     # APPS
     mail.init_app(application)
@@ -79,5 +79,10 @@ def create_app(config_name="default"):
     from .auth import create_module as auth_create_module
 
     auth_create_module(application)
+
+    # COMPONENTS
+    from app.components import register_all_components
+
+    register_all_components(application)
 
     return application

@@ -1,7 +1,8 @@
 from app import db
+from app.models.base_mixin import BaseMixin
 
 
-class RecipeHasIngredient(db.Model):
+class RecipeHasIngredient(db.Model, BaseMixin):
     """Recipe-Ingredient connection class
 
     Extends:

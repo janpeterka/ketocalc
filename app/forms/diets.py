@@ -7,23 +7,21 @@ from app.forms.custom import ComaFloatField
 
 
 class DietForm(FlaskForm):
-    name = StringField(
-        "Název diety", [validators.InputRequired("Název musí být vyplněn")]
-    )
+    name = StringField("název", [validators.InputRequired("název musí být vyplněn")])
     calorie = ComaFloatField(
-        "Množství (kJ) kalorií / den",
-        [validators.InputRequired("Množství musí být vyplněno")],
+        "množství (kJ) kalorií / den",
+        [validators.InputRequired("množství musí být vyplněno")],
     )
     protein = ComaFloatField(
-        "Množství (g) bílkovin / den",
-        [validators.InputRequired("Množství musí být vyplněno")],
+        "množství (g) bílkovin / den",
+        [validators.InputRequired("množství musí být vyplněno")],
     )
     sugar = ComaFloatField(
-        "Množství (g) sacharidů / den",
-        [validators.InputRequired("Množství musí být vyplněno")],
+        "množství (g) sacharidů / den",
+        [validators.InputRequired("množství musí být vyplněno")],
     )
     fat = ComaFloatField(
-        "Množství (g) tuku / den",
-        [validators.InputRequired("Množství musí být vyplněno")],
+        "množství (g) tuku / den",
+        [validators.InputRequired("množství musí být vyplněno")],
     )
-    submit = SubmitField("Přidat dietu")
+    submit = SubmitField("přidat")

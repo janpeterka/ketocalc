@@ -11,9 +11,10 @@ from flask_login import current_user
 from app.models.item_mixin import ItemMixin
 
 from app.models import Ingredient
+from app.presenters import RecipePresenter
 
 
-class Recipe(db.Model, ItemMixin):
+class Recipe(db.Model, ItemMixin, RecipePresenter):
     __tablename__ = "recipes"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -58,60 +59,21 @@ class Recipe(db.Model, ItemMixin):
         else:
             AttributeError("Wrong ingredient type")
 
-        recipes = Recipe.query.filter(
+        return Recipe.query.filter(
             Recipe.ingredients.any(Ingredient.id == ingredient_id)
         ).all()
-        return recipes
 
     @staticmethod
     def load_by_ingredient_and_user(ingredient, user):
         recipes = Recipe.load_by_ingredient(ingredient)
-        private_recipes = [r for r in recipes if r.author == user]
-
-        return private_recipes
+        return [r for r in recipes if r.author == user]
 
     @staticmethod
     def public_recipes():
-        recipes = Recipe.query.filter(Recipe.public).all()
-        return recipes
-
-    def create_and_save(self, ingredients):
-        db.session.add(self)
-        db.session.flush()
-
-        for i in ingredients:
-            i.recipes_id = self.id
-            db.session.add(i)
-
-        db.session.commit()
-        return self.id
-
-    def toggle_shared(self):
-        self.is_shared = not self.is_shared
-        self.edit()
-
-        return self.is_shared
-
-    def toggle_reaction(self, user=None):
-        user = current_user if user is None else user
-
-        if self.has_reaction is True:
-            self.remove_reaction(user)
-        else:
-            self.add_reaction(user)
-
-    def add_reaction(self, user):
-        from app.models import UserHasRecipeReaction
-
-        UserHasRecipeReaction(recipe=self, user=user).save()
-
-    def remove_reaction(self, user):
-        from app.models import UserHasRecipeReaction
-
-        UserHasRecipeReaction.load_by_recipe_and_current_user(recipe=self).remove()
+        return Recipe.query.filter(Recipe.public).all()
 
     @property
-    def has_reaction(self):
+    def has_reaction_by_current_user(self):
         from app.models import UserHasRecipeReaction
 
         reactions = UserHasRecipeReaction.load_by_recipe_and_current_user(self)
@@ -159,10 +121,12 @@ class Recipe(db.Model, ItemMixin):
         metrics = ["calorie", "sugar", "fat", "protein"]
         for metric in metrics:
             total = getattr(self.totals, metric)
-            if getattr(self, "amount", None) is not None:
+            if getattr(self, "amount", None) is None:
+                value = total
+            elif self.totals.amount > 0:
                 value = (total / self.totals.amount) * self.amount
             else:
-                value = total
+                value = 0
             setattr(values, metric, value)
         return values
 

@@ -7,5 +7,5 @@ from app.data.texts import texts
 
 
 class PhotoForm(FlaskForm):
-    file = FileField("Fotka")
+    file = FileField("fotka")
     submit = SubmitField(texts.image.upload)

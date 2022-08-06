@@ -1,3 +1,6 @@
+from tests.helpers import test_with_authenticated_user, without_user
+
+
 def test_application(app, client):
     # app is correctly set
 
@@ -8,7 +11,8 @@ def test_application(app, client):
     assert app.config["TESTING"] is True
 
 
-def test_request(client):
+def test_request(app, db, client):
+    without_user(app)
     # getting page responses
     assert client.get("/login") == 200
     assert client.get("/register") == 200
@@ -18,9 +22,7 @@ def test_request(client):
 
 
 def test_requests_logged_in(app, db, client):
-    import helpers
-
-    helpers.test_with_authenticated_user(app)
+    test_with_authenticated_user(app)
 
     pages = [
         "/dashboard/",

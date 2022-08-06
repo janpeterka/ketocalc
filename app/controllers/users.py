@@ -36,16 +36,14 @@ class UserView(BaseView):
         del form.username
 
         if not form.validate_on_submit():
-            save_form_to_session(request.form)
-            return redirect(url_for("UserView:edit"))
+            return self.template("edit", form=form), 422
 
         self.user.first_name = form.first_name.data
         self.user.last_name = form.last_name.data
 
-        if self.user.edit() is not None:
-            flash("Uživatel byl upraven", "success")
-        else:
-            flash("Nepovedlo se změnit uživatele", "error")
+        self.user.edit()
+
+        flash("Uživatel byl upraven", "success")
 
         return redirect(url_for("UserView:show"))
 

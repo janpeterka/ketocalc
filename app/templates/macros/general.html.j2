@@ -1,22 +1,3 @@
-{% macro option(object, selected=False) %}
-
-	<option name='{{object.name}}' value='{{object.id}}' {% if selected %} selected {% endif %}>{{object.name}}</option>"
-
-{% endmacro %}
-
-
-{% macro options(list, selected_item=None) %}
-
-	{% for item in list %}
-	{% if item == selected_item %}
-		{{ option(item, selected=True) }}
-	{% else %}
-		{{ option(item) }}
-	{% endif %}
-	{% endfor %}
-
-{% endmacro %}
-
 {% macro link_or_name(object) %}
 
 	{% if not print %}

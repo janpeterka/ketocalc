@@ -1,4 +1,4 @@
-from app.models.users import User
+from app.models import User
 
 
 def create_user(username="test", password="testtest"):
@@ -24,3 +24,9 @@ def test_with_authenticated_user(app, username=None):
             assert False
         else:
             return user
+
+
+def without_user(app):
+    @app.login_manager.request_loader
+    def no_user(request):
+        return None

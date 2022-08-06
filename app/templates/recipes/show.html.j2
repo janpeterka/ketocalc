@@ -11,10 +11,6 @@
     {% endif %}
 {% endblock %}
 
-{% block script %}
-    {{ stimulus("show-recipe", "recipe-percentage") }}
-{% endblock %}
-
 {% block navbar %}
     {% if not is_print %}
         {{ super() }}
@@ -22,135 +18,135 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container">
-    <div class="row">
-        <div class="col-10" data-controller="show-recipe" data-show-recipe-diet-ratio-value="{{ recipe.diet.ratio }}" data-show-recipe-percentage-value="100">
-            <span {% if is_print %} class="d-print-table" {% endif %}>
-                <h2>
-                    {{ recipe.name }}
-                    {% if recipe.public and current_user != recipe.author %}
-                        <span class="font-italic font-weight-light">(vytvořil*a {{ recipe.author.first_name }} {{ recipe.author.last_name }})</span>
-                    {% elif recipe.public %}
-                        <span class="font-italic font-weight-light">(zveřejněno)</span>
-                    {% endif %}
-                </h2>
-                <h5>{{ recipe.diet.name }}</h5>
-                <span class="font-italic">{{ recipe.description if recipe.description }}</span>
-            </span>
 
-            {% if current_user.is_admin %}
-                <div class="admin-field">
-                    Autor: <a href="{{ url_for('UserView:show_by_id', id=recipe.author.id) }}">{{ recipe.author.username }}</a>
-                    Recipe views: {{ recipe.view_count }}
-                </div>
-            {% endif %}
-
-            <table id="ingredients" data-show-recipe-target="ingredientTable" class="table">
-                <tr>
-                    <th>{{ texts.title }}</th>
-                    <th>{{ texts.energy_simple }}</th>
-                    <th>{{ texts.protein_simple }}</th>
-                    <th>{{ texts.fat_simple }}</th>
-                    <th>{{ texts.sugar_simple }}</th>
-                    <th>{{ texts.amount_simple }}</th>
-                    <th></th>
-                </tr>
-
-                {% for ingredient in recipe.ingredients: %}
-                    <tr data-id="{{ ingredient.id }}"
-                        data-name="{{ ingredient.name }}"
-                        data-calorie="{{ ingredient.calorie }}"
-                        data-protein="{{ ingredient.protein }}"
-                        data-fat="{{ ingredient.fat }}"
-                        data-sugar="{{ ingredient.sugar }}"
-                        data-amount="{{ ingredient.amount }}">
-                        <td>{{ link_to(ingredient) }}</td>
-                        <td data-type="calorie"></td>
-                        <td data-type="protein"></td>
-                        <td data-type="fat"></td>
-                        <td data-type="sugar"></td>
-                        <td data-type="amount"></td>
-                        <td></td>
-                    </tr>
-                {% endfor %}
-
-                <tr class="totals" data-show-recipe-target="totals">
-                    <td>Celkem</td>
-                    <td data-field="calorie"></td>
-                    <td data-field="protein"></td>
-                    <td data-field="fat"></td>
-                    <td data-field="sugar"></td>
-                    <td data-field="amount"></td>
-                    <td data-field="ratio"></td>
-                </tr>
-            </table>
-
-            <div class="row" data-controller="recipe-percentage" data-recipe-percentage-target="percentage" data-recipe-percentage-percentage-value=100>
-                <div class="col-10">
-                <form class="form-inline" data-action="submit->recipe-percentage#set_percentage">
-                    {% from "macros/_percentage_button.html.j2" import percentage_button %}
-                    {% for percentage in [10, 12.5, 25, 50, 100] %}
-                        {{ percentage_button(percentage, controller="recipe-percentage", action="set_percentage") }}
-                    {% endfor %}
-                    <input class="form-control" data-recipe-percentage-target="percentageInput" style="width: 15%" type="number" step="0.1" />
-                    <input class="btn bg-color-blue" type="submit" value="spočítat vlastní">
-                </form>
-                </div>
-                <button type="button" disabled class="btn col-1">Zobrazeno <span data-recipe-percentage-target="showPercentage"></span>% diety</button>
-            </div>
-
-            {% if not is_print and recipe.can_current_user_edit %}
-            {% from "macros/_admin_field.html.j2" import admin_field_class with context %}
-
-            <div {{ admin_field_class(obj=recipe) }}>
-                <form action="{{ url_for('RecipeView:delete', id=recipe.id) }}" method="post" class="form-inline"  accept-charset="utf-8" onsubmit="return confirm('{{ texts.recipe_delete_confirm }}');">
-                    <a class="btn btn-warning" href="{{ url_for('RecipeView:edit', id=recipe.id) }}">{{ texts.edit }} {{ icon("edit") }}</a>
-                    <a class="btn btn-secondary" href="{{ url_for('RecipeView:print', id=recipe.id) }}" target="_blank" rel="noopener noreferrer">{{ texts.print }} {{ icon("print") }}</a>
-                    <button type="submit" class="btn btn-danger">{{ texts.recipe_delete }} {{ icon("delete") }}</button>
-                </form>
-                <form action="{{ url_for('RecipeView:toggle_shared', id=recipe.id) }}" method="post" accept-charset="utf-8">
-                    {% if recipe.public == True %}
-                        <button type="submit" class="btn btn-secondary">{{ texts.recipe_unshare }} {{ icon("unarchive") }}</button>
-                    {% else %}
-                        <button type="submit" class="btn btn-secondary">{{ texts.recipe_share }} {{ icon("archive") }}</button>
-                    {% endif %}
-                </form>
-            </div>
-            {% endif %}
-            
-            <div class="mt-2">
-                <a class="btn btn-info" href="{{ url_for('RecipeView:new', preset_ingredient_ids=recipe_ingredient_ids_list(recipe)) }}">
-                    {% if recipe.is_current_user_author %}
-                        Převést do jiné diety
-                    {% else %}
-                        Převést do mých receptů
-                    {% endif %}
-                </a>
-            </div>
-
-        </div>
-        
-        {% if not is_print %}
-        <div class="col-2">
-            {% from "macros/_render_image.html.j2" import render_image %}
-            {% for image in recipe.images %}
-                {{ render_image(image, style="width: 20rem; margin-bottom: 2rem", thumbnail=False) }}
-                {% if image.author == current_user or current_user.is_admin %}
-                    <form action="{{ url_for('FileView:delete', id=image.id) }}" method="post">
-                        <button type="submit" class="btn btn-danger">{{ texts.image.delete }} {{ icon("delete") }}</button>
-                    </form>
+<div class="row">
+    <div class="col-10" data-controller="show-recipe" data-show-recipe-diet-ratio-value="{{ recipe.diet.ratio }}" data-show-recipe-percentage-value="100">
+        <span {% if is_print %} class="d-print-table" {% endif %}>
+            <h2>
+                {{ recipe.name }}
+                {% if recipe.public and current_user != recipe.author %}
+                    <span class="font-italic font-weight-light">(vytvořil*a {{ recipe.author.first_name }} {{ recipe.author.last_name }})</span>
+                {% elif recipe.public %}
+                    <span class="font-italic font-weight-light">(zveřejněno)</span>
                 {% endif %}
-            {% endfor %}
-            {% if recipe.images|length == 0 and recipe.can_current_user_edit %}
-                <form {{ admin_field_class(obj=recipe) }} action="{{ url_for('RecipeView:upload_photo', id=recipe.id) }}" method="post" accept-charset="utf-8" enctype=multipart/form-data>
-                    {{ photo_form.file }}
-                    {{ photo_form.submit(class="btn btn-secondary") }}
-                </form>         
-            {% endif %}
-        </div>
+            </h2>
+            <h5>{{ recipe.diet.name }}</h5>
+            <span class="font-italic">{{ recipe.description if recipe.description }}</span>
+        </span>
+
+        {% if current_user.is_admin %}
+            <div class="admin-field">
+                Autor: <a href="{{ url_for('UserView:show_by_id', id=recipe.author.id) }}">{{ recipe.author.username }}</a>
+                Recipe views: {{ recipe.view_count }}
+            </div>
         {% endif %}
 
+        <table id="ingredients" data-show-recipe-target="ingredientTable" class="table">
+            <tr>
+                <th>název</th>
+                <th>energie (kJ)</th>
+                <th>bílkoviny (g)</th>
+                <th>tuky (g)</th>
+                <th>sacharidy (g)</th>
+                <th>množství (g)</th>
+                <th></th>
+            </tr>
+
+            {% for ingredient in recipe.ingredients: %}
+                <tr data-id="{{ ingredient.id }}"
+                    data-name="{{ ingredient.name }}"
+                    data-calorie="{{ ingredient.calorie }}"
+                    data-protein="{{ ingredient.protein }}"
+                    data-fat="{{ ingredient.fat }}"
+                    data-sugar="{{ ingredient.sugar }}"
+                    data-amount="{{ ingredient.amount }}">
+                    <td>{{ link_to(ingredient) }}</td>
+                    <td data-type="calorie"></td>
+                    <td data-type="protein"></td>
+                    <td data-type="fat"></td>
+                    <td data-type="sugar"></td>
+                    <td data-type="amount"></td>
+                    <td></td>
+                </tr>
+            {% endfor %}
+
+            <tr class="totals" data-show-recipe-target="totals">
+                <td>celkem</td>
+                <td data-field="calorie"></td>
+                <td data-field="protein"></td>
+                <td data-field="fat"></td>
+                <td data-field="sugar"></td>
+                <td data-field="amount"></td>
+                <td data-field="ratio"></td>
+            </tr>
+        </table>
+
+        <div class="row" data-controller="recipe-percentage" data-recipe-percentage-target="percentage" data-recipe-percentage-percentage-value=100>
+            <div class="col-10">
+            <form class="form-inline" data-action="submit->recipe-percentage#set_percentage">
+                {% from "macros/_percentage_button.html.j2" import percentage_button %}
+                {% for percentage in [10, 12.5, 25, 50, 100] %}
+                    {{ percentage_button(percentage, controller="recipe-percentage", action="set_percentage") }}
+                {% endfor %}
+                <input class="form-control" data-recipe-percentage-target="percentageInput" style="width: 15%" type="number" step="0.1" />
+                <input class="btn bg-color-blue" type="submit" value="spočítat vlastní">
+            </form>
+            </div>
+            <button type="button" disabled class="btn col-1">Zobrazeno <span data-recipe-percentage-target="showPercentage"></span>% diety</button>
+        </div>
+
+        {% if not is_print and recipe.can_current_user_edit %}
+        {% from "macros/_admin_field.html.j2" import admin_field_class with context %}
+
+        <div {{ admin_field_class(obj=recipe) }}>
+            <form action="{{ url_for('RecipeView:delete', id=recipe.id) }}" method="post" class="form-inline"  accept-charset="utf-8" onsubmit="return confirm('{{ texts.recipe_delete_confirm }}');">
+                <a class="btn btn-warning" href="{{ url_for('RecipeView:edit', id=recipe.id) }}">upravit {{ icon("edit") }}</a>
+                <a class="btn btn-secondary" href="{{ url_for('RecipeView:print', id=recipe.id) }}" target="_blank" rel="noopener noreferrer">tisk {{ icon("print") }}</a>
+                <button type="submit" class="btn btn-danger">smazat {{ icon("delete") }}</button>
+            </form>
+            <form action="{{ url_for('RecipeView:toggle_shared', id=recipe.id) }}" method="post" accept-charset="utf-8">
+                {% if recipe.public == True %}
+                    <button type="submit" class="btn btn-secondary">zneveřejnit {{ icon("unarchive") }}</button>
+                {% else %}
+                    <button type="submit" class="btn btn-secondary">zveřejnit {{ icon("archive") }}</button>
+                {% endif %}
+            </form>
+        </div>
+        {% endif %}
+        
+        <div class="mt-2">
+            <a class="btn btn-info" href="{{ url_for('RecipeView:new', preset_ingredient_ids=recipe.ingredient_ids_list) }}">
+                {% if recipe.is_current_user_author %}
+                    převést do jiné diety
+                {% else %}
+                    převést do mých receptů
+                {% endif %}
+            </a>
+        </div>
+
     </div>
+    
+    {% if not is_print %}
+    <div class="col-2">
+        {% from "macros/_render_image.html.j2" import render_image %}
+        {% for image in recipe.images %}
+            {{ render_image(image, style="width: 20rem; margin-bottom: 2rem", thumbnail=False) }}
+            {% if image.author == current_user or current_user.is_admin %}
+                <form action="{{ url_for('FileView:delete', id=image.id) }}" method="post">
+                    <button type="submit" class="btn btn-danger">smazat {{ icon("delete") }}</button>
+                </form>
+            {% endif %}
+        {% endfor %}
+        {% if recipe.images|length == 0 and recipe.can_current_user_edit %}
+            <form {{ admin_field_class(obj=recipe) }} action="{{ url_for('RecipeView:upload_photo', id=recipe.id) }}" method="post" accept-charset="utf-8" enctype=multipart/form-data>
+                {{ photo_form.file }}
+                {{ photo_form.submit(class="btn btn-secondary") }}
+            </form>         
+        {% endif %}
     </div>
+    {% endif %}
+
+</div>
+
 {% endblock %}
 

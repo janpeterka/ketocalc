@@ -1,9 +1,11 @@
 import os
 
 
+
+
 class Config(object):
     UPLOAD_FOLDER = "/temporary"
-    ALLOWED_EXTENSIONS = set(["png", "jpg", "jpeg", "gif"])
+    ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
 
     SECRET_KEY = os.environ.get("SECRET_KEY")
 
@@ -39,6 +41,7 @@ class Config(object):
     INFO_USED_DB = "production db"
 
 
+
 class LocalProdConfig(Config):
     INFO_USED_DB = "production db"
     TEMPLATES_AUTO_RELOAD = True
@@ -59,6 +62,8 @@ class DevConfig(Config):
     BUCKET = "ketocalcdev"
 
     INFO_USED_DB = "local db"
+
+    DEV_PASSWORD = os.getenv("DEV_PASSWORD")
 
     # SQLALCHEMY_ECHO = True
 

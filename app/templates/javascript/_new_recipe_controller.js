@@ -38,7 +38,7 @@ Stimulus.register("new-recipe", class extends Controller {
       }
 
       add_ingredient_by_id(ingredient_id){
-          fetch("{{ url_for('BaseRecipeView:addIngredientAJAX') }}",{
+          fetch("{{ url_for('RecipeCreatorView:addIngredientAJAX') }}",{
             method: 'POST',
             body: JSON.stringify({'ingredient_id' : ingredient_id}),
             headers: {'Content-Type': 'application/json,charset=UTF-8'}}
@@ -342,7 +342,7 @@ Stimulus.register("new-recipe", class extends Controller {
       }
 
       _calculate_core(ingredients, dietID){
-        fetch("{{ url_for('BaseRecipeView:calcRecipeAJAX') }}", {
+        fetch("{{ url_for('RecipeCreatorView:calcRecipeAJAX') }}", {
           method: 'POST',
           body: JSON.stringify({
               'ingredients' : ingredients,

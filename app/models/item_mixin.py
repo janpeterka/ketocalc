@@ -23,22 +23,24 @@ class ItemMixin(BaseMixin):
 
     @property
     def view_count(self) -> int:
-        log_count = RequestLog.query.filter(
+        return RequestLog.query.filter(
             and_(
                 RequestLog.item_id == self.id,
                 RequestLog.item_type == self.__class__.__name__.lower(),
                 RequestLog.user_id == getattr(current_user, "id", None),
             )
         ).count()
-        return log_count
 
     # CONTEXT PROCESSOR UTILITIES
-    @property
-    def link_to(self):
+    def link_to(self, **kwargs):
         from flask import url_for, Markup, escape
 
         self_view_name = f"{type(self).__name__.capitalize()}View:show"
 
+        text = kwargs.get("text")
+        if not text:
+            text = escape(self.name)
+
         return Markup(
-            f"<a data-turbo='false' href='{url_for(self_view_name, id=self.id)}'> {escape(self.name)} </a>"
+            f"<a data-turbo=\"false\" href='{url_for(self_view_name, id=self.id)}'> {text} </a>"
         )

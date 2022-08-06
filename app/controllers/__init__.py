@@ -1,5 +1,4 @@
 from .admin import AdminView
-from .base_recipes import BaseRecipeView
 from .cookbook import CookbookView
 from .daily_plans import DailyPlanView
 from .daily_recipes import DailyRecipeView
@@ -13,6 +12,7 @@ from .login import LoginView
 from .mails import MailView
 from .password_recovery import PasswordRecoveryView
 from .recipes import RecipeView
+from .recipe_creator import RecipeCreatorView
 from .register import RegisterView
 from .simple_calculator import SimpleCalculatorView
 from .support import SupportView
@@ -21,7 +21,6 @@ from .users import UserView
 
 __all__ = [
     "AdminView",
-    "BaseRecipeView",
     "CookbookView",
     "DailyPlanView",
     "DailyRecipeView",
@@ -35,6 +34,7 @@ __all__ = [
     "MailView",
     "PasswordRecoveryView",
     "RecipeView",
+    "RecipeCreatorView",
     "RegisterView",
     "SimpleCalculatorView",
     "SupportView",
@@ -45,7 +45,6 @@ __all__ = [
 
 def register_all_controllers(application):
     AdminView.register(application)
-    BaseRecipeView.register(application)
     CookbookView.register(application)
     DailyPlanView.register(application)
     DailyRecipeView.register(application)
@@ -59,6 +58,7 @@ def register_all_controllers(application):
     MailView.register(application)
     PasswordRecoveryView.register(application)
     RecipeView.register(application)
+    RecipeCreatorView.register(application)
     RegisterView.register(application)
     SimpleCalculatorView.register(application)
     SupportView.register(application)

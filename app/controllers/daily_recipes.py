@@ -5,6 +5,7 @@ from flask_login import login_required
 from app.helpers.base_view import BaseView
 
 from app.models import DailyPlan, Recipe, DailyPlanHasRecipes
+from app.services import DailyPlanManager
 
 
 class DailyRecipeView(BaseView):
@@ -31,21 +32,21 @@ class DailyRecipeView(BaseView):
 
         daily_plan = DailyPlan.load_by_date(date)
 
-        daily_plan.add_recipe(self.recipe, amount)
+        DailyPlanManager(daily_plan).add_recipe(self.recipe, amount)
 
         return redirect(url_for("DailyPlanView:show", date=date))
 
     def remove_recipe(self, id, date):
-        self.daily_recipe.daily_plan.remove_recipe_by_id(id)
+        DailyPlanManager(self.daily_recipe.daily_plan).remove_recipe_by_id(id)
 
         return redirect(url_for("DailyPlanView:show", date=date))
 
     def sort_up(self, id, date):
-        self.daily_plan.change_order(id, order_type="up")
+        DailyPlanManager(self.daily_plan).change_order(id, order_type="up")
 
         return redirect(url_for("DailyPlanView:show", date=date))
 
     def sort_down(self, id, date):
-        self.daily_plan.change_order(id, order_type="down")
+        DailyPlanManager(self.daily_plan).change_order(id, order_type="down")
 
         return redirect(url_for("DailyPlanView:show", date=date))

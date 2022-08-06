@@ -1,14 +1,12 @@
 from flask import redirect, url_for
 from flask import render_template as template
-
 from flask_login import current_user
 
-from app.models.ingredients import Ingredient
-from app.models.users import User
-from app.controllers.base_recipes import BaseRecipeView
+from app.helpers.base_view import BaseView
+from app.models import Ingredient, User
 
 
-class TrialRecipeView(BaseRecipeView):
+class TrialRecipeView(BaseView):
     def before_index(self):
         if current_user.is_authenticated:
             return redirect(url_for("IndexView:index"))
@@ -28,20 +26,19 @@ class TrialRecipeView(BaseRecipeView):
     def _get_preset_trial_ingredients(self):
         preset_ingredients = []
 
-        ingredient = Ingredient.load_shared_by_name("Ananas")
-        if ingredient:
+        if ingredient := Ingredient.load_shared_by_name("Ananas"):
             preset_ingredients.append(ingredient)
         else:
             preset_ingredients.append(Ingredient.load_random_by_nutrient("sugar"))
 
-        ingredient = Ingredient.load_shared_by_name("Avokádo")
-        if ingredient:
+        if ingredient := Ingredient.load_shared_by_name("Avokádo"):
             preset_ingredients.append(ingredient)
         else:
             preset_ingredients.append(Ingredient.load_random_by_nutrient("fat"))
 
-        ingredient = Ingredient.load_shared_by_name("Maso - krůtí, prsa bez kosti")
-        if ingredient:
+        if ingredient := Ingredient.load_shared_by_name(
+            "Maso - krůtí, prsa bez kosti"
+        ):
             preset_ingredients.append(ingredient)
         else:
             preset_ingredients.append(Ingredient.load_random_by_nutrient("protein"))

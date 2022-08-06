@@ -1,5 +1,3 @@
-{% from "macros/general.html.j2" import option with context %}
-
 <tr data-id="{{ ingredient.id }}" data-name="{{ ingredient.name }}" {% if ingredient.can_current_user_copy %}data-unusable="true"{% endif %}>
   <td>{{ link_to(ingredient, text=ingredient.name) }}</td>
   <td>{{ ingredient.calorie }}</td>
