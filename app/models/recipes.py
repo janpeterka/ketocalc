@@ -58,22 +58,18 @@ class Recipe(db.Model, ItemMixin):
         else:
             AttributeError("Wrong ingredient type")
 
-        recipes = Recipe.query.filter(
+        return Recipe.query.filter(
             Recipe.ingredients.any(Ingredient.id == ingredient_id)
         ).all()
-        return recipes
 
     @staticmethod
     def load_by_ingredient_and_user(ingredient, user):
         recipes = Recipe.load_by_ingredient(ingredient)
-        private_recipes = [r for r in recipes if r.author == user]
-
-        return private_recipes
+        return [r for r in recipes if r.author == user]
 
     @staticmethod
     def public_recipes():
-        recipes = Recipe.query.filter(Recipe.public).all()
-        return recipes
+        return Recipe.query.filter(Recipe.public).all()
 
     @property
     def has_reaction_by_current_user(self):
@@ -124,13 +120,12 @@ class Recipe(db.Model, ItemMixin):
         metrics = ["calorie", "sugar", "fat", "protein"]
         for metric in metrics:
             total = getattr(self.totals, metric)
-            if getattr(self, "amount", None) is not None:
-                if self.totals.amount > 0:
-                    value = (total / self.totals.amount) * self.amount
-                else:
-                    value = 0
-            else:
+            if getattr(self, "amount", None) is None:
                 value = total
+            elif self.totals.amount > 0:
+                value = (total / self.totals.amount) * self.amount
+            else:
+                value = 0
             setattr(values, metric, value)
         return values
 

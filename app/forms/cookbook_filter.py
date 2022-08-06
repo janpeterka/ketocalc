@@ -21,4 +21,4 @@ class CookbookFilterForm(FlaskForm):
         self.set_ingredient_names(ingredient_names)
 
     def set_ingredient_names(self, ingredient_names):
-        self.ingredient_name.choices = [name for name in ingredient_names]
+        self.ingredient_name.choices = list(ingredient_names)

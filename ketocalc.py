@@ -123,7 +123,7 @@ def log_request(exception=None):
 def reset_passwords():
     from app.models import User
 
-    if not application.config["APP_STATE"] == "development":
+    if application.config["APP_STATE"] != "development":
         print("You cannot do this!")
         return
 
