@@ -24,7 +24,7 @@ class RecipeView(BaseRecipeView):
         self.validate_edit(self.recipe)
 
     def before_update(self, id):
-        self.validate_update(self.recipe)
+        self.validate_edit(self.recipe)
 
     def index(self):
         self.diets = current_user.active_diets

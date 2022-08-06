@@ -19,7 +19,7 @@
         </div>
 
         <div>
-            <a href="{{ url_for('UserView:edit') }}" class="btn btn-secondary">{{ texts.edit }} {{ icon("edit") }}</a>
+            <a href="{{ url_for('UserView:edit') }}" class="btn btn-secondary">upravit {{ icon("edit") }}</a>
         </div>
 
         {% if current_user.is_admin %}
