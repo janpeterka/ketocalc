@@ -9,25 +9,15 @@ def _link_to_str(text, value, **kwargs):
 
 
 def link_to(obj_or_str, **kwargs):
-    from flask import url_for
-
     if type(obj_or_str) == str:
-        text = kwargs.get("text")
         if obj_or_str == "login":
-            if text is None:
-                text = "přihlaste se"
-            return (
-                f"<a href='{url_for('LoginView:show')}' data-turbo=\"false\">{text}</a>"
-            )
+            obj_or_str = "LoginView:show"
         elif obj_or_str == "register":
-            if text is None:
-                text = "zaregistrujte se"
-            return f"<a href='{url_for('RegisterView:show')}' data-turbo=\"false\">{text}</a>"
-        else:
-            raise NotImplementedError("This string has no associated link_to")
+            obj_or_str = "RegisterView:show"
 
     if type(obj_or_str) == str:
         return Markup(_link_to_str(obj_or_str, **kwargs))
+
     try:
         return obj_or_str.link_to(**kwargs)
     except Exception:
