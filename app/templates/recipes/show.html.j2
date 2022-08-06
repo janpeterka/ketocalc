@@ -115,7 +115,7 @@
         {% endif %}
         
         <div class="mt-2">
-            <a class="btn btn-info" href="{{ url_for('RecipeView:new', preset_ingredient_ids=recipe_ingredient_ids_list(recipe)) }}">
+            <a class="btn btn-info" href="{{ url_for('RecipeView:new', preset_ingredient_ids=recipe.ingredient_ids_list) }}">
                 {% if recipe.is_current_user_author %}
                     převést do jiné diety
                 {% else %}

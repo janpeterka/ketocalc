@@ -30,14 +30,6 @@ def inject_globals():
     return dict(texts=template_data.texts)
 
 
-@application.context_processor
-def utility_processor():
-    def recipe_ingredient_ids_list(recipe):
-        return str([i.id for i in recipe.ingredients])
-
-    return dict(recipe_ingredient_ids_list=recipe_ingredient_ids_list)
-
-
 @application.before_request
 def session_management():
     current_user.logged_from_admin = session.get("logged_from_admin")
