@@ -1,10 +1,6 @@
 {% extends "base.html.j2" %}
 {% block title %} {{ user.full_name }} {% endblock %}
 
-{% block script %}
-    {{ stimulus("password-visibility") }}
-{% endblock %}
-
 {% block content %}
     <div class="container">
         <div class="col-12">

@@ -1,10 +1,6 @@
 {% extends "base.html.j2" %}
 {% block title %} ketokalkulačka | přihlásit se {% endblock %}
 
-{% block script %}
-    {{ stimulus("password-visibility") }}
-{% endblock %}
-
 {% block content %}
 <div class="col-12" data-turbo="false">
 	<form action="{{ url_for('LoginView:post') }}" method="post" class="form-group form-control" >

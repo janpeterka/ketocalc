@@ -1,10 +1,6 @@
 {% extends "base.html.j2" %}
 {% block title %} denní přehled {% endblock %}
 
-{% block script %}
-    {{ stimulus("daily-plan", "load-recipes-for-diet") }}
-{% endblock %}
-
 {% block content %}
 <div data-controller="daily-plan">
     {% include "daily_plans/_date_navigation.html.j2" %}
@@ -13,12 +9,12 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>{{ texts.title }}</th>
-                    <th>{{ texts.energy_simple }}</th>
-                    <th>{{ texts.protein_simple }}</th>
-                    <th>{{ texts.fat_simple }}</th>
-                    <th>{{ texts.sugar_simple }}</th>
-                    <th>{{ texts.amount_simple }}</th>
+                    <th>název</th>
+                    <th>energie (kJ)</th>
+                    <th>bílkoviny (g)</th>
+                    <th>tuky (g)</th>
+                    <th>sacharidy (g)</th>
+                    <th>množství (g)</th>
                     <th></th>
                     <th></th>
                 </tr>
@@ -47,12 +43,12 @@
             
             <tr>
                 <th></th>
-                <th>{{ texts.energy_simple }}</th>
-                <th>{{ texts.protein_simple }}</th>
-                <th>{{ texts.fat_simple }}</th>
-                <th>{{ texts.sugar_simple }}</th> 
-                <th>{{ texts.amount_simple }}</th>
-                <th data-toggle="tooltip" title="tuky: bílkoviny + cukry">{{ texts.ratio }}</th>
+                <th>energie (kJ)</th>
+                <th>bílkoviny (g)</th>
+                <th>tuky (g)</th>
+                <th>sacharidy (g)</th> 
+                <th>množství (g)</th>
+                <th data-toggle="tooltip" title="tuky: bílkoviny + cukry">poměr</th>
             </tr>
             <tr data-daily-plan-target="totals">
                 <th>Celkem:</th>

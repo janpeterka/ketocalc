@@ -15,30 +15,15 @@ window.Stimulus = Application.start()
 {% endif %}
 
 
-{% for controller in varargs %}
-	{% if controller == "daily-plan" %}
-		{% include 'javascript/_daily_plan_controller.js' %}
-	{% elif controller == "load-recipes-for-diet" %}		
-		{% include 'javascript/_load_recipes_for_diet_controller.js' %}
-	{% elif controller == "password-visibility" %}		
-		{% include 'javascript/_password_visibility_controller.js' %}
-	{% elif controller == "new-recipe" %}		
-		{% include 'javascript/_new_recipe_controller.js' %}
-	{% elif controller == "recipe-percentage" %}		
-		{% include 'javascript/_recipe_percentage_controller.js' %}
-	{% elif controller == "recipe-reactions" %}		
-		{% include 'javascript/_recipe_reactions_controller.js' %}
-	{% elif controller == "show-info" %}	
-		{% include 'javascript/_show_info_controller.js' %}
-	{% elif controller == "show-recipe" %}
-		{% include 'javascript/_show_recipe_controller.js' %}
-	{% elif controller == "simple-calculator" %}
-		{% include 'javascript/_simple_calculator_controller.js' %}
-	{% else %}
-		console.log("Tento Stimulus controller neexistuje:")
-		console.log(controller)
-	{% endif %}
-{% endfor %}
+{% include 'javascript/_daily_plan_controller.js' %}
+{% include 'javascript/_load_recipes_for_diet_controller.js' %}
+{% include 'javascript/_password_visibility_controller.js' %}
+{% include 'javascript/_new_recipe_controller.js' %}
+{% include 'javascript/_recipe_percentage_controller.js' %}
+{% include 'javascript/_recipe_reactions_controller.js' %}
+{% include 'javascript/_show_info_controller.js' %}
+{% include 'javascript/_show_recipe_controller.js' %}
+{% include 'javascript/_simple_calculator_controller.js' %}
 
 </script>
 

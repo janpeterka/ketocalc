@@ -66,8 +66,9 @@
 
     {% block style %}{% endblock %}
     {% block script %}{% endblock %}
+    {{ stimulus() }}
 
-    <title>{% block title %}{% endblock %}</title>
+    <title>keto | {% block title %}{% endblock %}</title>
 {% endblock head %}
 </head>
 
@@ -100,9 +101,12 @@
         {% include 'admin/_from_admin.html.j2'%}        
     {% endif %}
 
+
+    {% block content_whole %}
     <div id="content" class="container mb-5">
         {% block content %}{% endblock %}
     </div>
+    {% endblock %}
     
     <div class="footer">
         {% block footer %}

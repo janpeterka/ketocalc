@@ -3,12 +3,12 @@
     <input type="text" data-new-recipe-target="recipeName" required class="form-control"/>
     <table class="table" data-new-recipe-target="recipeIngredientTable">
         <tr>
-            <th>{{ texts.title }}</th>
-            <th>{{ texts.energy_simple }}</th>
-            <th>{{ texts.protein_simple }}</th>
-            <th>{{ texts.fat_simple }}</th>
-            <th>{{ texts.sugar_simple }}</th>
-            <th>{{ texts.amount_simple }}</th>
+            <th>název</th>
+            <th>energie (kJ)</th>
+            <th>bílkoviny (g)</th>
+            <th>tuky (g)</th>
+            <th>sacharidy (g)</th>
+            <th>množství (g)</th>
         </tr>
 
         {% for ingredient in ingredients %}
