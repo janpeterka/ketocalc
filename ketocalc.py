@@ -25,6 +25,15 @@ application = create_app(config_name=env)
 cli.register(application)
 
 
+@application.before_request
+def sentry_add_user():
+    from sentry_sdk import set_user
+    from flask_security import current_user
+
+    if current_user.is_authenticated:
+        set_user({"id": current_user.id, "username": current_user.full_name})
+
+
 @application.context_processor
 def inject_globals():
     return dict(texts=template_data.texts)
